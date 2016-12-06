@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pqr &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.pqr &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -51,19 +53,19 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains classes for reading and writing PQR files</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">PDBWarning</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.pdb</span> <span class="kn">import</span> <span class="n">_standardize_resname</span><span class="p">,</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">_is_hetatm</span>
-<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">closing</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">PDBWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.pdb</span> <span class="k">import</span> <span class="n">_standardize_resname</span><span class="p">,</span> <span class="n">PDBFile</span><span class="p">,</span> <span class="n">_is_hetatm</span>
+<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="k">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
@@ -101,15 +103,15 @@
                     <span class="k">continue</span>
                 <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ORIGX&#39;</span><span class="p">,</span> <span class="s1">&#39;SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;MTRIX&#39;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;123&#39;</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">elif</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ATOM&#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">):</span>
                     <span class="c1"># Format is:</span>
                     <span class="c1"># rec atnum atname resname [chain] resnum x y z chg radius</span>
                     <span class="c1"># Where the chain ID is optional. rec must be ATOM or HETATM</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">elif</span> <span class="n">PDBFile</span><span class="o">.</span><span class="n">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                        <span class="k">return</span> <span class="bp">False</span> <span class="c1"># It is a PDB file</span>
+                        <span class="k">return</span> <span class="kc">False</span> <span class="c1"># It is a PDB file</span>
 
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">:</span>
                         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
@@ -119,10 +121,10 @@
                             <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                             <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="n">offset</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="o">+</span><span class="n">offset</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
                         <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
@@ -130,16 +132,16 @@
                         <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
                         <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">9</span><span class="o">+</span><span class="n">offset</span><span class="p">])</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">return</span> <span class="bp">True</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PQRFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="PQRFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a PQR file and return a populated `Structure` class</span>
 
 <span class="sd">        Parameters</span>
@@ -163,10 +165,10 @@
 <span class="sd">            default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
 
         <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
@@ -274,8 +276,8 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PQRFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">standard_resnames</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PQRFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pqr.html#parmed.formats.PQRFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">standard_resnames</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a PDB file from a Structure instance</span>
 
 <span class="sd">        Parameters</span>
@@ -301,19 +303,19 @@
 <span class="sd">            If True, common aliases for various amino and nucleic acid residues</span>
 <span class="sd">            will be converted into the PDB-standard values. Default is False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">atomrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ATOM  </span><span class="si">%5d</span><span class="s1"> </span><span class="si">%-3s</span><span class="s1">  </span><span class="si">%-3s</span><span class="s1"> </span><span class="si">%1s</span><span class="s1"> </span><span class="si">%3d</span><span class="s1">    </span><span class="si">%7.3f</span><span class="s1"> </span><span class="si">%7.3f</span><span class="s1"> </span><span class="si">%7.3f</span><span class="s1"> </span><span class="si">%8.4f</span><span class="s1"> &#39;</span>
                    <span class="s1">&#39;</span><span class="si">%8.4f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">hetatomrec</span> <span class="o">=</span> <span class="n">atomrec</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CRYST1 </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%8.3f</span><span class="s1"> </span><span class="si">%6.2f</span><span class="s1"> </span><span class="si">%6.2f</span><span class="s1"> </span><span class="si">%6.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -377,14 +379,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -400,13 +399,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

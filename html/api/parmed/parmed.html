@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -157,6 +159,9 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="parmed.formats.registry.html">parmed.formats.registry module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.formats.sdf.html">parmed.formats.sdf module</a><ul class="simple">
 </ul>
 </li>
 </ul>
@@ -405,6 +410,7 @@
 <li class="toctree-l1"><a class="reference internal" href="parmed.structure.html">parmed.structure module</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.symmetry.html">parmed.symmetry module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.topologyobjects.html">parmed.topologyobjects module</a><ul class="simple">
 </ul>
 </li>
@@ -528,6 +534,9 @@ terms</p>
 <tr class="row-odd"><td>coordinates</td>
 <td>(np.ndarray of shape (nframes, natom, 3)) If no coordinates are set, this is set to None. The first frame will match the coordinates present on the atoms.</td>
 </tr>
+<tr class="row-even"><td>symmetry</td>
+<td>(<code class="xref py py-class docutils literal"><span class="pre">Symmetry</span></code>) if no symmetry is set, this is set to None.</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -543,7 +552,7 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.add_atom_to_residue" title="parmed.Structure.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
 <td>Adds a new atom to the Structure at the end if the given residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.assign_bonds" title="parmed.Structure.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.assign_bonds" title="parmed.Structure.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.copy" title="parmed.Structure.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
@@ -639,13 +648,16 @@ terms</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.update_dihedral_exclusions" title="parmed.Structure.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.write_cif" title="parmed.Structure.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.visualize" title="parmed.Structure.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.write_cif" title="parmed.Structure.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.write_pdb" title="parmed.Structure.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.write_pdb" title="parmed.Structure.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.Structure.write_psf" title="parmed.Structure.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.Structure.write_psf" title="parmed.Structure.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -1724,6 +1736,27 @@ Structure, but returns a <em>view</em> rather than a copy</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.Structure.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/structure.html#Structure.visualize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.Structure.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.Structure.write_cif">
 <code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.Structure.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
@@ -1787,6 +1820,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1859,6 +1897,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1890,7 +1933,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2345,37 +2388,43 @@ applies both to local and remote files. The following names are supported:</p>
 <li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
+<p>SDF file is loaded via <cite>rdkit</cite> package.</p>
 <p class="rubric">Examples</p>
 <p>Load a Mol2 file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
 <span class="go">&lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
 </pre></div>
 </div>
 <p>Load a Mol2 file as a Structure</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">&lt;Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load an Amber topology file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s1">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s1">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
 <span class="go">&lt;AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a CHARMM PSF file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
 <span class="go">&lt;CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a PDB and CIF file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a Gromacs topology file &#8211; only works with Gromacs installed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
 <span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load a SDF file &#8211; only works with rdkit installed</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;mol.sdf&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&lt;Structure 34 atoms; 1 residues; 66 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -2444,12 +2493,17 @@ being parsed simply for its coordinates. Default is False.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
 <p><strong>structure#</strong> : <a class="reference internal" href="#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The Structure object initialized with all of the information from
 the PDBx/mmCIF file.  No bonds or other topological features are
 added by default. If multiple structures are defined in the CIF
 file, multiple Structure instances will be returned as a tuple.</p>
 </div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if the file severely violates the PDB format specification.</strong></p>
+<p><strong>If this occurs, check the formatting on each line and make sure it</strong></p>
+<p class="last"><strong>matches the others.</strong></p>
 </td>
 </tr>
 </tbody>
@@ -2526,6 +2580,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="function">
@@ -2592,6 +2651,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="function">
@@ -2631,8 +2695,8 @@ instance</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="k">import</span> <span class="n">Chem</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;Cc1ccccc1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_rdkit</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
 </pre></div>
@@ -2763,7 +2827,7 @@ somewhat-stripped version you would get by using
 <p>An Angle can contain bonds or atoms. A bond is contained if it exists
 between atoms 1 and 2 or atoms 2 and 3.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle</span> <span class="o">=</span> <span class="n">Angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">angle</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">angle</span>
 <span class="go">True</span>
@@ -2823,7 +2887,7 @@ removing each atom form each others&#8217; angle partner lists</p>
 <p class="rubric">Notes</p>
 <p>Two <cite>AngleType`s are equal if their `k</cite> and <cite>theteq</cite> attributes are equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">at1</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">at1</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">at2</span> <span class="o">=</span> <span class="n">AngleType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">at1</span> <span class="ow">is</span> <span class="n">at2</span>
 <span class="go">False</span>
@@ -2834,7 +2898,7 @@ removing each atom form each others&#8217; angle partner lists</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">angle_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">angle_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AngleType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">angle_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AngleType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">angle_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -2983,7 +3047,7 @@ sublists of atoms. The == operator is not defined, so Atom equality should
 be done using the <cite>is</cite> operator. This allows Atom instances to be hashable
 (and so used as <cite>dict</cite> keys and put in <a href="#id5"><span class="problematic" id="id6">`</span></a>set`s)</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.01</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.01</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;OC&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="mf">12.01</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="o">.</span><span class="n">bond_to</span><span class="p">(</span><span class="n">a2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="ow">in</span> <span class="n">a2</span><span class="o">.</span><span class="n">bond_partners</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">a1</span><span class="o">.</span><span class="n">bond_partners</span>
@@ -2993,7 +3057,7 @@ be done using the <cite>is</cite> operator. This allows Atom instances to be has
 </pre></div>
 </div>
 <p>This object also supports automatic indexing when it is part of a container</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">(</span><span class="nb">list</span><span class="o">=</span><span class="n">atom_list</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">(</span><span class="nb">list</span><span class="o">=</span><span class="n">atom_list</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;OC&#39;</span><span class="p">,</span> <span class="n">charge</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">atom_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -3349,7 +3413,7 @@ it belongs to.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.append" title="parmed.AtomList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.append" title="parmed.AtomList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.assign_nbidx_from_types" title="parmed.AtomList.assign_nbidx_from_types"><code class="xref py py-obj docutils literal"><span class="pre">assign_nbidx_from_types</span></code></a>()</td>
@@ -3367,7 +3431,7 @@ it belongs to.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.count" title="parmed.AtomList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.extend" title="parmed.AtomList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.extend" title="parmed.AtomList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.find_original_index" title="parmed.AtomList.find_original_index"><code class="xref py py-obj docutils literal"><span class="pre">find_original_index</span></code></a>(idx)</td>
@@ -3379,16 +3443,16 @@ it belongs to.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.index_members" title="parmed.AtomList.index_members"><code class="xref py py-obj docutils literal"><span class="pre">index_members</span></code></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.insert" title="parmed.AtomList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.insert" title="parmed.AtomList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.pop" title="parmed.AtomList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.pop" title="parmed.AtomList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.prune_unused" title="parmed.AtomList.prune_unused"><code class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></code></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.remove" title="parmed.AtomList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.AtomList.remove" title="parmed.AtomList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.AtomList.reverse" title="parmed.AtomList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
@@ -3544,7 +3608,7 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 
 <dl class="class">
 <dt id="parmed.Bond">
-<em class="property">class </em><code class="descclassname">parmed.</code><code class="descname">Bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.Bond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.</code><code class="descname">Bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em>, <em>order=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.Bond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A covalent bond connecting two atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3559,9 +3623,22 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 <blockquote>
 <div><p>The other atom involved in the bond</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="#parmed.BondType" title="parmed.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="#parmed.BondType" title="parmed.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a> or None, optional</p>
+<blockquote>
+<div><p>The bond type that defines the parameters for this bond. Default is None</p>
+</div></blockquote>
+<p><strong>order</strong> : float, optional</p>
 <blockquote class="last">
-<div><p>The bond type that defines the parameters for this bond</p>
+<div><dl class="docutils">
+<dt>The bond order of this bond. Bonds are classified as follows:</dt>
+<dd><p class="first last">1.0 &#8211; single bond
+2.0 &#8211; double bond
+3.0 &#8211; triple bond
+1.5 &#8211; aromatic bond
+1.25 &#8211; amide bond</p>
+</dd>
+</dl>
+<p>Default is 1.0</p>
 </div></blockquote>
 </td>
 </tr>
@@ -3574,12 +3651,24 @@ This bond instance is <cite>append`ed to the `bonds</cite> list for both <cite>a
 <cite>atom2</cite> and is automatically removed from those lists upon garbage
 collection</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bond</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="ow">in</span> <span class="n">bond</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">bond</span>
 <span class="go">True</span>
 </pre></div>
 </div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.Bond.order" title="parmed.Bond.order"><code class="xref py py-obj docutils literal"><span class="pre">order</span></code></a></td>
+<td>Bond order.</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -3598,6 +3687,12 @@ collection</p>
 <dd><p>Deletes this bond from the atoms that make it up. This method removes
 this bond from the <cite>bonds</cite> list for both atom1 and atom2 as well as
 removing atom1 from atom2.bond_partners and vice versa.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.Bond.order">
+<code class="descname">order</code><a class="headerlink" href="#parmed.Bond.order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bond order. See description in <a class="reference internal" href="#parmed.Bond" title="parmed.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> argument list</p>
 </dd></dl>
 
 </dd></dl>
@@ -3630,7 +3725,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 <p class="rubric">Notes</p>
 <p>Two <cite>BondType`s are equal if their `k</cite> and <cite>req</cite> attributes are equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bt1</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bt1</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bt2</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bt1</span> <span class="ow">is</span> <span class="n">bt2</span>
 <span class="go">False</span>
@@ -3641,7 +3736,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bond_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bond_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bond_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BondType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">bond_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bond_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BondType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">bond_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bond_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -3744,7 +3839,7 @@ torsions are consecutive.</p>
 atoms 1 and 2, between atoms 2 and 3, between atoms 3 and 4, or between
 atoms 4 and 5.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cmap</span> <span class="o">=</span> <span class="n">Cmap</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cmap</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cmap</span>
 <span class="go">True</span>
@@ -3882,7 +3977,7 @@ point is the same to within 1E-8</p>
 <p>See the docs for <cite>_CmapGrid</cite> for information on how to access the
 interpolating grid data if necessary.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span> <span class="o">=</span> <span class="n">CmapType</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">ct</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">(0, 0)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ct</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">ct</span><span class="o">.</span><span class="n">grid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -3975,7 +4070,7 @@ or because it is one term in a multi-term dihedral expansion</p>
 <p>A Dihedral can contain bonds or atoms. A bond is contained if it exists
 between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihed</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a3</span><span class="p">,</span><span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a3</span><span class="p">,</span><span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span>
 <span class="go">True</span>
@@ -3986,8 +4081,8 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 </pre></div>
 </div>
 <p>For improper torsions, the bond pattern is different</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dihed</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dihed</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span><span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a3</span><span class="p">,</span><span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span><span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dihed</span> <span class="c1"># Not like a normal dihedral!</span>
@@ -4113,7 +4208,7 @@ iterable</p>
 <p>Two <code class="xref py py-class docutils literal"><span class="pre">DihedralType`s</span> <span class="pre">are</span> <span class="pre">equal</span> <span class="pre">if</span> <span class="pre">their</span> <span class="pre">`phi_k</span></code>, <cite>per</cite>, <cite>phase</cite>,
 <cite>scee</cite>, and <cite>scnb</cite> attributes are equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt2</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="ow">is</span> <span class="n">dt2</span>
 <span class="go">False</span>
@@ -4124,7 +4219,7 @@ iterable</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
 <span class="gp">... </span>                                  <span class="nb">list</span><span class="o">=</span><span class="n">dihedral_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dihedral_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">DihedralType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -4387,7 +4482,7 @@ torsion</p>
 exists between atom 1 and any other atom. Raises <code class="xref py py-class docutils literal"><span class="pre">MoleculeError</span></code> if any
 of the atoms are duplicates.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">imp</span> <span class="o">=</span> <span class="n">Improper</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="n">imp</span>
 <span class="go">True</span>
@@ -4456,7 +4551,7 @@ other 3 can be in any order</p>
 <p>Two <cite>ImproperType`s are equal if their `psi_k</cite> and <cite>psi_eq</cite> attributes are
 equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">it1</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">it1</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it2</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">it1</span> <span class="ow">is</span> <span class="n">it2</span>
 <span class="go">False</span>
@@ -4467,7 +4562,7 @@ equal</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">improper_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">improper_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">improper_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ImproperType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">improper_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">improper_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ImproperType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">improper_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">improper_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -4530,7 +4625,7 @@ the AMOEBA force field.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mf</span> <span class="o">=</span> <span class="n">MultipoleFrame</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="ow">in</span> <span class="n">mf</span>
 <span class="go">True</span>
@@ -4845,7 +4940,7 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.add_atom" title="parmed.ResidueList.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom,&nbsp;resname,&nbsp;resnum[,&nbsp;chain,&nbsp;...])</td>
 <td>Adds a new atom to the ResidueList, adding a new residue to this list if</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.append" title="parmed.ResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.append" title="parmed.ResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.claim" title="parmed.ResidueList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
@@ -4860,7 +4955,7 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.count" title="parmed.ResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.extend" title="parmed.ResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.extend" title="parmed.ResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.index" title="parmed.ResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
@@ -4869,10 +4964,10 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.index_members" title="parmed.ResidueList.index_members"><code class="xref py py-obj docutils literal"><span class="pre">index_members</span></code></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.insert" title="parmed.ResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.insert" title="parmed.ResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.pop" title="parmed.ResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.pop" title="parmed.ResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.prune" title="parmed.ResidueList.prune"><code class="xref py py-obj docutils literal"><span class="pre">prune</span></code></a>()</td>
@@ -4881,7 +4976,7 @@ atoms. No change if an atom is not present in this residue.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.prune_unused" title="parmed.ResidueList.prune_unused"><code class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></code></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.remove" title="parmed.ResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.ResidueList.remove" title="parmed.ResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.ResidueList.reverse" title="parmed.ResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
@@ -5100,7 +5195,7 @@ Angstroms</p>
 <p>Two <cite>StretchBendType`s are equal if their `req1</cite>, <cite>req2</cite>, <cite>theteq</cite>, and <cite>k</cite>
 attributes are equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sbt1</span> <span class="o">=</span> <span class="n">StretchBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sbt1</span> <span class="o">=</span> <span class="n">StretchBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sbt2</span> <span class="o">=</span> <span class="n">StretchBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">sbt1</span> <span class="ow">is</span> <span class="n">sbt2</span>
 <span class="go">False</span>
@@ -5111,7 +5206,7 @@ attributes are equal</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">strbnd_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">strbnd_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strbnd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StretchBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">strbnd_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strbnd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">StretchBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">180.0</span><span class="p">,</span> <span class="n">strbnd_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">strbnd_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -5182,7 +5277,7 @@ correction-map (CMAP) potential used by the CHARMM force field</p>
 exists between atoms 1 and 2, between atoms 2 and 3, between atoms 3 and 4,
 or between atoms 4 and 5.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tortor</span> <span class="o">=</span> <span class="n">TorsionTorsion</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tortor</span> <span class="ow">and</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tortor</span>
 <span class="go">True</span>
@@ -5442,7 +5537,7 @@ the one shown below</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
 <p>This creates a list type that allows you to see if anything has changed</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Atom</span><span class="p">())</span>
@@ -5451,7 +5546,7 @@ the one shown below</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">index_members</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">needs_indexing</span><span class="p">,</span> <span class="n">tl</span><span class="o">.</span><span class="n">changed</span>
 <span class="go">(False, True)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span> <span class="c1"># Must do when changes have been incorporated</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Must do when changes have been incorporated</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tl</span><span class="o">.</span><span class="n">needs_indexing</span><span class="p">,</span> <span class="n">tl</span><span class="o">.</span><span class="n">changed</span>
 <span class="go">(False, False)</span>
 </pre></div>
@@ -5478,7 +5573,7 @@ the one shown below</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.append" title="parmed.TrackedList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.append" title="parmed.TrackedList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.claim" title="parmed.TrackedList.claim"><code class="xref py py-obj docutils literal"><span class="pre">claim</span></code></a>()</td>
@@ -5493,7 +5588,7 @@ the one shown below</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.count" title="parmed.TrackedList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.extend" title="parmed.TrackedList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.extend" title="parmed.TrackedList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.index" title="parmed.TrackedList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
@@ -5502,16 +5597,16 @@ the one shown below</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.index_members" title="parmed.TrackedList.index_members"><code class="xref py py-obj docutils literal"><span class="pre">index_members</span></code></a>()</td>
 <td>Assigns the idx variable for every member of this list to its place in</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.insert" title="parmed.TrackedList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.insert" title="parmed.TrackedList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.pop" title="parmed.TrackedList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.pop" title="parmed.TrackedList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.prune_unused" title="parmed.TrackedList.prune_unused"><code class="xref py py-obj docutils literal"><span class="pre">prune_unused</span></code></a>()</td>
 <td>This method inspects the <cite>used</cite> attribute of all of its members, if it</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.remove" title="parmed.TrackedList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.TrackedList.remove" title="parmed.TrackedList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td></td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.TrackedList.reverse" title="parmed.TrackedList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
@@ -5635,7 +5730,7 @@ valence angle separated by two bonds.</p>
 identical.  You can also test that a <a class="reference internal" href="#parmed.Bond" title="parmed.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> is contained in this
 Urey-Bradley valence angle</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b1</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">b2</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">angle</span> <span class="o">=</span> <span class="n">Angle</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)</span>
@@ -5692,7 +5787,7 @@ atom2.</p>
 <p class="rubric">Notes</p>
 <p>Two <cite>OutOfPlaneBendType`s are equal if their `k</cite> attribute is equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ot2</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="ow">is</span> <span class="n">ot2</span>
 <span class="go">False</span>
@@ -5703,7 +5798,7 @@ atom2.</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -5990,13 +6085,13 @@ units. Default is None</p>
 files. Also, sigma is related to Rmin, but rmin is Rmin/2, so there is an
 extra factor of 2 in the sigma for this reason.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="s1">&#39;HA&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.008</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">at</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="s1">&#39;HA&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.008</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">at</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at</span><span class="o">.</span><span class="n">number</span>
 <span class="go">(&#39;HA&#39;, 1)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">at2</span> <span class="o">=</span> <span class="n">AtomType</span><span class="p">(</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">12.01</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">at2</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at2</span><span class="o">.</span><span class="n">number</span>
 <span class="go">(&#39;CA&#39;, 2)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">at</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">at</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">at</span><span class="p">)))</span>
 <span class="go">HA: 1</span>
 </pre></div>
 </div>
@@ -6809,7 +6904,7 @@ cross-product</p>
 <p class="rubric">Notes</p>
 <p>Two <a href="#id39"><span class="problematic" id="id40">`</span></a>RBTorsionType`s are equal if their coefficients are all equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">RBTorsionType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="o">=</span> <span class="n">RBTorsionType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt2</span> <span class="o">=</span> <span class="n">RBTorsionType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dt1</span> <span class="ow">is</span> <span class="n">dt2</span>
 <span class="go">False</span>
@@ -6820,7 +6915,7 @@ cross-product</p>
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rb_torsion_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rb_torsion_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rb_torsion_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RBTorsionType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span>
 <span class="gp">... </span>                                     <span class="nb">list</span><span class="o">=</span><span class="n">rb_torsion_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rb_torsion_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RBTorsionType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">,</span> <span class="mf">40.0</span><span class="p">,</span> <span class="mf">50.0</span><span class="p">,</span> <span class="mf">60.0</span><span class="p">,</span>
@@ -6881,14 +6976,11 @@ cross-product</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -6904,12 +6996,12 @@ cross-product</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

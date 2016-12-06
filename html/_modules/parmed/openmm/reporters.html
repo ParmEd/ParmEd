@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.reporters &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm.reporters &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -52,17 +54,17 @@
 <span class="sd">This module contains a handful of extra reporter classes for OpenMM</span>
 <span class="sd">simulations</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
-<span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="kn">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.netcdffiles</span> <span class="kn">import</span> <span class="n">NetCDFTraj</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="kn">import</span> <span class="n">Rst7</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">isinf</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="k">import</span> <span class="n">AmberMdcrd</span>
+<span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="k">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.netcdffiles</span> <span class="k">import</span> <span class="n">NetCDFTraj</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.readparm</span> <span class="k">import</span> <span class="n">Rst7</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="k">import</span> <span class="n">needs_openmm</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">isnan</span><span class="p">,</span> <span class="n">isinf</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">time</span>
 <span class="n">VELUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">picosecond</span>
 <span class="n">FRCUNIT</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie_per_mole</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span>
 
@@ -122,10 +124,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="StateDataReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
-                 <span class="n">systemMass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">energyUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">,</span>
+<div class="viewcode-block" id="StateDataReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">potentialEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kineticEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">temperature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                 <span class="n">systemMass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">energyUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">,</span>
                  <span class="n">timeUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">,</span> <span class="n">volumeUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span>
                  <span class="n">densityUnit</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">grams</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">item</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">milliliter</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">=</span> <span class="n">reportInterval</span>
@@ -144,10 +146,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_density</span> <span class="o">=</span> <span class="n">density</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_separator</span> <span class="o">=</span> <span class="n">separator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="o">=</span> <span class="n">systemMass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_needsPositions</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_needsVelocities</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_needsForces</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_needsPositions</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_needsVelocities</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_needsForces</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span> <span class="o">=</span> <span class="p">(</span><span class="n">potentialEnergy</span> <span class="ow">or</span> <span class="n">kineticEnergy</span> <span class="ow">or</span>
                             <span class="n">totalEnergy</span> <span class="ow">or</span> <span class="n">temperature</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_energyUnit</span> <span class="o">=</span> <span class="n">energyUnit</span>
@@ -190,7 +192,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_initializeConstants</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
             <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constructHeaders</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#&quot;</span><span class="si">%s</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_separator</span><span class="o">+</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">headers</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Check for errors.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checkForErrors</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
@@ -255,7 +257,7 @@
 <span class="sd">        simulation : Simulation</span>
 <span class="sd">            The simulation to generate a report for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+        <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="k">as</span> <span class="nn">mm</span>
         <span class="n">system</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">system</span>
         <span class="n">frclist</span> <span class="o">=</span> <span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature</span><span class="p">:</span>
@@ -269,7 +271,7 @@
                 <span class="n">dof</span> <span class="o">-=</span> <span class="mi">3</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dof</span> <span class="o">=</span> <span class="n">dof</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Compute the total system mass.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_totalMass</span> <span class="o">=</span> <span class="mi">0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">dalton</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumParticles</span><span class="p">()):</span>
@@ -326,7 +328,7 @@
 <div class="viewcode-block" id="StateDataReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_openedFile</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">pass</span>               <span class="c1"># pragma: no cover</span></div></div>
@@ -335,7 +337,7 @@
     <span class="sd">&quot;&quot;&quot; NetCDFReporter prints a trajectory in NetCDF format &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="NetCDFReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a NetCDFReporter instance.</span>
 
@@ -361,8 +363,8 @@
 <span class="c1">#           raise ValueError(&#39;Cannot write a trajectory without coordinates, &#39;</span>
 <span class="c1">#                            &#39;velocities, or forces! Pick at least one.&#39;)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">=</span> <span class="n">reportInterval</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># not written yet</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="nb">file</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># not written yet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="n">file</span></div>
 
 <div class="viewcode-block" id="NetCDFReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -382,7 +384,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stepsleft</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="NetCDFReporter.report"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
@@ -402,7 +404,7 @@
             <span class="n">vels</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getVelocities</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">VELUNIT</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">:</span>
             <span class="n">frcs</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">FRCUNIT</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># This must be the first frame, so set up the trajectory now</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">:</span>
                 <span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)</span>
@@ -410,7 +412,7 @@
                 <span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">:</span>
                 <span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frcs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="n">NetCDFTraj</span><span class="o">.</span><span class="n">open_new</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ParmEd-created trajectory using OpenMM&quot;</span>
@@ -434,7 +436,7 @@
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
@@ -442,7 +444,7 @@
 <div class="viewcode-block" id="NetCDFReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.NetCDFReporter.html#parmed.openmm.NetCDFReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">pass</span>               <span class="c1"># pragma: no cover</span></div></div>
@@ -473,7 +475,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="MdcrdReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="MdcrdReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># ASCII mdcrds can have either coordinates, forces, or velocities</span>
         <span class="n">ntrue</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">crds</span><span class="p">:</span> <span class="n">ntrue</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -485,8 +487,8 @@
         <span class="c1"># Control flags</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span> <span class="o">=</span> <span class="n">crds</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">frcs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">=</span> <span class="n">reportInterval</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># not written yet</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="nb">file</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># not written yet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="n">file</span></div>
 
 <div class="viewcode-block" id="MdcrdReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -506,7 +508,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stepsleft</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">vels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MdcrdReporter.report"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -516,7 +518,7 @@
 <span class="sd">            - simulation (Simulation) The Simulation to generate a report for</span>
 <span class="sd">            - state (State) The current state of the simulation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="kn">import</span> <span class="n">VELSCALE</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="k">import</span> <span class="n">VELSCALE</span>
         <span class="k">global</span> <span class="n">VELUNIT</span><span class="p">,</span> <span class="n">FRCUNIT</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">:</span>
             <span class="n">crds</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
@@ -524,7 +526,7 @@
             <span class="n">vels</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getVelocities</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">VELUNIT</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">:</span>
             <span class="n">frcs</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">FRCUNIT</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># This must be the first frame, so set up the trajectory now</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crds</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)</span>
@@ -532,7 +534,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">frcs</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frcs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span><span class="p">,</span>
                     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;ParmEd-created trajectory using OpenMM&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 
@@ -567,7 +569,7 @@
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
@@ -575,7 +577,7 @@
 <div class="viewcode-block" id="MdcrdReporter.finalize"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.MdcrdReporter.html#parmed.openmm.MdcrdReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">pass</span>               <span class="c1"># pragma: no cover</span></div></div>
@@ -602,14 +604,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="RestartReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">write_multiple</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">netcdf</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                 <span class="n">write_velocities</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="nb">file</span>
+<div class="viewcode-block" id="RestartReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">write_multiple</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">netcdf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">write_velocities</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fname</span> <span class="o">=</span> <span class="n">file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">=</span> <span class="n">reportInterval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write_multiple</span> <span class="o">=</span> <span class="n">write_multiple</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">netcdf</span> <span class="o">=</span> <span class="n">netcdf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">write_velocities</span> <span class="o">=</span> <span class="n">write_velocities</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="bp">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="RestartReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -629,7 +631,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">stepsleft</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RestartReporter.report"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.RestartReporter.html#parmed.openmm.RestartReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate a report.</span>
@@ -643,8 +645,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">global</span> <span class="n">VELUNIT</span>
         <span class="n">crds</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uses_pbc</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">crds</span><span class="p">)</span>
             <span class="c1"># First time written</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rst7</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span>
@@ -721,13 +723,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="ProgressReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">totalSteps</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                 <span class="n">volume</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">systemMass</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ProgressReporter.__init__"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">totalSteps</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">kineticEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">systemMass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Make sure we got a file name rather than a file-like object.</span>
         <span class="c1"># Immediately close the file after opening. This erases it, which isn&#39;t</span>
         <span class="c1"># a bad thing, but also prepares it for reports</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ProgressReporter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
                 <span class="n">f</span><span class="p">,</span> <span class="n">reportInterval</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="n">potentialEnergy</span><span class="p">,</span>
                 <span class="n">kineticEnergy</span><span class="o">=</span><span class="n">kineticEnergy</span><span class="p">,</span> <span class="n">totalEnergy</span><span class="o">=</span><span class="n">totalEnergy</span><span class="p">,</span>
@@ -743,10 +745,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_totalSteps</span> <span class="o">=</span> <span class="n">totalSteps</span>
 
         <span class="c1"># For timing</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_firstStep</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lastReportTime</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_timeStep</span> <span class="o">=</span> <span class="bp">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_firstStep</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastReportTime</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_timeStep</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ProgressReporter.describeNextReport"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter.describeNextReport">[docs]</a>    <span class="k">def</span> <span class="nf">describeNextReport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -764,7 +766,7 @@
 <span class="sd">            pos, vel, frc, and ene are flags indicating whether positions,</span>
 <span class="sd">            velocities, forces, and/or energies are needed from the Context</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># First time this is called, initialize the timers</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_lastReportTime</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
@@ -773,7 +775,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_firstStep</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span>
         <span class="n">stepsleft</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">currentStep</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span>
         <span class="n">steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reportInterval</span> <span class="o">-</span> <span class="n">stepsleft</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needEnergy</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ProgressReporter.report"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.ProgressReporter.html#parmed.openmm.ProgressReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -782,7 +784,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initializeConstants</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hasInitialized</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Check for errors.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checkForErrors</span><span class="p">(</span><span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
@@ -842,7 +844,7 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-+&#39;</span> <span class="o">*</span> <span class="mi">39</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">remaining_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="o">=</span> <span class="bp">None</span></div>
+        <span class="k">if</span> <span class="n">remaining_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_startTime</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">_constructReportValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -902,7 +904,7 @@
 <span class="sd">        If True, write the system volume (default is False)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">volume</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EnergyMinimizerReporter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_volume</span> <span class="o">=</span> <span class="n">volume</span>
 
@@ -911,12 +913,12 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;EnergyMinimizerReporter is not intended for &#39;</span>
                                   <span class="s1">&#39;use in reporting on molecular dynamics&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="EnergyMinimizerReporter.report"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.reporters.html#parmed.openmm.EnergyMinimizerReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EnergyMinimizerReporter.report"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.reporters.html#parmed.openmm.EnergyMinimizerReporter.report">[docs]</a>    <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Print out the current energy &quot;&quot;&quot;</span>
-        <span class="n">has_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+        <span class="n">has_pbc</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getUnitCellDimensions</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                             <span class="n">enforcePeriodicBox</span><span class="o">=</span><span class="n">has_pbc</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Frame: </span><span class="si">%10d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">frame</span><span class="p">)</span>
         <span class="n">e</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_energyUnit</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;   Potential Energy = </span><span class="si">%12.4f</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span>
@@ -930,7 +932,7 @@
 <div class="viewcode-block" id="EnergyMinimizerReporter.finalize"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.reporters.html#parmed.openmm.EnergyMinimizerReporter.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes any open file &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
             <span class="k">pass</span>               <span class="c1"># pragma: no cover</span></div></div>
@@ -957,14 +959,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -980,13 +979,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

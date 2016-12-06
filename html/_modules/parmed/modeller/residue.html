@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.modeller.residue &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.modeller.residue &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -53,14 +55,14 @@
 <span class="sd">typically used in modelling applications</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">copy</span> <span class="kn">as</span> <span class="nn">_copy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">_copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="k">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">iteritems</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PROTEIN&#39;</span><span class="p">,</span> <span class="s1">&#39;NUCLEIC&#39;</span><span class="p">,</span> <span class="s1">&#39;SOLVENT&#39;</span><span class="p">,</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s1">&#39;ResidueTemplate&#39;</span><span class="p">,</span>
@@ -120,33 +122,33 @@
 <span class="sd">        atom of this residue when this residue is the last in a chain</span>
 <span class="sd">    groups : list of list(:class:`Atom`)</span>
 <span class="sd">        If set, each group is a list of Atom instances making up each group</span>
-<span class="sd">    overload_level : integer</span>
+<span class="sd">    override_level : integer</span>
 <span class="sd">        For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple</span>
 <span class="sd">        identically-matching residue templates with the same names it choses</span>
-<span class="sd">        (overloads with) the one with the highest overload_level</span>
-<span class="sd">        (overloadLevel in OpenMM). Default is 0.</span>
+<span class="sd">        (overrides with) the one with the highest override_level</span>
+<span class="sd">        (overrideLevel in OpenMM). Default is 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">UNKNOWN</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">overload_level</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">override_level</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tail</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
@@ -177,7 +179,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span></div>
 
-<div class="viewcode-block" id="ResidueTemplate.add_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.add_bond">[docs]</a>    <span class="k">def</span> <span class="nf">add_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplate.add_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.add_bond">[docs]</a>    <span class="k">def</span> <span class="nf">add_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds a bond between the two provided atoms in the residue</span>
 
 <span class="sd">        Parameters</span>
@@ -190,6 +192,14 @@
 <span class="sd">            The other atom in the bond. It must be in the ``atoms`` list of this</span>
 <span class="sd">            ResidueTemplate. It can also be the atom index (index from 0) of the</span>
 <span class="sd">            atom in the bond.</span>
+<span class="sd">        order : float</span>
+<span class="sd">            The bond order of this bond. Bonds are classified as follows:</span>
+<span class="sd">                1.0 -- single bond</span>
+<span class="sd">                2.0 -- double bond</span>
+<span class="sd">                3.0 -- triple bond</span>
+<span class="sd">                1.5 -- aromatic bond</span>
+<span class="sd">                1.25 -- amide bond</span>
+<span class="sd">            Default is 1.0</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -213,7 +223,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Both atoms must belong to template.atoms&#39;</span><span class="p">)</span>
         <span class="c1"># Do not add the same bond twice</span>
         <span class="k">if</span> <span class="n">atom1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atom2</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">))</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">))</span></div>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="ResidueTemplate.from_residue"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.from_residue">[docs]</a>    <span class="k">def</span> <span class="nf">from_residue</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
@@ -289,9 +299,9 @@
             <span class="n">other</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
         <span class="n">other</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">other</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">other</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">idx</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
             <span class="n">other</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">idx</span><span class="p">])</span>
@@ -311,7 +321,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
-<div class="viewcode-block" id="ResidueTemplate.fix_charges"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.fix_charges">[docs]</a>    <span class="k">def</span> <span class="nf">fix_charges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplate.fix_charges"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.fix_charges">[docs]</a>    <span class="k">def</span> <span class="nf">fix_charges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adjusts the partial charge of all atoms in the residue to match the</span>
 <span class="sd">        requested target charge. The default target charge is the closest</span>
@@ -353,7 +363,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot fix charges on an empty residue&#39;</span><span class="p">)</span>
         <span class="n">net_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">to</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">net_charge</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We need to make sure</span>
@@ -417,7 +427,7 @@
 <span class="sd">            - vy : float (y-coordinate velocity)</span>
 <span class="sd">            - vz : float (z-coordinate velocity)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+        <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
         <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;number&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">]</span>
@@ -484,7 +494,7 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">struct</span></div>
 
-<div class="viewcode-block" id="ResidueTemplate.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplate.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves the current ResidueTemplate in the requested file format.</span>
 <span class="sd">        Supported formats can be specified explicitly or determined by file-name</span>
@@ -520,8 +530,8 @@
 <span class="sd">        TypeError if the structure cannot be converted to the desired format for</span>
 <span class="sd">        whatever reason</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
-        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="kn">import</span> <span class="n">Mol2File</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="k">import</span> <span class="n">AmberOFFLibrary</span>
+        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="k">import</span> <span class="n">Mol2File</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">,</span>
@@ -530,24 +540,24 @@
                 <span class="s1">&#39;.pdb&#39;</span> <span class="p">:</span> <span class="s1">&#39;PDB&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.pqr&#39;</span> <span class="p">:</span> <span class="s1">&#39;PQR&#39;</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">format</span> <span class="o">=</span> <span class="n">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">base</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.bz2&#39;</span><span class="p">,</span> <span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
                 <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">base</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">extmap</span><span class="p">:</span>
-                <span class="n">format</span> <span class="o">=</span> <span class="n">extmap</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
+                <span class="nb">format</span> <span class="o">=</span> <span class="n">extmap</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not determine file type of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">:</span>
-            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">:</span>
-            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span> <span class="s1">&#39;OFF&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">:</span>
+            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">:</span>
+            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span> <span class="s1">&#39;OFF&#39;</span><span class="p">):</span>
             <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">write</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="p">:</span> <span class="bp">self</span><span class="p">},</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PDB&#39;</span><span class="p">,</span> <span class="s1">&#39;PQR&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">to_structure</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PDB&#39;</span><span class="p">,</span> <span class="s1">&#39;PQR&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_structure</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span>
                                      <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized format for ResidueTemplate save&#39;</span><span class="p">)</span></div></div>
@@ -596,11 +606,11 @@
 <span class="sd">        The name of the residue container</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ResidueTemplateContainer.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">term_decorate</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">term_decorate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates a ResidueTemplateContainer from a Structure instance filled</span>
 <span class="sd">        with residues</span>
@@ -626,17 +636,22 @@
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
             <span class="n">rt</span> <span class="o">=</span> <span class="n">ResidueTemplate</span><span class="o">.</span><span class="n">from_residue</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="c1"># See if we need to decorate the termini names</span>
-            <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;N</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;N&#39;</span><span class="p">:</span>
+                        <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;N</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">elif</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">5&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">elif</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;5&#39;</span><span class="p">:</span>
+                        <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">5&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">elif</span> <span class="n">rt</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rt</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">term_decorate</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;C</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span> <span class="ow">or</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;C&#39;</span><span class="p">:</span>
+                        <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;C</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">elif</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
-                    <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">3&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">if</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;3&#39;</span><span class="p">:</span>
+                        <span class="n">rt</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">3&#39;</span> <span class="o">%</span> <span class="n">rt</span><span class="o">.</span><span class="n">name</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -696,7 +711,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ResidueTemplateContainer.from_library"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_library">[docs]</a>    <span class="k">def</span> <span class="nf">from_library</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.from_library"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_library">[docs]</a>    <span class="k">def</span> <span class="nf">from_library</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts a dictionary of ResidueTemplate items into a</span>
 <span class="sd">        ResidueTemplateContainer.</span>
@@ -734,7 +749,7 @@
                 <span class="n">cont</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cont</span></div>
 
-<div class="viewcode-block" id="ResidueTemplateContainer.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.save"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves the current ResidueTemplateContainer in the requested file format.</span>
 <span class="sd">        Supported formats can be specified explicitly or determined by file-name</span>
@@ -771,29 +786,29 @@
 <span class="sd">        contrast, ``Structure.save`` will save a single @&lt;MOLECULE&gt; mol2 file</span>
 <span class="sd">        with multiple residues if the mol2 format is requested.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
-        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="kn">import</span> <span class="n">Mol2File</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="k">import</span> <span class="n">AmberOFFLibrary</span>
+        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="k">import</span> <span class="n">Mol2File</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.off&#39;</span> <span class="p">:</span> <span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.lib&#39;</span> <span class="p">:</span> <span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">format</span> <span class="o">=</span> <span class="n">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">format</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">base</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;.bz2&#39;</span><span class="p">,</span> <span class="s1">&#39;.gz&#39;</span><span class="p">):</span>
                 <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">base</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">extmap</span><span class="p">:</span>
-                <span class="n">format</span> <span class="o">=</span> <span class="n">extmap</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
+                <span class="nb">format</span> <span class="o">=</span> <span class="n">extmap</span><span class="p">[</span><span class="n">ext</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Could not determine file type of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">format</span> <span class="o">==</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">:</span>
-            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">format</span> <span class="o">==</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">:</span>
-            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span> <span class="s1">&#39;OFF&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">:</span>
+            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">:</span>
+            <span class="n">Mol2File</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mol3</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">format</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;OFFLIB&#39;</span><span class="p">,</span> <span class="s1">&#39;OFF&#39;</span><span class="p">):</span>
             <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_library</span><span class="p">(),</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized format for ResidueTemplate save&#39;</span><span class="p">)</span></div></div>
@@ -807,14 +822,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -830,13 +842,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

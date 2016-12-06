@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.residue module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.residue module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -91,7 +93,7 @@ residues in typical biopolymers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.residue.AminoAcidResidue.get" title="parmed.residue.AminoAcidResidue.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.residue.AminoAcidResidue.get" title="parmed.residue.AminoAcidResidue.get"><code class="xref py py-obj docutils literal"><span class="pre">get</span></code></a>(key[,&nbsp;abbronly])</td>
 <td>Gets the amino acid corresponding to either the residue name, 3-letter abbreviation or 1-letter symbol.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.residue.AminoAcidResidue.has" title="parmed.residue.AminoAcidResidue.has"><code class="xref py py-obj docutils literal"><span class="pre">has</span></code></a>(thing)</td>
@@ -106,7 +108,7 @@ residues in typical biopolymers.</p>
 
 <dl class="classmethod">
 <dt id="parmed.residue.AminoAcidResidue.get">
-<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/residue.html#AminoAcidResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.residue.AminoAcidResidue.get" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">get</code><span class="sig-paren">(</span><em>key</em>, <em>abbronly=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/residue.html#AminoAcidResidue.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.residue.AminoAcidResidue.get" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the amino acid corresponding to either the residue name, 3-letter
 abbreviation or 1-letter symbol. It is case-insensitive.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -116,6 +118,11 @@ abbreviation or 1-letter symbol. It is case-insensitive.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : str</p>
 <blockquote>
 <div><p>1-letter symbol, 3-letter abbreviation, or residue name</p>
+</div></blockquote>
+<p><strong>abbronly</strong> : bool</p>
+<blockquote>
+<div><p>If True, only look for the 3-letter abbreviation (not the 1-letter
+symbol)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -374,14 +381,11 @@ False.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -397,12 +401,12 @@ False.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>PyRosetta Integration &mdash; ParmEd 2.5.0 documentation</title>
+    <title>PyRosetta Integration &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" /> 
   </head>
@@ -40,7 +42,7 @@
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -115,14 +117,14 @@ PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose
 simulating with OpenMM is that proline residues have virtual sites that prevent
 it from being recognized by OpenMM. If you get an error that looks like the
 following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>Traceback (most recent call last):
-  File &quot;test.py&quot;, line 11, in &lt;module&gt;
-    positiveIon=&#39;Na+&#39;, negativeIon=&#39;Cl-&#39;, ionicStrength=0.1*molar)
-  File &quot;.../python2.7/site-packages/simtk/openmm/app/modeller.py&quot;, line 372, in addSolvent
-    system = forcefield.createSystem(self.topology)
-  File &quot;.../python2.7/site-packages/simtk/openmm/app/forcefield.py&quot;, line 785, in createSystem
-    raise ValueError(&#39;No template found for residue %d (%s).  %s&#39; % (res.index+1, res.name, _findMatchErrors(self, res)))
-ValueError: No template found for residue 2 (PRO).  This might mean your input topology is missing some atoms or bonds, or possibly that you are using the wrong force field.
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s2">&quot;test.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">11</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="n">positiveIon</span><span class="o">=</span><span class="s1">&#39;Na+&#39;</span><span class="p">,</span> <span class="n">negativeIon</span><span class="o">=</span><span class="s1">&#39;Cl-&#39;</span><span class="p">,</span> <span class="n">ionicStrength</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">molar</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s2">&quot;.../python2.7/site-packages/simtk/openmm/app/modeller.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">372</span><span class="p">,</span> <span class="ow">in</span> <span class="n">addSolvent</span>
+    <span class="n">system</span> <span class="o">=</span> <span class="n">forcefield</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s2">&quot;.../python2.7/site-packages/simtk/openmm/app/forcefield.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">785</span><span class="p">,</span> <span class="ow">in</span> <span class="n">createSystem</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No template found for residue </span><span class="si">%d</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">).  </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">_findMatchErrors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res</span><span class="p">)))</span>
+<span class="ne">ValueError</span><span class="p">:</span> <span class="n">No</span> <span class="n">template</span> <span class="n">found</span> <span class="k">for</span> <span class="n">residue</span> <span class="mi">2</span> <span class="p">(</span><span class="n">PRO</span><span class="p">)</span><span class="o">.</span>  <span class="n">This</span> <span class="n">might</span> <span class="n">mean</span> <span class="n">your</span> <span class="nb">input</span> <span class="n">topology</span> <span class="ow">is</span> <span class="n">missing</span> <span class="n">some</span> <span class="n">atoms</span> <span class="ow">or</span> <span class="n">bonds</span><span class="p">,</span> <span class="ow">or</span> <span class="n">possibly</span> <span class="n">that</span> <span class="n">you</span> <span class="n">are</span> <span class="n">using</span> <span class="n">the</span> <span class="n">wrong</span> <span class="n">force</span> <span class="n">field</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>then you know that you have to strip all <code class="docutils literal"><span class="pre">NV</span></code> atoms (which are proline virtual
@@ -161,14 +163,11 @@ your <code class="docutils literal"><span class="pre">Structure</span></code> pr
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -187,12 +186,12 @@ your <code class="docutils literal"><span class="pre">Structure</span></code> pr
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

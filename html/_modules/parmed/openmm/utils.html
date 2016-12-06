@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.utils &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm.utils &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -51,10 +53,10 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This package contains some useful functionality for common tasks in OpenMM</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.decorators</span> <span class="k">import</span> <span class="n">needs_openmm</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">map</span>
 
 <div class="viewcode-block" id="energy_decomposition"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.energy_decomposition.html#parmed.openmm.energy_decomposition">[docs]</a><span class="k">def</span> <span class="nf">energy_decomposition</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">nrg</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -93,16 +95,16 @@
         <span class="n">force_group_names</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_names</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">grp</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">force_group_names</span><span class="p">):</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">grp</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">grp</span><span class="p">)</span>
         <span class="n">energy_components</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">nrg</span><span class="p">)</span>
 
-    <span class="n">e</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span>
     <span class="n">energy_components</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">nrg</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">energy_components</span></div>
 
 <span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="energy_decomposition_system"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.utils.html#parmed.openmm.energy_decomposition_system">[docs]</a><span class="k">def</span> <span class="nf">energy_decomposition_system</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="energy_decomposition_system"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.utils.html#parmed.openmm.energy_decomposition_system">[docs]</a><span class="k">def</span> <span class="nf">energy_decomposition_system</span><span class="p">(</span><span class="n">structure</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">nrg</span><span class="o">=</span><span class="n">u</span><span class="o">.</span><span class="n">kilocalories_per_mole</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function computes the energy contribution for all of the different</span>
@@ -127,12 +129,12 @@
 <span class="sd">        Each entry is a tuple with the name of the force followed by its</span>
 <span class="sd">        contribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
+    <span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="k">as</span> <span class="nn">mm</span>
     <span class="c1"># First get all of the old force groups so we can restore them</span>
     <span class="n">old_groups</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">getForceGroup</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">system</span><span class="o">.</span><span class="n">getForces</span><span class="p">()]</span>
     <span class="n">old_recip_group</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">def</span> <span class="nf">_ene</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">grp</span><span class="p">):</span>
-        <span class="n">st</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">grp</span><span class="p">)</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">grp</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getForce</span><span class="p">(</span><span class="n">grp</span><span class="p">))</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
                 <span class="n">st</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">nrg</span><span class="p">))</span>
 
@@ -142,13 +144,13 @@
                 <span class="n">old_recip_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">getReciprocalSpaceForceGroup</span><span class="p">())</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">setReciprocalSpaceForceGroup</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">platform</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">platform</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">con</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">0.001</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">con</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">0.001</span><span class="p">),</span>
                              <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="n">platform</span><span class="p">))</span>
         <span class="n">con</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">structure</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">structure</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">structure</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">con</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span><span class="o">*</span><span class="n">structure</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_ene</span><span class="p">(</span><span class="n">con</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">system</span><span class="o">.</span><span class="n">getNumForces</span><span class="p">())))</span>
@@ -169,14 +171,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -192,13 +191,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pdbx.PdbxReader &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.pdbx.PdbxReader &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -74,8 +76,8 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PdbxError</span><span class="p">,</span> <span class="n">PdbxSyntaxError</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.pdbx.PdbxContainers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">PdbxError</span><span class="p">,</span> <span class="n">PdbxSyntaxError</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.pdbx.PdbxContainers</span> <span class="k">import</span> <span class="p">(</span>
         <span class="n">DataCategory</span><span class="p">,</span> <span class="n">DefinitionContainer</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PdbxReader"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxReader.html#parmed.formats.pdbx.PdbxReader">[docs]</a><span class="k">class</span> <span class="nc">PdbxReader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -126,13 +128,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">inWord</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span><span class="p">,</span><span class="s2">&quot;ST_UNKNOWN&quot;</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span><span class="s2">&quot;ST_UNKNOWN&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">rWord</span><span class="o">=</span><span class="n">inWord</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>            
             <span class="k">return</span> <span class="n">rWord</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stateDict</span><span class="p">[</span><span class="n">rWord</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span><span class="p">,</span><span class="s2">&quot;ST_UNKNOWN&quot;</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span><span class="s2">&quot;ST_UNKNOWN&quot;</span>
         
     <span class="k">def</span> <span class="nf">__parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">containerList</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Parser for PDBx data files and dictionaries.</span>
@@ -148,35 +150,35 @@
 <span class="sd">                    containerList - is appended with data and definition objects - </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Working container - data or definition</span>
-        <span class="n">curContainer</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">curContainer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1">#</span>
         <span class="c1"># Working category container </span>
         <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">curCategory</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1">#</span>
-        <span class="n">curRow</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">state</span> <span class="o">=</span>  <span class="bp">None</span>
+        <span class="n">curRow</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">state</span> <span class="o">=</span>  <span class="kc">None</span>
 
         <span class="c1"># Find the first reserved word and begin capturing data.</span>
         <span class="c1">#</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">break</span>
         
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1">#</span>
             <span class="c1">#  Set the current state  -</span>
             <span class="c1">#</span>
             <span class="c1">#  At this point in the processing cycle we are expecting a token containing</span>
             <span class="c1">#  either a &#39;_category.attribute&#39;  or a reserved word.  </span>
             <span class="c1">#</span>
-            <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;ST_KEY_VALUE_PAIR&quot;</span>
-            <span class="k">elif</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s2">&quot;Miscellaneous syntax error&quot;</span><span class="p">)</span>
@@ -219,20 +221,20 @@
                 <span class="c1"># Get the data for this attribute from the next token</span>
                 <span class="n">tCat</span><span class="p">,</span> <span class="n">tAtt</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">tCat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">curQuotedString</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">tCat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="n">curQuotedString</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s2">&quot;Missing data for item _</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">))</span>
 
-                <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1"># </span>
                     <span class="c1"># Validation check token for misplaced reserved words  -  </span>
                     <span class="c1">#</span>
                     <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s2">&quot;Unexpected reserved word: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reservedWord</span><span class="p">))</span>
 
                     <span class="n">curRow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
 
-                <span class="k">elif</span> <span class="n">curQuotedString</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">curQuotedString</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">curRow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curQuotedString</span><span class="p">)</span>
 
                 <span class="k">else</span><span class="p">:</span>
@@ -250,7 +252,7 @@
                 <span class="c1">#    defines the name of the category container.</span>
                 <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">curAttName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">curAttName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s2">&quot;Unexpected token in loop_ declaration&quot;</span><span class="p">)</span>
                     <span class="k">return</span>
 
@@ -270,10 +272,10 @@
                 <span class="n">curCategory</span><span class="o">.</span><span class="n">appendAttribute</span><span class="p">(</span><span class="n">curAttName</span><span class="p">)</span>
 
                 <span class="c1"># Read the rest of the loop_ declaration </span>
-                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">curCatName</span><span class="p">,</span> <span class="n">curAttName</span><span class="p">,</span> <span class="n">curQuotedString</span><span class="p">,</span> <span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
                     
-                    <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">break</span>
 
                     <span class="k">if</span> <span class="n">curCatName</span> <span class="o">!=</span> <span class="n">curCategory</span><span class="o">.</span><span class="n">getName</span><span class="p">():</span>
@@ -284,23 +286,23 @@
 
 
                 <span class="c1"># If the next token is a &#39;word&#39;, check it for any reserved words - </span>
-                <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">reservedWord</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span><span class="p">:</span>
                             <span class="k">return</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">__syntaxError</span><span class="p">(</span><span class="s2">&quot;Unexpected reserved word after loop declaration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reservedWord</span><span class="p">))</span>
                     
                 <span class="c1"># Read the table of data for this loop_ - </span>
-                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">curRow</span> <span class="o">=</span> <span class="p">[]</span>                    
                     <span class="n">curCategory</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curRow</span><span class="p">)</span>
 
                     <span class="k">for</span> <span class="n">tAtt</span> <span class="ow">in</span> <span class="n">curCategory</span><span class="o">.</span><span class="n">getAttributeList</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">curRow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
-                        <span class="k">elif</span> <span class="n">curQuotedString</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">elif</span> <span class="n">curQuotedString</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">curRow</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curQuotedString</span><span class="p">)</span>
 
                         <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
@@ -308,13 +310,13 @@
                     <span class="c1"># loop_ data processing ends if - </span>
 
                     <span class="c1"># A new _category.attribute is encountered</span>
-                    <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">curCatName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="k">break</span>
 
                     <span class="c1"># A reserved word is encountered</span>
-                    <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">curWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">reservedWord</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getState</span><span class="p">(</span><span class="n">curWord</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">reservedWord</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="k">break</span>
                         
                 <span class="k">continue</span>
@@ -327,7 +329,7 @@
                     <span class="n">curContainer</span> <span class="o">=</span> <span class="n">DefinitionContainer</span><span class="p">(</span><span class="n">sName</span><span class="p">)</span>
                     <span class="n">containerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curContainer</span><span class="p">)</span>
                     <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">curCategory</span> <span class="o">=</span> <span class="kc">None</span>
 
                 <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
@@ -339,7 +341,7 @@
                 <span class="n">curContainer</span> <span class="o">=</span> <span class="n">DataContainer</span><span class="p">(</span><span class="n">dName</span><span class="p">)</span>
                 <span class="n">containerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curContainer</span><span class="p">)</span>
                 <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">curCategory</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;ST_STOP&quot;</span><span class="p">:</span>
@@ -349,7 +351,7 @@
                 <span class="n">curContainer</span><span class="o">.</span><span class="n">setGlobal</span><span class="p">()</span>
                 <span class="n">containerList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curContainer</span><span class="p">)</span>
                 <span class="n">categoryIndex</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="n">curCategory</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">curCategory</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">curCatName</span><span class="p">,</span><span class="n">curAttName</span><span class="p">,</span><span class="n">curQuotedString</span><span class="p">,</span><span class="n">curWord</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;ST_UNKNOWN&quot;</span><span class="p">:</span>
@@ -388,7 +390,7 @@
         <span class="n">fileIter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ifh</span><span class="p">)</span>
 
         <span class="c1">## Tokenizer loop begins here ---</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -401,7 +403,7 @@
             <span class="c1">#</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
                 <span class="n">mlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
-                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
@@ -411,7 +413,7 @@
                 <span class="c1"># remove trailing new-line that is part of the \n; delimiter</span>
                 <span class="n">mlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
                 <span class="c1">#</span>
-                <span class="k">yield</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mlString</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mlString</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="c1">#</span>
                 <span class="c1"># Need to process the remainder of the current line -</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -421,13 +423,13 @@
             <span class="c1"># quoted within the quoted string category</span>
             <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">mmcifRe</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                 <span class="n">tgroups</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">tgroups</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tgroups</span> <span class="o">!=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">qs</span> <span class="o">=</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                    <span class="k">elif</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">elif</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">qs</span> <span class="o">=</span> <span class="n">tgroups</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">qs</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="n">qs</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="n">groups</span> <span class="o">=</span> <span class="p">(</span><span class="n">tgroups</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">tgroups</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qs</span><span class="p">,</span><span class="n">tgroups</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
                     <span class="k">yield</span> <span class="n">groups</span>
 
@@ -459,7 +461,7 @@
         <span class="n">fileIter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">ifh</span><span class="p">)</span>
 
         <span class="c1">## Tokenizer loop begins here ---</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
 
@@ -472,7 +474,7 @@
             <span class="c1">#</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
                 <span class="n">mlString</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
-                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">fileIter</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__curLineNumber</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">):</span>
@@ -482,7 +484,7 @@
                 <span class="c1"># remove trailing new-line that is part of the \n; delimiter</span>
                 <span class="n">mlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mlString</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
                 <span class="c1">#</span>
-                <span class="k">yield</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mlString</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mlString</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="c1">#</span>
                 <span class="c1"># Need to process the remainder of the current line -</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
@@ -491,7 +493,7 @@
             <span class="c1">## Apply regex to the current line </span>
             <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">mmcifRe</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                 <span class="n">groups</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">groups</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">groups</span> <span class="o">!=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
                     <span class="k">yield</span> <span class="n">groups</span></div>
 </pre></div>
 
@@ -503,14 +505,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -526,13 +525,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

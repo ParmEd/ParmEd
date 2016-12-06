@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.unit.mymatrix module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.unit.mymatrix module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -75,14 +77,14 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <em class="property">class </em><code class="descclassname">parmed.unit.mymatrix.</code><code class="descname">MyMatrix</code><span class="sig-paren">(</span><em>collection</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/mymatrix.html#MyMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.mymatrix.MyMatrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#parmed.unit.mymatrix.MyVector" title="parmed.unit.mymatrix.MyVector"><code class="xref py py-class docutils literal"><span class="pre">parmed.unit.mymatrix.MyVector</span></code></a></p>
 <p>Pure python linear algebra matrix for internal matrix inversion in UnitSystem.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MyMatrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">MyMatrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 <span class="go">[[1, 0]</span>
 <span class="go"> [0, 1]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="o">~</span><span class="n">m</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="o">~</span><span class="n">m</span><span class="p">)</span>
 <span class="go">[[1.0, 0.0]</span>
 <span class="go"> [0.0, 1.0]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
 <span class="go">[[1, 0, 0, 0, 0]</span>
 <span class="go"> [0, 1, 0, 0, 0]</span>
 <span class="go"> [0, 0, 1, 0, 0]</span>
@@ -93,18 +95,18 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <span class="go">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 <span class="go">MyMatrixTranspose([[0, 0, 0],[1, 0, 0],[0, 1, 0],[0, 0, 1],[0, 0, 0]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 <span class="go">[[0, 0, 0]</span>
 <span class="go"> [1, 0, 0]</span>
 <span class="go"> [0, 1, 0]</span>
 <span class="go"> [0, 0, 1]</span>
 <span class="go"> [0, 0, 0]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
 <span class="go">[[0, 1]</span>
 <span class="go"> [0, 0]</span>
 <span class="go"> [0, 0]]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">9</span><span class="p">,</span><span class="mi">8</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 <span class="go">[[1, 0, 0, 0, 0]</span>
 <span class="go"> [9, 8, 0, 0, 0]</span>
 <span class="go"> [7, 6, 1, 0, 0]</span>
@@ -213,7 +215,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <dt id="parmed.unit.mymatrix.eye">
 <code class="descclassname">parmed.unit.mymatrix.</code><code class="descname">eye</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/mymatrix.html#eye"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.mymatrix.eye" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns identity matrix.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 <span class="go">[[1, 0, 0]</span>
 <span class="go"> [0, 1, 0]</span>
 <span class="go"> [0, 0, 1]]</span>
@@ -225,7 +227,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <dt id="parmed.unit.mymatrix.zeros">
 <code class="descclassname">parmed.unit.mymatrix.</code><code class="descname">zeros</code><span class="sig-paren">(</span><em>m</em>, <em>n=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/mymatrix.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.mymatrix.zeros" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns matrix of zeroes</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 <span class="go">[[0, 0, 0]</span>
 <span class="go"> [0, 0, 0]</span>
 <span class="go"> [0, 0, 0]]</span>
@@ -251,14 +253,11 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -274,12 +273,12 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

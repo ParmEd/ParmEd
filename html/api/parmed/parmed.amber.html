@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -111,7 +113,7 @@
 <p>A class that can parse and print files stored in the Amber topology or MDL
 format. In particular, these files have the general form:</p>
 <p><code class="docutils literal"><span class="pre">`</span>
-<span class="pre">%VERSION</span> <span class="pre">VERSION_STAMP</span> <span class="pre">=</span> <span class="pre">V00001.000</span>&nbsp; <span class="pre">DATE</span> <span class="pre">=</span> <span class="pre">XX/XX/XX</span>&nbsp; <span class="pre">XX:XX:XX</span>
+<span class="pre">%VERSION</span> <span class="pre">VERSION_STAMP</span> <span class="pre">=</span> <span class="pre">V00001.000</span>&#160; <span class="pre">DATE</span> <span class="pre">=</span> <span class="pre">XX/XX/XX</span>&#160; <span class="pre">XX:XX:XX</span>
 <span class="pre">%FLAG</span> <span class="pre">&lt;FLAG_NAME&gt;</span>
 <span class="pre">%COMMENT</span> <span class="pre">&lt;comments&gt;</span>
 <span class="pre">%FORMAT(&lt;Fortran_Format&gt;)</span>
@@ -181,7 +183,7 @@ from the data in this file</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberFormat.id_format" title="parmed.amber.AmberFormat.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberFormat.parse" title="parmed.amber.AmberFormat.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberFormat.parse" title="parmed.amber.AmberFormat.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberFormat.rdparm" title="parmed.amber.AmberFormat.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
@@ -510,20 +512,20 @@ same for each of those functions.</p>
 <div><p>File name to open</p>
 </div></blockquote>
 <dl class="docutils">
-<dt>mode <span class="classifier-delimiter">:</span> <span class="classifier">str={&#8216;r&#8217;, &#8216;w&#8217;}</span></dt>
-<dd><p class="first last">Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
+<dt>mode</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">str={&#8216;r&#8217;, &#8216;w&#8217;}</span><dd><p class="first last">Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
 </dd>
-<dt>natom <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span></dt>
-<dd><p class="first last">Number of atoms in the system (necessary when mode=&#8217;w&#8217;)</p>
+<dt>natom</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span><dd><p class="first last">Number of atoms in the system (necessary when mode=&#8217;w&#8217;)</p>
 </dd>
-<dt>hasbox <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span></dt>
-<dd><p class="first last">Does the system have PBCs? Necessary when mode=&#8217;w&#8217;</p>
+<dt>hasbox</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span><dd><p class="first last">Does the system have PBCs? Necessary when mode=&#8217;w&#8217;</p>
 </dd>
-<dt>title <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
-<dd><p class="first last">Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
+<dt>title</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span><dd><p class="first last">Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
 </dd>
-<dt>time <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span></dt>
-<dd><p class="first last">The time to write to the restart file in ps. Default is 0.</p>
+<dt>time</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span><dd><p class="first last">The time to write to the restart file in ps. Default is 0.</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -2097,7 +2099,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.add_flag" title="parmed.amber.AmberParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.assign_bonds" title="parmed.amber.AmberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.assign_bonds" title="parmed.amber.AmberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.copy" title="parmed.amber.AmberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
@@ -2205,7 +2207,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.omm_urey_bradley_force" title="parmed.amber.AmberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.parse" title="parmed.amber.AmberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.prune_empty_terms" title="parmed.amber.AmberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
@@ -2256,19 +2258,22 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.view_as" title="parmed.amber.AmberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.visualize" title="parmed.amber.AmberParm.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_cif" title="parmed.amber.AmberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_parm" title="parmed.amber.AmberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_pdb" title="parmed.amber.AmberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_psf" title="parmed.amber.AmberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberParm.write_rst7" title="parmed.amber.AmberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -3747,6 +3752,27 @@ be converted into</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.amber.AmberParm.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.amber.AmberParm.write_cif">
 <code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmberParm.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
@@ -3810,6 +3836,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -3901,6 +3932,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -3932,7 +3968,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -4075,7 +4111,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.add_flag" title="parmed.amber.ChamberParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.assign_bonds" title="parmed.amber.ChamberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.assign_bonds" title="parmed.amber.ChamberParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.copy" title="parmed.amber.ChamberParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
@@ -4183,7 +4219,7 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.omm_urey_bradley_force" title="parmed.amber.ChamberParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.parse" title="parmed.amber.ChamberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.parse" title="parmed.amber.ChamberParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.prune_empty_terms" title="parmed.amber.ChamberParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
@@ -4234,19 +4270,22 @@ unit cell dimensions (a, b, c, alpha, beta, and gamma, respectively)</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.view_as" title="parmed.amber.ChamberParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_cif" title="parmed.amber.ChamberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.visualize" title="parmed.amber.ChamberParm.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_cif" title="parmed.amber.ChamberParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_parm" title="parmed.amber.ChamberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_parm" title="parmed.amber.ChamberParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_pdb" title="parmed.amber.ChamberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_pdb" title="parmed.amber.ChamberParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_psf" title="parmed.amber.ChamberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_psf" title="parmed.amber.ChamberParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_rst7" title="parmed.amber.ChamberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.ChamberParm.write_rst7" title="parmed.amber.ChamberParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -5713,6 +5752,27 @@ be converted into</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.amber.ChamberParm.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.amber.ChamberParm.write_cif">
 <code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.ChamberParm.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
@@ -5776,6 +5836,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -5867,6 +5932,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -5898,7 +5968,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -6113,7 +6183,7 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.add_flag" title="parmed.amber.AmoebaParm.add_flag"><code class="xref py py-obj docutils literal"><span class="pre">add_flag</span></code></a>(flag_name,&nbsp;flag_format[,&nbsp;data,&nbsp;...])</td>
 <td>Adds a new flag with the given flag name and Fortran format string and</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.assign_bonds" title="parmed.amber.AmoebaParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.assign_bonds" title="parmed.amber.AmoebaParm.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.copy" title="parmed.amber.AmoebaParm.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
@@ -6224,7 +6294,7 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.omm_urey_bradley_force" title="parmed.amber.AmoebaParm.omm_urey_bradley_force"><code class="xref py py-obj docutils literal"><span class="pre">omm_urey_bradley_force</span></code></a>()</td>
 <td>Creates the OpenMM Urey-Bradley force</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.parse" title="parmed.amber.AmoebaParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.parse" title="parmed.amber.AmoebaParm.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.prune_empty_terms" title="parmed.amber.AmoebaParm.prune_empty_terms"><code class="xref py py-obj docutils literal"><span class="pre">prune_empty_terms</span></code></a>()</td>
@@ -6275,19 +6345,22 @@ Amber inpcrd/restart file will be loaded into the molecule</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.view_as" title="parmed.amber.AmoebaParm.view_as"><code class="xref py py-obj docutils literal"><span class="pre">view_as</span></code></a>(cls)</td>
 <td>Returns a view of the current object as another object.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_cif" title="parmed.amber.AmoebaParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.visualize" title="parmed.amber.AmoebaParm.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_cif" title="parmed.amber.AmoebaParm.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_parm" title="parmed.amber.AmoebaParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_parm" title="parmed.amber.AmoebaParm.write_parm"><code class="xref py py-obj docutils literal"><span class="pre">write_parm</span></code></a>(name)</td>
 <td>Writes the current data in parm_data into a new topology file with a given name.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_pdb" title="parmed.amber.AmoebaParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_pdb" title="parmed.amber.AmoebaParm.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_psf" title="parmed.amber.AmoebaParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_psf" title="parmed.amber.AmoebaParm.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_rst7" title="parmed.amber.AmoebaParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmoebaParm.write_rst7" title="parmed.amber.AmoebaParm.write_rst7"><code class="xref py py-obj docutils literal"><span class="pre">write_rst7</span></code></a>(name[,&nbsp;netcdf])</td>
 <td>Writes a restart file with the current coordinates and velocities and</td>
 </tr>
 </tbody>
@@ -7791,6 +7864,27 @@ be converted into</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.amber.AmoebaParm.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.amber.AmoebaParm.write_cif">
 <code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.AmoebaParm.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
@@ -7854,6 +7948,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -7945,6 +8044,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -7976,7 +8080,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -8204,7 +8308,7 @@ format as the topology file</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.BeemanRestart.id_format" title="parmed.amber.BeemanRestart.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as either Amber-format file (like prmtop) or an old-style topology file.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.BeemanRestart.parse" title="parmed.amber.BeemanRestart.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.BeemanRestart.parse" title="parmed.amber.BeemanRestart.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Meant for use with the automatic file loader, this will automatically</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.BeemanRestart.rdparm" title="parmed.amber.BeemanRestart.rdparm"><code class="xref py py-obj docutils literal"><span class="pre">rdparm</span></code></a>(fname[,&nbsp;slow])</td>
@@ -8561,14 +8665,11 @@ and then returns an instance of the appropriate type.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -8584,12 +8685,12 @@ and then returns an instance of the appropriate type.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

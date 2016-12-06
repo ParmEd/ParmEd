@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pdbx.PdbxContainers &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.pdbx.PdbxContainers &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -93,7 +95,7 @@
 <span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;Creative Commons Attribution 3.0 Unported&quot;</span>
 <span class="n">__version__</span>   <span class="o">=</span> <span class="s2">&quot;V0.01&quot;</span>
 
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
 
 <span class="kn">import</span> <span class="nn">re</span><span class="o">,</span><span class="nn">sys</span><span class="o">,</span><span class="nn">traceback</span>
 
@@ -121,7 +123,7 @@
 <div class="viewcode-block" id="CifName.attributePart"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.CifName.attributePart">[docs]</a>    <span class="k">def</span> <span class="nf">attributePart</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">name</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span></div></div>
 
@@ -135,7 +137,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span><span class="o">=</span><span class="p">[]</span>
         <span class="c1"># dictionary of DataCategory objects keyed by category name.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="o">=</span><span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="o">=</span><span class="kc">None</span>
 
 <div class="viewcode-block" id="ContainerBase.getType"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.ContainerBase.getType">[docs]</a>    <span class="k">def</span> <span class="nf">getType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type</span></div>
@@ -156,7 +158,7 @@
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span></div>
+            <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ContainerBase.getObjNameList"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.ContainerBase.getObjNameList">[docs]</a>    <span class="k">def</span> <span class="nf">getObjNameList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span></div>
@@ -165,7 +167,7 @@
         <span class="sd">&quot;&quot;&quot; Add the input object to the current object catalog. An existing object</span>
 <span class="sd">            of the same name will be overwritten.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">:</span>
                 <span class="c1"># self.__objNameList is keeping track of object order here -- </span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
@@ -174,7 +176,7 @@
 <div class="viewcode-block" id="ContainerBase.replace"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.ContainerBase.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">obj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Replace an existing object with the input object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">getName</span><span class="p">()]</span><span class="o">=</span><span class="n">obj</span></div>
         
 
@@ -198,9 +200,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">newName</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">newName</span><span class="p">]</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">curName</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">newName</span><span class="p">]</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="n">newName</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ContainerBase.remove"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.ContainerBase.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">curName</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Revmove object by name.  Return True on success or False otherwise.</span>
@@ -210,13 +212,13 @@
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objCatalog</span><span class="p">[</span><span class="n">curName</span><span class="p">]</span>
                 <span class="n">i</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">curName</span><span class="p">)</span>
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__objNameList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="k">return</span> <span class="bp">False</span></div></div>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
 
 <div class="viewcode-block" id="DefinitionContainer"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DefinitionContainer">[docs]</a><span class="k">class</span> <span class="nc">DefinitionContainer</span><span class="p">(</span><span class="n">ContainerBase</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
@@ -225,13 +227,13 @@
 
 <div class="viewcode-block" id="DefinitionContainer.isCategory"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isCategory">[docs]</a>    <span class="k">def</span> <span class="nf">isCategory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span></div>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="DefinitionContainer.isAttribute"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.isAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">isAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">False</span></div>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
     
 
 <div class="viewcode-block" id="DefinitionContainer.printIt"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DefinitionContainer.printIt">[docs]</a>    <span class="k">def</span> <span class="nf">printIt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fh</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;brief&quot;</span><span class="p">):</span>
@@ -258,14 +260,14 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DataContainer</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setType</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span><span class="o">=</span><span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span><span class="o">=</span><span class="kc">False</span>
         
 <div class="viewcode-block" id="DataContainer.invokeDataBlockMethod"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataContainer.invokeDataBlockMethod">[docs]</a>    <span class="k">def</span> <span class="nf">invokeDataBlockMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__currentRow</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span></div>
+        <span class="n">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="DataContainer.setGlobal"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataContainer.setGlobal">[docs]</a>    <span class="k">def</span> <span class="nf">setGlobal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span><span class="o">=</span><span class="bp">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span><span class="o">=</span><span class="kc">True</span></div>
 
 <div class="viewcode-block" id="DataContainer.getGlobal"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataContainer.getGlobal">[docs]</a>    <span class="k">def</span> <span class="nf">getGlobal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__globalFlag</span></div></div>
@@ -273,15 +275,15 @@
 <div class="viewcode-block" id="DataCategoryBase"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategoryBase">[docs]</a><span class="k">class</span> <span class="nc">DataCategoryBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Base object definition for a data category -</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">attributeNameList</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowList</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">attributeNameList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">rowList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="c1">#</span>
-        <span class="k">if</span> <span class="n">rowList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rowList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="o">=</span><span class="n">rowList</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="o">=</span><span class="p">[]</span>
 
-        <span class="k">if</span> <span class="n">attributeNameList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attributeNameList</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">=</span><span class="n">attributeNameList</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">=</span><span class="p">[]</span>
@@ -316,15 +318,15 @@
 <div class="viewcode-block" id="DataCategory"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory">[docs]</a><span class="k">class</span> <span class="nc">DataCategory</span><span class="p">(</span><span class="n">DataCategoryBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;  Methods for creating, accessing, and formatting PDBx cif data categories.  </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">attributeNameList</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowList</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">attributeNameList</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">rowList</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DataCategory</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">attributeNameList</span><span class="p">,</span><span class="n">rowList</span><span class="p">)</span>        
         <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span><span class="o">=</span><span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__currentAttribute</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__currentAttribute</span><span class="o">=</span><span class="kc">None</span>
         <span class="c1">#</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__avoidEmbeddedQuoting</span><span class="o">=</span><span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__avoidEmbeddedQuoting</span><span class="o">=</span><span class="kc">False</span>
         <span class="c1">#</span>
         <span class="c1"># --------------------------------------------------------------------</span>
         <span class="c1"># any whitespace </span>
@@ -369,7 +371,7 @@
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">ii</span><span class="p">]</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s2">&quot;Should not be here&quot;</span>
+        <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Should not be here&quot;</span>
         
     
 <div class="viewcode-block" id="DataCategory.getCurrentAttribute"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getCurrentAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -397,13 +399,13 @@
                 <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> 
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">)</span> <span class="o">-</span><span class="mi">1</span>
-                <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
-        <span class="k">return</span> <span class="bp">False</span></div>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="DataCategory.getFullRow"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getFullRow">[docs]</a>    <span class="k">def</span> <span class="nf">getFullRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a full row based on the length of the the attribute list.</span>
@@ -490,12 +492,12 @@
 
         
 
-<div class="viewcode-block" id="DataCategory.getValue"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DataCategory.getValue"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attribute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__currentAttribute</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">attribute</span> <span class="o">=</span> <span class="n">attributeName</span>
-        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span><span class="n">rowIndex</span>
@@ -507,13 +509,13 @@
                 <span class="k">raise</span> <span class="ne">IndexError</span>        
         <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">attribute</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="DataCategory.setValue"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.setValue">[docs]</a>    <span class="k">def</span> <span class="nf">setValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DataCategory.setValue"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.setValue">[docs]</a>    <span class="k">def</span> <span class="nf">setValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attribute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__currentAttribute</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">attribute</span><span class="o">=</span><span class="n">attributeName</span>
 
-        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span> <span class="n">rowIndex</span>
@@ -529,21 +531,21 @@
 
                 <span class="c1"># extend the list if needed - </span>
                 <span class="k">if</span> <span class="p">(</span> <span class="n">ind</span> <span class="o">&gt;=</span> <span class="n">ll</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span> <span class="o">-</span><span class="n">ll</span><span class="p">)])</span>    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span> <span class="o">-</span><span class="n">ll</span><span class="p">)])</span>    
                 <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">[</span><span class="n">rowI</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="n">value</span>                    
             <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;DataCategory(setvalue) index error category </span><span class="si">%s</span><span class="s2"> attribute </span><span class="si">%s</span><span class="s2"> index </span><span class="si">%d</span><span class="s2"> value </span><span class="si">%r</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">attribute</span><span class="p">,</span><span class="n">rowI</span><span class="p">,</span><span class="n">value</span><span class="p">))</span>
-                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                                
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                                
                 <span class="c1">#raise IndexError</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;DataCategory(setvalue) value error category </span><span class="si">%s</span><span class="s2"> attribute </span><span class="si">%s</span><span class="s2"> index </span><span class="si">%d</span><span class="s2"> value </span><span class="si">%r</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span>
                                  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span><span class="n">attribute</span><span class="p">,</span><span class="n">rowI</span><span class="p">,</span><span class="n">value</span><span class="p">))</span>                
-                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                </div>
+                <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                </div>
                 <span class="c1">#raise ValueError</span>
 
     <span class="k">def</span> <span class="nf">__emptyRow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">))]</span>
         
 <div class="viewcode-block" id="DataCategory.replaceValue"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceValue">[docs]</a>    <span class="k">def</span> <span class="nf">replaceValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">oldValue</span><span class="p">,</span><span class="n">newValue</span><span class="p">,</span><span class="n">attributeName</span><span class="p">):</span>
         <span class="n">numReplace</span><span class="o">=</span><span class="mi">0</span>
@@ -557,7 +559,7 @@
         <span class="k">return</span> <span class="n">numReplace</span></div>
 
 <div class="viewcode-block" id="DataCategory.replaceSubstring"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.replaceSubstring">[docs]</a>    <span class="k">def</span> <span class="nf">replaceSubstring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">oldValue</span><span class="p">,</span><span class="n">newValue</span><span class="p">,</span><span class="n">attributeName</span><span class="p">):</span>
-        <span class="n">ok</span><span class="o">=</span><span class="bp">False</span>
+        <span class="n">ok</span><span class="o">=</span><span class="kc">False</span>
         <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">:</span>            
             <span class="k">return</span> <span class="n">ok</span>
         <span class="n">ind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">attributeName</span><span class="p">)</span>
@@ -565,7 +567,7 @@
             <span class="n">val</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
             <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">oldValue</span><span class="p">,</span><span class="n">newValue</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]:</span>
-                <span class="n">ok</span><span class="o">=</span><span class="bp">True</span>
+                <span class="n">ok</span><span class="o">=</span><span class="kc">True</span>
         <span class="k">return</span> <span class="n">ok</span></div>
         
 <div class="viewcode-block" id="DataCategory.invokeAttributeMethod"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeAttributeMethod">[docs]</a>    <span class="k">def</span> <span class="nf">invokeAttributeMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeName</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
@@ -575,21 +577,21 @@
         <span class="c1">#</span>
         <span class="n">ind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">attributeName</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)]</span>
-            <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span>
+            <span class="n">row</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)]</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rowList</span><span class="p">:</span>
             <span class="n">ll</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">ind</span> <span class="o">&gt;=</span> <span class="n">ll</span><span class="p">):</span>
-                <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">-</span><span class="n">ll</span><span class="p">)])</span>
-                <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="bp">None</span>
-            <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="kc">None</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">ind</span><span class="o">-</span><span class="n">ll</span><span class="p">)])</span>
+                <span class="n">row</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span>
+            <span class="n">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span><span class="o">+=</span><span class="mi">1</span></div>
 
 <div class="viewcode-block" id="DataCategory.invokeCategoryMethod"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.invokeCategoryMethod">[docs]</a>    <span class="k">def</span> <span class="nf">invokeCategoryMethod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">type</span><span class="p">,</span><span class="n">method</span><span class="p">,</span><span class="n">db</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span></div>
+        <span class="n">exec</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">getInline</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="DataCategory.getAttributeLengthMaximumList"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getAttributeLengthMaximumList">[docs]</a>    <span class="k">def</span> <span class="nf">getAttributeLengthMaximumList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">mList</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">)]</span>
@@ -606,9 +608,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_attributeNameList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">newAttributeName</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="p">[</span><span class="n">curAttributeName</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>            
             <span class="bp">self</span><span class="o">.</span><span class="n">_catalog</span><span class="p">[</span><span class="n">newAttributeName</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span><span class="o">=</span><span class="n">newAttributeName</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+            <span class="k">return</span> <span class="kc">False</span></div>
         
 <div class="viewcode-block" id="DataCategory.printIt"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.printIt">[docs]</a>    <span class="k">def</span> <span class="nf">printIt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fh</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
         <span class="n">fh</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -645,7 +647,7 @@
         <span class="sd">&quot;&quot;&quot; Format input data following PDBx quoting rules - </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">inp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">inp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span><span class="s1">&#39;DT_NULL_VALUE&#39;</span><span class="p">)</span>
 
             <span class="c1"># pure numerical values are returned as unquoted strings</span>
@@ -692,12 +694,12 @@
                         
                         
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="nb">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                            
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__lfh</span><span class="p">)</span>                            
 
     <span class="k">def</span> <span class="nf">__dataTypePdbx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Detect the PDBx data type - </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">inp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">inp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;DT_NULL_VALUE&#39;</span><span class="p">)</span>
         
         <span class="c1"># pure numerical values are returned as unquoted strings</span>
@@ -771,13 +773,13 @@
 
         <span class="k">return</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DataCategory.getValueFormatted"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted">[docs]</a>    <span class="k">def</span> <span class="nf">getValueFormatted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="DataCategory.getValueFormatted"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxContainers.html#parmed.formats.pdbx.PdbxContainers.DataCategory.getValueFormatted">[docs]</a>    <span class="k">def</span> <span class="nf">getValueFormatted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">rowIndex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attribute</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__currentAttribute</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">attribute</span><span class="o">=</span><span class="n">attributeName</span>
 
-        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">rowIndex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__currentRowIndex</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rowI</span> <span class="o">=</span> <span class="n">rowIndex</span>
@@ -866,14 +868,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -889,13 +888,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

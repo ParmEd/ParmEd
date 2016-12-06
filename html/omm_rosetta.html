@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Seeding OpenMM Simulations with PyRosetta and ParmEd &mdash; ParmEd 2.5.0 documentation</title>
+    <title>Seeding OpenMM Simulations with PyRosetta and ParmEd &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="up" title="PyRosetta Integration" href="rosetta.html" />
     <link rel="next" title="Using parmed" href="parmed.html" />
@@ -45,8 +47,8 @@
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="rosetta.html" accesskey="U">PyRosetta Integration</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="rosetta.html" accesskey="U">PyRosetta Integration</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,7 +67,7 @@
 <h2>Generate pose from primary structure<a class="headerlink" href="#generate-pose-from-primary-structure" title="Permalink to this headline">¶</a></h2>
 <p>To start, let&#8217;s create a PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code>
 directly from a sequence of twelve alanines:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rosetta</span> <span class="kn">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">pose_from_sequence</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rosetta</span> <span class="k">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">pose_from_sequence</span>
 
 <span class="n">init</span><span class="p">()</span>
 
@@ -78,7 +80,7 @@ directly from a sequence of twelve alanines:</p>
 <h2>Mutate a residue<a class="headerlink" href="#mutate-a-residue" title="Permalink to this headline">¶</a></h2>
 <p>Want to mutate the fifth residue to a lysine? PyRosetta
 makes it as easy as:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">toolbox</span> <span class="kn">import</span> <span class="n">mutate_residue</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">toolbox</span> <span class="k">import</span> <span class="n">mutate_residue</span>
 
 <span class="n">mutant</span> <span class="o">=</span> <span class="n">mutate_residue</span><span class="p">(</span><span class="n">pose</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">)</span>
 </pre></div>
@@ -88,7 +90,7 @@ makes it as easy as:</p>
 <h2>Load Pose into ParmEd<a class="headerlink" href="#load-pose-into-parmed" title="Permalink to this headline">¶</a></h2>
 <p>The next step is to use ParmEd&#8217;s <code class="xref py py-func docutils literal"><span class="pre">load_rosetta()</span></code> function
 to convert our mutant into a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_rosetta</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_rosetta</span>
 
 <span class="n">struct</span> <span class="o">=</span> <span class="n">load_rosetta</span><span class="p">(</span><span class="n">mutant</span><span class="p">)</span>
 </pre></div>
@@ -98,9 +100,9 @@ to convert our mutant into a <code class="xref py py-class docutils literal"><sp
 <h2>Start an OpenMM simulation<a class="headerlink" href="#start-an-openmm-simulation" title="Permalink to this headline">¶</a></h2>
 <p>Finally, we can use the following code to solvate and
 start simulating our ParmEd <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">simtk.openmm.app</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">simtk.unit</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">simtk.openmm.app</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">simtk.unit</span> <span class="k">import</span> <span class="o">*</span>
 
 <span class="n">ff</span> <span class="o">=</span> <span class="n">ForceField</span><span class="p">(</span><span class="s1">&#39;amber99sbildn.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">)</span>
 
@@ -164,14 +166,11 @@ start simulating our ParmEd <code class="xref py py-class docutils literal"><spa
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -193,13 +192,13 @@ start simulating our ParmEd <code class="xref py py-class docutils literal"><spa
         <li class="right" >
           <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="rosetta.html" >PyRosetta Integration</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="rosetta.html" >PyRosetta Integration</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

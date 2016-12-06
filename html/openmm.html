@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>OpenMM Functionality &mdash; ParmEd 2.5.0 documentation</title>
+    <title>OpenMM Functionality &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.openmm.StateDataReporter" href="openmmobj/parmed.openmm.StateDataReporter.html" />
     <link rel="prev" title="The API for ParmEd Command-line Utilities" href="parmed_api.html" /> 
@@ -44,7 +46,7 @@
         <li class="right" >
           <a href="parmed_api.html" title="The API for ParmEd Command-line Utilities"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -119,7 +121,7 @@ modestly optimized GPU implementation of that term!</p>
 <p>For example, suppose you want to model a few bonds in your biomolecule using a
 typical Morse potential, the OpenMM Python code that will do this is shown
 below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">force</span> <span class="o">=</span> <span class="n">CustomBondForce</span><span class="p">(</span><span class="s2">&quot;D*(1-exp(-alpha*(r-req)))^2&quot;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">force</span> <span class="o">=</span> <span class="n">CustomBondForce</span><span class="p">(</span><span class="s2">&quot;D*(1-exp(-alpha*(r-req)))^2&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>And that&#8217;s it! Once you add the bonds to that force, with their parameters,
@@ -206,9 +208,9 @@ energy unit (<code class="docutils literal"><span class="pre">nrg</span></code>)
 different force groups. This permits an form of energy decomposition that allows
 energy components to be compared between programs more effectively. For
 example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="k">import</span> <span class="n">app</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">simtk</span> <span class="k">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Instantiate the parm and create the system</span>
 <span class="gp">... </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tip4p.parm7&#39;</span><span class="p">,</span> <span class="s1">&#39;tip4p.rst7&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span>
@@ -288,11 +290,11 @@ capabilities, but want to use that parametrized system in another program, like
 Amber or Gromacs.</p>
 <p>An example is shown below, using the OpenMM functionality to parametrize a PDB
 file with the ff99SB force field:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">chem</span>
-<span class="kn">import</span> <span class="nn">parmed.unit</span> <span class="kn">as</span> <span class="nn">u</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">chem</span>
+<span class="kn">import</span> <span class="nn">parmed.unit</span> <span class="k">as</span> <span class="nn">u</span>
 
-<span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="kn">import</span> <span class="n">app</span>
-<span class="kn">from</span> <span class="nn">simtk</span> <span class="kn">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
+<span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="k">import</span> <span class="n">app</span>
+<span class="kn">from</span> <span class="nn">simtk</span> <span class="k">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
 
 <span class="n">pdb</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="s1">&#39;input.pdb&#39;</span><span class="p">)</span>
 <span class="n">forcefield</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">ForceField</span><span class="p">(</span><span class="s1">&#39;amber99sb.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;tip3p.xml&#39;</span><span class="p">)</span>
@@ -350,14 +352,11 @@ prevents ParmEd from recognizing the potential.</li>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -379,12 +378,12 @@ prevents ParmEd from recognizing the potential.</li>
         <li class="right" >
           <a href="parmed_api.html" title="The API for ParmEd Command-line Utilities"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

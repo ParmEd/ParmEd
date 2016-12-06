@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Examples using CHARMM Files &mdash; ParmEd 2.5.0 documentation</title>
+    <title>Examples using CHARMM Files &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="up" title="OpenMM Functionality" href="openmm.html" />
     <link rel="next" title="Running OpenMM Simulation with GROMACS Files" href="omm_gromacs.html" />
@@ -45,8 +47,8 @@
         <li class="right" >
           <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="openmm.html" accesskey="U">OpenMM Functionality</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="openmm.html" accesskey="U">OpenMM Functionality</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -80,22 +82,22 @@ find the following files that you will need for this demonstration in the
 </div></blockquote>
 <p>The following sample script (<code class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
 distribution) will set up and run the simulation using OpenMM:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="c1"># OpenMM Imports</span>
-<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
-<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="k">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="k">as</span> <span class="nn">app</span>
 
 <span class="c1"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="k">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="k">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c1"># Load the CHARMM files</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">(</span><span class="s1">&#39;toppar/par_all36_prot.prm&#39;</span><span class="p">)</span>
 <span class="n">ala5_gas</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;ala5_autopsf.psf&#39;</span><span class="p">)</span>
 <span class="n">ala5_crds</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="s1">&#39;ala5_autopsf.pdb&#39;</span><span class="p">)</span>
@@ -109,7 +111,7 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="c1"># END NOTE</span>
 
 <span class="c1"># Create the OpenMM system</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
 <span class="n">system</span> <span class="o">=</span> <span class="n">ala5_gas</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">,</span>
                                <span class="n">constraints</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">,</span> <span class="n">implicitSolvent</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HCT</span><span class="p">,</span>
                                <span class="n">implicitSolventSaltConc</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">moles</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span>
@@ -134,19 +136,19 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">ala5_crds</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
 <span class="c1"># Minimize the energy</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Minimizing energy&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Minimizing energy&#39;</span><span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
 <span class="c1"># Set up the reporters to report energies and coordinates every 100 steps</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">volume</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">volume</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">DCDReporter</span><span class="p">(</span><span class="s1">&#39;ala5_gb.dcd&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
 
 <span class="c1"># Run dynamics</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Running dynamics&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running dynamics&#39;</span><span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -268,22 +270,22 @@ find the following files that you will need for this demonstration in the
 </div></blockquote>
 <p>The following sample script (<code class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
 distribution) will set up and run the simulation using OpenMM:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="c1"># OpenMM Imports</span>
-<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
-<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="k">as</span> <span class="nn">mm</span>
+<span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="k">as</span> <span class="nn">app</span>
 
 <span class="c1"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.openmmreporters</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="k">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.openmmreporters</span> <span class="k">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c1"># Load the CHARMM files</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
 <span class="n">params</span> <span class="o">=</span> <span class="n">CharmmParameterSet</span><span class="p">(</span><span class="s1">&#39;toppar/par_all36_prot.prm&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;toppar/toppar_water_ions.str&#39;</span><span class="p">)</span>
 <span class="n">ala2_solv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;ala2_charmmgui.psf&#39;</span><span class="p">)</span>
@@ -317,7 +319,7 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="p">)</span>
 
 <span class="c1"># Create the OpenMM system</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating OpenMM System&#39;</span><span class="p">)</span>
 <span class="n">system</span> <span class="o">=</span> <span class="n">ala2_solv</span><span class="o">.</span><span class="n">createSystem</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">nonbondedMethod</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span>
                                 <span class="n">nonbondedCutoff</span><span class="o">=</span><span class="mf">12.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span>
                                 <span class="n">constraints</span><span class="o">=</span><span class="n">app</span><span class="o">.</span><span class="n">HBonds</span><span class="p">,</span>
@@ -343,19 +345,19 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">ala2_crds</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
 <span class="c1"># Minimize the energy</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Minimizing energy&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Minimizing energy&#39;</span><span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">maxIterations</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
 <span class="c1"># Set up the reporters to report energies and coordinates every 100 steps</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">volume</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">StateDataReporter</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">potentialEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">kineticEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">volume</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">reporters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">DCDReporter</span><span class="p">(</span><span class="s1">&#39;ala2_solv.dcd&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
 
 <span class="c1"># Run dynamics</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;Running dynamics&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Running dynamics&#39;</span><span class="p">)</span>
 <span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -528,14 +530,11 @@ running a long simulation in chunks.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -557,13 +556,13 @@ running a long simulation in chunks.</p>
         <li class="right" >
           <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="openmm.html" >OpenMM Functionality</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="openmm.html" >OpenMM Functionality</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

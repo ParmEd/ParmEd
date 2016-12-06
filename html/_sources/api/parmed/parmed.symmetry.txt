@@ -1,0 +1,7 @@
+parmed.symmetry module
+======================
+
+.. automodule:: parmed.symmetry
+    :members:
+    :undoc-members:
+    :show-inheritance:

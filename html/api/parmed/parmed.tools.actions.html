@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.tools.actions module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.tools.actions module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -58,6 +60,16 @@ ParmEd interpreter. So just adding the subclass, wherever it happens, and
 giving it a &#8216;usage&#8217; attribute is sufficient to have it added to the
 interpreter map. There are a number of attributes that can refine the
 behavior of individual Actions in the interpreter:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>input_parm</strong> : Structure</p>
+<p class="last"><strong>arg_list</strong> : str or ArgumentList</p>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -1427,8 +1439,8 @@ atoms.</p>
 <blockquote>
 <div><ul>
 <li><dl class="first docutils">
-<dt>&lt;mask&gt; <span class="classifier-delimiter">:</span> <span class="classifier">The selection of atoms to change the LJ type for. All atoms</span></dt>
-<dd><p class="first last">selected must have the same LJ type</p>
+<dt>&lt;mask&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">The selection of atoms to change the LJ type for. All atoms</span><dd><p class="first last">selected must have the same LJ type</p>
 </dd>
 </dl>
 </li>
@@ -2429,8 +2441,8 @@ atom2 from mask2, and atom2 from mask3, etc.)</p>
 <li><p class="first">&lt;mask3&gt; : The selection of other end-atoms in each angle</p>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;k&gt; <span class="classifier-delimiter">:</span> <span class="classifier">Force constant in kcal/mol/radians^2 in energy expression</span></dt>
-<dd><p class="first last">k(THET - THETeq)^2</p>
+<dt>&lt;k&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Force constant in kcal/mol/radians^2 in energy expression</span><dd><p class="first last">k(THET - THETeq)^2</p>
 </dd>
 </dl>
 </li>
@@ -2516,14 +2528,14 @@ mask4.</p>
 <li><p class="first">&lt;mask1&gt; : Selection of one of the end-atoms for each dihedral</p>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;mask2&gt; <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the middle atom bonded to &lt;mask1&gt; and</span></dt>
-<dd><p class="first last">&lt;mask3&gt; in each dihedral</p>
+<dt>&lt;mask2&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the middle atom bonded to &lt;mask1&gt; and</span><dd><p class="first last">&lt;mask3&gt; in each dihedral</p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;mask3&gt; <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the other middle atom bonded to &lt;mask2&gt;</span></dt>
-<dd><p class="first last">and &lt;mask4&gt;</p>
+<dt>&lt;mask3&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the other middle atom bonded to &lt;mask2&gt;</span><dd><p class="first last">and &lt;mask4&gt;</p>
 </dd>
 </dl>
 </li>
@@ -2540,8 +2552,8 @@ mask4.</p>
 <li><p class="first">&lt;scee&gt; : 1-4 electrostatic scaling constant (default 1.2)</p>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;type&gt; <span class="classifier-delimiter">:</span> <span class="classifier">Type of dihedral, either &#8220;improper&#8221; or &#8220;normal&#8221;.</span></dt>
-<dd><p class="first last">Default is &#8220;normal&#8221;</p>
+<dt>&lt;type&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Type of dihedral, either &#8220;improper&#8221; or &#8220;normal&#8221;.</span><dd><p class="first last">Default is &#8220;normal&#8221;</p>
 </dd>
 </dl>
 </li>
@@ -3254,16 +3266,16 @@ outputted topology files.</p>
 <li><p class="first">&lt;nparm&gt; : Number of topology files that will be generated</p>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;other_parm&gt; <span class="classifier-delimiter">:</span> <span class="classifier">The other parm object used in interpolation if more</span></dt>
-<dd><p class="first last">than 2 parms are present (first parm is active one)</p>
+<dt>&lt;other_parm&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">The other parm object used in interpolation if more</span><dd><p class="first last">than 2 parms are present (first parm is active one)</p>
 </dd>
 </dl>
 </li>
 <li><p class="first">eleconly : Only do charge interpolation</p>
 </li>
 <li><dl class="first docutils">
-<dt>&lt;prefix&gt; <span class="classifier-delimiter">:</span> <span class="classifier">Generated parm objects will be written as &lt;prefix&gt;.#, where</span></dt>
-<dd><p class="first last"># starts from &lt;num&gt; and increases by 1</p>
+<dt>&lt;prefix&gt;</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Generated parm objects will be written as &lt;prefix&gt;.#, where</span><dd><p class="first last"># starts from &lt;num&gt; and increases by 1</p>
 </dd>
 </dl>
 </li>
@@ -3909,6 +3921,13 @@ script file is provided.</p>
 <p>This action will compute a single-point energy for the loaded structure (you
 must use &#8216;loadRestart&#8217; prior to this command to load coordinates). The
 following options and keywords are supported:</p>
+<p class="rubric">Examples</p>
+<p># Using AMBER
+import parmed as pmd
+parm = pmd.load_file(&#8216;prmtop&#8217;, xyz=&#8217;rst7&#8217;) 
+pmd.tools.energy(parm, &#8216;igb 8&#8217;).execute()</p>
+<p># Using Openmm
+pmd.tools.energy(parm, &#8216;igb 5 omm&#8217;).execute()</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -3988,8 +4007,8 @@ following options and keywords are supported:</p>
 <li><p class="first">&lt;mask2&gt; : Amber mask defining the other atom in the bond</p>
 </li>
 <li><dl class="first docutils">
-<dt>[verbose] <span class="classifier-delimiter">:</span> <span class="classifier">Print out every bond that is deleted as well as the</span></dt>
-<dd><p class="first last">number of other valence terms that were eliminated.</p>
+<dt>[verbose]</dt>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Print out every bond that is deleted as well as the</span><dd><p class="first last">number of other valence terms that were eliminated.</p>
 </dd>
 </dl>
 </li>
@@ -4133,7 +4152,7 @@ properly expanded when looking for files.</p>
 
 <dl class="attribute">
 <dt id="parmed.tools.actions.chamber.usage">
-<code class="descname">usage</code><em class="property"> = '-top &lt;RTF&gt; -param &lt;PAR&gt; [-str &lt;STR&gt;] -psf &lt;PSF&gt; [-crd &lt;CRD&gt;] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii &lt;radiusset&gt;]'</em><a class="headerlink" href="#parmed.tools.actions.chamber.usage" title="Permalink to this definition">¶</a></dt>
+<code class="descname">usage</code><em class="property"> = '-top &lt;RTF&gt; -param &lt;PAR&gt; [-str &lt;STR&gt;] -psf &lt;PSF&gt; [-crd &lt;CRD&gt;] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii &lt;radiusset&gt;] [nosettle]'</em><a class="headerlink" href="#parmed.tools.actions.chamber.usage" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -4495,14 +4514,11 @@ example:</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -4518,12 +4534,12 @@ example:</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

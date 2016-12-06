@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.psf &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.psf &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -52,14 +54,13 @@
 <span class="sd">This module contains classes for reading and writing CHARMM- and XPLOR-style PSF</span>
 <span class="sd">files</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="k">import</span> <span class="n">CharmmPsfFile</span>
 <span class="c1"># TODO -- move this functionality to a more centralized location</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm.psf</span> <span class="kn">import</span> <span class="n">set_molecules</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">parmed.utils</span> <span class="kn">import</span> <span class="n">canonical_improper_order</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm.psf</span> <span class="k">import</span> <span class="n">set_molecules</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="PSFFile"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.psf.html#parmed.amber.PSFFile">[docs]</a><span class="k">class</span> <span class="nc">PSFFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -112,7 +113,7 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PSFFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.psf.html#parmed.amber.PSFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PSFFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.psf.html#parmed.amber.PSFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">vmd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes a PSF file from the stored molecule</span>
 
@@ -125,7 +126,7 @@
 <span class="sd">            attribute, it will be used to print the PSF file. Otherwise, it will</span>
 <span class="sd">            be treated like a string and a file will be opened, printed, then</span>
 <span class="sd">            closed</span>
-<span class="sd">        vmd : bool </span>
+<span class="sd">        vmd : bool</span>
 <span class="sd">            If True, it will write out a PSF in the format that VMD prints it in</span>
 <span class="sd">            (i.e., no NUMLP/NUMLPH or MOLNT sections)</span>
 
@@ -138,11 +139,21 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;EXT&#39;</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">flags</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="n">ext</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">ext</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># See if this is an XPLOR format</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">xplor</span> <span class="o">=</span> <span class="s1">&#39;XPLOR&#39;</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">flags</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                    <span class="n">xplor</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xplor</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Index the atoms and residues TODO delete</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
 
         <span class="c1"># Assign the formats we need to write with</span>
@@ -161,6 +172,8 @@
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">flags</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;CHEQ&#39;</span><span class="p">,)))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;EXT&#39;</span><span class="p">)</span> <span class="c1"># EXT is always active if no flags present</span>
+            <span class="k">if</span> <span class="n">xplor</span><span class="p">:</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; XPLOR&#39;</span><span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">intfmt</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">+</span> <span class="s1">&#39; !NTITLE</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -250,11 +263,7 @@
                 <span class="k">yield</span> <span class="p">(</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom4</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">dih</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dih</span><span class="o">.</span><span class="n">improper</span><span class="p">:</span>
-                    <span class="c1"># Central atom first</span>
-                    <span class="k">yield</span> <span class="n">canonical_improper_order</span><span class="p">(</span>
-                            <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span>
-                            <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                    <span class="p">)</span>
+                    <span class="k">yield</span> <span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">improp_gen</span><span class="p">(</span><span class="n">struct</span><span class="p">)):</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">a1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">a3</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">a4</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># Write 2 dihedrals per line</span>
@@ -303,7 +312,7 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">typ</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-4</span> <span class="k">else</span> <span class="mi">2</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">4</span> <span class="k">else</span> <span class="mi">2</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="n">intfmt</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -344,14 +353,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -367,13 +373,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

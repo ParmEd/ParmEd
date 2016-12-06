@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -70,7 +72,7 @@
 <p>This is a collection of all of the OpenMM functionality supported in ParmEd</p>
 <dl class="class">
 <dt id="parmed.openmm.StateDataReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
@@ -680,7 +682,7 @@ single-point energies.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.EnergyMinimizerReporter.describeNextReport" title="parmed.openmm.EnergyMinimizerReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.EnergyMinimizerReporter.describeNextReport" title="parmed.openmm.EnergyMinimizerReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
 <td>Disable this reporter inside MD</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.EnergyMinimizerReporter.finalize" title="parmed.openmm.EnergyMinimizerReporter.finalize"><code class="xref py py-obj docutils literal"><span class="pre">finalize</span></code></a>()</td>
@@ -854,7 +856,7 @@ result, this function may require a significant amount of memory.</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>This computes the energy of every force group in the given structure and
 computes the energy for each force group for the given Context.  Note, the
 context must have positions already assigned.</p>
@@ -891,7 +893,7 @@ with the energy of that group in</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition_system">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>structure</em>, <em>system</em>, <em>platform=None</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>structure</em>, <em>system</em>, <em>platform=None</em>, <em>nrg=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function computes the energy contribution for all of the different
 force groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1237,14 +1239,11 @@ removed if it is provided).</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1260,12 +1259,12 @@ removed if it is provided).</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

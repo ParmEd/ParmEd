@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -89,6 +91,9 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.formats.registry.html">parmed.formats.registry module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.formats.sdf.html">parmed.formats.sdf module</a><ul class="simple">
 </ul>
 </li>
 </ul>
@@ -182,37 +187,43 @@ applies both to local and remote files. The following names are supported:</p>
 <li><code class="docutils literal"><span class="pre">.bz2</span></code> : bzip2 compressed file</li>
 </ul>
 </div></blockquote>
+<p>SDF file is loaded via <cite>rdkit</cite> package.</p>
 <p class="rubric">Examples</p>
 <p>Load a Mol2 file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
 <span class="go">&lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
 </pre></div>
 </div>
 <p>Load a Mol2 file as a Structure</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="go">&lt;Structure 31 atoms; 1 residues; 33 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load an Amber topology file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s1">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="s1">&#39;trx.inpcrd&#39;</span><span class="p">)</span>
 <span class="go">&lt;AmberParm 1654 atoms; 108 residues; 1670 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a CHARMM PSF file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;ala_ala_ala.psf&#39;</span><span class="p">)</span>
 <span class="go">&lt;CharmmPsfFile 33 atoms; 3 residues; 32 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a PDB and CIF file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;</span>
 </pre></div>
 </div>
 <p>Load a Gromacs topology file &#8211; only works with Gromacs installed</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;1aki.ff99sbildn.top&#39;</span><span class="p">)</span>
 <span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
+</pre></div>
+</div>
+<p>Load a SDF file &#8211; only works with rdkit installed</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;mol.sdf&#39;</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&lt;Structure 34 atoms; 1 residues; 66 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -421,6 +432,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 </dd></dl>
@@ -546,12 +562,17 @@ being parsed simply for its coordinates. Default is False.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
 <p><strong>structure#</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote class="last">
+<blockquote>
 <div><p>The Structure object initialized with all of the information from
 the PDBx/mmCIF file.  No bonds or other topological features are
 added by default. If multiple structures are defined in the CIF
 file, multiple Structure instances will be returned as a tuple.</p>
 </div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if the file severely violates the PDB format specification.</strong></p>
+<p><strong>If this occurs, check the formatting on each line and make sure it</strong></p>
+<p class="last"><strong>matches the others.</strong></p>
 </td>
 </tr>
 </tbody>
@@ -622,6 +643,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 </dd></dl>
@@ -644,11 +670,21 @@ will be converted into the PDB-standard values. Default is False</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.formats.Mol2File.parse" title="parmed.formats.Mol2File.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
 <td>Parses a mol2 file (or mol3) file</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.Mol2File.write" title="parmed.formats.Mol2File.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;mol3,&nbsp;split,&nbsp;...])</td>
 <td>Writes a mol2 file from a structure or residue template</td>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="parmed.formats.Mol2File.BOND_ORDER_MAP">
+<code class="descname">BOND_ORDER_MAP</code><em class="property"> = {'am': 1.25, 'ar': 1.5}</em><a class="headerlink" href="#parmed.formats.Mol2File.BOND_ORDER_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.formats.Mol2File.REVERSE_BOND_ORDER_MAP">
+<code class="descname">REVERSE_BOND_ORDER_MAP</code><em class="property"> = {1.25: 'am', 1.5: 'ar'}</em><a class="headerlink" href="#parmed.formats.Mol2File.REVERSE_BOND_ORDER_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.id_format">
 <em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.id_format" title="Permalink to this definition">¶</a></dt>
@@ -719,7 +755,7 @@ raises Mol2Error if you try to parse a mol2 file that has multiple
 
 <dl class="staticmethod">
 <dt id="parmed.formats.Mol2File.write">
-<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>mol3=False</em>, <em>split=False</em>, <em>compress_whitespace=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/mol2.html#Mol2File.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.Mol2File.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a mol2 file from a structure or residue template</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -742,10 +778,18 @@ raises Mol2Error if you try to parse a mol2 file that has multiple
 HEAD/TAIL sections. Default is False</p>
 </div></blockquote>
 <p><strong>split</strong> : bool, optional</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If True and <code class="docutils literal"><span class="pre">struct</span></code> is a ResidueTemplateContainer or a Structure
 with multiple residues, each residue is printed in a separate
 &#64;&lt;MOLECULE&gt; section that appear sequentially in the output file</p>
+</div></blockquote>
+<p><strong>compress_whitespace</strong> : bool, optional</p>
+<blockquote class="last">
+<div><p>If True, seprate fields on one line with a single space instead of
+aligning them with whitespace. This is useful for parsers that
+truncate lines at 80 characters (e.g., some versions of OpenEye).
+However, it will not look as &#8220;neat&#8221; upon visual inspection in a text
+editor. Default is False.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -859,7 +903,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -996,6 +1040,57 @@ will be converted into the PDB-standard values. Default is False</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="parmed.formats.SDFFile">
+<em class="property">class </em><code class="descclassname">parmed.formats.</code><code class="descname">SDFFile</code><a class="reference internal" href="../../_modules/parmed/formats/sdf.html#SDFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.SDFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class to read SDF file</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.SDFFile.id_format" title="parmed.formats.SDFFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
+<td>Identify the file as a SDF file format or not</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.SDFFile.parse" title="parmed.formats.SDFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="parmed.formats.SDFFile.id_format">
+<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/sdf.html#SDFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.SDFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify the file as a SDF file format or not</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
+<blockquote>
+<div><p>Name of the file to test whether or not it is a sdf file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
+<blockquote class="last">
+<div><p>True if it is a sdf file, False otherwise</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="parmed.formats.SDFFile.parse">
+<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/sdf.html#SDFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.SDFFile.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 
@@ -1027,14 +1122,11 @@ will be converted into the PDB-standard values. Default is False</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1050,12 +1142,12 @@ will be converted into the PDB-standard values. Default is False</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

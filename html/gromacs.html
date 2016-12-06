@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The parmed.gromacs package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>The parmed.gromacs package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.gromacs.GromacsTopologyFile" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" /> 
   </head>
@@ -40,7 +42,7 @@
         <li class="right" >
           <a href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" title="parmed.gromacs.GromacsTopologyFile"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -83,12 +85,12 @@ the Gromacs install location.</li>
 <p>If you wish to specify the location, you can do so by modifying the
 <code class="docutils literal"><span class="pre">GROMACS_TOPDIR</span></code> variable in the <code class="docutils literal"><span class="pre">parmed.gromacs</span></code> package in the
 following way:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">gromacs</span>
 <span class="n">gromacs</span><span class="o">.</span><span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s2">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
 </pre></div>
 </div>
 <p>Note, because strings are immutable in Python, the following will <em>not</em> work:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.gromacs</span> <span class="kn">import</span> <span class="n">GROMACS_TOPDIR</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.gromacs</span> <span class="k">import</span> <span class="n">GROMACS_TOPDIR</span>
 <span class="n">GROMACS_TOPDIR</span> <span class="o">=</span> <span class="s2">&quot;/path/to/gromacs/installation/share/gromacs/top&quot;</span>
 </pre></div>
 </div>
@@ -123,7 +125,7 @@ include topology files that were included and parsed while processing the
 topology file).</p>
 <p>An example using this class on <a class="reference external" href="https://github.com/swails/ParmEd/blob/master/test/files/1aki.charmm27.top">one of the test files in the ParmEd repostory</a>
 is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s1">&#39;1aki.charmm27.top&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s1">&#39;1aki.charmm27.top&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">top</span>
 <span class="go">&lt;GromacsTopologyFile 1960 atoms; 129 residues; 1984 bonds; parametrized&gt;</span>
 </pre></div>
@@ -158,24 +160,24 @@ original order of the atoms is changed, then the topology atom order will no
 longer match that from the coordinate file! An annotated example may help
 demonstrate this. Consider the following topology file (it is actually the
 <code class="docutils literal"><span class="pre">topol3.top</span></code> file from the <code class="docutils literal"><span class="pre">12.DPPC/</span></code> directory in the test suite):</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>#include &quot;DPPC_2.itp&quot;
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#include &quot;DPPC_2.itp&quot;</span>
 
-; System specifications
-[ system ]
-DPPC Bilayer
+<span class="p">;</span> <span class="n">System</span> <span class="n">specifications</span>
+<span class="p">[</span> <span class="n">system</span> <span class="p">]</span>
+<span class="n">DPPC</span> <span class="n">Bilayer</span>
 
-[ molecules ]
-; molecule name nr.
-DPPC 4
-SOL 122
-DPPC 4
-SOL 122
+<span class="p">[</span> <span class="n">molecules</span> <span class="p">]</span>
+<span class="p">;</span> <span class="n">molecule</span> <span class="n">name</span> <span class="n">nr</span><span class="o">.</span>
+<span class="n">DPPC</span> <span class="mi">4</span>
+<span class="n">SOL</span> <span class="mi">122</span>
+<span class="n">DPPC</span> <span class="mi">4</span>
+<span class="n">SOL</span> <span class="mi">122</span>
 </pre></div>
 </div>
 <p>The DPPC and SOL molecule types are defined in the <code class="docutils literal"><span class="pre">DPPC_2.itp</span></code> include
 topology file. When this topology is read in, there will be 252 residues &#8211; 8
 DPPC residues and 244 SOL residues:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can safely ignore the warning printed here</span>
 <span class="gp">... </span><span class="n">system</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;topol3.top&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">system</span>
@@ -189,18 +191,18 @@ want to do is combine the 4th and 5th molecules (since indices start from 0,
 this would be molecules 3 and 4), as well as the five residues 127 through 131
 (indices 126, 127, 128, 129, and 130). Our <code class="docutils literal"><span class="pre">combine</span></code> would then look like
 <code class="docutils literal"><span class="pre">[[3,4],[126,127,128,129,130]]</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">system</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;test.top&#39;</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">126</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">129</span><span class="p">,</span> <span class="mi">130</span><span class="p">]])</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">system</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;test.top&#39;</span><span class="p">,</span> <span class="n">combine</span><span class="o">=</span><span class="p">[[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">126</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">129</span><span class="p">,</span> <span class="mi">130</span><span class="p">]])</span>
 </pre></div>
 </div>
 <p>If we look at the bottom of the <code class="docutils literal"><span class="pre">test.top</span></code> file we generated, we should see
 this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>[ molecules ]
-; Compound       #mols
-DPPC                 3
-system1              1
-SOL                121
-system2              1
-SOL                121
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span> <span class="n">molecules</span> <span class="p">]</span>
+<span class="p">;</span> <span class="n">Compound</span>       <span class="c1">#mols</span>
+<span class="n">DPPC</span>                 <span class="mi">3</span>
+<span class="n">system1</span>              <span class="mi">1</span>
+<span class="n">SOL</span>                <span class="mi">121</span>
+<span class="n">system2</span>              <span class="mi">1</span>
+<span class="n">SOL</span>                <span class="mi">121</span>
 </pre></div>
 </div>
 <p>If we think about it, this is exactly what we want.  We left our first 3 DPPC
@@ -263,7 +265,7 @@ is the recommended way to parse these files.</p>
 <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile" title="parmed.gromacs.GromacsGroFile"><code class="xref py py-class docutils literal"><span class="pre">GromacsGroFile</span></code></a>.  For example, ParmEd is the first software package to
 enable conversion of Gromacs simulation input files to AMBER format in just a
 few lines of code:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">gromacs</span><span class="p">,</span> <span class="n">amber</span><span class="p">,</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span> <span class="o">=</span> <span class="n">GromacsTopologyFile</span><span class="p">(</span><span class="s1">&#39;topol.top&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_gro</span> <span class="o">=</span> <span class="n">GromacsGroFile</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;conf.gro&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gmx_top</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">gmx_gro</span><span class="o">.</span><span class="n">box</span> <span class="c1"># Needed because .prmtop contains box info</span>
@@ -279,16 +281,16 @@ few lines of code:</p>
 <p>Furthermore, you may check the correctness of topology loading by using the
 <a class="reference internal" href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile" title="parmed.gromacs.GromacsTopologyFile"><code class="xref py py-class docutils literal"><span class="pre">GromacsTopologyFile</span></code></a> object to calculate an OpenMM potential energy and
 force, then comparing that result with your own output from Gromacs:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="kn">as</span> <span class="nn">mm</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="kn">as</span> <span class="nn">app</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm</span> <span class="k">as</span> <span class="nn">mm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="k">as</span> <span class="nn">app</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">gmx_top</span><span class="o">.</span><span class="n">createSystem</span><span class="p">()</span> <span class="c1"># OpenMM System creation</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">integ</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">VerletIntegrator</span><span class="p">(</span><span class="mf">1.0</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">femtosecond</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">plat</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">Platform</span><span class="o">.</span><span class="n">getPlatformByName</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">integ</span><span class="p">,</span> <span class="n">plat</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="n">gmx_top</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">applyConstraints</span><span class="p">(</span><span class="mf">1e-12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">getForces</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">applyConstraints</span><span class="p">(</span><span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">simul</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">getForces</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">())</span>
 </pre></div>
 </div>
 <p>A typical protein/water system with 23,000 atoms at ambient conditions with
@@ -334,14 +336,11 @@ simulation results.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -360,12 +359,12 @@ simulation results.</p>
         <li class="right" >
           <a href="gromacsobj/parmed.gromacs.GromacsTopologyFile.html" title="parmed.gromacs.GromacsTopologyFile"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.modeller.residue module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.modeller.residue module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -110,8 +112,8 @@ atoms.</p>
 <tr class="row-even"><td>groups</td>
 <td>(list of list(<code class="xref py py-class docutils literal"><span class="pre">Atom</span></code>)) If set, each group is a list of Atom instances making up each group</td>
 </tr>
-<tr class="row-odd"><td>overload_level</td>
-<td>(integer) For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple identically-matching residue templates with the same names it choses (overloads with) the one with the highest overload_level (overloadLevel in OpenMM). Default is 0.</td>
+<tr class="row-odd"><td>override_level</td>
+<td>(integer) For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple identically-matching residue templates with the same names it choses (overrides with) the one with the highest override_level (overrideLevel in OpenMM). Default is 0.</td>
 </tr>
 </tbody>
 </table>
@@ -125,7 +127,7 @@ atoms.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.residue.ResidueTemplate.add_atom" title="parmed.modeller.residue.ResidueTemplate.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom)</td>
 <td>Adds an atom to this residue template</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.residue.ResidueTemplate.add_bond" title="parmed.modeller.residue.ResidueTemplate.add_bond"><code class="xref py py-obj docutils literal"><span class="pre">add_bond</span></code></a>(atom1,&nbsp;atom2)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.residue.ResidueTemplate.add_bond" title="parmed.modeller.residue.ResidueTemplate.add_bond"><code class="xref py py-obj docutils literal"><span class="pre">add_bond</span></code></a>(atom1,&nbsp;atom2[,&nbsp;order])</td>
 <td>Adds a bond between the two provided atoms in the residue</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.residue.ResidueTemplate.fix_charges" title="parmed.modeller.residue.ResidueTemplate.fix_charges"><code class="xref py py-obj docutils literal"><span class="pre">fix_charges</span></code></a>([to,&nbsp;precision])</td>
@@ -169,7 +171,7 @@ atoms.</p>
 
 <dl class="method">
 <dt id="parmed.modeller.residue.ResidueTemplate.add_bond">
-<code class="descname">add_bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/modeller/residue.html#ResidueTemplate.add_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.modeller.residue.ResidueTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>order=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/modeller/residue.html#ResidueTemplate.add_bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.modeller.residue.ResidueTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a bond between the two provided atoms in the residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -186,6 +188,19 @@ of the atom in the bond.</p>
 <div><p>The other atom in the bond. It must be in the <code class="docutils literal"><span class="pre">atoms</span></code> list of this
 ResidueTemplate. It can also be the atom index (index from 0) of the
 atom in the bond.</p>
+</div></blockquote>
+<p><strong>order</strong> : float</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>The bond order of this bond. Bonds are classified as follows:</dt>
+<dd><p class="first last">1.0 &#8211; single bond
+2.0 &#8211; double bond
+3.0 &#8211; triple bond
+1.5 &#8211; aromatic bond
+1.25 &#8211; amide bond</p>
+</dd>
+</dl>
+<p>Default is 1.0</p>
 </div></blockquote>
 </td>
 </tr>
@@ -779,7 +794,7 @@ standard Residues</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.residue.PatchTemplate.add_atom" title="parmed.modeller.residue.PatchTemplate.add_atom"><code class="xref py py-obj docutils literal"><span class="pre">add_atom</span></code></a>(atom)</td>
 <td>Adds an atom to this residue template</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.residue.PatchTemplate.add_bond" title="parmed.modeller.residue.PatchTemplate.add_bond"><code class="xref py py-obj docutils literal"><span class="pre">add_bond</span></code></a>(atom1,&nbsp;atom2)</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.modeller.residue.PatchTemplate.add_bond" title="parmed.modeller.residue.PatchTemplate.add_bond"><code class="xref py py-obj docutils literal"><span class="pre">add_bond</span></code></a>(atom1,&nbsp;atom2[,&nbsp;order])</td>
 <td>Adds a bond between the two provided atoms in the residue</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.modeller.residue.PatchTemplate.fix_charges" title="parmed.modeller.residue.PatchTemplate.fix_charges"><code class="xref py py-obj docutils literal"><span class="pre">fix_charges</span></code></a>([to,&nbsp;precision])</td>
@@ -823,7 +838,7 @@ standard Residues</p>
 
 <dl class="method">
 <dt id="parmed.modeller.residue.PatchTemplate.add_bond">
-<code class="descname">add_bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.modeller.residue.PatchTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
+<code class="descname">add_bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>order=1.0</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.modeller.residue.PatchTemplate.add_bond" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a bond between the two provided atoms in the residue</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -840,6 +855,19 @@ of the atom in the bond.</p>
 <div><p>The other atom in the bond. It must be in the <code class="docutils literal"><span class="pre">atoms</span></code> list of this
 ResidueTemplate. It can also be the atom index (index from 0) of the
 atom in the bond.</p>
+</div></blockquote>
+<p><strong>order</strong> : float</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>The bond order of this bond. Bonds are classified as follows:</dt>
+<dd><p class="first last">1.0 &#8211; single bond
+2.0 &#8211; double bond
+3.0 &#8211; triple bond
+1.5 &#8211; aromatic bond
+1.25 &#8211; amide bond</p>
+</dd>
+</dl>
+<p>Default is 1.0</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1089,14 +1117,11 @@ template</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1112,12 +1137,12 @@ template</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

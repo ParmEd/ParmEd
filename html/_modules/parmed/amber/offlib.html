@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber.offlib &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber.offlib &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -52,21 +54,21 @@
 <span class="sd">Tool for parsing and writing OFF library files to and from dictionaries of</span>
 <span class="sd">ResidueTemplate objects</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">Atom</span>
-<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">RAD_TO_DEG</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">AmberWarning</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">parmed.modeller.residue</span> <span class="kn">import</span> <span class="n">ResidueTemplate</span><span class="p">,</span> <span class="n">ResidueTemplateContainer</span>
-<span class="kn">from</span> <span class="nn">parmed.modeller.residue</span> <span class="kn">import</span> <span class="n">PROTEIN</span><span class="p">,</span> <span class="n">NUCLEIC</span><span class="p">,</span> <span class="n">SOLVENT</span><span class="p">,</span> <span class="n">UNKNOWN</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">periodic_table</span> <span class="k">as</span> <span class="n">pt</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">closing</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">Atom</span>
+<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="k">import</span> <span class="n">RAD_TO_DEG</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">AmberWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed.modeller.residue</span> <span class="k">import</span> <span class="n">ResidueTemplate</span><span class="p">,</span> <span class="n">ResidueTemplateContainer</span>
+<span class="kn">from</span> <span class="nn">parmed.modeller.residue</span> <span class="k">import</span> <span class="n">PROTEIN</span><span class="p">,</span> <span class="n">NUCLEIC</span><span class="p">,</span> <span class="n">SOLVENT</span><span class="p">,</span> <span class="n">UNKNOWN</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">periodic_table</span> <span class="k">as</span> <span class="n">pt</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -128,8 +130,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">_headerre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()):</span>
-                <span class="k">return</span> <span class="bp">True</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
     <span class="c1">#===================================================</span>
 
@@ -161,10 +163,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Now parse the library file</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">_headerre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
@@ -176,7 +178,7 @@
         <span class="n">rematch</span> <span class="o">=</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">_resre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">rematch</span> <span class="ow">and</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">residues</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">residues</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">rematch</span> <span class="o">=</span> <span class="n">AmberOFFLibrary</span><span class="o">.</span><span class="n">_resre</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
@@ -272,7 +274,9 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Error processing boundbox table entries&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">hasbox</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">angle</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
+                <span class="k">if</span> <span class="n">angle</span> <span class="o">&lt;</span> <span class="mf">3.15</span><span class="p">:</span>
+                    <span class="c1"># No box is this acute -- must be in radians</span>
+                    <span class="n">angle</span> <span class="o">*=</span> <span class="n">RAD_TO_DEG</span>
                 <span class="n">container</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">angle</span><span class="p">]</span>
         <span class="c1"># Get the child sequence entry</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -380,10 +384,10 @@
                                <span class="p">(</span><span class="n">rematch</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">name</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nres</span><span class="p">):</span>
             <span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">,</span><span class="n">c3</span><span class="p">,</span><span class="n">c4</span><span class="p">,</span><span class="n">c5</span><span class="p">,</span><span class="n">c6</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">c1</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">templ</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c1</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">templ</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
                     <span class="n">templ</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">templ</span><span class="p">[</span><span class="n">c1</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;HEAD atom is not connect0&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">c2</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">templ</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c2</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">templ</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
                     <span class="n">templ</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">templ</span><span class="p">[</span><span class="n">c2</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;TAIL atom is not connect1&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">,</span> <span class="n">c5</span><span class="p">,</span> <span class="n">c6</span><span class="p">):</span>
@@ -417,7 +421,6 @@
                 <span class="n">container</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">SOLVENT</span>
             <span class="k">elif</span> <span class="n">typ</span> <span class="o">!=</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unknown residue type &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">typ</span><span class="p">,</span> <span class="n">AmberWarning</span><span class="p">)</span>
-<span class="c1"># TODO delete</span>
             <span class="k">if</span> <span class="n">nres</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">container</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">resname</span>
         <span class="c1"># Get the residues sequence table</span>
@@ -476,10 +479,10 @@
 <span class="sd">        dest : str or file-like</span>
 <span class="sd">            Either a file name or a file-like object to write the file to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># Write the residues in alphabetical order</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">lib</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!!index array str</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -522,7 +525,7 @@
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &quot;</span><span class="si">%s</span><span class="s1">&quot; &quot;</span><span class="si">%s</span><span class="s1">&quot; 0 -1 0.0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.boundbox array dbl</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39; -1.000000</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39; 0.0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 1.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -539,21 +542,23 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 0</span><span class="se">\n</span><span class="s1"> 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; 0</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">):</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.connectivity table  int atom1x  &#39;</span>
                        <span class="s1">&#39;int atom2x  int flags</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
-                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> 1</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
-                                               <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> 1</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="n">base</span><span class="p">,</span>
+                                               <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="n">base</span><span class="p">))</span>
+                <span class="n">base</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.hierarchy table  str abovetype  int &#39;</span>
                    <span class="s1">&#39;abovex  str belowtype  int belowx</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
@@ -571,15 +576,17 @@
                 <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%.6g</span><span class="s1"> </span><span class="si">%.6g</span><span class="s1"> </span><span class="si">%.6g</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span><span class="p">))</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.residueconnect table  int c1x  int c2x  &#39;</span>
                    <span class="s1">&#39;int c3x  int c4x  int c5x  int c6x</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
-            <span class="c1"># Make the CONECT1 and 0 default to 1 so that the TREE gets set</span>
-            <span class="c1"># correctly by tleap. Not used for anything else...</span>
-            <span class="n">conn</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">conn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span> <span class="n">conn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">at</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">connections</span><span class="p">):</span>
+            <span class="c1"># Make the CONECT1 and 0 default to first and last atom so that the</span>
+            <span class="c1"># TREE gets set correctly by tleap. Not used for anything else...</span>
+            <span class="n">conn</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">conn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="n">conn</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">at</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">connections</span><span class="p">[:</span><span class="mi">4</span><span class="p">]):</span>
                 <span class="n">conn</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">at</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span>
+            <span class="n">c</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.residues table  str name  int seq  int &#39;</span>
                    <span class="s1">&#39;childseq  int startatomx  str restype  int imagingx</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                    <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -598,7 +605,7 @@
                               <span class="n">AmberWarning</span><span class="p">)</span>
                 <span class="n">typ</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &quot;</span><span class="si">%s</span><span class="s1">&quot; </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> &quot;</span><span class="si">%s</span><span class="s1">&quot; </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">),</span> <span class="n">c</span><span class="p">,</span>
-                       <span class="n">typ</span><span class="p">,</span> <span class="n">_imaging_atom</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
+                       <span class="n">typ</span><span class="p">,</span> <span class="n">_imaging_atom</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">+</span><span class="n">c</span><span class="p">))</span>
             <span class="n">c</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;!entry.</span><span class="si">%s</span><span class="s1">.unit.residuesPdbSequenceNumber array int</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                    <span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -635,15 +642,15 @@
 <span class="sd">    except 1, it is the heavy atom. Otherwise, it is the atom *closest* to the</span>
 <span class="sd">    COM of the residue</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="kn">import</span> <span class="n">center_of_mass</span>
+    <span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="k">import</span> <span class="n">center_of_mass</span>
     <span class="c1">#TODO implement the docstring</span>
-    <span class="n">found_heavy</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">found_heavy</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">heavy_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">heavy_idx</span> <span class="o">=</span> <span class="n">i</span>
             <span class="k">if</span> <span class="n">found_heavy</span><span class="p">:</span> <span class="k">break</span>
-            <span class="n">found_heavy</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">found_heavy</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">heavy_idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">heavy_idx</span>
@@ -657,7 +664,7 @@
             <span class="n">masses</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">mass</span>
     <span class="n">com</span> <span class="o">=</span> <span class="n">center_of_mass</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">masses</span><span class="p">)</span>
     <span class="n">diff</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">-</span> <span class="n">com</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">((</span><span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
           </div>
@@ -668,14 +675,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -691,13 +695,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

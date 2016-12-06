@@ -18,6 +18,7 @@ Submodules
    parmed.formats.pqr
    parmed.formats.psf
    parmed.formats.registry
+   parmed.formats.sdf
 
 Module contents
 ---------------

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>simtk.unit.unit &mdash; ParmEd 2.5.0 documentation</title>
+    <title>simtk.unit.unit &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -81,7 +83,7 @@
 <span class="sd">OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE</span>
 <span class="sd">USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Christopher M. Bruns&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.5&quot;</span>
@@ -89,10 +91,10 @@
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">.mymatrix</span> <span class="kn">import</span> <span class="n">MyMatrix</span><span class="p">,</span> <span class="n">zeros</span>
-<span class="kn">from</span> <span class="nn">.basedimension</span> <span class="kn">import</span> <span class="n">BaseDimension</span>
-<span class="kn">from</span> <span class="nn">.baseunit</span> <span class="kn">import</span> <span class="n">BaseUnit</span>
-<span class="kn">from</span> <span class="nn">.standard_dimensions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">.mymatrix</span> <span class="k">import</span> <span class="n">MyMatrix</span><span class="p">,</span> <span class="n">zeros</span>
+<span class="kn">from</span> <span class="nn">.basedimension</span> <span class="k">import</span> <span class="n">BaseDimension</span>
+<span class="kn">from</span> <span class="nn">.baseunit</span> <span class="k">import</span> <span class="n">BaseUnit</span>
+<span class="kn">from</span> <span class="nn">.standard_dimensions</span> <span class="k">import</span> <span class="o">*</span>
 
 <div class="viewcode-block" id="Unit"><a class="viewcode-back" href="../../../unitobj/parmed.unit.Unit.html#parmed.unit.Unit">[docs]</a><span class="k">class</span> <span class="nc">Unit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -225,7 +227,7 @@
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -302,11 +304,11 @@
         <span class="c1"># There might be odd exponents in base and scaled units that</span>
         <span class="c1"># boil down to even exponents in base dimensions.</span>
         <span class="c1"># But if ScaledUnits and BaseUnits have even exponents, we should use them.</span>
-        <span class="n">nice_and_even</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">nice_and_even</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">exponent</span><span class="o">%</span><span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># This isn&#39;t going to work, we need to bust apart the ScaledUnits</span>
-                <span class="n">nice_and_even</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">nice_and_even</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">break</span>
             <span class="n">new_units</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span><span class="o">/</span><span class="mi">2</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">nice_and_even</span><span class="p">:</span>
@@ -357,9 +359,9 @@
                 <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">][</span><span class="n">other</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unit</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_dimensionless</span><span class="p">():</span>
-                <span class="k">return</span> <span class="bp">True</span>
+                <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
         <span class="n">self_dims</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
             <span class="n">self_dims</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
@@ -367,7 +369,7 @@
         <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
             <span class="n">other_dims</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">=</span> <span class="n">exponent</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">self_dims</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other_dims</span><span class="p">):</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">self_dims</span> <span class="o">==</span> <span class="n">other_dims</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span> <span class="ow">in</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_compatible_cache</span><span class="p">:</span>
@@ -385,10 +387,10 @@
             <span class="k">return</span> <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">exponent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_dimensions</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">exponent</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
-                <span class="k">return</span> <span class="bp">False</span>
-        <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">return</span> <span class="bp">True</span></div>
+                <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">Unit</span><span class="o">.</span><span class="n">_is_dimensionless_cache</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
     <span class="c1"># Performance</span>
     <span class="n">_conversion_factor_cache</span> <span class="o">=</span> <span class="p">{}</span>
@@ -466,7 +468,7 @@
         <span class="c1"># emit negative exponents second</span>
         <span class="n">neg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">neg_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">neg_count</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -474,7 +476,7 @@
                 <span class="n">neg</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">symbol</span>
                 <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
                     <span class="n">neg</span> <span class="o">+=</span> <span class="s2">&quot;**</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="o">-</span><span class="n">power</span>
-                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Format of denominator depends on number of terms</span>
         <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
             <span class="n">neg_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -514,7 +516,7 @@
         <span class="c1"># emit negative exponents second</span>
         <span class="n">neg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="n">neg_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">simple_denominator</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">for</span> <span class="n">unit</span><span class="p">,</span> <span class="n">power</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter_base_or_scaled_units</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">power</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">neg_count</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -522,7 +524,7 @@
                 <span class="n">neg</span> <span class="o">+=</span> <span class="n">unit</span><span class="o">.</span><span class="n">name</span>
                 <span class="k">if</span> <span class="n">power</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">:</span>
                     <span class="n">neg</span> <span class="o">+=</span> <span class="s2">&quot;**</span><span class="si">%g</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="o">-</span><span class="n">power</span>
-                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">simple_denominator</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Format of denominator depends on number of terms</span>
         <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">neg_count</span><span class="p">:</span>
             <span class="n">neg_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -755,14 +757,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -778,13 +777,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

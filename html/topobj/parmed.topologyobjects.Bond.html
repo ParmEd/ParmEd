@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.topologyobjects.Bond &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.topologyobjects.Bond &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../index.html" />
     <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -51,7 +53,7 @@
 <h1>parmed.topologyobjects.Bond<a class="headerlink" href="#parmed-topologyobjects-bond" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="parmed.topologyobjects.Bond">
-<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">Bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">Bond</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em>, <em>order=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Bond"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond" title="Permalink to this definition">¶</a></dt>
 <dd><p>A covalent bond connecting two atoms.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -65,9 +67,22 @@
 <blockquote>
 <div><p>The other atom involved in the bond</p>
 </div></blockquote>
-<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a></p>
+<p><strong>type</strong> : <a class="reference internal" href="parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a> or None, optional</p>
+<blockquote>
+<div><p>The bond type that defines the parameters for this bond. Default is None</p>
+</div></blockquote>
+<p><strong>order</strong> : float, optional</p>
 <blockquote class="last">
-<div><p>The bond type that defines the parameters for this bond</p>
+<div><dl class="docutils">
+<dt>The bond order of this bond. Bonds are classified as follows:</dt>
+<dd><p class="first last">1.0 &#8211; single bond
+2.0 &#8211; double bond
+3.0 &#8211; triple bond
+1.5 &#8211; aromatic bond
+1.25 &#8211; amide bond</p>
+</dd>
+</dl>
+<p>Default is 1.0</p>
 </div></blockquote>
 </td>
 </tr>
@@ -80,12 +95,24 @@ This bond instance is <cite>append`ed to the `bonds</cite> list for both <cite>a
 <cite>atom2</cite> and is automatically removed from those lists upon garbage
 collection</p>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(),</span> <span class="n">Atom</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bond</span> <span class="o">=</span> <span class="n">Bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">a1</span> <span class="ow">in</span> <span class="n">bond</span> <span class="ow">and</span> <span class="n">a2</span> <span class="ow">in</span> <span class="n">bond</span>
 <span class="go">True</span>
 </pre></div>
 </div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Bond.order" title="parmed.topologyobjects.Bond.order"><code class="xref py py-obj docutils literal"><span class="pre">order</span></code></a></td>
+<td>Bond order.</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -100,7 +127,7 @@ collection</p>
 </table>
 <dl class="method">
 <dt id="parmed.topologyobjects.Bond.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Bond.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em>, <em>order=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Bond.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bond constructor</p>
 </dd></dl>
 
@@ -111,7 +138,7 @@ collection</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Bond.__init__" title="parmed.topologyobjects.Bond.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2[,&nbsp;type])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Bond.__init__" title="parmed.topologyobjects.Bond.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(atom1,&nbsp;atom2[,&nbsp;type,&nbsp;order])</td>
 <td>Bond constructor</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Bond.delete" title="parmed.topologyobjects.Bond.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
@@ -125,6 +152,12 @@ collection</p>
 <dd><p>Deletes this bond from the atoms that make it up. This method removes
 this bond from the <cite>bonds</cite> list for both atom1 and atom2 as well as
 removing atom1 from atom2.bond_partners and vice versa.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.Bond.order">
+<code class="descname">order</code><a class="headerlink" href="#parmed.topologyobjects.Bond.order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bond order. See description in <a class="reference internal" href="#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> argument list</p>
 </dd></dl>
 
 </dd></dl>
@@ -147,14 +180,11 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -170,13 +200,13 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

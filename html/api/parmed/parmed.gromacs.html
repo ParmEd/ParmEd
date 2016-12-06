@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.gromacs package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.gromacs package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -157,7 +159,7 @@ file unless it has its default value of <code class="docutils literal"><span cla
 <tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.add_atom_to_residue" title="parmed.gromacs.GromacsTopologyFile.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
 <td>Adds a new atom to the Structure at the end if the given residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.assign_bonds" title="parmed.gromacs.GromacsTopologyFile.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.assign_bonds" title="parmed.gromacs.GromacsTopologyFile.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.copy" title="parmed.gromacs.GromacsTopologyFile.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(cls[,&nbsp;split_dihedrals])</td>
@@ -265,16 +267,19 @@ file unless it has its default value of <code class="docutils literal"><span cla
 <tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.update_dihedral_exclusions" title="parmed.gromacs.GromacsTopologyFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write" title="parmed.gromacs.GromacsTopologyFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;combine,&nbsp;parameters])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.visualize" title="parmed.gromacs.GromacsTopologyFile.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write" title="parmed.gromacs.GromacsTopologyFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;combine,&nbsp;parameters])</td>
 <td>Write a Gromacs Topology File from a Structure</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_cif" title="parmed.gromacs.GromacsTopologyFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_cif" title="parmed.gromacs.GromacsTopologyFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_pdb" title="parmed.gromacs.GromacsTopologyFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_pdb" title="parmed.gromacs.GromacsTopologyFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_psf" title="parmed.gromacs.GromacsTopologyFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../gromacsobj/parmed.gromacs.GromacsTopologyFile.html#parmed.gromacs.GromacsTopologyFile.write_psf" title="parmed.gromacs.GromacsTopologyFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -1420,6 +1425,27 @@ Structure, but returns a <em>view</em> rather than a copy</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.gromacs.GromacsTopologyFile.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.GromacsTopologyFile.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.gromacs.GromacsTopologyFile.write">
 <code class="descname">write</code><span class="sig-paren">(</span><em>dest</em>, <em>combine=None</em>, <em>parameters='inline'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/gromacs/gromacstop.html#GromacsTopologyFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsTopologyFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a Gromacs Topology File from a Structure</p>
@@ -1521,6 +1547,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1593,6 +1624,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1624,7 +1660,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1779,14 +1815,11 @@ periodic box dimensions <em>are</em> defined, this variable has no effect.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1802,12 +1835,12 @@ periodic box dimensions <em>are</em> defined, this variable has no effect.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

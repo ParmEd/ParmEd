@@ -17,6 +17,7 @@ parmed.amber.AmberParm
       ~AmberParm.add_atom
       ~AmberParm.add_atom_to_residue
       ~AmberParm.add_flag
+      ~AmberParm.assign_bonds
       ~AmberParm.copy
       ~AmberParm.createSystem
       ~AmberParm.delete_flag

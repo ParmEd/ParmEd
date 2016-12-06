@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.charmm.psf module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.charmm.psf module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -36,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -119,7 +121,7 @@ Date: April 20, 2014</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.add_atom_to_residue" title="parmed.charmm.psf.CharmmPsfFile.add_atom_to_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_atom_to_residue</span></code></a>(atom,&nbsp;residue)</td>
 <td>Adds a new atom to the Structure at the end if the given residue</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.assign_bonds" title="parmed.charmm.psf.CharmmPsfFile.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(*reslibs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.assign_bonds" title="parmed.charmm.psf.CharmmPsfFile.assign_bonds"><code class="xref py py-obj docutils literal"><span class="pre">assign_bonds</span></code></a>(\*reslibs)</td>
 <td>Assigns bonds to all atoms based on the provided residue template libraries.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.clear_cmap" title="parmed.charmm.psf.CharmmPsfFile.clear_cmap"><code class="xref py py-obj docutils literal"><span class="pre">clear_cmap</span></code></a>()</td>
@@ -224,13 +226,16 @@ Date: April 20, 2014</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.update_dihedral_exclusions" title="parmed.charmm.psf.CharmmPsfFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_cif" title="parmed.charmm.psf.CharmmPsfFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.visualize" title="parmed.charmm.psf.CharmmPsfFile.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_cif" title="parmed.charmm.psf.CharmmPsfFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_pdb" title="parmed.charmm.psf.CharmmPsfFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_pdb" title="parmed.charmm.psf.CharmmPsfFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_psf" title="parmed.charmm.psf.CharmmPsfFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.psf.CharmmPsfFile.write_psf" title="parmed.charmm.psf.CharmmPsfFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -663,13 +668,13 @@ However, if you change any reference in the parameter set, then that
 reference will no longer be shared with structure.</p>
 <p>Example where the reference in ParameterSet is changed. The
 following will NOT modify the parameters in the psf:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>psf.load_parameters(parmset, copy_parameters=False)
-parmset.angle_types[(&#39;a1&#39;, &#39;a2&#39;, a3&#39;)] = AngleType(1, 2)
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">parmset</span><span class="p">,</span> <span class="n">copy_parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">parmset</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="n">a3</span><span class="s1">&#39;)] = AngleType(1, 2)</span>
 </pre></div>
 </div>
 <p>The following WILL change the parameter in the psf because the
 reference has not been changed in <code class="docutils literal"><span class="pre">ParameterSet</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">parmset</span><span class="p">,</span> <span class="n">copy_parameters</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">psf</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">parmset</span><span class="p">,</span> <span class="n">copy_parameters</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">parmset</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="s1">&#39;a3&#39;</span><span class="p">)]</span>
 <span class="n">a</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">a</span><span class="o">.</span><span class="n">theteq</span> <span class="o">=</span> <span class="mi">100</span>
@@ -680,7 +685,7 @@ Since dihedral_type is a Fourier sequence, ParameterSet stores
 DihedralType for every term in DihedralTypeList. Therefore, the
 example below will STILL modify the type in the <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>
 list_types:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">parmset</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">parmset</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This assigns a new instance of DihedralType to an existing
@@ -1336,6 +1341,27 @@ Structure, but returns a <em>view</em> rather than a copy</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.charmm.psf.CharmmPsfFile.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use nglview for visualization. This only works with Jupyter notebook
+and require to install <cite>nglview</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args and kwargs</strong> : positional and keyword arguments given to nglview, optional</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;1tsu&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.charmm.psf.CharmmPsfFile.write_cif">
 <code class="descname">write_cif</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.charmm.psf.CharmmPsfFile.write_cif" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
@@ -1399,6 +1425,11 @@ will be converted into the PDB-standard values. Default is False</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDBx standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1471,6 +1502,11 @@ will be converted into the PDB-standard values.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If multiple coordinate frames are present, these will be written as
+separate models (but only the unit cell from the first model will be
+written, as the PDB standard dictates that only one set of unit cells
+shall be present).</p>
 </dd></dl>
 
 <dl class="method">
@@ -1502,7 +1538,7 @@ closed</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="p">(</span><span class="s1">&#39;testfiles/test.psf&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span><span class="o">.</span><span class="n">write_psf</span><span class="p">(</span><span class="s1">&#39;testfiles/test2.psf&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1534,14 +1570,11 @@ closed</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1557,12 +1590,12 @@ closed</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

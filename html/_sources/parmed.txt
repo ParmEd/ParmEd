@@ -153,7 +153,7 @@ chamber
 
 .. code-block:: none
 
-    chamber -top <RTF> -param <PAR> [-str <STR>] -psf <PSF> [-crd <CRD>] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii <radiusset>]
+    chamber -top <RTF> -param <PAR> [-str <STR>] -psf <PSF> [-crd <CRD>] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii <radiusset>] [nosettle]
 
 This action will read CHARMM parameter, topology (RTF), and stream (STR) files and apply those parameters to a structure defined in a CHARMM PSF (protein structure file). XPLOR, CHARMM, and VMD-generated PSF files are all supported. You may specify -top, -param, and -str as many times as you want to provide multiple parameter files. All topology files are read first (in the order they are specified), followed by all parameter files, and finally all stream files are read in. Topology files are only necessary if the parameter files do not define the atom types (newer CHARMM force fields define atom types directly in the parameter file. Environment variables and shell wild-cards (* and ?), as well as the home shortcut character ~ are properly expanded when looking for files.
 
@@ -169,7 +169,7 @@ Options
     - -nocmap Do not use any CMAP parameters
     - -box Box dimensions. If no angles are defined, they are assumed to be 90 degrees (orthorhombic box). Alternatively, you can use the word 'bounding' to define a box that encloses the centers of all atoms.
     - -radii Implicit solvent solvation radii. ``<radiusset>`` can be amber6, bondi, mbondi, mbondi2, mbondi3 Same effect as the changeRadii_ command. Default is mbondi.
-    - nocondense This no longer has any effect and is ignored.
+    - nosettle This avoids changing the names of the water residue and oxygen atoms from TIP3 and OH2 to WAT and O
 
 If the PDB file has a CRYST1 record, the box information will be set from there. Any box info given on the command-line will override the box found in the crd file.
 
@@ -331,6 +331,16 @@ OpenMM-specific options
     - precision <precision model> : Precision model to use. Options are single, double, and mixed. Reference platform is always double and CPU platform is always single. Mixed (default) uses single precision for calculations and double for accumulation (only used if 'omm' is provided)
     - decompose : Print bond, angle, dihedral, and nonbonded energies separately
     - applayer : Use OpenMM's class to compute the energy
+
+Examples
+
+
+
+
+    # Using AMBER import parmed as pmd parm_ = pmd.load_file('prmtop', xyz='rst7') pmd.tools.energy(parm, 'igb 8').execute()
+
+
+    # Using Openmm pmd.tools.energy(parm, 'igb 5 omm').execute()
 
 gromber
 ~~~~~~~

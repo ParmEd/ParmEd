@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.tools.add1264 &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.tools.add1264 &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -52,10 +54,10 @@
 <span class="sd">This module contains the necessary machinery to add the LENNARD_JONES_CCOEF to a</span>
 <span class="sd">topology file given a list of atomic polarizabilities</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
-<span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="kn">import</span> <span class="n">LJ12_6_4Error</span><span class="p">,</span> <span class="n">DuplicateParamWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">parmed.tools.exceptions</span> <span class="k">import</span> <span class="n">LJ12_6_4Error</span><span class="p">,</span> <span class="n">DuplicateParamWarning</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">WATER_POL</span> <span class="o">=</span> <span class="mf">1.444</span> <span class="c1"># Polarizability of water</span>
@@ -104,7 +106,7 @@
 
 <div class="viewcode-block" id="params1264"><a class="viewcode-back" href="../../../api/parmed/parmed.tools.add1264.html#parmed.tools.add1264.params1264">[docs]</a><span class="k">def</span> <span class="nf">params1264</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">c4file</span><span class="p">,</span> <span class="n">watermodel</span><span class="p">,</span> <span class="n">polfile</span><span class="p">,</span> <span class="n">tunfactor</span><span class="p">):</span>
    
-    <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">periodic_table</span> <span class="k">as</span> <span class="n">pt</span>
+    <span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">periodic_table</span> <span class="k">as</span> <span class="n">pt</span>
 
     <span class="k">global</span> <span class="n">DEFAULT_C4_PARAMS</span><span class="p">,</span> <span class="n">WATER_POL</span>
 
@@ -115,7 +117,7 @@
                             <span class="s1">&#39;2 columns: &lt;Amber Atom Type&gt; &lt;Polarizability&gt;&#39;</span> <span class="o">%</span>
                             <span class="n">polfile</span><span class="p">)</span>
    
-    <span class="k">if</span> <span class="n">c4file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">c4file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">c4list</span> <span class="o">=</span> <span class="n">DEFAULT_C4_PARAMS</span><span class="p">[</span><span class="n">watermodel</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -126,7 +128,7 @@
                                 <span class="s1">&#39;&lt;C4 Parameter&gt;&#39;</span> <span class="o">%</span> <span class="n">c4file</span><span class="p">)</span>
 
 
-    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;***********************************************************&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***********************************************************&quot;</span><span class="p">)</span>
     <span class="c1"># Determine which atom type was treated as the center metal ion</span>
     <span class="n">mettypdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">mask</span><span class="o">.</span><span class="n">Selected</span><span class="p">():</span>
@@ -134,7 +136,7 @@
         <span class="n">metchg</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;CHARGE&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">mettypind</span> <span class="ow">in</span> <span class="n">mettypdict</span><span class="p">:</span> <span class="k">continue</span>
         <span class="n">mettypdict</span><span class="p">[</span><span class="n">mettypind</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">metchg</span><span class="p">))</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;The selected metal ion is </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The selected metal ion is </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
               <span class="n">pt</span><span class="o">.</span><span class="n">Element</span><span class="p">[</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">])</span>
     <span class="n">mettypinds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mettypdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
@@ -232,14 +234,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -255,13 +254,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.tools.gui.guifiletools &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.tools.gui.guifiletools &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -50,26 +52,26 @@
   <h1>Source code for parmed.tools.gui.guifiletools</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot; Tools for getting/giving file names easily for opening and saving &quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">parmed.utils.six.moves.tkinter_tkfiledialog</span> <span class="kn">as</span> <span class="nn">tkFileDialog</span>
+<span class="kn">import</span> <span class="nn">parmed.utils.six.moves.tkinter_tkfiledialog</span> <span class="k">as</span> <span class="nn">tkFileDialog</span>
 
 <span class="c1">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
 
-<div class="viewcode-block" id="file_chooser"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.gui.guifiletools.html#parmed.tools.gui.guifiletools.file_chooser">[docs]</a><span class="k">def</span> <span class="nf">file_chooser</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">set_var</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="file_chooser"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.gui.guifiletools.html#parmed.tools.gui.guifiletools.file_chooser">[docs]</a><span class="k">def</span> <span class="nf">file_chooser</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">set_var</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Opens a file dialog to choose a topology file &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">extensions</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">extensions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">extensions</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Amber Prmtop&#39;</span><span class="p">,</span> <span class="s1">&#39;*.prmtop&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Amber Prmtop&#39;</span><span class="p">,</span> <span class="s1">&#39;*.parm7&#39;</span><span class="p">),</span>
                       <span class="p">(</span><span class="s1">&#39;Amber Prmtop&#39;</span><span class="p">,</span> <span class="s1">&#39;*.top&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;All Files&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)]</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="n">tkFileDialog</span><span class="o">.</span><span class="n">askopenfilename</span><span class="p">(</span><span class="n">filetypes</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
                             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Select an Amber </span><span class="si">%s</span><span class="s1"> file to load&#39;</span> <span class="o">%</span> <span class="n">ftype</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">set_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">set_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">set_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fname</span></div>
 
 <span class="c1">#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~</span>
 
-<div class="viewcode-block" id="save_file_chooser"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.gui.guifiletools.html#parmed.tools.gui.guifiletools.save_file_chooser">[docs]</a><span class="k">def</span> <span class="nf">save_file_chooser</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ext_opts</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="save_file_chooser"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.gui.guifiletools.html#parmed.tools.gui.guifiletools.save_file_chooser">[docs]</a><span class="k">def</span> <span class="nf">save_file_chooser</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ext_opts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Opens a file dialog to choose a file name to save a new file as &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">ext_opts</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ext_opts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">ext_opts</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;All files&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)]</span>
     <span class="k">return</span> <span class="n">tkFileDialog</span><span class="o">.</span><span class="n">asksaveasfilename</span><span class="p">(</span><span class="n">filetypes</span><span class="o">=</span><span class="n">ext_opts</span><span class="p">,</span>
                         <span class="n">defaultextension</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save </span><span class="si">%s</span><span class="s1"> file as&#39;</span> <span class="o">%</span> <span class="n">ftype</span><span class="p">)</span></div>
@@ -85,14 +87,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -108,13 +107,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

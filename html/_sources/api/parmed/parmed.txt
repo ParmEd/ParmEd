@@ -33,6 +33,7 @@ Submodules
    parmed.residue
    parmed.scripts
    parmed.structure
+   parmed.symmetry
    parmed.topologyobjects
    parmed.vec3
 

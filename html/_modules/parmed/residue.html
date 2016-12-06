@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.residue &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.residue &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -99,9 +101,9 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">cls</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
 
 <span class="c1"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -123,23 +125,23 @@
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    ValueError</span>
-<span class="sd">        If any aliases have the same abbreviation as *other* </span>
+<span class="sd">        If any aliases have the same abbreviation as *other*</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_all_residues_by_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">_all_residues_by_abbr</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">_all_residues_by_symbol</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">all_residues</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abbr</span> <span class="o">=</span> <span class="n">abbr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_name</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">[</span><span class="n">abbr</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">if</span> <span class="n">symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_symbol</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">all_residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">aliases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">aliases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
                 <span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">:</span>
@@ -151,7 +153,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">symbol</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="AminoAcidResidue.get"><a class="viewcode-back" href="../../api/parmed/parmed.residue.html#parmed.residue.AminoAcidResidue.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="AminoAcidResidue.get"><a class="viewcode-back" href="../../api/parmed/parmed.residue.html#parmed.residue.AminoAcidResidue.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">abbronly</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the amino acid corresponding to either the residue name, 3-letter</span>
 <span class="sd">        abbreviation or 1-letter symbol. It is case-insensitive.</span>
@@ -160,6 +162,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        key : str</span>
 <span class="sd">            1-letter symbol, 3-letter abbreviation, or residue name</span>
+<span class="sd">        abbronly : bool</span>
+<span class="sd">            If True, only look for the 3-letter abbreviation (not the 1-letter</span>
+<span class="sd">            symbol)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -171,7 +176,7 @@
 <span class="sd">        KeyError if ``key`` is not a symbol, abbreviation, or case-insensitive</span>
 <span class="sd">        name of an amino acid residue, or any of its abbreviations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">abbronly</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_all_residues_by_symbol</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
@@ -189,7 +194,7 @@
 <span class="n">GLN</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Glutamine&#39;</span><span class="p">,</span> <span class="s1">&#39;GLN&#39;</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">)</span>
 <span class="n">GLY</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Glycine&#39;</span><span class="p">,</span> <span class="s1">&#39;GLY&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">)</span>
 <span class="n">HIS</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Histidine&#39;</span><span class="p">,</span> <span class="s1">&#39;HIS&#39;</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;HIP&#39;</span><span class="p">,</span> <span class="s1">&#39;HIE&#39;</span><span class="p">,</span> <span class="s1">&#39;HID&#39;</span><span class="p">])</span>
-<span class="n">HYP</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Hydroxyproline&#39;</span><span class="p">,</span> <span class="s1">&#39;HYP&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="n">HYP</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Hydroxyproline&#39;</span><span class="p">,</span> <span class="s1">&#39;HYP&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="n">ILE</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Isoleucine&#39;</span><span class="p">,</span> <span class="s1">&#39;ILE&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">)</span>
 <span class="n">LEU</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Leucine&#39;</span><span class="p">,</span> <span class="s1">&#39;LEU&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">)</span>
 <span class="n">LYS</span> <span class="o">=</span> <span class="n">AminoAcidResidue</span><span class="p">(</span><span class="s1">&#39;Lysine&#39;</span><span class="p">,</span> <span class="s1">&#39;LYS&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;LYN&#39;</span><span class="p">])</span>
@@ -221,13 +226,13 @@
     <span class="n">_all_residues_by_symbol</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">all_residues</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">abbr</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abbr</span> <span class="o">=</span> <span class="n">abbr</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_name</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">[</span><span class="n">abbr</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">all_residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">aliases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">aliases</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="n">aliases</span><span class="p">:</span>
                 <span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">alias</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_all_residues_by_abbr</span><span class="p">:</span>
@@ -241,7 +246,7 @@
 <div class="viewcode-block" id="DNAResidue.get"><a class="viewcode-back" href="../../api/parmed/parmed.residue.html#parmed.residue.DNAResidue.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the nucleic acid corresponding to either the residue name or</span>
-<span class="sd">        abbreviation. It is case-insensitive. </span>
+<span class="sd">        abbreviation. It is case-insensitive.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -289,7 +294,7 @@
 <div class="viewcode-block" id="RNAResidue.get"><a class="viewcode-back" href="../../api/parmed/parmed.residue.html#parmed.residue.RNAResidue.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Gets the nucleic acid corresponding to either the residue name or</span>
-<span class="sd">        abbreviation. It is case-insensitive. </span>
+<span class="sd">        abbreviation. It is case-insensitive.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -329,13 +334,12 @@
 <span class="n">T</span> <span class="o">=</span> <span class="n">RNAResidue</span><span class="p">(</span><span class="s1">&#39;Thymine&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;THY&#39;</span><span class="p">,</span> <span class="s1">&#39;T3&#39;</span><span class="p">,</span> <span class="s1">&#39;T5&#39;</span><span class="p">,</span> <span class="s1">&#39;TN&#39;</span><span class="p">,</span>
                                 <span class="s1">&#39;RT&#39;</span><span class="p">,</span> <span class="s1">&#39;RT3&#39;</span><span class="p">,</span> <span class="s1">&#39;RT5&#39;</span><span class="p">,</span> <span class="s1">&#39;RTN&#39;</span><span class="p">])</span>
 
-<span class="n">SOLVENT_NAMES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;WAT&#39;</span><span class="p">,</span> <span class="s1">&#39;HOH&#39;</span><span class="p">,</span> <span class="s1">&#39;TIP3&#39;</span><span class="p">,</span> <span class="s1">&#39;SOL&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;TIP4&#39;</span><span class="p">,</span> <span class="s1">&#39;TIP5&#39;</span><span class="p">,</span> <span class="s1">&#39;SPCE&#39;</span><span class="p">,</span> <span class="s1">&#39;SPC&#39;</span><span class="p">])</span>
-<span class="n">EXTRA_POINT_NAMES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;EP&#39;</span><span class="p">,</span> <span class="s1">&#39;LP&#39;</span><span class="p">])</span>
-<span class="n">CATION_NAMES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;Na+&#39;</span><span class="p">,</span> <span class="s1">&#39;Li+&#39;</span><span class="p">,</span> <span class="s1">&#39;Mg+&#39;</span><span class="p">,</span> <span class="s1">&#39;Rb+&#39;</span><span class="p">,</span> <span class="s1">&#39;MG&#39;</span><span class="p">,</span> <span class="s1">&#39;Cs+&#39;</span><span class="p">,</span> <span class="s1">&#39;POT&#39;</span><span class="p">,</span> <span class="s1">&#39;SOD&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;MG2&#39;</span><span class="p">,</span> <span class="s1">&#39;CAL&#39;</span><span class="p">,</span> <span class="s1">&#39;RUB&#39;</span><span class="p">,</span> <span class="s1">&#39;LIT&#39;</span><span class="p">,</span> <span class="s1">&#39;ZN2&#39;</span><span class="p">,</span> <span class="s1">&#39;CD2&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;K+&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;NA+&#39;</span><span class="p">])</span>
-<span class="n">ANION_NAMES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;Cl-&#39;</span><span class="p">,</span> <span class="s1">&#39;Br-&#39;</span><span class="p">,</span> <span class="s1">&#39;F-&#39;</span><span class="p">,</span> <span class="s1">&#39;I-&#39;</span><span class="p">,</span> <span class="s1">&#39;CLA&#39;</span><span class="p">,</span> <span class="s1">&#39;CL&#39;</span><span class="p">,</span> <span class="s1">&#39;BR&#39;</span><span class="p">,</span> <span class="s1">&#39;CL-&#39;</span><span class="p">])</span>
+<span class="n">WATER_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;WAT&#39;</span><span class="p">,</span> <span class="s1">&#39;HOH&#39;</span><span class="p">,</span> <span class="s1">&#39;TIP3&#39;</span><span class="p">,</span> <span class="s1">&#39;TIP4&#39;</span><span class="p">,</span> <span class="s1">&#39;TIP5&#39;</span><span class="p">,</span> <span class="s1">&#39;SPCE&#39;</span><span class="p">,</span> <span class="s1">&#39;SPC&#39;</span><span class="p">}</span>
+<span class="n">SOLVENT_NAMES</span> <span class="o">=</span> <span class="n">WATER_NAMES</span> <span class="o">|</span> <span class="p">{</span><span class="s1">&#39;SOL&#39;</span><span class="p">}</span>
+<span class="n">EXTRA_POINT_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;EP&#39;</span><span class="p">,</span> <span class="s1">&#39;LP&#39;</span><span class="p">}</span>
+<span class="n">CATION_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Na+&#39;</span><span class="p">,</span> <span class="s1">&#39;Li+&#39;</span><span class="p">,</span> <span class="s1">&#39;Mg+&#39;</span><span class="p">,</span> <span class="s1">&#39;Rb+&#39;</span><span class="p">,</span> <span class="s1">&#39;MG&#39;</span><span class="p">,</span> <span class="s1">&#39;Cs+&#39;</span><span class="p">,</span> <span class="s1">&#39;POT&#39;</span><span class="p">,</span> <span class="s1">&#39;SOD&#39;</span><span class="p">,</span> <span class="s1">&#39;MG2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;CAL&#39;</span><span class="p">,</span> <span class="s1">&#39;RUB&#39;</span><span class="p">,</span> <span class="s1">&#39;LIT&#39;</span><span class="p">,</span> <span class="s1">&#39;ZN2&#39;</span><span class="p">,</span> <span class="s1">&#39;CD2&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;K+&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;NA+&#39;</span><span class="p">}</span>
+<span class="n">ANION_NAMES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Cl-&#39;</span><span class="p">,</span> <span class="s1">&#39;Br-&#39;</span><span class="p">,</span> <span class="s1">&#39;F-&#39;</span><span class="p">,</span> <span class="s1">&#39;I-&#39;</span><span class="p">,</span> <span class="s1">&#39;CLA&#39;</span><span class="p">,</span> <span class="s1">&#39;CL&#39;</span><span class="p">,</span> <span class="s1">&#39;BR&#39;</span><span class="p">,</span> <span class="s1">&#39;CL-&#39;</span><span class="p">}</span>
 <span class="n">ALLION_NAMES</span> <span class="o">=</span> <span class="n">CATION_NAMES</span> <span class="o">|</span> <span class="n">ANION_NAMES</span>
 </pre></div>
 
@@ -347,14 +351,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -370,13 +371,13 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

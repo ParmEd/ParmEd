@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pdb &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.pdb &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -52,29 +54,30 @@
 <span class="sd">This package contains classes responsible for reading and writing both PDB and</span>
 <span class="sd">PDBx/mmCIF files.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">closing</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">closing</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">ftplib</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">PDBWarning</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.pdbx</span> <span class="kn">import</span> <span class="n">PdbxReader</span><span class="p">,</span> <span class="n">PdbxWriter</span><span class="p">,</span> <span class="n">containers</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
-<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
-<span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="kn">import</span> <span class="n">StandardBiomolecularResidues</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">Bond</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">PDBError</span><span class="p">,</span> <span class="n">PDBWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.pdbx</span> <span class="k">import</span> <span class="n">PdbxReader</span><span class="p">,</span> <span class="n">PdbxWriter</span><span class="p">,</span> <span class="n">containers</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="k">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">Mass</span><span class="p">,</span> <span class="n">Element</span><span class="p">,</span> <span class="n">element_by_name</span>
+<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="k">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span><span class="p">,</span> <span class="n">WATER_NAMES</span>
+<span class="kn">from</span> <span class="nn">parmed.modeller</span> <span class="k">import</span> <span class="n">StandardBiomolecularResidues</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">Bond</span>
+<span class="kn">from</span> <span class="nn">parmed.symmetry</span> <span class="k">import</span> <span class="n">Symmetry</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span><span class="p">,</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">PY3</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
-<span class="k">def</span> <span class="nf">_compare_atoms</span><span class="p">(</span><span class="n">old_atom</span><span class="p">,</span> <span class="n">new_atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_compare_atoms</span><span class="p">(</span><span class="n">old_atom</span><span class="p">,</span> <span class="n">new_atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span> <span class="n">inscode</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compares two atom instances, along with the residue name, number, and chain</span>
 <span class="sd">    identifier, to determine if two atoms are actually the *same* atom, but</span>
@@ -94,32 +97,38 @@
 <span class="sd">        The chain identifier that the new atom would belong to</span>
 <span class="sd">    segid : ``str``</span>
 <span class="sd">        The segment identifier for the molecule</span>
+<span class="sd">    inscode : ``str``</span>
+<span class="sd">        The insertion code for the residue</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    True if they are the same atom, False otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">new_atom</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">resname</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span> <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="o">!=</span> <span class="n">segid</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-    <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">new_atom</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">resname</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">number</span> <span class="o">!=</span> <span class="n">resid</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">!=</span> <span class="n">chain</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">segid</span> <span class="o">!=</span> <span class="n">segid</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">old_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">insertion_code</span> <span class="o">!=</span> <span class="n">inscode</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 
 <span class="c1">#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
 <span class="k">def</span> <span class="nf">_standardize_resname</span><span class="p">(</span><span class="n">resname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Looks up a standardized residue name for the given resname &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">AminoAcidResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">,</span> <span class="n">abbronly</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="kc">False</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="n">RNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="kc">False</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="n">DNAResidue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span><span class="o">.</span><span class="n">abbr</span><span class="p">,</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="n">resname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">in</span> <span class="n">WATER_NAMES</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">&#39;HOH&#39;</span><span class="p">,</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">resname</span><span class="p">,</span> <span class="kc">True</span>
 
 <span class="k">def</span> <span class="nf">_is_hetatm</span><span class="p">(</span><span class="n">resname</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Sees if residue name is &quot;standard&quot;, otherwise, we need to use HETATM to</span>
@@ -167,7 +176,7 @@
                     <span class="k">continue</span>
                 <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ORIGX&#39;</span><span class="p">,</span> <span class="s1">&#39;SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;MTRIX&#39;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;123&#39;</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                 <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">):</span>
                     <span class="n">atnum</span><span class="p">,</span> <span class="n">atname</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">11</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">12</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span>
                     <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">17</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">22</span><span class="p">:</span><span class="mi">26</span><span class="p">]</span>
@@ -177,36 +186,36 @@
                     <span class="c1"># Check for various attributes. This is the first atom, so</span>
                     <span class="c1"># we can assume we haven&#39;t gotten into the regime of &quot;weird&quot;</span>
                     <span class="c1"># yet, like hexadecimal atom/residue indices.</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">atnum</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="n">atname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">resname</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">resid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">atnum</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="n">atname</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">resname</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">resid</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span> <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="bp">False</span>
+                        <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">if</span> <span class="n">occupancy</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="nb">float</span><span class="p">(</span><span class="n">occupancy</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                            <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">if</span> <span class="n">bfactor</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="nb">float</span><span class="p">(</span><span class="n">bfactor</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                            <span class="k">return</span> <span class="bp">False</span>
+                            <span class="k">return</span> <span class="kc">False</span>
                     <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
                         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">elem</span><span class="p">):</span>
-                            <span class="k">return</span> <span class="bp">False</span>
-                    <span class="k">return</span> <span class="bp">True</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                    <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">return</span> <span class="bp">False</span></div>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PDBFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">saveto</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PDBFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">saveto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Goes to the wwPDB website and downloads the requested PDB, loading it</span>
 <span class="sd">        as a :class:`Structure` instance</span>
@@ -264,7 +273,7 @@
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">saveto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">saveto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">saveto</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
             <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -275,7 +284,7 @@
     <span class="n">_relatere</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;RELATED ID: *(\w+) *RELATED DB: *(\w+)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PDBFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PDBFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read a PDB file and return a populated `Structure` class</span>
 
 <span class="sd">        Parameters</span>
@@ -333,10 +342,10 @@
 <span class="sd">            default.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
 
         <span class="n">struct</span> <span class="o">=</span> <span class="n">Structure</span><span class="p">()</span>
@@ -344,7 +353,7 @@
         <span class="n">struct</span><span class="o">.</span><span class="n">experimental</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pmid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">journal_authors</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">volume_page</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">struct</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">related_entries</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">modelno</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># For PDB files with multiple MODELs</span>
         <span class="n">atomno</span> <span class="o">=</span> <span class="mi">0</span>
@@ -353,17 +362,20 @@
 
         <span class="c1"># Support hexadecimal numbering like that printed by VMD</span>
         <span class="n">last_atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
-        <span class="n">last_atom_added</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">last_atom_added</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">last_resid</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">resend</span> <span class="o">=</span> <span class="mi">26</span>
-        <span class="n">res_hex</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">atom_hex</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">res_hex</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">atom_hex</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">atom_overflow</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">ZEROSET</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
         <span class="n">altloc_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">_symmetry_lines</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fileobj</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;REMARK 290   SMTRY&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">_symmetry_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
                 <span class="n">rec</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;ATOM  &#39;</span> <span class="ow">or</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">:</span>
                     <span class="n">atomno</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -414,7 +426,7 @@
                                 <span class="n">resid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resid</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
                             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="n">resid</span> <span class="o">==</span> <span class="s1">&#39;****&#39;</span><span class="p">:</span>
-                                    <span class="n">resid</span> <span class="o">=</span> <span class="bp">None</span> <span class="c1"># Figure out by unique atoms</span>
+                                    <span class="n">resid</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Figure out by unique atoms</span>
                                 <span class="k">else</span><span class="p">:</span>
                                     <span class="k">raise</span>
                         <span class="k">elif</span> <span class="n">resid</span> <span class="o">==</span> <span class="s1">&#39;1000&#39;</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
@@ -440,7 +452,7 @@
                             <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atnum</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">atnum</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
-                                <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">True</span>
+                                <span class="n">atom_overflow</span> <span class="o">=</span> <span class="kc">True</span>
                                 <span class="n">atnum</span> <span class="o">=</span> <span class="n">last_atom_added</span><span class="o">.</span><span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="k">raise</span>
@@ -451,16 +463,16 @@
                             <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atnum</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                             <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">atnum</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">):</span>
-                                <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">True</span>
+                                <span class="n">atom_overflow</span> <span class="o">=</span> <span class="kc">True</span>
                                 <span class="n">atnum</span> <span class="o">=</span> <span class="n">last_atom_added</span><span class="o">.</span><span class="n">number</span> <span class="o">+</span> <span class="mi">1</span>
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="n">atnum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">atnum</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
-                                <span class="n">atom_hex</span> <span class="o">=</span> <span class="bp">True</span>
+                                <span class="n">atom_hex</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="c1"># It&#39;s possible that the residue number has cycled so much</span>
                     <span class="c1"># that it is now filled with ****&#39;s. In that case, start a</span>
                     <span class="c1"># new residue if the current residue repeats the same atom</span>
                     <span class="c1"># name as # the &#39;last&#39; residue.</span>
-                    <span class="k">if</span> <span class="n">resid</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">resid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="c1"># If the last residue is number 0xffff, then this is the</span>
                         <span class="c1"># first residue that has overridden, so make it a new</span>
                         <span class="c1"># residue</span>
@@ -471,7 +483,7 @@
                                 <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">atname</span><span class="p">:</span>
                                     <span class="n">resid</span> <span class="o">=</span> <span class="n">last_resid</span> <span class="o">+</span> <span class="mi">1</span>
                                     <span class="k">break</span>
-                    <span class="k">if</span> <span class="n">resid</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">resid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="c1"># Still part of the last residue</span>
                         <span class="n">resid</span> <span class="o">=</span> <span class="n">last_resid</span>
                     <span class="n">last_resid</span> <span class="o">=</span> <span class="n">resid</span>
@@ -489,8 +501,8 @@
                                 <span class="n">charge</span><span class="o">=</span><span class="n">chg</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">mass</span><span class="p">,</span> <span class="n">occupancy</span><span class="o">=</span><span class="n">occupancy</span><span class="p">,</span>
                                 <span class="n">bfactor</span><span class="o">=</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">altloc</span><span class="o">=</span><span class="n">altloc</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
                     <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
-                                       <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span> <span class="n">segid</span><span class="p">)</span> <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">,</span>
+                                       <span class="n">segid</span><span class="p">,</span> <span class="n">inscode</span><span class="p">)</span> <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
                         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span>
                         <span class="n">last_atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">[</span><span class="n">altloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
                         <span class="n">altloc_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">number</span><span class="p">)</span>
@@ -529,7 +541,7 @@
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Problem parsing residue number from &#39;</span>
                                       <span class="s1">&#39;ANISOU record&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">continue</span> <span class="c1"># Skip the rest of this record</span>
-                    <span class="n">icode</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">27</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="n">icode</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">26</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">try</span><span class="p">:</span>
                         <span class="n">u11</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">28</span><span class="p">:</span><span class="mi">35</span><span class="p">])</span>
                         <span class="n">u22</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">35</span><span class="p">:</span><span class="mi">42</span><span class="p">])</span>
@@ -541,7 +553,7 @@
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Problem parsing anisotropic factors &#39;</span>
                                       <span class="s1">&#39;from ANISOU record&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">continue</span>
-                    <span class="k">if</span> <span class="n">last_atom_added</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">last_atom_added</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Orphaned ANISOU record. Poorly &#39;</span>
                                       <span class="s1">&#39;formatted PDB file&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">continue</span>
@@ -553,10 +565,10 @@
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;ANISOU record does not match previous &#39;</span>
                                       <span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">continue</span>
-                    <span class="n">la</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u11</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">u22</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">u33</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span>
-                                          <span class="n">u12</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">u13</span><span class="o">/</span><span class="mf">1e4</span><span class="p">,</span> <span class="n">u23</span><span class="o">/</span><span class="mf">1e4</span><span class="p">])</span>
+                    <span class="n">la</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">u11</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">,</span> <span class="n">u22</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">,</span> <span class="n">u33</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">,</span>
+                                          <span class="n">u12</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">,</span> <span class="n">u13</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">,</span> <span class="n">u23</span><span class="o">/</span><span class="mi">1</span><span class="n">e4</span><span class="p">])</span>
                 <span class="k">elif</span> <span class="n">rec</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;TER&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">ter</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">ter</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">elif</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;ENDMDL&#39;</span><span class="p">:</span>
                     <span class="c1"># End the current model</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -569,7 +581,7 @@
                     <span class="n">atomno</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">resend</span> <span class="o">=</span> <span class="mi">26</span>
-                    <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">atom_overflow</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">elif</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;MODEL &#39;</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">modelno</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -582,7 +594,7 @@
                     <span class="n">modelno</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="n">atomno</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">resend</span> <span class="o">=</span> <span class="mi">26</span>
-                    <span class="n">atom_overflow</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">atom_overflow</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">elif</span> <span class="n">rec</span> <span class="o">==</span> <span class="s1">&#39;CRYST1&#39;</span><span class="p">:</span>
                     <span class="n">a</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">15</span><span class="p">])</span>
                     <span class="n">b</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">15</span><span class="p">:</span><span class="mi">24</span><span class="p">])</span>
@@ -630,7 +642,7 @@
                     <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;   2&#39;</span><span class="p">:</span>
                         <span class="c1"># Resolution</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">22</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span> <span class="k">continue</span>
-                        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="c1"># Skip over comments</span>
                             <span class="k">continue</span>
                         <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">11</span><span class="p">:</span><span class="mi">22</span><span class="p">]</span> <span class="o">!=</span>  <span class="s1">&#39;RESOLUTION.&#39;</span><span class="p">:</span>
@@ -659,13 +671,13 @@
                     <span class="k">if</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span>
                         <span class="k">continue</span> <span class="c1"># Do not handle altloc bonds yet.</span>
                     <span class="n">origin</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-existent &#39;</span>
                                       <span class="s1">&#39;origin atom </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">b</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">continue</span> <span class="c1"># pragma: no cover</span>
                     <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span>
                         <span class="n">partner</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-existent &#39;</span>
                                           <span class="s1">&#39;destination atom </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
                         <span class="k">elif</span> <span class="n">partner</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">origin</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
@@ -677,7 +689,7 @@
                         <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">altloc_ids</span><span class="p">:</span> <span class="k">continue</span>
                         <span class="n">partner</span> <span class="o">=</span> <span class="n">_find_atom_index</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">partner</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;CONECT record references non-&#39;</span>
                                           <span class="s1">&#39;existent destination atom </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span>
                                           <span class="n">PDBWarning</span><span class="p">)</span>
@@ -704,13 +716,21 @@
             <span class="n">all_coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
                         <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="c1"># process symmetry lines</span>
+        <span class="k">if</span> <span class="n">_symmetry_lines</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">_symmetry_lines</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;REMARK 290   SMTRY&#39;</span><span class="p">):</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">4</span><span class="p">:])</span>
+            <span class="n">tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f8&#39;</span><span class="p">)</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">symmetry</span> <span class="o">=</span> <span class="n">Symmetry</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">struct</span></div>
 
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="PDBFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">altlocs</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
-              <span class="n">write_anisou</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">charmm</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">standard_resnames</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PDBFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.PDBFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altlocs</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+              <span class="n">write_anisou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">charmm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standard_resnames</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a PDB file from a Structure instance</span>
 
 <span class="sd">        Parameters</span>
@@ -755,6 +775,13 @@
 <span class="sd">        standard_resnames : bool, optional, default False</span>
 <span class="sd">            If True, common aliases for various amino and nucleic acid residues</span>
 <span class="sd">            will be converted into the PDB-standard values.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If multiple coordinate frames are present, these will be written as</span>
+<span class="sd">        separate models (but only the unit cell from the first model will be</span>
+<span class="sd">        written, as the PDB standard dictates that only one set of unit cells</span>
+<span class="sd">        shall be present).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">altlocs</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">altlocs</span><span class="p">)]:</span>
             <span class="n">altlocs</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
@@ -765,10 +792,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal value of occupancy [</span><span class="si">%s</span><span class="s2">]; expected &#39;all&#39;, &quot;</span>
                              <span class="s2">&quot;&#39;first&#39;, or &#39;occupancy&#39;&quot;</span> <span class="o">%</span> <span class="n">altlocs</span><span class="p">)</span>
-        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">charmm</span><span class="p">:</span>
             <span class="n">atomrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ATOM  </span><span class="si">%5d</span><span class="s1"> </span><span class="si">%-4s%1s%-4s%1s%4d%1s</span><span class="s1">   </span><span class="si">%8.3f%8.3f%8.3f%6.2f</span><span class="s1">&#39;</span>
                        <span class="s1">&#39;</span><span class="si">%6.2f</span><span class="s1">      </span><span class="si">%-4s%2s%-2s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -785,12 +812,18 @@
             <span class="n">terrec</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;TER   </span><span class="si">%5d</span><span class="s1">      </span><span class="si">%-3s</span><span class="s1"> </span><span class="si">%1s%4d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">reslen</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="n">hetatomrec</span> <span class="o">=</span> <span class="n">atomrec</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;ATOM  &#39;</span><span class="p">,</span> <span class="s1">&#39;HETATM&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;CRYST1</span><span class="si">%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f</span><span class="s1"> </span><span class="si">%-11s%4s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">struct</span><span class="o">.</span><span class="n">space_group</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">symmetry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d%4d%10.6f%10.6f%10.6f%15.5f</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">symmetry</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+                <span class="n">arr_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">index</span> <span class="o">%</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">index</span><span class="o">//</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">arr</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">symm_line</span> <span class="o">=</span> <span class="s2">&quot;REMARK 290   SMTRY&quot;</span> <span class="o">+</span> <span class="n">fmt</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arr_list</span><span class="p">)</span>
+                <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">symm_line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -815,7 +848,7 @@
                         <span class="n">a</span> <span class="o">=</span> <span class="n">item</span>
                 <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(),</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;Should not be here&#39;</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Should not be here&#39;</span>
         <span class="k">if</span> <span class="n">standard_resnames</span><span class="p">:</span>
             <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="n">reslen</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -862,8 +895,8 @@
                                <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
                                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
                                <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-                    <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                        <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mf">1e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mi">1</span><span class="n">e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
                         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anisourec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span>
                                    <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span>
                                    <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anisou</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -888,8 +921,8 @@
                                    <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">rnum</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">insertion_code</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">occupancy</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="n">segid</span><span class="p">,</span>
                                    <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-                        <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                            <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mf">1e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">anisou</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">ani</span><span class="o">*</span><span class="mi">1</span><span class="n">e4</span><span class="p">)</span> <span class="k">for</span> <span class="n">ani</span> <span class="ow">in</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span><span class="p">]</span>
                             <span class="n">el</span> <span class="o">=</span> <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">anisourec</span> <span class="o">%</span> <span class="p">(</span><span class="n">anum</span><span class="p">,</span> <span class="n">aname</span><span class="p">,</span>
                                 <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span>
@@ -935,17 +968,17 @@
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span> <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;data_&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">True</span>
+                    <span class="k">return</span> <span class="kc">True</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">False</span>
-            <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="CIFFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">saveto</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CIFFile.download"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">saveto</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</span>
 <span class="sd">        loading it as a :class:`Structure` instance</span>
@@ -1001,7 +1034,7 @@
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">GzipFile</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">fileobj</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">saveto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">saveto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">saveto</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
             <span class="n">fileobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -1010,7 +1043,7 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="CIFFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CIFFile.parse"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skip_bonds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read a PDBx or mmCIF file and return a populated `Structure` class</span>
 
@@ -1068,12 +1101,18 @@
 <span class="sd">            the PDBx/mmCIF file.  No bonds or other topological features are</span>
 <span class="sd">            added by default. If multiple structures are defined in the CIF</span>
 <span class="sd">            file, multiple Structure instances will be returned as a tuple.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError if the file severely violates the PDB format specification.</span>
+<span class="sd">        If this occurs, check the formatting on each line and make sure it</span>
+<span class="sd">        matches the others.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">fileobj</span> <span class="o">=</span> <span class="n">filename</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -1091,21 +1130,21 @@
             <span class="n">struct</span><span class="o">.</span><span class="n">experimental</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">journal</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">doi</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">pmid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">journal_authors</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">volume_page</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="n">struct</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">struct</span><span class="o">.</span><span class="n">year</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">related_entries</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="c1"># Now we have the data. First get the metadata if it exists</span>
             <span class="n">exptl</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;exptl&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">exptl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exptl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">experimental</span> <span class="o">=</span> <span class="n">exptl</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">)</span>
             <span class="n">auth</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;audit_author&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">nameidx</span> <span class="o">=</span> <span class="n">auth</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">nameidx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">authors</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">t</span><span class="p">[</span><span class="n">nameidx</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span>
                                                <span class="n">auth</span><span class="o">.</span><span class="n">getRowList</span><span class="p">()])</span>
             <span class="n">reflns</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;reflns&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">reflns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reflns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">=</span> <span class="n">reflns</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="s1">&#39;d_resolution_high&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
                     <span class="k">try</span><span class="p">:</span>
@@ -1114,7 +1153,7 @@
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Could not convert resolution (</span><span class="si">%s</span><span class="s1">) to &#39;</span>
                                       <span class="s1">&#39;float&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="p">)</span>
             <span class="n">cite</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;citation_author&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">nameidx</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">nameidx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">journal_authors</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1124,7 +1163,7 @@
                             <span class="n">journal_authors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">journal_authors</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">journal_authors</span><span class="p">)</span>
             <span class="n">cite</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;citation&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cite</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">doiid</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;pdbx_database_id_DOI&#39;</span><span class="p">)</span>
                 <span class="n">pmiid</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;pdbx_database_id_PubMed&#39;</span><span class="p">)</span>
                 <span class="n">titlid</span> <span class="o">=</span> <span class="n">cite</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span>
@@ -1150,7 +1189,7 @@
                 <span class="k">if</span> <span class="n">volid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">struct</span><span class="o">.</span><span class="n">volume</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="n">volid</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">])</span>
             <span class="n">keywds</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;struct_keywords&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">keywds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keywds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">textid</span> <span class="o">=</span> <span class="n">keywds</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">textid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">rows</span> <span class="o">=</span> <span class="n">keywds</span><span class="o">.</span><span class="n">getRowList</span><span class="p">()</span>
@@ -1158,7 +1197,7 @@
                     <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span>
                             <span class="n">struct</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
             <span class="n">dbase</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;pdbx_database_related&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">dbase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dbase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dbid</span> <span class="o">=</span> <span class="n">dbase</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;db_id&#39;</span><span class="p">)</span>
                 <span class="n">nameid</span> <span class="o">=</span> <span class="n">dbase</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;db_name&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dbid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">nameid</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
@@ -1184,8 +1223,8 @@
             <span class="n">occupid</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;occupancy&#39;</span><span class="p">)</span>
             <span class="n">bfactorid</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;B_iso_or_equiv&#39;</span><span class="p">)</span>
             <span class="n">modelid</span> <span class="o">=</span> <span class="n">atoms</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;pdbx_PDB_model_num&#39;</span><span class="p">)</span>
-            <span class="n">origmodel</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="n">lastmodel</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">origmodel</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">lastmodel</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">all_coords</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">xyz</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">atommap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -1203,7 +1242,7 @@
                 <span class="n">inscode</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">inscodeid</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">inscode</span> <span class="ow">in</span> <span class="s1">&#39;?.&#39;</span><span class="p">:</span> <span class="n">inscode</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="n">model</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">modelid</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">origmodel</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">origmodel</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">origmodel</span> <span class="o">=</span> <span class="n">lastmodel</span> <span class="o">=</span> <span class="n">model</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">xid</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">yid</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">zid</span><span class="p">])</span>
                 <span class="n">occup</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">occupid</span><span class="p">])</span>
@@ -1240,7 +1279,7 @@
                                 <span class="n">altloc</span><span class="o">=</span><span class="n">altloc</span><span class="p">,</span> <span class="n">number</span><span class="o">=</span><span class="n">atnum</span><span class="p">)</span>
                 <span class="n">atom</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">_compare_atoms</span><span class="p">(</span><span class="n">last_atom</span><span class="p">,</span> <span class="n">atom</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">resnum</span><span class="p">,</span>
-                                   <span class="n">chain</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                                   <span class="n">chain</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">inscode</span><span class="p">)</span>
                         <span class="ow">and</span> <span class="n">altloc</span><span class="p">):</span>
                     <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="n">last_atom</span><span class="o">.</span><span class="n">residue</span>
                     <span class="n">last_atom</span><span class="o">.</span><span class="n">other_locations</span><span class="p">[</span><span class="n">altloc</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
@@ -1265,7 +1304,7 @@
                     <span class="n">atommap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span>
             <span class="c1"># Check for unit cell parameters</span>
             <span class="n">cell</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;cell&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cell</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cell</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">aid</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;length_a&#39;</span><span class="p">)</span>
                 <span class="n">bid</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;length_b&#39;</span><span class="p">)</span>
                 <span class="n">cid</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;length_c&#39;</span><span class="p">)</span>
@@ -1283,7 +1322,7 @@
                     <span class="n">struct</span><span class="o">.</span><span class="n">space_group</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">spaceid</span><span class="p">]</span>
             <span class="c1"># Check for anisotropic B-factors</span>
             <span class="n">anisou</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;atom_site_anisotrop&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">atnumid</span> <span class="o">=</span> <span class="n">anisou</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
                 <span class="n">atnameid</span> <span class="o">=</span> <span class="n">anisou</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;pdbx_auth_atom_id&#39;</span><span class="p">)</span>
                 <span class="n">altlocid</span> <span class="o">=</span> <span class="n">anisou</span><span class="o">.</span><span class="n">getAttributeIndex</span><span class="p">(</span><span class="s1">&#39;pdbx_label_alt_id&#39;</span><span class="p">)</span>
@@ -1328,9 +1367,12 @@
                     <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
                         <span class="c1"># If at least one went wrong, set them all to None</span>
                         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">atommap</span><span class="p">):</span>
-                            <span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="bp">None</span>
+                            <span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="o">=</span> <span class="kc">None</span>
                         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Problem processing anisotropic &#39;</span>
                                       <span class="s1">&#39;B-factors. Skipping&#39;</span><span class="p">,</span> <span class="n">PDBWarning</span><span class="p">)</span>
+            <span class="n">symmetry_obj</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">getObj</span><span class="p">(</span><span class="s1">&#39;symmetry&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">symmetry_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">space_group</span> <span class="o">=</span> <span class="n">symmetry_obj</span><span class="o">.</span><span class="n">getRow</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">xyz</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Corrupt CIF; all models must have the &#39;</span>
@@ -1352,8 +1394,8 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="CIFFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-              <span class="n">altlocs</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">standard_resnames</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CIFFile.write"><a class="viewcode-back" href="../../../api/parmed/parmed.formats.pdb.html#parmed.amber.CIFFile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">renumber</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">coordinates</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+              <span class="n">altlocs</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standard_resnames</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write a PDB file from the current Structure instance</span>
 
@@ -1395,6 +1437,13 @@
 <span class="sd">        standard_resnames : bool, optional</span>
 <span class="sd">            If True, common aliases for various amino and nucleic acid residues</span>
 <span class="sd">            will be converted into the PDB-standard values. Default is False</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If multiple coordinate frames are present, these will be written as</span>
+<span class="sd">        separate models (but only the unit cell from the first model will be</span>
+<span class="sd">        written, as the PDBx standard dictates that only one set of unit cells</span>
+<span class="sd">        shall be present).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">altlocs</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">altlocs</span><span class="p">)]:</span>
             <span class="n">altlocs</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
@@ -1405,14 +1454,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Illegal value of occupancy [</span><span class="si">%s</span><span class="s2">]; expected &#39;all&#39;, &quot;</span>
                              <span class="s2">&quot;&#39;first&#39;, or &#39;occupancy&#39;&quot;</span> <span class="o">%</span> <span class="n">altlocs</span><span class="p">)</span>
-        <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">):</span>
             <span class="n">dest</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
-            <span class="n">own_handle</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="c1"># Make the main container</span>
         <span class="n">cont</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">DataContainer</span><span class="p">(</span><span class="s1">&#39;cell&#39;</span><span class="p">)</span>
         <span class="c1"># Add cell info if applicable</span>
-        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cell</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">DataCategory</span><span class="p">(</span><span class="s1">&#39;cell&#39;</span><span class="p">)</span>
             <span class="n">cell</span><span class="o">.</span><span class="n">appendAttribute</span><span class="p">(</span><span class="s1">&#39;length_a&#39;</span><span class="p">)</span>
             <span class="n">cell</span><span class="o">.</span><span class="n">appendAttribute</span><span class="p">(</span><span class="s1">&#39;length_b&#39;</span><span class="p">)</span>
@@ -1422,8 +1471,8 @@
             <span class="n">cell</span><span class="o">.</span><span class="n">appendAttribute</span><span class="p">(</span><span class="s1">&#39;angle_gamma&#39;</span><span class="p">)</span>
             <span class="n">cell</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[:])</span>
             <span class="n">cont</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span> <span class="mi">3</span><span class="p">))</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
@@ -1448,7 +1497,7 @@
                         <span class="n">a</span> <span class="o">=</span> <span class="n">item</span>
                 <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(),</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s1">&#39;Should not be here&#39;</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Should not be here&#39;</span>
         <span class="k">if</span> <span class="n">standard_resnames</span><span class="p">:</span>
             <span class="n">standardize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1468,7 +1517,7 @@
                  <span class="s1">&#39;auth_comp_id&#39;</span><span class="p">,</span> <span class="s1">&#39;auth_asym_id&#39;</span><span class="p">,</span> <span class="s1">&#39;auth_atom_id&#39;</span><span class="p">,</span>
                  <span class="s1">&#39;pdbx_PDB_model_num&#39;</span><span class="p">]</span>
         <span class="p">)</span>
-        <span class="n">write_anisou</span> <span class="o">=</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+        <span class="n">write_anisou</span> <span class="o">=</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                                             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">write_anisou</span><span class="p">:</span>
             <span class="n">cifanisou</span> <span class="o">=</span> <span class="n">containers</span><span class="o">.</span><span class="n">DataCategory</span><span class="p">(</span><span class="s1">&#39;atom_site_anisotrop&#39;</span><span class="p">)</span>
@@ -1515,7 +1564,7 @@
                              <span class="n">pa</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span>
                              <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
                     <span class="p">)</span>
-                    <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">pa</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                         <span class="n">cifanisou</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                                 <span class="p">[</span><span class="n">anum</span><span class="p">,</span> <span class="n">Element</span><span class="p">[</span><span class="n">pa</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
                                  <span class="n">pa</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pa</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">rnum</span><span class="p">,</span>
@@ -1541,7 +1590,7 @@
                                  <span class="n">oatom</span><span class="o">.</span><span class="n">bfactor</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                                  <span class="n">rnum</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">chain</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>
                         <span class="p">)</span>
-                        <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">write_anisou</span> <span class="ow">and</span> <span class="n">oatom</span><span class="o">.</span><span class="n">anisou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">cifanisou</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                                     <span class="p">[</span><span class="n">anum</span><span class="p">,</span> <span class="n">Element</span><span class="p">[</span><span class="n">oatom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span>
                                      <span class="n">oatom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">oatom</span><span class="o">.</span><span class="n">altloc</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span>
@@ -1577,14 +1626,14 @@
             <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
             <span class="n">idx0</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="bp">None</span> <span class="c1"># not found</span>
+        <span class="k">return</span> <span class="kc">None</span> <span class="c1"># not found</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">idx0</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">while</span> <span class="n">idx0</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">struct</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
             <span class="n">idx0</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="k">return</span> <span class="bp">None</span> <span class="c1"># not found</span>
+        <span class="k">return</span> <span class="kc">None</span> <span class="c1"># not found</span>
 
 <span class="k">def</span> <span class="nf">_needs_ter_card</span><span class="p">(</span><span class="n">res</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Determines if a TER card is needed by seeing if the residue is a</span>
@@ -1592,22 +1641,22 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># First see if it&#39;s in the list of standard biomolecular residues. If so,</span>
     <span class="c1"># and it has no tail, no TER is needed</span>
-    <span class="n">std_resname</span> <span class="o">=</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">std_resname</span> <span class="o">=</span> <span class="n">_standardize_resname</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">std_resname</span> <span class="ow">in</span> <span class="n">StandardBiomolecularResidues</span><span class="p">:</span>
-        <span class="n">is_std_res</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="k">if</span> <span class="n">StandardBiomolecularResidues</span><span class="p">[</span><span class="n">std_resname</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">False</span>
+        <span class="n">is_std_res</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">StandardBiomolecularResidues</span><span class="p">[</span><span class="n">std_resname</span><span class="p">]</span><span class="o">.</span><span class="n">tail</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">is_std_res</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">is_std_res</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">my_res_idx</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">idx</span>
     <span class="n">residxs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
             <span class="n">residxs</span> <span class="o">|=</span> <span class="p">{</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">my_res_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">residxs</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">False</span> <span class="c1"># It&#39;s connected to next residue</span>
+        <span class="k">return</span> <span class="kc">False</span> <span class="c1"># It&#39;s connected to next residue</span>
     <span class="k">elif</span> <span class="n">is_std_res</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Heuristic -- add a TER if it&#39;s bonded to the previous residue, which</span>
         <span class="c1"># indicates it&#39;s polymeric. Otherwise don&#39;t.</span>
@@ -1622,14 +1671,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1645,13 +1691,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

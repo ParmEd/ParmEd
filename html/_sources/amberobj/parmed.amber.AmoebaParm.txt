@@ -17,6 +17,7 @@ parmed.amber.AmoebaParm
       ~AmoebaParm.add_atom
       ~AmoebaParm.add_atom_to_residue
       ~AmoebaParm.add_flag
+      ~AmoebaParm.assign_bonds
       ~AmoebaParm.copy
       ~AmoebaParm.createSystem
       ~AmoebaParm.delete_flag

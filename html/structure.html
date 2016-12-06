@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The structure module &mdash; ParmEd 2.5.0 documentation</title>
+    <title>The structure module &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.structure.Structure" href="structobj/parmed.structure.Structure.html" /> 
   </head>
@@ -40,7 +42,7 @@
         <li class="right" >
           <a href="structobj/parmed.structure.Structure.html" title="parmed.structure.Structure"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -197,7 +199,7 @@ coordinates.</p>
 accessed from the <code class="docutils literal"><span class="pre">coordinates</span></code> attribute on the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance
 itself. The <code class="docutils literal"><span class="pre">coordinates</span></code> attribute is a numpy array of shape <code class="docutils literal"><span class="pre">(natom,</span> <span class="pre">3)</span></code>.
 For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2koc&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.886, -5.163, 9.647)</span>
@@ -217,7 +219,7 @@ positions). As such, if you modify individual positions in the <code class="docu
 array, they will <em>not</em> actually change the locations of that atom. In fact, if
 you change the <code class="docutils literal"><span class="pre">coordinates</span></code> array, all of the cached coordinates will be
 discarded and replaced with a copy of the position attributes on each atom:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.886, -5.163, 9.647)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
@@ -234,7 +236,7 @@ discarded and replaced with a copy of the position attributes on each atom:</p>
 reflected in the coordinate array, but <em>not</em> in a reference to the old
 coordinates &#8211; i.e., the <code class="docutils literal"><span class="pre">coordinates</span></code> array is a cache that may be discarded
 when it no longer matches the positions on each atom:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="c1"># A reference to the original cache!</span>
 <span class="go">array([[ -8.886,  -5.163,   9.647],</span>
@@ -264,7 +266,7 @@ automatically converted into a numpy array <em>and assigned to the individual
 atoms</em>. For example, using the <code class="docutils literal"><span class="pre">coords</span></code> reference we stored in our previous
 example and assigned to <code class="docutils literal"><span class="pre">pdb.coordinates</span></code> will reset the first atoms&#8217; position
 to its original value:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coords</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coords</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.8859999999999992, -5.1630000000000003, 9.6470000000000002)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
@@ -286,7 +288,7 @@ conformers using the <a class="reference internal" href="structobj/parmed.struct
 conformer number or the word <cite>&#8216;all&#8217;</cite> to get all coordinates.</p>
 <p>As an example, consider the PDB 2KOC, which is an NMR structure with 20
 conformers:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2KOC&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2KOC&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="go">array([[ -8.886,  -5.163,   9.647],</span>
 <span class="go">       [-10.305,  -4.745,  10.229],</span>
@@ -318,7 +320,7 @@ conformers:</p>
 <p>Be careful, though! Anything you do that makes the first conformer differ from
 the positions on each of the atoms will invalidate the cache and delete <em>all</em>
 conformers, as shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Invalidates cached coordinates!</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Invalidates cached coordinates!</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
 <span class="go">array([[  0.   ,  -5.163,   9.647],</span>
 <span class="go">       [-10.305,  -4.745,  10.229],</span>
@@ -339,35 +341,35 @@ accessed. As a result, repeated access to <code class="docutils literal"><span c
 requires only a single access, as does storing a reference to it and accessing
 that instead. Below, I show some performance timings from IPython for a simple
 task of finding the lowest x-coordinate value among all atoms:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>In [1]: import parmed as pmd
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 
-In [2]: def slow_min_x(struct):
-   ...:     return min([struct.coordinates[i][0]
-   ...:                 for i in range(len(struct.atoms))])
-   ...:
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">slow_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+   <span class="o">...</span><span class="p">:</span>                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))])</span>
+   <span class="o">...</span><span class="p">:</span>
 
-In [3]: def iter_min_x(struct):
-   ...:     return min([x[0] for x in struct.coordinates])
-   ...:
+<span class="n">In</span> <span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">iter_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span><span class="p">])</span>
+   <span class="o">...</span><span class="p">:</span>
 
-In [4]: def ref_min_x(struct):
-   ...:     coords = struct.coordinates
-   ...:     return min([coords[i][0] for i in range(len(struct.atoms))])
-   ...:
+<span class="n">In</span> <span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">ref_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="n">coords</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span>
+   <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">atoms</span><span class="p">))])</span>
+   <span class="o">...</span><span class="p">:</span>
 
-In [5]: pmd.download_PDB(&#39;4lzt&#39;)
-Out[5]: &lt;Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized&gt;
+<span class="n">In</span> <span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="o">&lt;</span><span class="n">Structure</span> <span class="mi">1164</span> <span class="n">atoms</span><span class="p">;</span> <span class="mi">274</span> <span class="n">residues</span><span class="p">;</span> <span class="mi">0</span> <span class="n">bonds</span><span class="p">;</span> <span class="n">PBC</span> <span class="p">(</span><span class="n">triclinic</span><span class="p">);</span> <span class="n">NOT</span> <span class="n">parametrized</span><span class="o">&gt;</span>
 
-In [6]: struct = pmd.download_PDB(&#39;4lzt&#39;)
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">struct</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
 
-In [7]: %timeit slow_min_x(struct)
-1 loops, best of 3: 1.08 s per loop
+<span class="n">In</span> <span class="p">[</span><span class="mi">7</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">slow_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+<span class="mi">1</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.08</span> <span class="n">s</span> <span class="n">per</span> <span class="n">loop</span>
 
-In [8]: %timeit iter_min_x(struct)
-1000 loops, best of 3: 1.2 ms per loop
+<span class="n">In</span> <span class="p">[</span><span class="mi">8</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">iter_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+<span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.2</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
 
-In [9]: %timeit ref_min_x(struct)
-1000 loops, best of 3: 1.29 ms per loop
+<span class="n">In</span> <span class="p">[</span><span class="mi">9</span><span class="p">]:</span> <span class="o">%</span><span class="n">timeit</span> <span class="n">ref_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">)</span>
+<span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.29</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
 </pre></div>
 </div>
 <p>Notice &#8211; the <code class="docutils literal"><span class="pre">slow_min_x</span></code> function is about 1000x slower than all of the
@@ -421,7 +423,7 @@ contain the <em>same</em> atoms, residues, bonds, etc. as the original Structure
 that you can simplify the process of modifying a subset of the structure, you
 want to use the <code class="docutils literal"><span class="pre">view</span></code> descriptor of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instead.  This is described in more detail below.</p>
 <p><strong>Let&#8217;s look at the simplest form of the selection syntax &#8211; by atom index</strong>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span> <span class="c1"># use the 4LZT.cif file in test/files/</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC; NOT parametrized&gt;</span>
@@ -451,7 +453,7 @@ if no atoms match the selection.</p>
 mask syntax</a> <strong>for more details</strong>.</p>
 <p>If you pass a single string, it will be interpreted as an Amber mask. The
 example below continues from the same <code class="docutils literal"><span class="pre">struct</span></code> we were using above:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;@CA&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;@CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;:1-10&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 75 atoms; 10 residues; 75 bonds; NOT parametrized&gt;</span>
@@ -478,7 +480,7 @@ interpreted as a mask array.  A common use-case for a mask array is to convert a
 (see <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.to_dataframe" title="parmed.structure.Structure.to_dataframe"><code class="xref py py-func docutils literal"><span class="pre">Structure.to_dataframe</span></code></a>
 for more information), and using Pandas/numpy to generate the mask array. An
 example of this is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">resid</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)]</span>
@@ -488,7 +490,7 @@ example of this is shown below:</p>
 <p>A mask array cannot be used alongside a residue or chain selection. In fact,
 ParmEd will simply interpret that array as a selection array, which may lead to
 unexpected results, as seen below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,:,</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,:,</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 409 atoms; 274 residues; 135 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
@@ -528,7 +530,7 @@ array, since that would either include duplicates <em>or</em> select every atom.
 </ul>
 <p>Let&#8217;s have a look at some examples, again continuing with the <code class="docutils literal"><span class="pre">struct</span></code> object
 we defined above:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="go">&lt;Structure 5 atoms; 2 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># note, this is the 10th to 20th atom of the 1st residue!</span>
 <span class="go">&lt;Structure 0 atoms; 0 residues; 0 bonds; NOT parametrized&gt;</span>
@@ -551,7 +553,7 @@ selected atoms. You still need to familiarize yourself with the selection
 syntax, as it is the same when you are trying to take a view.</p>
 <p>However, instead of selecting directly from the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance, you instead select from
 <code class="docutils literal"><span class="pre">Structure.view</span></code>, as demonstrated below on a downloaded PDB:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="kn">as</span> <span class="nn">pmd</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">&lt;Residue LYS[1]; chain=A&gt;</span>
@@ -578,7 +580,7 @@ that is the sum of the originals. This is demonstrated below using AMBER
 topology files of two small molecules, phenol and biphenyl, which can be found
 in the <code class="docutils literal"><span class="pre">test/files</span></code> directory of the ParmEd distribution (<code class="docutils literal"><span class="pre">phenol.prmtop</span></code>
 and <code class="docutils literal"><span class="pre">biphenyl.prmtop</span></code>):</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;biphenyl.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
@@ -596,7 +598,7 @@ and <code class="docutils literal"><span class="pre">biphenyl.prmtop</span></cod
 <p>Note that the order of addition controls the order that the atoms are added to
 the resulting <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>, as you would
 probably expect:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
 <span class="go">[13, 22]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">biphenyl</span> <span class="o">+</span> <span class="n">phenol</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
 <span class="go">[22, 13]</span>
@@ -607,7 +609,7 @@ combining using standard addition, particularly for large systems. Note, if you
 are adding a large and a small structure together, adding the small one to the
 large one in-place is the most efficient way to do that. In-place combination is
 demonstrated below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
 <span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
@@ -635,7 +637,7 @@ multiplication operator (<code class="docutils literal"><span class="pre">*</spa
 <p>The only mode supported here is multiplying a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance by an integer, which indicates the
 number of copies of the original structure will be added to the result.  And
 like with combination, replication can be done both in-place and not:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">2</span>
@@ -678,7 +680,7 @@ result, the return value is a list of <code class="docutils literal"><span class
 the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> (or subclass) instances
 followed by the number of times that structure occurs.  Using our phenol and
 biphenyl examples from earlier:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/phenol.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/biphenyl.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
@@ -698,7 +700,7 @@ biphenyl examples from earlier:</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal"><span class="pre">load_file</span></code></a>(filename,&nbsp;*args,&nbsp;**kwargs)</td>
+<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal"><span class="pre">load_file</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
 <td>Identifies the file format of the specified file and returns its parsed contents.</td>
 </tr>
 </tbody>
@@ -738,7 +740,7 @@ PDB file and a CIF file. These structures are both used in the ParmEd unittest
 suite, so you can get the files from there, or <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT">download them from here.</a></p>
 <hr class="docutils" />
 <p>The first example demonstrates reading the PDB file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
@@ -769,7 +771,7 @@ suite, so you can get the files from there, or <a class="reference external" hre
 </pre></div>
 </div>
 <p>The second example demonstrates reading the CIF file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
@@ -810,9 +812,9 @@ that you can very simply convert a PDBx/mmCIF file to a PDB file.</p>
 format, but many programs in the field of computational parmed and physics
 has decades worth of legacy code built around PDB files. Not to worry!  A quick
 1-liner will seamlessly convert PDBx to PDB:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
-<span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s1">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                                <span class="n">renumber</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+<span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s1">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">renumber</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>In this case, the metadata is <em>not</em> copied (i.e., the <code class="docutils literal"><span class="pre">EXPTL</span></code>, <code class="docutils literal"><span class="pre">JRNL</span></code>,
@@ -868,14 +870,11 @@ the numbering starts again.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -894,12 +893,12 @@ the numbering starts again.</p>
         <li class="right" >
           <a href="structobj/parmed.structure.Structure.html" title="parmed.structure.Structure"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

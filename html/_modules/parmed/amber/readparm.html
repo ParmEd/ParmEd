@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber.readparm &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber.readparm &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -72,11 +74,11 @@
 <span class="sd">Boston, MA 02111-1307, USA.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">parmed.amber.amberformat</span> <span class="kn">import</span> <span class="n">AmberFormat</span>
-<span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="kn">import</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">Rst7</span>
-<span class="kn">from</span> <span class="nn">parmed.amber._chamberparm</span> <span class="kn">import</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">ConvertFromPSF</span>
-<span class="kn">from</span> <span class="nn">parmed.amber._tinkerparm</span> <span class="kn">import</span> <span class="n">AmoebaParm</span><span class="p">,</span> <span class="n">BeemanRestart</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.amberformat</span> <span class="k">import</span> <span class="n">AmberFormat</span>
+<span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="k">import</span> <span class="n">AmberParm</span><span class="p">,</span> <span class="n">Rst7</span>
+<span class="kn">from</span> <span class="nn">parmed.amber._chamberparm</span> <span class="k">import</span> <span class="n">ChamberParm</span><span class="p">,</span> <span class="n">ConvertFromPSF</span>
+<span class="kn">from</span> <span class="nn">parmed.amber._tinkerparm</span> <span class="k">import</span> <span class="n">AmoebaParm</span><span class="p">,</span> <span class="n">BeemanRestart</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">string_types</span>
 
 <span class="c1"># Silence pyflakes warnings for deprecated/unused classes</span>
 <span class="k">assert</span> <span class="n">BeemanRestart</span> <span class="ow">and</span> <span class="n">ConvertFromPSF</span>
@@ -85,7 +87,7 @@
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AmberFormat&#39;</span><span class="p">,</span> <span class="s1">&#39;AmberParm&#39;</span><span class="p">,</span> <span class="s1">&#39;ChamberParm&#39;</span><span class="p">,</span> <span class="s1">&#39;LoadParm&#39;</span><span class="p">,</span> <span class="s1">&#39;Rst7&#39;</span><span class="p">]</span>
 
 <span class="c1"># Supply a function to load a topology file in the &#39;correct&#39; format</span>
-<div class="viewcode-block" id="LoadParm"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.LoadParm">[docs]</a><span class="k">def</span> <span class="nf">LoadParm</span><span class="p">(</span><span class="n">parmname</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="LoadParm"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.LoadParm">[docs]</a><span class="k">def</span> <span class="nf">LoadParm</span><span class="p">(</span><span class="n">parmname</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads a topology file using the correct class.</span>
 
@@ -109,8 +111,8 @@
 <span class="sd">        (i.e., CHARMM force field), or Amoeba-style (i.e., Amoeba force field),</span>
 <span class="sd">        and then returns an instance of the appropriate type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
-    <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">IFBOX</span>
+    <span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+    <span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="k">import</span> <span class="n">IFBOX</span>
     <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="n">parmname</span><span class="p">)</span>
     <span class="k">if</span> <span class="s1">&#39;CTITLE&#39;</span> <span class="ow">in</span> <span class="n">parm</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
         <span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">)</span>
@@ -121,22 +123,22 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">f</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not have coordinates&#39;</span> <span class="o">%</span> <span class="n">xyz</span><span class="p">)</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">coordinates</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">box</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">xyz</span>
-    <span class="k">if</span> <span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">box</span>
 
     <span class="c1"># If all else fails, set the box from the prmtop file</span>
-    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">box</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">]</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">+</span> <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-    <span class="n">parm</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+    <span class="n">parm</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="k">return</span> <span class="n">parm</span></div>
 </pre></div>
@@ -149,14 +151,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -172,13 +171,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

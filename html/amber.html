@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The parmed.amber package &mdash; ParmEd 2.5.0 documentation</title>
+    <title>The parmed.amber package &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="parmed.amber.AmberFormat" href="amberobj/parmed.amber.AmberFormat.html" />
     <link rel="prev" title="parmed.formats.registry.load_file" href="fileio/parmed.formats.registry.load_file.html" /> 
@@ -44,7 +46,7 @@
         <li class="right" >
           <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -105,7 +107,7 @@ data, and this class is appropriate for use with those files.</p>
 <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>, for the <em>prmtop</em> parsers.</p>
 <p>An example using this class on <a class="reference external" href="https://github.com/swails/ParmEd/blob/master/test/files/cSPCE.mdl">one of the test files in the ParmEd repostory</a> is shown
 below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="s1">&#39;cSPCE.mdl&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="s1">&#39;cSPCE.mdl&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;ATMTYP&#39;</span><span class="p">]</span>
 <span class="go">[1, 2]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;COORD&#39;</span><span class="p">]</span>
@@ -114,7 +116,7 @@ below:</p>
 </div>
 <p>If you want to, you can make modifications to the data and then write a new
 file:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;COORD&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;COORD&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">amb</span><span class="o">.</span><span class="n">write_parm</span><span class="p">(</span><span class="s1">&#39;new.mdl&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Let&#39;s check that our new file has the changed COORD</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_amb</span> <span class="o">=</span> <span class="n">AmberFormat</span><span class="p">(</span><span class="s1">&#39;new.mdl&#39;</span><span class="p">)</span>
@@ -138,7 +140,7 @@ topological data structures used in the <a class="reference internal" href="stru
 the terms present in the force field.</p>
 <p>The example of an Amber topology file shown here is <code class="docutils literal"><span class="pre">trx.prmtop</span></code>, taken from
 the ParmEd unit test directory <a class="reference external" href="http://github.com/swails/ParmEd/tree/master/test/files/trx.prmtop">available here</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
 <span class="go">&#39;N&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
@@ -229,7 +231,7 @@ classes as examples for working with an <a class="reference internal" href="api/
 raw data and parameter/topology data structures can become out-of-sync and lead
 to potential errors (like above, we use <code class="docutils literal"><span class="pre">trx.prmtop</span></code> from the ParmEd test
 suite, <a class="reference external" href="http://github.com/swails/ParmEd/tree/master/test/files/trx.prmtop">available here</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s1">&#39;NATOM&#39;</span><span class="p">)</span>
 <span class="go">1654</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
@@ -245,7 +247,7 @@ matches the total number of atoms in the structure, and that the names of the
 atoms match between the raw data and <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code>
 instances.  Now let&#8217;s see what happens if we modify our atom name and pop our
 last atom off the structure:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 <span class="go">&lt;Atom OXT [-1]&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1653</span>
@@ -259,7 +261,7 @@ last atom off the structure:</p>
 <p>Here we can clearly see that the raw data is not being updated with the changes
 we are making to our structure.  Now let&#8217;s use <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberParm.remake_parm" title="parmed.amber.AmberParm.remake_parm"><code class="xref py py-meth docutils literal"><span class="pre">AmberParm.remake_parm()</span></code></a> to
 synchronize the raw data with the parameter/topology changes we are making:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">remake_parm</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">remake_parm</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1653</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s1">&#39;natom&#39;</span><span class="p">)</span>
@@ -273,7 +275,7 @@ synchronize the raw data with the parameter/topology changes we are making:</p>
 <p>They match again. Whew! This goes both ways, though. Let&#8217;s modify some of the
 raw data, and see how it does not propagate up to the parameter/topology data
 structures:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 <span class="go">&#39;H1&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Hey&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
@@ -285,7 +287,7 @@ data do not propagate. You need to use <a class="reference internal" href="api/p
 made modifications to arrays that were <em>not</em> atomic property arrays, you need to
 use <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberParm.load_structure" title="parmed.amber.AmberParm.load_structure"><code class="xref py py-meth docutils literal"><span class="pre">AmberParm.load_structure()</span></code></a>, but this is more expensive and arrays that
 are not atomic properties are <em>much</em> harder to directly modify correctly):</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">load_atom_info</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">load_atom_info</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;ATOM_NAME&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 <span class="go">&#39;Hey&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
@@ -309,7 +311,7 @@ flags present in the prmtop file).</p>
 <p>For example, let&#8217;s try it on <code class="docutils literal"><span class="pre">trx.prmtop</span></code> (an Amber prmtop file) and
 <code class="docutils literal"><span class="pre">dhfr_cmap_pbc.parm7</span></code> (a Chamber prmtop file), both available in the ParmEd
 test suite:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trxparm</span> <span class="o">=</span> <span class="n">LoadParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">trxparm</span> <span class="o">=</span> <span class="n">LoadParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dhfrparm</span> <span class="o">=</span> <span class="n">LoadParm</span><span class="p">(</span><span class="s1">&#39;dhfr_cmap_pbc.parm7&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">trxparm</span><span class="p">)</span> <span class="c1"># see that this is an AmberParm</span>
 <span class="go">&lt;class &#39;parmed.amber._amberparm.AmberParm&#39;&gt;</span>
@@ -377,7 +379,7 @@ you plan on setting the data in order to <em>write</em> a restart file, you shou
 provide the argument <code class="docutils literal"><span class="pre">natom</span></code> to the <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.Rst7" title="parmed.amber.Rst7"><code class="xref py py-class docutils literal"><span class="pre">Rst7</span></code></a> constructor. Examples using
 the NetCDF restart file <code class="docutils literal"><span class="pre">ncinpcrd.rst7</span></code> from the ParmEd unit tests are shown
 below (you are, of course, free to use an ASCII restart file instead):</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read an Amber NetCDF restart file</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read an Amber NetCDF restart file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ncrst</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="s2">&quot;ncinpcrd.rst7&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ncrst</span><span class="o">.</span><span class="n">natom</span>
 <span class="go">2101</span>
@@ -394,11 +396,11 @@ below (you are, of course, free to use an ASCII restart file instead):</p>
 units (since the OpenMM core unit system is different than the one used by
 Amber). To facilitate this, the <code class="docutils literal"><span class="pre">positions</span></code>, <code class="docutils literal"><span class="pre">velocities</span></code>, and
 <code class="docutils literal"><span class="pre">box_vectors</span></code> attributes of the <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.Rst7" title="parmed.amber.Rst7"><code class="xref py py-class docutils literal"><span class="pre">Rst7</span></code></a> class satisfy this requirement:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ncrst</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ncrst</span><span class="o">.</span><span class="n">positions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">Quantity(value=array([ 6.82122493,  6.62762507, -8.51669   ]), unit=angstrom)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ncrst</span><span class="o">.</span><span class="n">velocities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">Quantity(value=array([-2.87565556, -3.02095312,  3.73882771]), unit=angstrom/picosecond)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ncrst</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">))</span> <span class="c1"># Prettier printing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ncrst</span><span class="o">.</span><span class="n">box_vectors</span><span class="p">))</span> <span class="c1"># Prettier printing</span>
 <span class="go">Quantity(value=[30.264272500000001, 0.0, 0.0], unit=angstrom)</span>
 <span class="go">Quantity(value=[-10.088090019353215, 28.533430037688813, 0.0], unit=angstrom)</span>
 <span class="go">Quantity(value=[-10.088090019353215, -13.45078642114427, 25.164120774794483], unit=angstrom)</span>
@@ -411,11 +413,11 @@ you need the flexibility afforded by the raw classes, you are encouraged to use
 <p>Writing a restart file is easy as well.  If you provide velocities, velocities
 will be written.  If you supply unit cell dimensions, unit cell dimensions will
 be written.  For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span> <span class="o">=</span> <span class="n">Rst7</span><span class="p">(</span><span class="n">natom</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">90</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new_rst7.ncrst&#39;</span><span class="p">,</span> <span class="n">netcdf</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c1"># Write NetCDF format</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new_rst7.ncrst&#39;</span><span class="p">,</span> <span class="n">netcdf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Write NetCDF format</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_rst7</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new_rst7.rst7&#39;</span><span class="p">)</span>               <span class="c1"># Write ASCII format</span>
 </pre></div>
 </div>
@@ -454,8 +456,8 @@ number, returns either all or just the requested coordinates. The analogous
 <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><code class="xref py py-meth docutils literal"><span class="pre">box</span></code></a> method returns the unit cell lengths. The example
 below uses the file <code class="docutils literal"><span class="pre">tz2.truncoct.crd</span></code> from the ParmEd unit tests, which has
 5827 atoms and box lengths:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">crd</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="s1">&#39;tz2.truncoct.crd&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">5827</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">AmberMdcrd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crd</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="s1">&#39;tz2.truncoct.crd&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">5827</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">crd</span><span class="o">.</span><span class="n">coordinates</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="go">array([ 0.078,  3.174, -8.844, ...,  2.178, -5.224,  8.991])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">crd</span><span class="o">.</span><span class="n">coordinates</span><span class="p">())</span> <span class="c1"># number of total frames</span>
@@ -479,9 +481,9 @@ below uses the file <code class="docutils literal"><span class="pre">tz2.truncoc
 <p>When you are writing an <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd" title="parmed.amber.AmberMdcrd"><code class="xref py py-class docutils literal"><span class="pre">AmberMdcrd</span></code></a> file, you need to use the methods
 <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_coordinates" title="parmed.amber.AmberMdcrd.add_coordinates"><code class="xref py py-meth docutils literal"><span class="pre">add_coordinates</span></code></a> and <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.add_box" title="parmed.amber.AmberMdcrd.add_box"><code class="xref py py-meth docutils literal"><span class="pre">add_box</span></code></a> instead of <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.coordinates" title="parmed.amber.AmberMdcrd.coordinates"><code class="xref py py-meth docutils literal"><span class="pre">coordinates</span></code></a>
 and <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMdcrd.box" title="parmed.amber.AmberMdcrd.box"><code class="xref py py-meth docutils literal"><span class="pre">box</span></code></a>, as shown in the example below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberMdcrd</span>
-<span class="n">crd</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="s1">&#39;new.mdcrd&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">AmberMdcrd</span>
+<span class="n">crd</span> <span class="o">=</span> <span class="n">AmberMdcrd</span><span class="p">(</span><span class="s1">&#39;new.mdcrd&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">hasbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="c1"># Add the first frame</span>
 <span class="n">crd</span><span class="o">.</span><span class="n">add_coordinates</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
 <span class="n">crd</span><span class="o">.</span><span class="n">add_box</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
@@ -502,7 +504,7 @@ instance is different, but querying and adding coordinates (and unit cell
 dimensions, velocities, and forces) is done in the same way.</p>
 <p>To parse an existing NetCDF trajectory, use the <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_old" title="parmed.amber.NetCDFTraj.open_old"><code class="xref py py-meth docutils literal"><span class="pre">open_old</span></code></a> constructor. To write a new one, use <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.open_new" title="parmed.amber.NetCDFTraj.open_new"><code class="xref py py-meth docutils literal"><span class="pre">open_new</span></code></a>. An example parsing an existing NetCDF trajectory (using
 the <code class="docutils literal"><span class="pre">tz2.truncoct.nc</span></code> file in the ParmEd unit tests) is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">NetCDFTraj</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">NetCDFTraj</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">traj</span> <span class="o">=</span> <span class="n">NetCDFTraj</span><span class="o">.</span><span class="n">open_old</span><span class="p">(</span><span class="s1">&#39;tz2.truncoct.nc&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">traj</span><span class="o">.</span><span class="n">atom</span>  <span class="c1"># number of atoms in the file</span>
 <span class="go">5827</span>
@@ -533,11 +535,11 @@ allowing you to extract them with the analogous <a class="reference internal" hr
 Likewise, you can set them with <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_velocities" title="parmed.amber.NetCDFTraj.add_velocities"><code class="xref py py-meth docutils literal"><span class="pre">add_velocities</span></code></a> and <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.NetCDFTraj.add_forces" title="parmed.amber.NetCDFTraj.add_forces"><code class="xref py py-meth docutils literal"><span class="pre">add_forces</span></code></a>.</p>
 <p>An example of writing a NetCDF trajectory (with velocities and forces) is shown
 below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">NetCDFTraj</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">NetCDFTraj</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="c1"># Open the NetCDF trajectory file for writing</span>
-<span class="n">crd</span> <span class="o">=</span> <span class="n">NetCDFTraj</span><span class="o">.</span><span class="n">open_new</span><span class="p">(</span><span class="s1">&#39;new_crd.nc&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                          <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">crd</span> <span class="o">=</span> <span class="n">NetCDFTraj</span><span class="o">.</span><span class="n">open_new</span><span class="p">(</span><span class="s1">&#39;new_crd.nc&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">crds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># Add random coordinates, velocities, and forces for first frame</span>
 <span class="n">crd</span><span class="o">.</span><span class="n">add_coordinates</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
 <span class="n">crd</span><span class="o">.</span><span class="n">add_velocities</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
@@ -586,7 +588,7 @@ the behavior of a NetCDF object <em>created</em> with one implementation is unde
 if you switch to a different one. So you are cautioned against switching NetCDF
 implementations when open NetCDF file handles are still open.</p>
 <p>An example of switching between NetCDF implementations is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">netcdffiles</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">netcdffiles</span>
 <span class="c1"># Use the default NetCDF package (if one is already selected,</span>
 <span class="c1"># this does nothing)</span>
 <span class="n">netcdffiles</span><span class="o">.</span><span class="n">use</span><span class="p">()</span> <span class="c1"># You can also pass &quot;None&quot;</span>
@@ -615,9 +617,9 @@ with parenthesis to denote order-of-operations.</p>
 <h3>Residue selections<a class="headerlink" href="#residue-selections" title="Permalink to this headline">¶</a></h3>
 <p>Examples of residue selections, accompanied by comments annotating what is being
 selected, is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>:1,3,6-10    Select residues 1, 3, 6, 7, 8, 9, and 10
-:ALA,LYS,10  Select all residues with names ALA or LYS, and residue 10
-:1-3,6-10    Select residues 1, 2, 3, 6, 7, 8, 9, and 10
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="o">-</span><span class="mi">10</span>    <span class="n">Select</span> <span class="n">residues</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="ow">and</span> <span class="mi">10</span>
+<span class="p">:</span><span class="n">ALA</span><span class="p">,</span><span class="n">LYS</span><span class="p">,</span><span class="mi">10</span>  <span class="n">Select</span> <span class="nb">all</span> <span class="n">residues</span> <span class="k">with</span> <span class="n">names</span> <span class="n">ALA</span> <span class="ow">or</span> <span class="n">LYS</span><span class="p">,</span> <span class="ow">and</span> <span class="n">residue</span> <span class="mi">10</span>
+<span class="p">:</span><span class="mi">1</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="o">-</span><span class="mi">10</span>    <span class="n">Select</span> <span class="n">residues</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="ow">and</span> <span class="mi">10</span>
 </pre></div>
 </div>
 </div>
@@ -625,8 +627,8 @@ selected, is shown below:</p>
 <h3>Atom selections<a class="headerlink" href="#atom-selections" title="Permalink to this headline">¶</a></h3>
 <p>Examples of residue selections, accompanied by comments annotating what is being
 selected, is shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>@1-100,150-160   Select the first 100 atoms as well as the 11 atoms 150-160
-@CA,C,10-15      Select all atoms whose names are CA or C, and 6 atoms 10-15
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nd">@1</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">150</span><span class="o">-</span><span class="mi">160</span>   <span class="n">Select</span> <span class="n">the</span> <span class="n">first</span> <span class="mi">100</span> <span class="n">atoms</span> <span class="k">as</span> <span class="n">well</span> <span class="k">as</span> <span class="n">the</span> <span class="mi">11</span> <span class="n">atoms</span> <span class="mi">150</span><span class="o">-</span><span class="mi">160</span>
+<span class="nd">@CA</span><span class="p">,</span><span class="n">C</span><span class="p">,</span><span class="mi">10</span><span class="o">-</span><span class="mi">15</span>      <span class="n">Select</span> <span class="nb">all</span> <span class="n">atoms</span> <span class="n">whose</span> <span class="n">names</span> <span class="n">are</span> <span class="n">CA</span> <span class="ow">or</span> <span class="n">C</span><span class="p">,</span> <span class="ow">and</span> <span class="mi">6</span> <span class="n">atoms</span> <span class="mi">10</span><span class="o">-</span><span class="mi">15</span>
 </pre></div>
 </div>
 </div>
@@ -635,10 +637,10 @@ selected, is shown below:</p>
 <p>You can select all residues that are a specific <em>element</em> if you want to.
 Examples are shown below, accompanied by comments annotating what is being
 selected:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>@/C          Select all carbon atoms
-@/H          Select all hydrogen atoms
-@/C,N,O,H,S  Select all carbon, nitrogen, oxygen, hydrogen, and sulfur atoms
-@/Fe         Select all iron atoms
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">@/</span><span class="n">C</span>          <span class="n">Select</span> <span class="nb">all</span> <span class="n">carbon</span> <span class="n">atoms</span>
+<span class="o">@/</span><span class="n">H</span>          <span class="n">Select</span> <span class="nb">all</span> <span class="n">hydrogen</span> <span class="n">atoms</span>
+<span class="o">@/</span><span class="n">C</span><span class="p">,</span><span class="n">N</span><span class="p">,</span><span class="n">O</span><span class="p">,</span><span class="n">H</span><span class="p">,</span><span class="n">S</span>  <span class="n">Select</span> <span class="nb">all</span> <span class="n">carbon</span><span class="p">,</span> <span class="n">nitrogen</span><span class="p">,</span> <span class="n">oxygen</span><span class="p">,</span> <span class="n">hydrogen</span><span class="p">,</span> <span class="ow">and</span> <span class="n">sulfur</span> <span class="n">atoms</span>
+<span class="o">@/</span><span class="n">Fe</span>         <span class="n">Select</span> <span class="nb">all</span> <span class="n">iron</span> <span class="n">atoms</span>
 </pre></div>
 </div>
 <p>Be careful, though!  These element names are case-sensitive, and bad element
@@ -655,7 +657,7 @@ names can be set and/or changed to whatever the force field developer wants.</p>
 characters to select from type names rather than atom names. Note, no indices
 (or index ranges) can be used, as atom types have no defined order.  Examples
 are shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>@%CT,CX         Select all atoms whose types are CT or CX
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">@%</span><span class="n">CT</span><span class="p">,</span><span class="n">CX</span>         <span class="n">Select</span> <span class="nb">all</span> <span class="n">atoms</span> <span class="n">whose</span> <span class="n">types</span> <span class="n">are</span> <span class="n">CT</span> <span class="ow">or</span> <span class="n">CX</span>
 </pre></div>
 </div>
 </div>
@@ -663,20 +665,20 @@ are shown below:</p>
 <h3>Logical operators<a class="headerlink" href="#logical-operators" title="Permalink to this headline">¶</a></h3>
 <p>You often want to select certain atoms from certain residues. You can use the
 <code class="docutils literal"><span class="pre">&amp;</span></code> binary operator to do this, as shown in examples below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>(:1-100)&amp;(@CA)      Selects atoms named CA in the first 100 residues
-(:1-100)&amp;(@CA,CB)   Selects atoms named CA or CB in the first 100 residues
-(:ASP,GLU)&amp;(@CA)    Selects atoms named CA in all ASP or GLU residues
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">(:</span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="nd">@CA</span><span class="p">)</span>      <span class="n">Selects</span> <span class="n">atoms</span> <span class="n">named</span> <span class="n">CA</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">first</span> <span class="mi">100</span> <span class="n">residues</span>
+<span class="p">(:</span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="nd">@CA</span><span class="p">,</span><span class="n">CB</span><span class="p">)</span>   <span class="n">Selects</span> <span class="n">atoms</span> <span class="n">named</span> <span class="n">CA</span> <span class="ow">or</span> <span class="n">CB</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">first</span> <span class="mi">100</span> <span class="n">residues</span>
+<span class="p">(:</span><span class="n">ASP</span><span class="p">,</span><span class="n">GLU</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="nd">@CA</span><span class="p">)</span>    <span class="n">Selects</span> <span class="n">atoms</span> <span class="n">named</span> <span class="n">CA</span> <span class="ow">in</span> <span class="nb">all</span> <span class="n">ASP</span> <span class="ow">or</span> <span class="n">GLU</span> <span class="n">residues</span>
 </pre></div>
 </div>
 <p>This is so common, you can use a simple shortcut, demonstrated below, giving
 equivalent expressions to the examples above:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>:1-100@CA
-:1-100@CA,CB
-:ASP,GLU@CA
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span><span class="nd">@CA</span>
+<span class="p">:</span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span><span class="nd">@CA</span><span class="p">,</span><span class="n">CB</span>
+<span class="p">:</span><span class="n">ASP</span><span class="p">,</span><span class="n">GLU</span><span class="nd">@CA</span>
 </pre></div>
 </div>
 <p>You can also expand your selection using the <code class="docutils literal"><span class="pre">|</span></code> (or) operator. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>:1-100|@CA      Selects all atoms in the first 100 residues AND all atoms named CA
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="mi">1</span><span class="o">-</span><span class="mi">100</span><span class="o">|</span><span class="nd">@CA</span>      <span class="n">Selects</span> <span class="nb">all</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">first</span> <span class="mi">100</span> <span class="n">residues</span> <span class="n">AND</span> <span class="nb">all</span> <span class="n">atoms</span> <span class="n">named</span> <span class="n">CA</span>
 </pre></div>
 </div>
 <p>Don&#8217;t get confused between what the <code class="docutils literal"><span class="pre">&amp;</span></code> (and) and <code class="docutils literal"><span class="pre">|</span></code> (or) operators do.
@@ -685,7 +687,7 @@ first 100 residues <em>or</em> if it satisfies the criteria of having the name <
 meaning it selects all atoms in the first 100 residues <em>and</em> all atoms named
 <code class="docutils literal"><span class="pre">CA</span></code>.</p>
 <p>You can also select all atoms <em>except</em> a particular selection:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>!(:LIG)         Selects all atoms that are NOT in a residue named LIG
+<div class="highlight-default"><div class="highlight"><pre><span></span>!(:LIG)         Selects all atoms that are NOT in a residue named LIG
 </pre></div>
 </div>
 </div>
@@ -696,7 +698,7 @@ many names, but they almost always start with &#8220;H&#8221;, so we would like 
 select all atoms that start with the letter &#8220;H&#8221;.  We can do this with
 <em>wild-cards</em>, which is the <code class="docutils literal"><span class="pre">=</span></code> character in Amber masks, and works for both
 atoms and residues. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>:AS=@H=   Select all atoms whose residue starts with AS AND atom name starts with H
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">AS</span><span class="o">=</span><span class="nd">@H</span><span class="o">=</span>   <span class="n">Select</span> <span class="nb">all</span> <span class="n">atoms</span> <span class="n">whose</span> <span class="n">residue</span> <span class="n">starts</span> <span class="k">with</span> <span class="n">AS</span> <span class="n">AND</span> <span class="n">atom</span> <span class="n">name</span> <span class="n">starts</span> <span class="k">with</span> <span class="n">H</span>
 </pre></div>
 </div>
 </div>
@@ -714,8 +716,8 @@ residue is selected if <em>any atom</em> satisfies the distance criteria.  The g
 syntax is <code class="docutils literal"><span class="pre">SELECTION&lt;:DISTANCE</span></code>, where <code class="docutils literal"><span class="pre">SELECTION</span></code> is an Amber mask (<code class="docutils literal"><span class="pre">:</span></code>
 can also be <code class="docutils literal"><span class="pre">&#64;</span></code> to select only atoms), and <code class="docutils literal"><span class="pre">DISTANCE</span></code> is a floating point
 distance that defines the criteria.  Examples are shown below with annotations:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>:8&lt;@5.0     All atoms that are LESS THAN 5 Angstroms away from any atom in residue 8
-:1&gt;:10.0    All atoms in any residue in which one atom is MORE THAN 10 angstroms away from residue 1
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">:</span><span class="mi">8</span><span class="o">&lt;</span><span class="nd">@5</span><span class="o">.</span><span class="mi">0</span>     <span class="n">All</span> <span class="n">atoms</span> <span class="n">that</span> <span class="n">are</span> <span class="n">LESS</span> <span class="n">THAN</span> <span class="mi">5</span> <span class="n">Angstroms</span> <span class="n">away</span> <span class="kn">from</span> <span class="nn">any</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span> <span class="mi">8</span>
+<span class="p">:</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">:</span><span class="mf">10.0</span>    <span class="n">All</span> <span class="n">atoms</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">residue</span> <span class="ow">in</span> <span class="n">which</span> <span class="n">one</span> <span class="n">atom</span> <span class="ow">is</span> <span class="n">MORE</span> <span class="n">THAN</span> <span class="mi">10</span> <span class="n">angstroms</span> <span class="n">away</span> <span class="kn">from</span> <span class="nn">residue</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
@@ -769,14 +771,11 @@ distance that defines the criteria.  Examples are shown below with annotations:<
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -798,12 +797,12 @@ distance that defines the criteria.  Examples are shown below with annotations:<
         <li class="right" >
           <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

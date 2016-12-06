@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>The API for ParmEd Command-line Utilities &mdash; ParmEd 2.5.0 documentation</title>
+    <title>The API for ParmEd Command-line Utilities &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="OpenMM Functionality" href="openmm.html" />
     <link rel="prev" title="Using parmed" href="parmed.html" /> 
@@ -44,7 +46,7 @@
         <li class="right" >
           <a href="parmed.html" title="Using parmed"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -60,20 +62,20 @@ to do, or perhaps you want to use some of <code class="docutils literal"><span c
 Python script or program.</p>
 <p>In that case, the ParmEd API is here! Every <a class="reference internal" href="api/parmed/parmed.tools.actions.html#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><code class="xref py py-class docutils literal"><span class="pre">Action</span></code></a> subclass is available for import from
 <a class="reference internal" href="api/parmed/parmed.tools.html#module-parmed.tools" title="parmed.tools"><code class="xref py py-mod docutils literal"><span class="pre">parmed.tools</span></code></a>. For a full listing of available actions, you are forward to
-the auto-generated list in <a class="reference internal" href="parmed.html"><em>the parmed page</em></a>.</p>
+the auto-generated list in <a class="reference internal" href="parmed.html"><span class="doc">the parmed page</span></a>.</p>
 <div class="section" id="importing-the-actions">
 <h2>Importing the actions<a class="headerlink" href="#importing-the-actions" title="Permalink to this headline">¶</a></h2>
 <p>All actions can be imported from <code class="docutils literal"><span class="pre">parmed.tools</span></code> with the same camelCase shown
 in the <code class="docutils literal"><span class="pre">parmed</span></code> page. Examples are shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="k">import</span> <span class="n">change</span><span class="p">,</span> <span class="n">addLJType</span><span class="p">,</span> <span class="n">changeRadii</span><span class="p">,</span> <span class="n">tiMerge</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="k">import</span> <span class="n">setBond</span><span class="p">,</span> <span class="n">deleteBond</span><span class="p">,</span> <span class="n">addDihedral</span><span class="p">,</span> <span class="n">addPDB</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="using-the-actions">
 <h2>Using the actions<a class="headerlink" href="#using-the-actions" title="Permalink to this headline">¶</a></h2>
 <p>Each of the actions described on the previous page can be invoked either on a
-parm list (a few, like <code class="xref doc docutils literal"><span class="pre">interpolate</span></code>, actually <em>require</em> a parm list with
+parm list (a few, like <span class="xref doc">interpolate</span>, actually <em>require</em> a parm list with
 multiple topologies), or a raw <code class="xref py py-class docutils literal"><span class="pre">AmberParm</span></code>
 object. Note that some actions do not support all <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberParm" title="parmed.amber.AmberParm"><code class="xref py py-class docutils literal"><span class="pre">AmberParm</span></code></a> subclasses (like those for the CHARMM or Amoeba
 force fields).</p>
@@ -82,9 +84,9 @@ each action requires in the ParmEd interpreter can then be given as separate
 arguments to the constructor or all as a single string in the second argument.
 Keyword arguments can optionally be given as keyword arguments to the action
 constructor.</p>
-<p>Examples of valid syntax for <code class="xref doc docutils literal"><span class="pre">addLJType</span></code> are shown below:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="kn">import</span> <span class="n">addLJType</span>
-<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="kn">import</span> <span class="n">AmberParm</span>
+<p>Examples of valid syntax for <span class="xref doc">addLJType</span> are shown below:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed.tools</span> <span class="k">import</span> <span class="n">addLJType</span>
+<span class="kn">from</span> <span class="nn">parmed.amber</span> <span class="k">import</span> <span class="n">AmberParm</span>
 
 <span class="n">parm</span> <span class="o">=</span> <span class="n">AmberParm</span><span class="p">(</span><span class="s1">&#39;trx.prmtop&#39;</span><span class="p">)</span>
 
@@ -101,15 +103,15 @@ constructor.</p>
 <p>Note that simply <em>instantiating</em> the object does not do anything. You need to
 explicitly <em>execute</em> it as well, as shown below (continuting from the example
 above):</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">action</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">action</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>The informational message printed to the ParmEd output are available by casting
 the action to a string:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">action</span><span class="p">))</span>
 
 <span class="c1"># Equivalent:</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -140,14 +142,11 @@ the action to a string:</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -169,12 +168,12 @@ the action to a string:</p>
         <li class="right" >
           <a href="parmed.html" title="Using parmed"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

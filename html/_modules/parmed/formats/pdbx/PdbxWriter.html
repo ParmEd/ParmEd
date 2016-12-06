@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.formats.pdbx.PdbxWriter &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.formats.pdbx.PdbxWriter &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -67,10 +69,10 @@
 <span class="n">__license__</span>   <span class="o">=</span> <span class="s2">&quot;Creative Commons Attribution 3.0 Unported&quot;</span>
 <span class="n">__version__</span>   <span class="o">=</span> <span class="s2">&quot;V0.01&quot;</span>
 
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.pdbx.PdbxContainers</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DefinitionContainer</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.pdbx.PdbxContainers</span> <span class="k">import</span> <span class="p">(</span><span class="n">DefinitionContainer</span><span class="p">,</span>
                                                    <span class="n">DataContainer</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">PdbxError</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">PdbxError</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <div class="viewcode-block" id="PdbxWriter"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter">[docs]</a><span class="k">class</span> <span class="nc">PdbxWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -84,9 +86,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__SPACING</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__indentSpace</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>        
-        <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="kc">False</span>
         <span class="c1"># Maximum number of rows checked for value length and format</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="o">=</span><span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="o">=</span><span class="kc">None</span>
 
 <div class="viewcode-block" id="PdbxWriter.setRowPartition"><a class="viewcode-back" href="../../../../api/parmed/parmed.formats.pdbx.PdbxWriter.html#parmed.formats.pdbx.PdbxWriter.setRowPartition">[docs]</a>    <span class="k">def</span> <span class="nf">setRowPartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">numRows</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Maximum number of rows checked for value length and format</span>
@@ -102,16 +104,16 @@
         <span class="n">indS</span><span class="o">=</span><span class="s2">&quot; &quot;</span> <span class="o">*</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__INDENT_DEFINITION</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">DefinitionContainer</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;save_</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="n">indS</span><span class="o">+</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>            
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">DataContainer</span><span class="p">):</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getGlobal</span><span class="p">()):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;global_</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="kc">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>            
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;data_</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">container</span><span class="o">.</span><span class="n">getName</span><span class="p">())</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="bp">False</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__doDefinitionIndent</span><span class="o">=</span><span class="kc">False</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__write</span><span class="p">(</span><span class="s2">&quot;#</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>                            
         
         <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">getObjNameList</span><span class="p">():</span>
@@ -192,7 +194,7 @@
         <span class="c1">#print myCategory.getAttributeList()</span>
 
         <span class="c1">#    For speed make the following evaluation on a portion of the table</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">numSteps</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">myCategory</span><span class="o">.</span><span class="n">getRowCount</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">__rowPartition</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">numSteps</span><span class="o">=</span><span class="mi">1</span>
@@ -247,14 +249,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -270,13 +269,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber._chamberparm &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber._chamberparm &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -70,16 +72,17 @@
 <span class="sd">Foundation, Inc., 59 Temple Place - Suite 330,</span>
 <span class="sd">Boston, MA 02111-1307, USA.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
-<span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="kn">import</span> <span class="n">AmberParm</span>
-<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="kn">import</span> <span class="n">NTYPES</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">TINY</span><span class="p">,</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">SMALL</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">AmberError</span><span class="p">,</span> <span class="n">AmberWarning</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="k">import</span> <span class="n">AmberParm</span>
+<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="k">import</span> <span class="p">(</span><span class="n">NTYPES</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">TINY</span><span class="p">,</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">SMALL</span><span class="p">,</span>
+                              <span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">AmberError</span><span class="p">,</span> <span class="n">AmberWarning</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span>
                                     <span class="n">ImproperType</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
-<span class="kn">import</span> <span class="nn">copy</span> <span class="kn">as</span> <span class="nn">_copy</span>
-<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+<span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">_copy</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">pi</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
@@ -142,7 +145,7 @@
 
     <span class="c1">#===================================================</span>
 
-<div class="viewcode-block" id="ChamberParm.initialize_topology"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.ChamberParm.initialize_topology">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamberParm.initialize_topology"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.ChamberParm.initialize_topology">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes topology data structures, like the list of atoms, bonds,</span>
 <span class="sd">        etc., after the topology file has been read. The following methods are</span>
@@ -151,6 +154,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">LJ_14_radius</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">LJ_14_depth</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">AmberParm</span><span class="o">.</span><span class="n">initialize_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span></div>
+
+    <span class="c1">#===================================================</span>
+
+    <span class="k">def</span> <span class="nf">_copy_lj_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Copies Lennard-Jones lists and dicts from myself to a copy &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_copy_lj_data</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">LJ_14_radius</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">LJ_14_radius</span><span class="p">)</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">LJ_14_depth</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">LJ_14_depth</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">LJ_14_radius</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin_14</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">LJ_14_depth</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">nb_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon_14</span>
 
     <span class="c1">#===================================================</span>
 
@@ -190,7 +204,7 @@
     <span class="c1">#===================================================</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ChamberParm.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.ChamberParm.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ChamberParm.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.ChamberParm.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Take a Structure instance and initialize a ChamberParm instance from</span>
 <span class="sd">        that data.</span>
@@ -224,9 +238,9 @@
                 <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;ChamberParm does not support all potential terms &#39;</span>
                              <span class="s1">&#39;defined in the input Structure&#39;</span><span class="p">)</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">update_dihedral_exclusions</span><span class="p">()</span>
-        <span class="n">inst</span><span class="o">.</span><span class="n">_add_missing_13_14</span><span class="p">(</span><span class="n">ignore_inconsistent_vdw</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">_add_missing_13_14</span><span class="p">(</span><span class="n">ignore_inconsistent_vdw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">LJ_types</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">nbfixes</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">assign_nbidx_from_types</span><span class="p">()</span>
@@ -251,7 +265,7 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NATOM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NATOM</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">elif</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span>
@@ -366,11 +380,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">chamber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">amoeba</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_cmap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -402,6 +416,11 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[:]</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">eq</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_FORCE_CONSTANT&#39;</span><span class="p">],</span>
                          <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">]):</span>
+            <span class="c1"># Previous versions of ParmEd stored improper phases as degrees,</span>
+            <span class="c1"># whereas it should really be stored in radians. So do a simple</span>
+            <span class="c1"># heuristic check to see if a conversion is necessary so we support</span>
+            <span class="c1"># all versions.</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="n">eq</span> <span class="o">*</span> <span class="n">RAD_TO_DEG</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">eq</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span> <span class="k">else</span> <span class="n">eq</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                     <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">)</span>
             <span class="p">)</span>
@@ -411,6 +430,13 @@
                     <span class="n">Improper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">l</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="p">)</span>
+        <span class="c1"># Make sure that if we have a comment in the CHARMM impropers, we fix it</span>
+        <span class="c1"># to say the units are in radians</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">,</span> <span class="p">[]))):</span>
+            <span class="n">comment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;degrees&#39;</span> <span class="ow">in</span> <span class="n">comment</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parm_comments</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="n">comment</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;degrees&#39;</span><span class="p">,</span> <span class="s1">&#39;radians&#39;</span><span class="p">)</span>
 
     <span class="c1">#===================================================</span>
 
@@ -439,7 +465,7 @@
         <span class="sd">&quot;&quot;&quot; Make sure each section has the necessary number of entries &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ChamberParm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_check_section_lengths</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">check_length</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">check_length</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span> <span class="k">return</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">!=</span> <span class="n">length</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">AmberError</span><span class="p">(</span><span class="s1">&#39;FLAG </span><span class="si">%s</span><span class="s1"> has </span><span class="si">%d</span><span class="s1"> elements; expected </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
@@ -476,9 +502,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span>
         <span class="k">for</span> <span class="n">urey_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">:</span>
-            <span class="n">urey_type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">urey_type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">urey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradleys</span><span class="p">:</span>
-            <span class="n">urey</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">urey</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="o">.</span><span class="n">prune_unused</span><span class="p">()</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;CHARMM_UREY_BRADLEY_FORCE_CONSTANT&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="p">[</span><span class="nb">type</span><span class="o">.</span><span class="n">k</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">urey_bradley_types</span><span class="p">]</span>
@@ -500,14 +526,14 @@
         <span class="sd">&quot;&quot;&quot; Sets the topology file section data from the improper arrays &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span>
         <span class="k">for</span> <span class="n">improper_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">:</span>
-            <span class="n">improper_type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">improper_type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">improper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
-            <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">improper</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="o">.</span><span class="n">prune_unused</span><span class="p">()</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_FORCE_CONSTANT&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="p">[</span><span class="nb">type</span><span class="o">.</span><span class="n">psi_k</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">]</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="p">[</span><span class="nb">type</span><span class="o">.</span><span class="n">psi_eq</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">]</span>
+                <span class="p">[</span><span class="nb">type</span><span class="o">.</span><span class="n">psi_eq</span><span class="o">*</span><span class="n">DEG_TO_RAD</span> <span class="k">for</span> <span class="nb">type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">]</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;CHARMM_IMPROPERS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">improper_array</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">impropers</span><span class="p">:</span>
             <span class="n">improper_array</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">imp</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">imp</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
@@ -525,9 +551,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_cmap</span><span class="p">:</span> <span class="k">return</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span>
         <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span>
-            <span class="n">ct</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">ct</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">cmap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmaps</span><span class="p">:</span>
-            <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">cmap</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">used</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="o">.</span><span class="n">prune_unused</span><span class="p">()</span>
         <span class="c1"># If we have no cmaps, delete all remnants of the CMAP terms in the</span>
         <span class="c1"># prmtop and bail out</span>
@@ -631,7 +657,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;CHARMM_IMPROPER_FORCE_CONSTANT&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                 <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;K_psi: kcal/mole/rad**2&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;CHARMM_IMPROPER_PHASE&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;psi: degrees&#39;</span><span class="p">])</span>
+                <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;psi: radians&#39;</span><span class="p">])</span>
         <span class="n">natyp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NATYP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NATYP</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;SOLTY&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="n">natyp</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;LENNARD_JONES_ACOEF&#39;</span><span class="p">,</span> <span class="s1">&#39;3E24.16&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -662,7 +688,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;CHARMM_CMAP_INDEX&#39;</span><span class="p">,</span> <span class="s1">&#39;6I8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                     <span class="n">comments</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Atom index i,j,k,l,m of the cross term&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;and then pointer to CHARMM_CMAP_PARAMETER_n&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">,</span> <span class="s1">&#39;3I8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span> <span class="s1">&#39;10I8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -673,11 +699,11 @@
 
     <span class="c1">#===================================================</span>
 
-    <span class="k">def</span> <span class="nf">_set_nonbonded_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbfixes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_set_nonbonded_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbfixes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the tables of Lennard-Jones nonbonded interaction pairs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.tools.actions</span> <span class="kn">import</span> <span class="n">addLJType</span>
+        <span class="kn">from</span> <span class="nn">parmed.tools.actions</span> <span class="k">import</span> <span class="n">addLJType</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span>
         <span class="n">ntypes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NTYPES</span><span class="p">]</span>
         <span class="n">ntypes2</span> <span class="o">=</span> <span class="n">ntypes</span> <span class="o">*</span> <span class="n">ntypes</span>
@@ -703,7 +729,7 @@
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_BCOEF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nttyp</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recalculate_LJ</span><span class="p">()</span>
         <span class="c1"># Now make any NBFIX modifications we had</span>
-        <span class="k">if</span> <span class="n">nbfixes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nbfixes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fix</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nbfixes</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">terms</span> <span class="ow">in</span> <span class="n">fix</span><span class="p">:</span>
                     <span class="n">j</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="n">rmin14</span><span class="p">,</span> <span class="n">eps14</span> <span class="o">=</span> <span class="n">terms</span>
@@ -732,12 +758,12 @@
         <span class="c1"># assumption in my experience).</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">:</span> <span class="k">return</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">])):</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">ii</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">replaced_atoms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">needed_split</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">needed_split</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">:</span>
                 <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">pair</span><span class="o">.</span><span class="n">atom2</span>
                 <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">a1</span><span class="o">.</span><span class="n">nb_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a2</span><span class="o">.</span><span class="n">nb_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
@@ -747,10 +773,10 @@
                 <span class="n">rmin6</span> <span class="o">=</span> <span class="n">rmin</span> <span class="o">*</span> <span class="n">rmin</span> <span class="o">*</span> <span class="n">rmin</span> <span class="o">*</span> <span class="n">rmin</span> <span class="o">*</span> <span class="n">rmin</span> <span class="o">*</span> <span class="n">rmin</span>
                 <span class="n">acoef</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">rmin6</span><span class="o">*</span><span class="n">rmin6</span>
                 <span class="n">bcoef</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">rmin6</span>
-                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">acoef</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SMALL</span><span class="p">:</span>
                         <span class="c1"># Need to split out another type</span>
-                        <span class="n">needed_split</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">needed_split</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="k">assert</span> <span class="p">(</span><span class="n">a1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replaced_atoms</span> <span class="ow">or</span>
                                 <span class="n">a2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replaced_atoms</span><span class="p">)</span>
                         <span class="c1"># Only add each atom as a new type ONCE</span>
@@ -767,8 +793,8 @@
                         <span class="n">j</span> <span class="o">=</span> <span class="n">ntypes</span> <span class="o">-</span> <span class="mi">1</span>
                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span><span class="p">):</span>
                             <span class="n">_</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;NONBONDED_PARM_INDEX&#39;</span><span class="p">][</span><span class="n">ntypes</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
                         <span class="c1"># We can stop here, since the next loop through the</span>
                         <span class="c1"># explicit exclusions will fill this in</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -783,8 +809,8 @@
         <span class="c1"># Now go through and change all None&#39;s to 0s, as these terms won&#39;t be</span>
         <span class="c1"># used for any exceptions, anyway</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">,</span> \
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> \
                         <span class="s1">&#39;A- and B- coefficients must be in lock-step!&#39;</span>
                 <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_ACOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">data</span><span class="p">[</span><span class="s1">&#39;LENNARD_JONES_14_BCOEF&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span></div>
@@ -839,14 +865,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -862,13 +885,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

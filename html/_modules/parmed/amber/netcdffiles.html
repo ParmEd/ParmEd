@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber.netcdffiles &mdash; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber.netcdffiles &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
@@ -37,8 +39,8 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -61,14 +63,22 @@
 <span class="sd">NetCDF-file manipulation that the parmed/amber package does should be</span>
 <span class="sd">contained in this module.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">__version__</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.netcdf</span> <span class="kn">import</span> <span class="n">netcdf_file</span> <span class="k">as</span> <span class="n">NetCDFFile</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># netCDF4 is *much* faster to write NetCDF files, and can make a huge</span>
+    <span class="c1"># difference when using it as an OpenMM reporter. So do what we can to use</span>
+    <span class="c1"># the faster library when available</span>
+    <span class="kn">import</span> <span class="nn">netCDF4</span> <span class="k">as</span> <span class="nn">nc</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">nc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.netcdf</span> <span class="k">import</span> <span class="n">netcdf_file</span> <span class="k">as</span> <span class="n">NetCDFFile</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">add_metaclass</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="NetCDFRestart"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFRestart">[docs]</a><span class="k">class</span> <span class="nc">NetCDFRestart</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -94,19 +104,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">)</span>\
                 <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ftp://&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;AMBERRESTART&#39;</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">return</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="c1"># Passed all our tests</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
@@ -117,12 +127,19 @@
 <span class="sd">        be called instead for reading existing or writing new NetCDF files,</span>
 <span class="sd">        respectively.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
-   
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;NETCDF3_64BIT&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Could not find netCDF4 module. Falling back on &#39;</span>
+                              <span class="s1">&#39;scipy implementation, which can significantly &#39;</span>
+                              <span class="s1">&#39;slow down simulations if used as a reporter&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="NetCDFRestart.open_new"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFRestart.open_new">[docs]</a>    <span class="k">def</span> <span class="nf">open_new</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">natom</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">vels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-                 <span class="n">remd</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">remd_dimtypes</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+                 <span class="n">remd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remd_dimtypes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens a new NetCDF file and sets the attributes</span>
 
@@ -150,15 +167,15 @@
 <span class="sd">        -----</span>
 <span class="sd">        `remd` is case-insensitive, and done based on first-letter matching</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">remd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">remd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">remd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;tT&#39;</span><span class="p">:</span>
                 <span class="n">remd_type</span> <span class="o">=</span> <span class="s1">&#39;TEMPERATURE&#39;</span>
-                <span class="k">if</span> <span class="n">temp</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">temp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;temp must be specified for &#39;</span>
                                      <span class="s1">&#39;T-REMD restarts.&#39;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">remd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;mM&#39;</span><span class="p">:</span>
                 <span class="n">remd_type</span> <span class="o">=</span> <span class="s1">&#39;MULTI&#39;</span>
-                <span class="k">if</span> <span class="n">remd_dimtypes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">remd_dimtypes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;remd_dimtypes must be given for multi-D &#39;</span>
                                      <span class="s1">&#39;REMD, and must have the same length.&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">remd_dimtypes</span><span class="p">:</span>
@@ -171,7 +188,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;remd must be None, T[emperature] or M[ulti]&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">remd_type</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">remd_type</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="n">ncfile</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_ncfile</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
@@ -229,6 +246,8 @@
             <span class="n">v</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;angstrom/picosecond&#39;</span>
             <span class="n">v</span><span class="o">.</span><span class="n">scale_factor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">20.455</span><span class="p">)</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="mf">20.455</span>
+            <span class="k">if</span> <span class="n">nc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">set_auto_maskandscale</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">remd_type</span> <span class="o">==</span> <span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;temp0&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,))</span>
@@ -262,11 +281,11 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span> <span class="s1">&#39;application&#39;</span><span class="p">):</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">):</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Set up the dimensions as attributes</span>
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
             <span class="c1"># Exception for ParmEd-created ncrst files</span>
@@ -287,9 +306,9 @@
         <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][:]</span>
         <span class="k">return</span> <span class="n">coords</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
-    <span class="nd">@coordinates.setter</span>
+    <span class="nd">@coordinates</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">coordinates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
-        <span class="n">stuff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">stuff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">stuff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
@@ -298,7 +317,7 @@
         <span class="n">vels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;velocities&#39;</span><span class="p">][:]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">vels</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity_scale</span><span class="p">)</span>
 
-    <span class="nd">@velocities.setter</span>
+    <span class="nd">@velocities</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">velocities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;velocities&#39;</span><span class="p">][:]</span> <span class="o">=</span> \
                     <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity_scale</span>
@@ -307,8 +326,8 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cell_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][:]</span>
-   
-    <span class="nd">@cell_lengths.setter</span>
+
+    <span class="nd">@cell_lengths</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">cell_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -316,8 +335,8 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cell_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_angles&#39;</span><span class="p">][:]</span>
-   
-    <span class="nd">@cell_angles.setter</span>
+
+    <span class="nd">@cell_angles</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">cell_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_angles&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -327,7 +346,7 @@
         <span class="n">leng</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_angles</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">leng</span><span class="p">,</span> <span class="n">ang</span><span class="p">))</span>
 
-    <span class="nd">@box.setter</span>
+    <span class="nd">@box</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_lengths</span> <span class="o">=</span> <span class="n">stuff</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_angles</span> <span class="o">=</span> <span class="n">stuff</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
@@ -336,7 +355,7 @@
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getValue</span><span class="p">()</span>
 
-    <span class="nd">@time.setter</span>
+    <span class="nd">@time</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">stuff</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -349,7 +368,7 @@
     <span class="k">def</span> <span class="nf">remd_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;remd_indices&#39;</span><span class="p">][:]</span>
 
-    <span class="nd">@remd_indices.setter</span>
+    <span class="nd">@remd_indices</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">remd_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;remd_indices&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
@@ -359,14 +378,17 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;remd_dimtype&#39;</span><span class="p">][:]</span>
 
 <div class="viewcode-block" id="NetCDFRestart.close"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFRestart.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_ncfile&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">())</span>
 
 <div class="viewcode-block" id="NetCDFRestart.flush"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFRestart.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
+        <span class="k">if</span> <span class="n">nc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># netCDF4.Dataset does not have a flush method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
 <div class="viewcode-block" id="NetCDFTraj"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj">[docs]</a><span class="k">class</span> <span class="nc">NetCDFTraj</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -407,30 +429,37 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">)</span>\
                 <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ftp://&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-            <span class="k">return</span> <span class="bp">False</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">Conventions</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;AMBER&#39;</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="bp">False</span>
+                    <span class="k">return</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="c1"># Passed all our tests</span>
-            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">return</span> <span class="kc">True</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="NetCDFTraj.__init__"><a class="viewcode-back" href="../../../amberobj/parmed.amber.NetCDFTraj.html#parmed.amber.NetCDFTraj.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Opens a NetCDF File &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span></div>
-   
+        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">nc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">nc</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;NETCDF3_64BIT&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Could not find netCDF4 module. Falling back on &#39;</span>
+                              <span class="s1">&#39;scipy implementation, which can significantly &#39;</span>
+                              <span class="s1">&#39;slow down simulations if used as a reporter&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span> <span class="o">=</span> <span class="n">NetCDFFile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="NetCDFTraj.open_new"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.open_new">[docs]</a>    <span class="k">def</span> <span class="nf">open_new</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">natom</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                 <span class="n">remd</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">remd_dimension</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFTraj.open_new"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.open_new">[docs]</a>    <span class="k">def</span> <span class="nf">open_new</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">natom</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">crds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">frcs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">remd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remd_dimension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens a new NetCDF file and sets the attributes</span>
 
@@ -459,19 +488,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
         <span class="n">ncfile</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">_ncfile</span>
-        <span class="k">if</span> <span class="n">remd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">remd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">remd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;Tt&#39;</span><span class="p">:</span>
                 <span class="n">inst</span><span class="o">.</span><span class="n">remd</span> <span class="o">=</span> <span class="s1">&#39;TEMPERATURE&#39;</span>
             <span class="k">elif</span> <span class="n">remd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s1">&#39;Mm&#39;</span><span class="p">:</span>
                 <span class="n">inst</span><span class="o">.</span><span class="n">remd</span> <span class="o">=</span> <span class="s1">&#39;MULTI&#39;</span>
-                <span class="k">if</span> <span class="n">remd_dimension</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">remd_dimension</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;remd_dimension must be given &#39;</span>
                                      <span class="s1">&#39;for multi-D REMD&#39;</span><span class="p">)</span>
                 <span class="n">inst</span><span class="o">.</span><span class="n">remd_dimension</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">remd_dimension</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;remd must be T[emperature] or M[ultiD]&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">remd</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">remd</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hasvels</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">vels</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">hascrds</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">crds</span><span class="p">)</span>
@@ -490,12 +519,12 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">programVersion</span> <span class="o">=</span> <span class="n">__version__</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">title</span>
         <span class="c1"># Create the dimensions</span>
-        <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;spatial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
         <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">remd</span> <span class="o">==</span> <span class="s1">&#39;MULTI&#39;</span><span class="p">:</span>
             <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;remd_dimension&#39;</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">remd_dimension</span><span class="p">)</span>
-        <span class="n">inst</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">spatial</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">natom</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">frame</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">spatial</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">atom</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">natom</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasbox</span><span class="p">:</span>
             <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;cell_spatial&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
             <span class="n">ncfile</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;cell_angular&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
@@ -524,6 +553,8 @@
             <span class="n">v</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;angstrom/picosecond&#39;</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">scale_factor</span> <span class="o">=</span> <span class="mf">20.455</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">_last_vel_frame</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">nc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">v</span><span class="o">.</span><span class="n">set_auto_maskandscale</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasfrcs</span><span class="p">:</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;forces&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span>
                                             <span class="p">(</span><span class="s1">&#39;frame&#39;</span><span class="p">,</span> <span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="s1">&#39;spatial&#39;</span><span class="p">))</span>
@@ -547,7 +578,7 @@
             <span class="n">ncfile</span><span class="o">.</span><span class="n">createVariable</span><span class="p">(</span><span class="s1">&#39;remd_dimtype&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span>
                                         <span class="p">(</span><span class="s1">&#39;remd_dimension&#39;</span><span class="p">,))</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">_last_remd_frame</span> <span class="o">=</span> <span class="mi">0</span>
-    
+
         <span class="n">inst</span><span class="o">.</span><span class="n">_last_time_frame</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">return</span> <span class="n">inst</span></div>
@@ -571,11 +602,11 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span> <span class="s1">&#39;application&#39;</span><span class="p">):</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ncfile</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">):</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Set up the dimensions as attributes</span>
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">:</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">dim</span><span class="p">,</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dim</span><span class="p">])</span>
@@ -595,7 +626,7 @@
             <span class="n">inst</span><span class="o">.</span><span class="n">velocity_scale</span> <span class="o">=</span> <span class="n">scale</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hasfrcs</span><span class="p">:</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">_forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;forces&#39;</span><span class="p">][:])</span>
-        <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
                 <span class="n">inst</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">][:])</span>
             <span class="k">elif</span> <span class="n">inst</span><span class="o">.</span><span class="n">hascrds</span><span class="p">:</span>
@@ -689,11 +720,11 @@
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][:],</span>
                               <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_angles&#39;</span><span class="p">][:]))</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
     <span class="n">box</span> <span class="o">=</span> <span class="n">cell_lengths_angles</span>
 
-<div class="viewcode-block" id="NetCDFTraj.add_cell_lengths_angles"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles">[docs]</a>    <span class="k">def</span> <span class="nf">add_cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="NetCDFTraj.add_cell_lengths_angles"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.add_cell_lengths_angles">[docs]</a>    <span class="k">def</span> <span class="nf">add_cell_lengths_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">angles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a new cell length and angle frame to the end of a NetCDF</span>
 <span class="sd">        trajectory.  This should only be called on objects created with the</span>
@@ -713,13 +744,13 @@
         <span class="k">def</span> <span class="nf">strip_units</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">desired_units</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">desired_units</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">x</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">angles</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Both lengths and angles are required.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">angles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span> <span class="ow">and</span> <span class="n">angles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Angles can be provided only once.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;6 numbers expected -- 3 lengths and 3 angles.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">angles</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">angles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">angles</span> <span class="o">=</span> <span class="p">[</span><span class="n">strip_units</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">3</span><span class="p">:]]</span>
         <span class="n">lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">strip_units</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lengths</span><span class="p">[:</span><span class="mi">3</span><span class="p">]]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;cell_lengths&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_box_frame</span><span class="p">]</span> <span class="o">=</span> \
@@ -786,21 +817,24 @@
     <span class="k">def</span> <span class="nf">remd_dimtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;remd_dimtype&#39;</span><span class="p">][:]</span>
 
-    <span class="nd">@remd_dimtype.setter</span>
+    <span class="nd">@remd_dimtype</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">remd_dimtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stuff</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;remd_dimtype&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">stuff</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;i&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
 <div class="viewcode-block" id="NetCDFTraj.close"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Closes the NetCDF file &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="bp">True</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">closed</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_ncfile&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">close</span><span class="p">())</span>
 
 <div class="viewcode-block" id="NetCDFTraj.flush"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.netcdffiles.html#parmed.amber.NetCDFTraj.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
+        <span class="k">if</span> <span class="n">nc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># netCDF4.Dataset does not have a flush method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ncfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>
@@ -811,14 +845,11 @@
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -834,13 +865,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>

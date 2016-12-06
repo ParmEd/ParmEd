@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using parmed &mdash; ParmEd 2.5.0 documentation</title>
+    <title>Using parmed &#8212; ParmEd 2.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,6 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="The API for ParmEd Command-line Utilities" href="parmed_api.html" />
     <link rel="prev" title="Seeding OpenMM Simulations with PyRosetta and ParmEd" href="omm_rosetta.html" /> 
@@ -44,7 +46,7 @@
         <li class="right" >
           <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -184,7 +186,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 </div>
 <div class="section" id="chamber">
 <h3>chamber<a class="headerlink" href="#chamber" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-none"><div class="highlight"><pre><span></span>chamber -top &lt;RTF&gt; -param &lt;PAR&gt; [-str &lt;STR&gt;] -psf &lt;PSF&gt; [-crd &lt;CRD&gt;] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii &lt;radiusset&gt;]
+<div class="highlight-none"><div class="highlight"><pre><span></span>chamber -top &lt;RTF&gt; -param &lt;PAR&gt; [-str &lt;STR&gt;] -psf &lt;PSF&gt; [-crd &lt;CRD&gt;] [-nocmap] [-box a,b,c[,alpha,beta,gamma]|bounding] [-radii &lt;radiusset&gt;] [nosettle]
 </pre></div>
 </div>
 <p>This action will read CHARMM parameter, topology (RTF), and stream (STR) files and apply those parameters to a structure defined in a CHARMM PSF (protein structure file). XPLOR, CHARMM, and VMD-generated PSF files are all supported. You may specify -top, -param, and -str as many times as you want to provide multiple parameter files. All topology files are read first (in the order they are specified), followed by all parameter files, and finally all stream files are read in. Topology files are only necessary if the parameter files do not define the atom types (newer CHARMM force fields define atom types directly in the parameter file. Environment variables and shell wild-cards (* and ?), as well as the home shortcut character ~ are properly expanded when looking for files.</p>
@@ -200,7 +202,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>-nocmap Do not use any CMAP parameters</li>
 <li>-box Box dimensions. If no angles are defined, they are assumed to be 90 degrees (orthorhombic box). Alternatively, you can use the word &#8216;bounding&#8217; to define a box that encloses the centers of all atoms.</li>
 <li>-radii Implicit solvent solvation radii. <code class="docutils literal"><span class="pre">&lt;radiusset&gt;</span></code> can be amber6, bondi, mbondi, mbondi2, mbondi3 Same effect as the <a class="reference internal" href="#changeradii">changeRadii</a> command. Default is mbondi.</li>
-<li>nocondense This no longer has any effect and is ignored.</li>
+<li>nosettle This avoids changing the names of the water residue and oxygen atoms from TIP3 and OH2 to WAT and O</li>
 </ul>
 </div></blockquote>
 <p>If the PDB file has a CRYST1 record, the box information will be set from there. Any box info given on the command-line will override the box found in the crd file.</p>
@@ -337,6 +339,11 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <li>decompose : Print bond, angle, dihedral, and nonbonded energies separately</li>
 <li>applayer : Use OpenMM&#8217;s class to compute the energy</li>
 </ul>
+</div></blockquote>
+<p>Examples</p>
+<blockquote>
+<div><p># Using AMBER import parmed as pmd <a class="reference internal" href="#parm">parm</a> = pmd.load_file(&#8216;prmtop&#8217;, xyz=&#8217;rst7&#8217;) pmd.tools.energy(parm, &#8216;igb 8&#8217;).execute()</p>
+<p># Using Openmm pmd.tools.energy(parm, &#8216;igb 5 omm&#8217;).execute()</p>
 </div></blockquote>
 </div>
 <div class="section" id="gromber">
@@ -1069,14 +1076,11 @@ that action.</p>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1098,12 +1102,12 @@ that action.</p>
         <li class="right" >
           <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2015, Jason Swails.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
     </div>
   </body>
 </html>
