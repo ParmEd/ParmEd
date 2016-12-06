@@ -2511,12 +2511,6 @@ class Structure(object):
 
         Notes
         -----
-        This method calls update_dihedral_exclusions, which might alter the
-        ``ignore_end`` attribute of some
-        :class:`parmed.topologyobjects.Dihedral` instances based on any
-        changes that might have been made to the bonds and angles since the last
-        time it was called.
-
         Subclasses of Structure for which this nonbonded treatment is inadequate
         should override this method to implement what is needed.
 

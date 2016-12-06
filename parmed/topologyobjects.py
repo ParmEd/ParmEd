@@ -2026,10 +2026,7 @@ class Dihedral(_FourAtomTerm):
         self.type = type
         self.improper = improper
         self.ignore_end = ignore_end
-        self.signs = [1, 1]
-        if ignore_end: self.signs[0] = -1
         if improper:
-            self.signs[1] = -1
             self._funct = 4
         else:
             atom1.dihedral_to(atom2)
