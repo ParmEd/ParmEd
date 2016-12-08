@@ -1247,7 +1247,7 @@ class GromacsTopologyFile(Structure):
             if struct.adjusts:
                 for adjust in struct.adjusts:
                     if adjust.type is None: continue
-                    scee_values.add(1/adjust.chgscale)
+                    scee_values.add(1/adjust.type.chgscale)
                     # Do not add scnb_values, since we can just set explicit
                     # exception pair parameters in GROMACS (which this structure
                     # already has)
