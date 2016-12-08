@@ -7,6 +7,7 @@ by Jason Swails
 from __future__ import division, print_function, absolute_import
 
 from copy import copy
+from functools import wraps
 import math
 from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
@@ -27,6 +28,9 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
            'RBTorsionType', 'UnassignedAtomType']
+
+# Used for rounding in hash creation
+_TINY_DIGITS = int(math.log10(TINY) + 0.5)
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -55,6 +59,19 @@ def _strip_units(value, unit=None):
         else:
             return value.value_in_unit(unit)
     return value
+
+def _exception_to_notimplemented(func):
+    """
+    Wraps comparison operators to return NotImplemented instead of raising an
+    AttributeError
+    """
+    @wraps(func)
+    def wrapper(self, other):
+        try:
+            return func(self, other)
+        except AttributeError:
+            return NotImplemented
+    return wrapper
 
 def _getstate_with_exclusions(exclusions=None):
     """ Serializes based on all attributes except requested exclusions
@@ -1734,7 +1751,7 @@ class Bond(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class BondType(_ListItem, _ParameterType):
+class BondType(_ParameterType, _ListItem):
     """
     A bond type with a set of bond parameters
 
@@ -1785,6 +1802,7 @@ class BondType(_ListItem, _ParameterType):
         self.list = list
         self._idx = -1
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return abs(self.k - other.k) < TINY and abs(self.req - other.req) < TINY
 
@@ -1809,6 +1827,10 @@ class BondType(_ListItem, _ParameterType):
         if self is NoUreyBradley:
             return 'NoUreyBradley'
         return super(BondType, self).__reduce__()
+
+    def __hash__(self):
+        return hash((round(self.k, _TINY_DIGITS),
+                     round(self.req, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1895,7 +1917,7 @@ class Angle(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class AngleType(_ListItem, _ParameterType):
+class AngleType(_ParameterType, _ListItem):
     """
     An angle type with a set of angle parameters
 
@@ -1945,6 +1967,7 @@ class AngleType(_ListItem, _ParameterType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.k - other.k) < TINY and
                 abs(self.theteq - other.theteq) < TINY)
@@ -1957,6 +1980,10 @@ class AngleType(_ListItem, _ParameterType):
         return AngleType(self.k, self.theteq)
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((round(self.k, _TINY_DIGITS),
+                     round(self.theteq, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2157,7 +2184,7 @@ class Dihedral(_FourAtomTerm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class DihedralType(_ListItem, _ParameterType):
+class DihedralType(_ParameterType, _ListItem):
     """
     A dihedral type with a set of dihedral parameters
 
@@ -2227,6 +2254,7 @@ class DihedralType(_ListItem, _ParameterType):
 
     #===================================================
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.phi_k - other.phi_k) < TINY and
                 self.per == other.per and
@@ -2246,9 +2274,16 @@ class DihedralType(_ListItem, _ParameterType):
 
     __getstate__ = _getstate_with_exclusions()
 
+    def __hash__(self):
+        return hash((round(self.phi_k, _TINY_DIGITS),
+                     round(self.per, _TINY_DIGITS),
+                     round(self.phase, _TINY_DIGITS),
+                     round(self.scee, _TINY_DIGITS),
+                     round(self.scnb, _TINY_DIGITS)))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class RBTorsionType(_ListItem, _ParameterType):
+class RBTorsionType(_ParameterType, _ListItem):
     """
     A Ryckaert-Bellemans type with a set of dihedral parameters
 
@@ -2323,6 +2358,7 @@ class RBTorsionType(_ListItem, _ParameterType):
 
     #===================================================
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.c0 - other.c0) < TINY and
                 abs(self.c1 - other.c1) < TINY and
@@ -2342,6 +2378,14 @@ class RBTorsionType(_ListItem, _ParameterType):
                  self.scee, self.scnb))
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((round(self.c0, _TINY_DIGITS),
+                     round(self.c1, _TINY_DIGITS),
+                     round(self.c2, _TINY_DIGITS),
+                     round(self.c3, _TINY_DIGITS),
+                     round(self.c4, _TINY_DIGITS),
+                     round(self.c5, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2374,6 +2418,7 @@ class DihedralTypeList(list, _ListItem):
         self._idx = -1
         self.used = False
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         if len(self) != len(other): return False
         for t1, t2 in zip(self, other):
@@ -2437,6 +2482,9 @@ class DihedralTypeList(list, _ListItem):
         return DihedralTypeList([copy(x) for x in self])
 
     __getstate__ = _getstate_with_exclusions(['list', 'penalty'])
+
+    def __hash__(self):
+        return hash(tuple(self))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2644,7 +2692,7 @@ class Improper(_FourAtomTerm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class ImproperType(_ListItem, _ParameterType):
+class ImproperType(_ParameterType, _ListItem):
     """
     An improper type with a set of improper torsion parameters
 
@@ -2695,6 +2743,7 @@ class ImproperType(_ListItem, _ParameterType):
         self.list = list
         self._idx = -1
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.psi_k - other.psi_k) < TINY and
                 abs(self.psi_eq - other.psi_eq) < TINY)
@@ -2707,6 +2756,10 @@ class ImproperType(_ListItem, _ParameterType):
         return ImproperType(self.psi_k, self.psi_eq)
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((round(self.psi_k, _TINY_DIGITS),
+                     round(self.psi_eq, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2871,7 +2924,7 @@ class Cmap(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class CmapType(_ListItem, _ParameterType):
+class CmapType(_ParameterType, _ListItem):
     """
     A CMAP type with a potential energy interpoloation grid mapping out the 2-D
     potential of coupled torsions.
@@ -2942,6 +2995,7 @@ class CmapType(_ListItem, _ParameterType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (self.resolution == other.resolution and
                 all(abs(i - j) < TINY for i, j in zip(self.grid, other.grid)))
@@ -2954,6 +3008,9 @@ class CmapType(_ListItem, _ParameterType):
                         self.comments[:])
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((self.resolution, self.grid))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3060,16 +3117,14 @@ class _CmapGrid(object):
                 retstr += ','
         return retstr + ']'
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
-        try:
-            if self.resolution != other.resolution:
+        if self.resolution != other.resolution:
+            return False
+        for x, y in zip(self, other):
+            if abs(x - y) > TINY:
                 return False
-            for x, y in zip(self, other):
-                if abs(x - y) > TINY:
-                    return False
-            return True
-        except AttributeError:
-            return NotImplemented
+        return True
 
     def switch_range(self):
         """
@@ -3090,6 +3145,9 @@ class _CmapGrid(object):
 
     def __copy__(self):
         return _CmapGrid(self.resolution, copy(self._data))
+
+    def __hash__(self):
+        return hash(tuple([round(x, _TINY_DIGITS) for x in self]))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3176,7 +3234,7 @@ class OutOfPlaneBend(_FourAtomTerm):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class OutOfPlaneBendType(_ListItem, _ParameterType):
+class OutOfPlaneBendType(_ParameterType, _ListItem):
     """
     An angle type with a set of angle parameters
 
@@ -3223,6 +3281,7 @@ class OutOfPlaneBendType(_ListItem, _ParameterType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return abs(self.k - other.k) < TINY
 
@@ -3343,7 +3402,7 @@ class StretchBend(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class StretchBendType(_ListItem, _ParameterType):
+class StretchBendType(_ParameterType, _ListItem):
     """
     A stretch-bend type with two distances and an angle in AMOEBA
 
@@ -3405,6 +3464,7 @@ class StretchBendType(_ListItem, _ParameterType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.k1 - other.k1) < TINY and
                 abs(self.k2 - other.k2) < TINY and
@@ -3573,6 +3633,7 @@ class _TorTorTable(object):
         idx = self._indexes[_strip_units(idx, u.degrees)]
         self.data[idx] = _strip_units(value, u.kilocalories_per_mole)
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         try:
             for idx in self._indexes.keys():
@@ -3588,7 +3649,7 @@ class _TorTorTable(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class TorsionTorsionType(_ListItem, _ParameterType):
+class TorsionTorsionType(_ParameterType, _ListItem):
     """
     The type containing the parameter maps for the Amoeba torsion-torsion
     potentials. It contains the original potential as well as interpolated first
@@ -3660,6 +3721,7 @@ class TorsionTorsionType(_ListItem, _ParameterType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         if self.dims != other.dims: return False
         if self.ang1 != other.ang1: return False
@@ -4411,6 +4473,7 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
                 type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.rmin - other.rmin) < TINY and
                 abs(self.epsilon - other.epsilon) < TINY and
@@ -4455,6 +4518,7 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
         self._idx = -1
         self.list = list
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (abs(self.vdw_weight - other.vdw_weight) < TINY and
                 abs(self.multipole_weight - other.multipole_weight) < TINY and
@@ -4560,6 +4624,7 @@ class AtomType(object):
         self._bond_type = bond_type
         self.charge = charge
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         """
         Compares based on available properties (name and number, just name,
@@ -4768,6 +4833,7 @@ class Group(object):
         self.type = type
         self.move = move
 
+    @_exception_to_notimplemented
     def __eq__(self, other):
         return (self.atom is other.atom and self.type == other.type and
                 self.move == other.move)
