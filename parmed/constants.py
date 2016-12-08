@@ -5,7 +5,7 @@ Can be used like:
    from parmed.constants import *
 """
 from __future__ import division
-from math import pi as _pi, sqrt as _sqrt
+from math import pi as _pi, sqrt as _sqrt, log10 as _log10
 
 __all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH',
            'MBONA', 'NTHETH', 'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM',
@@ -18,7 +18,7 @@ AMBER_ELECTROSTATIC = 18.2223
 CHARMM_ELECTROSTATIC = _sqrt(332.0716)
 
 AMBER_POINTERS = """
-NATOM  : total number of atoms 
+NATOM  : total number of atoms
 NTYPES : total number of distinct atom types
 NBONH  : number of bonds containing hydrogen
 MBONA  : number of bonds not containing hydrogen
@@ -28,7 +28,7 @@ NPHIH  : number of dihedrals containing hydrogen
 MPHIA  : number of dihedrals not containing hydrogen
 NHPARM : currently not used
 NPARM  : currently not used
-NEXT   : number of excluded atoms 
+NEXT   : number of excluded atoms
 NRES   : number of residues
 NBONA  : MBONA + number of constraint bonds
 NTHETA : MTHETA + number of constraint angles
@@ -71,3 +71,5 @@ DEG_TO_RAD = _pi / 180.0
 # For use in floating point comparisons
 TINY = 1.0e-8
 SMALL = 1.0e-4
+TINY_DIGITS = int(_log10(TINY) + 0.5)
+SMALL_DIGITS = int(_log10(SMALL) + 0.5)

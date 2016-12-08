@@ -28,7 +28,7 @@ from copy import copy
 import math
 import numpy as np
 import os
-from parmed.constants import DEG_TO_RAD, SMALL
+from parmed.constants import DEG_TO_RAD, SMALL, TINY_DIGITS
 from parmed.exceptions import ParameterError
 from parmed.geometry import (box_lengths_and_angles_to_vectors,
         box_vectors_to_lengths_and_angles, STANDARD_BOND_LENGTHS_SQUARED,
@@ -4138,3 +4138,73 @@ def _res_in_templlib(res, lib):
         return lib[residue.RNAResidue.get(res.name).abbr]
     # Not present
     return None
+
+class _MoleculeType(object):
+    """
+    A moleculetype object for determining equivalence of molecules. Primarily
+    used for GROMACS topology creation, but it's needed by `Structure.split`
+    implemented here to identify distinct molecule types
+
+    Parameters
+    ----------
+    residues : :class:`Residue` or list of :class:`Residue`
+        The residue or collection of residues (in the form of a Structure) that
+        is contained in this particular molecule
+    """
+    def __init__(self, mol):
+        if isinstance(mol, Residue):
+            self.residues = [residue]
+        else:
+            self.residues = list(residue)
+
+    def __hash__(self):
+        """
+        Hashes the residues to ensure that two molecules types that hash the
+        same really *do* have the same residue names and Hamiltonians
+
+        The structure of the tuple we are hashing is as follows:
+
+        ( (list of residue name/length), (list of atom attribute tuples),
+          (list of sorted bond partner index,type tuples for each atom),
+          (list of sorted angle partner index,type tuples for each atom),
+          (list of sorted dihedral partner index,type tuples for each atom),
+          (list of sortd urey-bradley partner index,type tuples for each atom),
+          (list of sorted R-B torsion partner index,type tuples for each atom),
+        )
+        """
+        hashed = (tuple((x.name, len(x)) for x in self.residues),
+                  self._atom_attributes(),
+                  self._bond_attributes(),
+                  self._angle_attributes(),
+                  self._dihedral_attributes(),
+                  self._urey_attributes(),
+                  self._rb_torsion_attributes(),
+        )
+        return hash(hashed)
+
+    def _atom_attributes(self):
+        ret = []
+        for res in self.residues:
+            ret.extend([(a.atomic_number, a.name, a.type,
+                         round(a.charge, TINY_DIGITS),
+                         round(a.mass, TINY_DIGITS),
+                         round(a.solvent_radius, TINY_DIGITS),
+                         round(a.screen, TINY_DIGITS),
+                         round(a.occupancy, TINY_DIGITS),
+                         round(a.bfactor, TINY_DIGITS),
+                         a.altloc, a.tree, a.join, a.irotat,
+                         round(a.rmin, TINY_DIGITS),
+                         round(a.epsilon, TINY_DIGITS),
+                         round(a.rmin14, TINY_DIGITS),
+                         round(a.epsilon14, TINY_DIGITS)) for a in res.atoms])
+        return tuple(ret)
+
+    def _bond_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                ret.extend(sorted([
+                    (bond.atom1 if atom is bond.atom2 else bond.atom2,
+                     bond.type) for bond in atom.bonds]
+                ))
+        return tuple(ret)

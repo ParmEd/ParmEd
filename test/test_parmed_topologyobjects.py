@@ -1258,6 +1258,7 @@ class TestTopologyObjects(unittest.TestCase):
             self.assertIsNot(cp.grid, cmap_type.grid)
             self.assertEqual(hash(cp), hash(cmap_type))
             self.assertIn(cp, {cmap_type})
+            self.assertIn(cp.grid, {cmap_type.grid})
         # Check error handling
         self.assertRaises(IndexError, lambda: cmap_types[0].grid[10,10])
         def err():
@@ -1386,6 +1387,10 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(repr(t1), '<OutOfPlaneBend; %r--(%r,%r,%r); type=%r>' %
                 (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
+        cp = OutOfPlaneBendType(50.0)
+        self.assertIsNot(cp, t1.type)
+        self.assertEqual(hash(cp), hash(t1.type))
+        self.assertIn(cp, {t1.type})
 
     #=============================================
 
@@ -1442,6 +1447,10 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.theteq, 109.0)
         self.assertEqual(repr(strbnd), '<StretchBend; %r--%r--%r; type=%r>' %
                 tuple(atoms + [strbnd.type]))
+        cp = copy(strbnd.type)
+        self.assertIsNot(cp, strbnd.type)
+        self.assertEqual(hash(cp), hash(strbnd.type))
+        self.assertIn(cp, {strbnd.type})
 
     #=============================================
 
@@ -1850,6 +1859,10 @@ class TestTopologyObjects(unittest.TestCase):
         nbe.type = nbet
         self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' %
                          (a1, a2, nbet))
+        cp = copy(nbet)
+        self.assertIsNot(cp, nbet)
+        self.assertEqual(hash(cp), hash(nbet))
+        self.assertIn(cp, {nbet})
 
     #=============================================
 

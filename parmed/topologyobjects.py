@@ -10,7 +10,8 @@ from copy import copy
 from functools import wraps
 import math
 from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
-from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+from parmed.constants import (TINY, DEG_TO_RAD, RAD_TO_DEG ,
+                              TINY_DIGITS as _TINY_DIGITS)
 import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
@@ -30,7 +31,6 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'RBTorsionType', 'UnassignedAtomType']
 
 # Used for rounding in hash creation
-_TINY_DIGITS = int(math.log10(TINY) + 0.5)
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 
@@ -3293,6 +3293,9 @@ class OutOfPlaneBendType(_ParameterType, _ListItem):
 
     __getstate__ = _getstate_with_exclusions()
 
+    def __hash__(self):
+        return hash(round(self.k, _TINY_DIGITS))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PiTorsion(object):
@@ -3482,6 +3485,13 @@ class StretchBendType(_ParameterType, _ListItem):
                                self.theteq)
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((round(self.k1, _TINY_DIGITS),
+                     round(self.k2, _TINY_DIGITS),
+                     round(self.req1, _TINY_DIGITS),
+                     round(self.req2, _TINY_DIGITS),
+                     round(self.theteq, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4481,6 +4491,11 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
 
     __getstate__ = _getstate_with_exclusions()
 
+    def __hash__(self):
+        return hash((round(self.rmin, _TINY_DIGITS),
+                     round(self.epsilon, _TINY_DIGITS),
+                     round(self.chgscale, _TINY_DIGITS)))
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AmoebaNonbondedExceptionType(NonbondedExceptionType):
@@ -4532,6 +4547,13 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
                 self.mutual_weight)
 
     __getstate__ = _getstate_with_exclusions()
+
+    def __hash__(self):
+        return hash((round(self.vdw_weight, _TINY_DIGITS),
+                     round(self.multipole_weight, _TINY_DIGITS),
+                     round(self.direct_weight, _TINY_DIGITS),
+                     round(self.polar_weight, _TINY_DIGITS),
+                     round(self.mutual_weight, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4751,6 +4773,11 @@ class AtomType(object):
         cp.rmin_14 = self.rmin_14
         cp.nbfix = self.nbfix.copy()
         return cp
+
+    def __hash__(self):
+        return hash((self.name, self.mass, self.atomic_number, self.bond_type,
+                     self.charge, self.epsilon, self.rmin, self.epsilon_14,
+                     self.rmin_14, tuple(self.nbfix.items())))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
