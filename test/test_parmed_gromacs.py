@@ -198,6 +198,17 @@ class TestGromacsTop(FileIOTestCase):
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
         self._charmm27_checks(top)
 
+    def test_moleculetype_distinction(self):
+        """ Tests moleculetype distinction for different parameters """
+        parm = load_file(get_fn('different_molecules.parm7'))
+        parm.save(get_fn('different_molecules.top', written=True),
+                  format='gromacs', overwrite=True)
+        top = load_file(get_fn('different_molecules.top', written=True))
+        # Make sure all atoms have the same parameters
+        for a1, a2 in zip(parm.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertAlmostEqual(a1.charge, a2.charge, places=4)
+
     def _check_ff99sbildn(self, top):
         self.assertEqual(len(top.atoms), 4235)
         self.assertEqual(len(top.residues), 1046)
