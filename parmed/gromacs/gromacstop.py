@@ -1244,29 +1244,37 @@ class GromacsTopologyFile(Structure):
         else:
             scee_values = set()
             scnb_values = set()
-            for dihedral in struct.dihedrals:
-                if dihedral.type is None: continue
-                if isinstance(dihedral.type, DihedralTypeList):
-                    for dt in dihedral.type:
-                        if dt.scee:
-                            scee_values.add(dt.scee)
-                        if dt.scnb:
-                            scnb_values.add(dt.scnb)
-                else:
-                    if dihedral.type.scee:
-                        scee_values.add(dihedral.type.scee)
-                    if dihedral.type.scnb:
-                        scnb_values.add(dihedral.type.scnb)
-            if len(scee_values) > 1:
+            if struct.adjusts:
+                for adjust in struct.adjusts:
+                    if adjust.type is None: continue
+                    scee_values.add(1/adjust.chgscale)
+                    # Do not add scnb_values, since we can just set explicit
+                    # exception pair parameters in GROMACS (which this structure
+                    # already has)
+            else:
+                for dihedral in struct.dihedrals:
+                    if dihedral.type is None or dihedral.ignore_end: continue
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        for dt in dihedral.type:
+                            if dt.scee:
+                                scee_values.add(dt.scee)
+                            if dt.scnb:
+                                scnb_values.add(dt.scnb)
+                    else:
+                        if dihedral.type.scee:
+                            scee_values.add(dihedral.type.scee)
+                        if dihedral.type.scnb:
+                            scnb_values.add(dihedral.type.scnb)
+            if len(set('%.5f' % x for x in scee_values)) > 1:
                 raise GromacsError('Structure has mixed 1-4 scaling which is '
                                    'not supported by Gromacs')
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
-            if len(scee_values) == 1:
+            if len(set('%.5f' % x for x in scee_values)) == 1:
                 gmxtop.defaults.fudgeQQ = 1/scee_values[0]
             else:
                 gmxtop.defaults.fudgeQQ = 1.0
-            if len(scnb_values) == 1:
+            if len(set('%.5f' % x for x in scnb_values)) == 1:
                 gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
             else:
                 gmxtop.defaults.fudgeLJ = 1.0
