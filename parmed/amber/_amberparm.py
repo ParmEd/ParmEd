@@ -25,11 +25,11 @@ from __future__ import division
 from parmed.amber.amberformat import AmberFormat
 from parmed.amber.asciicrd import AmberAsciiRestart
 from parmed.amber.netcdffiles import NetCDFRestart
-from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
-            MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
-            NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
-            NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
+from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH, MTHETA,
+            NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA, NPHIA,
+            NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER, NDPER,
+            MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY, NNB,
+            TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL, TRUNCATED_OCTAHEDRON_ANGLE)
 from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
@@ -2074,34 +2074,35 @@ class AmberParm(AmberFormat, Structure):
                     box[5] = box[5].value_in_unit(u.degrees)
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
 
-            if self._box is None:
-                self._box = box
-                # We need to add topology information
-                if np.allclose(box[3:], 90):
-                    # Orthogonal
-                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
-                else:
-                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
-                if 'SOLVENT_POINTERS' not in self.flag_list:
-                    self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3,
-                                  after='IROTAT')
-                if 'ATOMS_PER_MOLECULE' not in self.flag_list:
-                    self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0],
-                                  after='SOLVENT_POINTERS')
-                if 'BOX_DIMENSIONS' not in self.flag_list:
-                    self.add_flag('BOX_DIMENSIONS', '5E16.8',
-                                  data=[box[3], box[0], box[1], box[2]],
-                                  after='ATOMS_PER_MOLECULE')
-                try:
-                    self.rediscover_molecules(fix_broken=False)
-                except MoleculeError:
-                    # Do not reorder molecules here -- only do that when
-                    # specifically requested. Otherwise we could get out-of-sync
-                    # with coordinates.
-                    pass
-                self.load_pointers()
+            self._box = box
+            # We need to set topology information
+            if np.allclose(box[3:], 90):
+                # Orthogonal
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
+            elif box[3] == box[4] and box[3] == box[5] and abs(box[3] -
+                    TRUNCATED_OCTAHEDRON_ANGLE) < 0.01:
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
             else:
-                self._box = box
+                # General triclinic case
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 3
+            if 'SOLVENT_POINTERS' not in self.flag_list:
+                self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3,
+                              after='IROTAT')
+            if 'ATOMS_PER_MOLECULE' not in self.flag_list:
+                self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0],
+                              after='SOLVENT_POINTERS')
+            if 'BOX_DIMENSIONS' not in self.flag_list:
+                self.add_flag('BOX_DIMENSIONS', '5E16.8',
+                              data=[box[3], box[0], box[1], box[2]],
+                              after='ATOMS_PER_MOLECULE')
+            try:
+                self.rediscover_molecules(fix_broken=False)
+            except MoleculeError:
+                # Do not reorder molecules here -- only do that when
+                # specifically requested. Otherwise we could get out-of-sync
+                # with coordinates.
+                pass
+            self.load_pointers()
 
     #===================================================
 
