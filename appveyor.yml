@@ -15,9 +15,12 @@ install:
       mingw-w64-x86_64-ncurses
       mingw-w64-x86_64-readline
       mingw-w64-x86_64-python2-numpy
-      mingw-w64-python2-nose
+      wget
       diffutils
     \""
+  - wget https://bootstrap.pypa.io/get-pip.py
+  - python get-pip.py
+  - python -m pip install nose
 
 build_script:
   - where python
