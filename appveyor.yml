@@ -25,4 +25,5 @@ build_script:
   - python -c "import numpy; print(numpy)"
   - python -c "import parmed; print(parmed)"
   - python -c "import parmed; print(parmed.load_file('4lzt.parm7'))"
-  - C:/msys64/mingw64/bin/parmed -h
+  - cd ..
+  - nosetests .
