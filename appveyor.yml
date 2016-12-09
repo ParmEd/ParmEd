@@ -30,5 +30,5 @@ build_script:
 # (or will get distutils.errors.DistutilsPlatformError: VC 6.0 is not supported by this module
   - wget https://bootstrap.pypa.io/get-pip.py
   - python get-pip.py
-  - python -m pip install nose
-  - nosetests .
+  - python -m pip install pytest
+  - py.test -v .
