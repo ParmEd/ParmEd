@@ -15,6 +15,7 @@ install:
       mingw-w64-x86_64-ncurses
       mingw-w64-x86_64-readline
       mingw-w64-x86_64-python2-numpy
+      mingw-w64-python2-nose
       diffutils
     \""
 
