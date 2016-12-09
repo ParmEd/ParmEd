@@ -28,5 +28,6 @@ install:
 build_script:
   - where python
   - python setup.py install
-  - cd tests
+  - cd test
   - python -c "import numpy; print(numpy)"
+  - python -c "import parmed; print(parmed)"
