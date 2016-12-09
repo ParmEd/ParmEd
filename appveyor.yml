@@ -21,6 +21,7 @@ install:
 build_script:
   - where python
   - python setup.py install
-  - cd test
+  - cd test/files
   - python -c "import numpy; print(numpy)"
   - python -c "import parmed; print(parmed)"
+  - python -c "import parmed; print(parmed.load_file('4lzt.parm7'))"
