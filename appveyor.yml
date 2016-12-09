@@ -23,3 +23,5 @@ build_script:
   - python setup.py install
   - python -c "import parmed"
   - python -c "import numpy; print(numpy)"
+
+build: off
