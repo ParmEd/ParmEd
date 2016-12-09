@@ -1,4 +1,11 @@
 os: Windows Server 2012
+
+# We need printf exponents to have 2 digits like the C standard says,
+# or tests will fail. Set environment variable for mingw-w64:
+# https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-crt/stdio/mingw_pformat.c#L223
+#
+# cpptraj.lib
+# https://ci.appveyor.com/project/hainm/cpptraj-l282n/build/artifacts
 environment:
   matrix:
   - PRINTF_EXPONENT_DIGITS: "2"
@@ -21,7 +28,5 @@ install:
 build_script:
   - where python
   - python setup.py install
-  - python -c "import parmed"
+  - cd tests
   - python -c "import numpy; print(numpy)"
-
-build: off
