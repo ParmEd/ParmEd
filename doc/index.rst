@@ -174,6 +174,7 @@ Program and API Reference
    Using the ParmEd programs (``parmed`` and ``xparmed``) <parmed>
    The ParmEd API <parmed_api>
    OpenMM Functionality <openmm>
+   Visualization Functionality <visualization>
 
 Click the "modules" link at the top of the page for a full API reference.
 
