@@ -1251,6 +1251,10 @@ class GromacsTopologyFile(Structure):
                     # Do not add scnb_values, since we can just set explicit
                     # exception pair parameters in GROMACS (which this structure
                     # already has)
+                # In order to specify specific pair parameters, we need to set
+                # gen_pairs to 'no' so that the pair-specific L-J parameters are
+                # printed to the topology file (rather than being auto-created)
+                gmxtop.defaults.gen_pairs = 'no'
             else:
                 for dihedral in struct.dihedrals:
                     if dihedral.type is None or dihedral.ignore_end: continue
@@ -1443,7 +1447,7 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.5f    %.5f\n' %
+                        parfile.write('%-5s %-5s  1  %.8f %.8f\n' %
                                       (key[0], key[1], param.sigma*lconv,
                                        param.epsilon*econv))
                     parfile.write('\n')
@@ -1769,8 +1773,8 @@ class GromacsTopologyFile(Structure):
                         key not in params.pair_types or
                         adjust.type != params.pair_types[key]) and \
                         adjust.type is not None:
-                    dest.write('  %.5f  %.5f' % (adjust.type.sigma*lconv,
-                                                 adjust.type.epsilon*econv))
+                    dest.write(' %.8f %.8f' % (adjust.type.sigma*lconv,
+                                               adjust.type.epsilon*econv))
                 dest.write('\n')
             dest.write('\n')
         elif struct.dihedrals:
