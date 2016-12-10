@@ -1368,11 +1368,17 @@ class Structure(object):
             if len(involved_residues) == 1:
                 res = sel[0].residue
                 names = tuple(a.name for a in res)
-                if (res.name, len(res), names) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names)]].add(i)
+                charges = tuple('%.6f' % a.charge for a in res)
+                rmins = tuple('%.6f' % a.rmin for a in res)
+                epsilons = tuple('%.6f' % a.epsilon for a in res)
+                if (res.name, len(res), names, charges,
+                    rmins, epsilons) in res_molecules:
+                    counts[res_molecules[(res.name, len(res), names,
+                                          charges, rmins, epsilons)]].add(i)
                     continue
                 else:
-                    res_molecules[(res.name, len(res), names)] = len(structs)
+                    res_molecules[(res.name, len(res), names,
+                                   charges, rmins, epsilons)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
@@ -1381,6 +1387,9 @@ class Structure(object):
                                 'Residues must all be set'
                         if a1.residue.name != a2.residue.name: break
                         if a1.name != a2.name: break
+                        if '%.6f' % a1.charge != '%.6f' % a2.charge: break
+                        if '%.6f' % a1.rmin != '%.6f' % a2.rmin: break
+                        if '%.6f' % a1.epsilon != '%.6f' % a2.epsilon: break
                     else:
                         counts[j].add(i)
                         is_duplicate = True
@@ -4139,174 +4148,3 @@ def _res_in_templlib(res, lib):
         return lib[residue.RNAResidue.get(res.name).abbr]
     # Not present
     return None
-
-class _MoleculeType(object):
-    """
-    A moleculetype object for determining equivalence of molecules. Primarily
-    used for GROMACS topology creation, but it's needed by `Structure.split`
-    implemented here to identify distinct molecule types
-
-    Parameters
-    ----------
-    residues : :class:`Residue` or list of :class:`Residue`
-        The residue or collection of residues (in the form of a Structure) that
-        is contained in this particular molecule
-    """
-    def __init__(self, mol):
-        if isinstance(mol, Residue):
-            self.residues = [residue]
-        else:
-            self.residues = list(residue)
-
-    def __hash__(self):
-        """
-        Hashes the residues to ensure that two molecules types that hash the
-        same really *do* have the same residue names and Hamiltonians
-
-        The structure of the tuple we are hashing is as follows:
-
-        ( (list of residue name/length), (list of atom attribute tuples),
-          (list of sorted bond partner index,type tuples for each atom),
-          (list of sorted angle partner index,type tuples for each atom),
-          (list of sorted dihedral partner index,type tuples for each atom),
-          (list of sortd urey-bradley partner index,type tuples for each atom),
-          (list of sorted R-B torsion partner index,type tuples for each atom),
-        )
-        """
-        hashed = (tuple((x.name, len(x)) for x in self.residues),
-                  self._atom_attributes(),
-                  self._bond_attributes(),
-                  self._angle_attributes(),
-                  self._dihedral_attributes(),
-                  self._urey_attributes(),
-                  self._cmap_attributes(),
-        )
-        return hash(hashed)
-
-    def _atom_attributes(self):
-        ret = []
-        for res in self.residues:
-            ret.extend([(a.atomic_number, a.name, a.type,
-                         round(a.charge, TINY_DIGITS),
-                         round(a.mass, TINY_DIGITS),
-                         round(a.solvent_radius, TINY_DIGITS),
-                         round(a.screen, TINY_DIGITS),
-                         round(a.occupancy, TINY_DIGITS),
-                         round(a.bfactor, TINY_DIGITS),
-                         a.altloc, a.tree, a.join, a.irotat,
-                         round(a.rmin, TINY_DIGITS),
-                         round(a.epsilon, TINY_DIGITS),
-                         round(a.rmin14, TINY_DIGITS),
-                         round(a.epsilon14, TINY_DIGITS)) for a in res.atoms])
-        return tuple(ret)
-
-    def _bond_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                ret.extend(sorted([
-                    (bond.atom1 if atom is bond.atom2 else bond.atom2,
-                     bond.type) for bond in atom.bonds]
-                ))
-        return tuple(ret)
-
-    def _angle_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                to_extend = []
-                for angle in atom.angles:
-                    if angle.atom1 is atom:
-                        to_extend.append((angle.atom2, angle.atom3, angle.type))
-                    elif angle.atom2 is atom:
-                        to_extend.append((angle.atom1, angle.atom3, angle.type))
-                    else:
-                        to_extend.append((angle.atom1, angle.atom2, angle.type))
-                ret.extend(sorted(to_extend))
-        return tuple(ret)
-
-    def _dihedral_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                to_extend = []
-                for dihed in atom.dihedrals:
-                    if dihed.atom1 is atom:
-                        to_extend.append((dihed.atom2, dihed.atom3, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom2 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom3, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom3 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom3 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
-                                          dihed.type))
-                    else:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom3,
-                                          dihed.type))
-                ret.extend(sorted(to_extend))
-        return tuple(ret)
-
-    def _improper_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                to_extend = []
-                for dihed in atom.improper:
-                    if dihed.atom1 is atom:
-                        to_extend.append((dihed.atom2, dihed.atom3, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom2 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom3, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom3 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
-                                          dihed.type))
-                    elif dihed.atom3 is atom:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
-                                          dihed.type))
-                    else:
-                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom3,
-                                          dihed.type))
-                ret.extend(sorted(to_extend))
-        return tuple(ret)
-
-    def _urey_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                ret.extend(sorted([
-                    (bond.atom1 if atom is bond.atom2 else bond.atom2,
-                     bond.type) for bond in atom.urey_bradleys]
-                ))
-        return tuple(ret)
-
-    def _cmap_attributes(self):
-        ret = []
-        for res in self.residues:
-            for atom in res:
-                to_extend = []
-                for cmap in atom.cmaps:
-                    if cmap.atom1 is atom:
-                        to_extend.append((cmap.atom2, cmap.atom3, cmap.atom4,
-                                          cmap.atom5, cmap.type))
-                    elif cmap.atom2 is atom:
-                        to_extend.append((cmap.atom1, cmap.atom3, cmap.atom4,
-                                          cmap.atom5, cmap.type))
-                    elif cmap.atom3 is atom:
-                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom4,
-                                          cmap.atom5, cmap.type))
-                    elif cmap.atom3 is atom:
-                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom4,
-                                          cmap.atom5, cmap.type))
-                    elif cmap.atom4 is atom:
-                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom3,
-                                          cmap.atom5, cmap.type))
-                    else:
-                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom3,
-                                          cmap.atom4, cmap.type))
-                ret.extend(sorted(to_extend))
-        return tuple(ret)
-
