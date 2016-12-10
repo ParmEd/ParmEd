@@ -998,10 +998,6 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(cp.scee, dihed_types[0].scee)
         self.assertEqual(cp.scnb, dihed_types[0].scnb)
         # Test hashing
-        #dihed_types.append(DihedralType(5.0, 2, 0.0, 1.2, 2.0, dihed_types))
-        #dihed_types.append(DihedralType(1.0, 3, 180.0, 1.2, 2.0, dihed_types))
-        #dihed_types.append(DihedralType(2.0, 4, 180.0, 1.2, 2.0, dihed_types))
-        #dihed_types.append(DihedralType(10.0, 1, 180.0, 0., 0., dihed_types))
         self.assertEqual(hash(dihed_types[0]),
                          hash(DihedralType(5, 2, 0, 1.2, 2.0)))
         self.assertEqual(hash(dihed_types[1]),

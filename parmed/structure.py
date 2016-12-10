@@ -4179,7 +4179,7 @@ class _MoleculeType(object):
                   self._angle_attributes(),
                   self._dihedral_attributes(),
                   self._urey_attributes(),
-                  self._rb_torsion_attributes(),
+                  self._cmap_attributes(),
         )
         return hash(hashed)
 
@@ -4209,3 +4209,104 @@ class _MoleculeType(object):
                      bond.type) for bond in atom.bonds]
                 ))
         return tuple(ret)
+
+    def _angle_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                to_extend = []
+                for angle in atom.angles:
+                    if angle.atom1 is atom:
+                        to_extend.append((angle.atom2, angle.atom3, angle.type))
+                    elif angle.atom2 is atom:
+                        to_extend.append((angle.atom1, angle.atom3, angle.type))
+                    else:
+                        to_extend.append((angle.atom1, angle.atom2, angle.type))
+                ret.extend(sorted(to_extend))
+        return tuple(ret)
+
+    def _dihedral_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                to_extend = []
+                for dihed in atom.dihedrals:
+                    if dihed.atom1 is atom:
+                        to_extend.append((dihed.atom2, dihed.atom3, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom2 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom3, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom3 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom3 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
+                                          dihed.type))
+                    else:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom3,
+                                          dihed.type))
+                ret.extend(sorted(to_extend))
+        return tuple(ret)
+
+    def _improper_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                to_extend = []
+                for dihed in atom.improper:
+                    if dihed.atom1 is atom:
+                        to_extend.append((dihed.atom2, dihed.atom3, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom2 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom3, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom3 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
+                                          dihed.type))
+                    elif dihed.atom3 is atom:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom4,
+                                          dihed.type))
+                    else:
+                        to_extend.append((dihed.atom1, dihed.atom2, dihed.atom3,
+                                          dihed.type))
+                ret.extend(sorted(to_extend))
+        return tuple(ret)
+
+    def _urey_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                ret.extend(sorted([
+                    (bond.atom1 if atom is bond.atom2 else bond.atom2,
+                     bond.type) for bond in atom.urey_bradleys]
+                ))
+        return tuple(ret)
+
+    def _cmap_attributes(self):
+        ret = []
+        for res in self.residues:
+            for atom in res:
+                to_extend = []
+                for cmap in atom.cmaps:
+                    if cmap.atom1 is atom:
+                        to_extend.append((cmap.atom2, cmap.atom3, cmap.atom4,
+                                          cmap.atom5, cmap.type))
+                    elif cmap.atom2 is atom:
+                        to_extend.append((cmap.atom1, cmap.atom3, cmap.atom4,
+                                          cmap.atom5, cmap.type))
+                    elif cmap.atom3 is atom:
+                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom4,
+                                          cmap.atom5, cmap.type))
+                    elif cmap.atom3 is atom:
+                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom4,
+                                          cmap.atom5, cmap.type))
+                    elif cmap.atom4 is atom:
+                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom3,
+                                          cmap.atom5, cmap.type))
+                    else:
+                        to_extend.append((cmap.atom1, cmap.atom2, cmap.atom3,
+                                          cmap.atom4, cmap.type))
+                ret.extend(sorted(to_extend))
+        return tuple(ret)
+
