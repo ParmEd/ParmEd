@@ -38,7 +38,8 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, Residue,
+        UnassignedAtomType)
 from parmed import unit as u, residue
 from parmed.utils import tag_molecules, PYPY, find_atom_pairs
 from parmed.utils.decorators import needs_openmm
