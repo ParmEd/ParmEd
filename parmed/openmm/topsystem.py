@@ -414,8 +414,7 @@ def _process_nonbonded(struct, force):
             chgscale = q / (ai.charge * aj.charge)
         except ZeroDivisionError:
             if q != 0:
-                raise TypeError('Cannot scale charge product of 0 to match '
-                                '%s' % q)
+                raise ValueError("Can't scale charge product 0 to match %s" % q)
             chgscale = 1
         nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
