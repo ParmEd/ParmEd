@@ -10,6 +10,7 @@ from copy import copy
 import math
 from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+from parmed.geometry import distance2, angle
 import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
@@ -1728,6 +1729,37 @@ class Bond(object):
         """
         self._order = float(value)
 
+    def measure(self):
+        """ Measures the current bond
+
+        Returns
+        -------
+        measurement : float or None
+            If the atoms have coordinates, returns the distance between the two
+            atoms. If any coordinates are missing, returns None
+        """
+        if None in (self.atom1, self.atom2):
+            return None
+        try:
+            return math.sqrt(distance2(self.atom1, self.atom2))
+        except AttributeError:
+            return None
+
+    def energy(self):
+        """ Measures the current bond energy
+
+        Returns
+        -------
+        energy : float or None
+            Bond strain energy in kcal/mol. Return value is None if either the
+            coordinates of either atom is not set or the bond type is not set
+        """
+        d = self.measure()
+        if self.type is None or d is None:
+            return None
+        dx = d - self.type.req
+        return self.type.k * dx * dx
+
     def __repr__(self):
         return '<%s %r--%r; type=%r>' % (type(self).__name__,
                 self.atom1, self.atom2, self.type)
@@ -1888,6 +1920,37 @@ class Angle(object):
         _delete_from_list(self.atom3._angle_partners, self.atom2)
 
         self.atom1 = self.atom2 = self.atom3 = self.type = None
+
+    def measure(self):
+        """ Measures the current angle
+
+        Returns
+        -------
+        measurement : float or None
+            If the atoms have coordinates, returns the angle between the three
+            atoms. If any coordinates are missing, returns None
+        """
+        if None in (self.atom1, self.atom2, self.atom3):
+            return None
+        try:
+            return angle(self.atom1, self.atom2, self.atom3) * RAD_TO_DEG
+        except AttributeError:
+            return None
+
+    def energy(self):
+        """ Measures the current bond energy
+
+        Returns
+        -------
+        energy : float or None
+            Bond strain energy in kcal/mol. Return value is None if either the
+            coordinates of either atom is not set or the bond type is not set
+        """
+        a = self.measure()
+        if self.type is None or a is None:
+            return None
+        da = (a - self.type.theteq) * DEG_TO_RAD
+        return self.type.k * da * da
 
     def __repr__(self):
         return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,

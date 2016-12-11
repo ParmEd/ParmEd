@@ -8,6 +8,7 @@ from __future__ import division
 import math
 from parmed.exceptions import MoleculeError, ParameterError
 from parmed.amber.readparm import AmberFormat
+from parmed.constants import DEG_TO_RAD
 import parmed.topologyobjects as topologyobjects
 from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
 from parmed.topologyobjects import *
@@ -775,6 +776,14 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(a1, a2.bond_partners) # Duplicated bond
         bond4.delete()
         self.assertNotIn(a1, a2.bond_partners)
+        # Now test measurements
+        self.assertIs(bond1.measure(), None)
+        self.assertIs(bond1.energy(), None)
+        self.assertIs(bond2.measure(), None)
+        self.assertIs(bond2.energy(), None)
+        a2.xx = a2.xy = a2.xz = 0.0
+        a3.xx, a3.xy, a3.xz = 1.0, 2.0, 3.0
+        self.assertEqual(bond2.measure(), math.sqrt(14))
         # Now test the bond types
         bond_types = TrackedList()
         bond_types.append(BondType(10.0, 1.0, bond_types))
@@ -793,6 +802,9 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(bond2.type.idx, 1)
         self.assertEqual(bond3.type.idx, 2)
         self.assertIs(bond1.type.list, bond_types)
+        # Now test energy calculations
+        self.assertAlmostEqual(bond2.energy(),
+                bond2.type.k*(bond2.measure() - bond2.type.req)**2)
         # Test the BondTypes.__copy__ method
         cp = copy(bond_types[0])
         self.assertIsNot(cp, bond_types[0])
@@ -816,6 +828,13 @@ class TestTopologyObjects(unittest.TestCase):
         ang1 = Angle(a1, a2, a3)
         ang2 = Angle(a2, a3, a4)
         self.assertEqual(repr(ang1), '<Angle %r--%r--%r; type=None>' % (a1, a2, a3))
+        # Now check measurements
+        self.assertIs(ang1.measure(), None)
+        self.assertIs(ang1.energy(), None)
+        a1.xx = a1.xy = a1.xz = 0
+        a2.xx, a2.xy, a2.xz = 0, 1, 0
+        a3.xx, a3.xy, a3.xz = 1, 1, 0
+        self.assertAlmostEqual(ang1.measure(), 90)
         angle_types = TrackedList()
         # Make a set of angle types
         angle_types.append(AngleType(50.0, 109.5, angle_types))
@@ -826,6 +845,9 @@ class TestTopologyObjects(unittest.TestCase):
         ang3 = Angle(a3, a4, a2, angle_types[2])
         ang1.type = angle_types[0]
         ang2.type = angle_types[1]
+        # Now test energy
+        self.assertAlmostEqual(ang1.energy(), ang1.type.k *
+                (ang1.type.theteq*DEG_TO_RAD - ang1.measure()*DEG_TO_RAD) ** 2)
         # Test angle as a container
         self.assertIn(a1, ang1)
         self.assertIn(a2, ang1)

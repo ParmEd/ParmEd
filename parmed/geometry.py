@@ -24,7 +24,7 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from collections import defaultdict
-from parmed import unit as u, Atom
+from parmed import unit as u
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from parmed.vec3 import Vec3
 from math import pi, cos, sin, sqrt, acos
@@ -232,6 +232,7 @@ def distance2(a1, a2):
     TypeError if a1 or a2 are not Atom or iterable
     ValueError if a1 or a2 are iterable, but do not have exactly 3 items
     """
+    from parmed.topologyobjects import Atom
     if isinstance(a1, Atom):
         x1, y1, z1 = a1.xx, a1.xy, a1.xz
     else:
@@ -244,6 +245,53 @@ def distance2(a1, a2):
     dy = y1 - y2
     dz = z1 - z2
     return dx*dx + dy*dy + dz*dz
+
+def angle(a1, a2, a3):
+    """
+    Computes the cartesian distance between two atoms. Ignores periodic boundary
+    conditions.
+
+    Parameters
+    ----------
+    a1, a2, a3 : Atom or collection of 3 coordinates
+        The two atoms between whom the angle should be calculated (with a2 being
+        the central atoms)
+
+    Returns
+    -------
+    ang : float
+        The angle between the vectors a1-a2 and a2-a3 in radians
+
+    Notes
+    -----
+    This is done in pure Python, so it should not be used for large numbers of
+    distance calculations. For that, use numpy-vectorized routines and the numpy
+    coordinate arrays
+
+    Raises
+    ------
+    TypeError if a1, a2, or a3 are not Atom or iterable
+    ValueError if a1, a2, or a3 are iterable, but do not have exactly 3 items
+    """
+    from parmed.topologyobjects import Atom
+    if isinstance(a1, Atom):
+        x1, y1, z1 = a1.xx, a1.xy, a1.xz
+    else:
+        x1, y1, z1 = a1
+    if isinstance(a2, Atom):
+        x2, y2, z2 = a2.xx, a2.xy, a2.xz
+    else:
+        x2, y2, z2 = a2
+    if isinstance(a3, Atom):
+        x3, y3, z3 = a3.xx, a3.xy, a3.xz
+    else:
+        x3, y3, z3 = a3
+    v1 = np.array([x1 - x2, y1 - y2, z1 - z2])
+    v2 = np.array([x3 - x2, y3 - y2, y3 - y2])
+    l1 = np.sqrt(np.dot(v1, v1))
+    l2 = np.sqrt(np.dot(v2, v2))
+    cosa = np.dot(v1, v2) / (l1 * l2)
+    return np.arccos(cosa)
 
 # tuples are pairs of atomic numbers followed by the distance cutoff below which
 # they are considered "bonded". This is taken from Atom.cpp in cpptraj
