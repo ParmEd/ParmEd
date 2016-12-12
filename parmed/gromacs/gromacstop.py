@@ -1227,6 +1227,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.cmap_types = struct.cmap_types
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
+        gmxtop.adjust_types = struct.adjust_types
         gmxtop.combining_rule = struct.combining_rule
         gmxtop.box = struct.box
         if (struct.trigonal_angles or
@@ -1244,29 +1245,41 @@ class GromacsTopologyFile(Structure):
         else:
             scee_values = set()
             scnb_values = set()
-            for dihedral in struct.dihedrals:
-                if dihedral.type is None: continue
-                if isinstance(dihedral.type, DihedralTypeList):
-                    for dt in dihedral.type:
-                        if dt.scee:
-                            scee_values.add(dt.scee)
-                        if dt.scnb:
-                            scnb_values.add(dt.scnb)
-                else:
-                    if dihedral.type.scee:
-                        scee_values.add(dihedral.type.scee)
-                    if dihedral.type.scnb:
-                        scnb_values.add(dihedral.type.scnb)
-            if len(scee_values) > 1:
+            if struct.adjusts:
+                for adjust in struct.adjusts:
+                    if adjust.type is None: continue
+                    scee_values.add(1/adjust.type.chgscale)
+                    # Do not add scnb_values, since we can just set explicit
+                    # exception pair parameters in GROMACS (which this structure
+                    # already has)
+                # In order to specify specific pair parameters, we need to set
+                # gen_pairs to 'no' so that the pair-specific L-J parameters are
+                # printed to the topology file (rather than being auto-created)
+                gmxtop.defaults.gen_pairs = 'no'
+            else:
+                for dihedral in struct.dihedrals:
+                    if dihedral.type is None or dihedral.ignore_end: continue
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        for dt in dihedral.type:
+                            if dt.scee:
+                                scee_values.add(dt.scee)
+                            if dt.scnb:
+                                scnb_values.add(dt.scnb)
+                    else:
+                        if dihedral.type.scee:
+                            scee_values.add(dihedral.type.scee)
+                        if dihedral.type.scnb:
+                            scnb_values.add(dihedral.type.scnb)
+            if len(set('%.5f' % x for x in scee_values)) > 1:
                 raise GromacsError('Structure has mixed 1-4 scaling which is '
                                    'not supported by Gromacs')
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
-            if len(scee_values) == 1:
+            if len(set('%.5f' % x for x in scee_values)) == 1:
                 gmxtop.defaults.fudgeQQ = 1/scee_values[0]
             else:
                 gmxtop.defaults.fudgeQQ = 1.0
-            if len(scnb_values) == 1:
+            if len(set('%.5f' % x for x in scnb_values)) == 1:
                 gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
             else:
                 gmxtop.defaults.fudgeLJ = 1.0
@@ -1435,7 +1448,7 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.5f    %.5f\n' %
+                        parfile.write('%-5s %-5s  1  %.8f %.8f\n' %
                                       (key[0], key[1], param.sigma*lconv,
                                        param.epsilon*econv))
                     parfile.write('\n')
@@ -1761,8 +1774,8 @@ class GromacsTopologyFile(Structure):
                         key not in params.pair_types or
                         adjust.type != params.pair_types[key]) and \
                         adjust.type is not None:
-                    dest.write('  %.5f  %.5f' % (adjust.type.sigma*lconv,
-                                                 adjust.type.epsilon*econv))
+                    dest.write(' %.8f %.8f' % (adjust.type.sigma*lconv,
+                                               adjust.type.epsilon*econv))
                 dest.write('\n')
             dest.write('\n')
         elif struct.dihedrals:

@@ -121,6 +121,7 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(len(x[1][1]), 4)
 
     def test_split_single_atom(self):
+        """ Tests splitting of a structure with single atom residues """
         s = structure.Structure()
         na = pmd.periodic_table.AtomicNum['Na']
         cl = pmd.periodic_table.AtomicNum['Cl']

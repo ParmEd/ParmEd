@@ -38,7 +38,8 @@ from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
         TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
         NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
         TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
+        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
+        UnassignedAtomType)
 from parmed import unit as u, residue
 from parmed.utils import tag_molecules, PYPY, find_atom_pairs
 from parmed.utils.decorators import needs_openmm
@@ -1367,11 +1368,17 @@ class Structure(object):
             if len(involved_residues) == 1:
                 res = sel[0].residue
                 names = tuple(a.name for a in res)
-                if (res.name, len(res), names) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names)]].add(i)
+                charges = tuple('%.6f' % a.charge for a in res)
+                rmins = tuple('%.6f' % a.rmin for a in res)
+                epsilons = tuple('%.6f' % a.epsilon for a in res)
+                if (res.name, len(res), names, charges,
+                    rmins, epsilons) in res_molecules:
+                    counts[res_molecules[(res.name, len(res), names,
+                                          charges, rmins, epsilons)]].add(i)
                     continue
                 else:
-                    res_molecules[(res.name, len(res), names)] = len(structs)
+                    res_molecules[(res.name, len(res), names,
+                                   charges, rmins, epsilons)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
@@ -1380,6 +1387,9 @@ class Structure(object):
                                 'Residues must all be set'
                         if a1.residue.name != a2.residue.name: break
                         if a1.name != a2.name: break
+                        if '%.6f' % a1.charge != '%.6f' % a2.charge: break
+                        if '%.6f' % a1.rmin != '%.6f' % a2.rmin: break
+                        if '%.6f' % a1.epsilon != '%.6f' % a2.epsilon: break
                     else:
                         counts[j].add(i)
                         is_duplicate = True
