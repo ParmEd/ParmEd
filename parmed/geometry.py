@@ -302,13 +302,21 @@ def dihedral(a1, a2, a3, a4):
     v2 = p[1] - p[2]
     v3 = p[3] - p[2]
     # Take the cross product between v1-v2 and v2-v3
-    v1xv2 = np.cross(v1, v2)
-    v2xv3 = np.cross(v2, v3)
+    v1xv2 = _cross(v1, v2)
+    v2xv3 = _cross(v2, v3)
     # Now find the angle between these cross-products
     l1 = np.sqrt(np.dot(v1xv2, v1xv2))
     l2 = np.sqrt(np.dot(v2xv3, v2xv3))
     cosa = np.dot(v1xv2, v2xv3) / (l1 * l2)
     return np.degrees(np.arccos(cosa))
+
+def _cross(v1, v2):
+    """ Computes the cross-product """
+    # Can't use np.cross for pypy, since it's not yet implemented
+    return np.array([v1[1]*v2[2] - v1[2]*v2[1],
+                     v1[2]*v2[0] - v1[0]*v2[2],
+                     v1[0]*v2[1] - v1[1]*v2[0]])
+
 
 def _get_coords_from_atom_or_tuple(a):
     from parmed.topologyobjects import Atom
