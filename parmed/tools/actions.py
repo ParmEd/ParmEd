@@ -9,7 +9,7 @@ import math
 import numpy as np
 import os
 from parmed.topologyobjects import (Bond, BondType, Angle, AngleType, Dihedral,
-        DihedralType)
+        DihedralType, DihedralTypeList)
 from parmed.structure import Structure
 from parmed.formats.registry import load_file
 import parmed.gromacs as gromacs
@@ -1496,11 +1496,18 @@ class printBonds(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%19s %19s %10s %10s\n' %
+        retstr = ['%19s %19s %10s %10s' %
                         ('Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
         # Loop through all of the bonds without and inc hydrogen
         atomsel = set(self.mask.Selected())
         atomsel2 = set(self.mask2.Selected())
+        do_measured = self.parm.coordinates is not None
+        do_energy = all(b.type is not None for b in self.parm.bonds)
+        if do_measured:
+            retstr.append(' %10s' % 'Distance')
+            if do_energy:
+                retstr.append(' %10s' % 'Energy')
+        retstr.append('\n')
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
             found = False
@@ -1510,14 +1517,19 @@ class printBonds(Action):
                 found = True
             if not found: continue
             if bond.type is not None:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f\n' % (
+                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f' % (
                         atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                         atom2.name, atom2.type, bond.type.req, bond.type.k)
                 )
             else:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s\n' % (
+                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s' % (
                         atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                         atom2.name, atom2.type, 'N/A', 'N/A'))
+            if do_measured:
+                retstr.append(' %10.4f' % bond.measure())
+                if do_energy:
+                    retstr.append(' %10.4f' % bond.energy())
+            retstr.append('\n')
         return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1548,8 +1560,15 @@ class printAngles(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%19s  %19s  %19s %10s %10s\n' %
+        retstr = ['%19s  %19s  %19s %10s %10s' %
                         ('Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
+        do_measured = self.parm.coordinates is not None
+        do_energy = all(a.type is not None for a in self.parm.angles)
+        if do_measured:
+            retstr.append(' %10s' % 'Angle')
+            if do_energy:
+                retstr.append(' %10s' % 'Energy')
+        retstr.append('\n')
         if self.one_arg:
             atomsel = self.mask.Selection()
             for angle in self.parm.angles:
@@ -1559,17 +1578,22 @@ class printAngles(Action):
                     continue
                 if angle.type is not None:
                     retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name,
+                           '%10.4f %10.4f' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, angle.type.k,
                            angle.type.theteq)
                     )
                 else:
                     retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name,
+                           '%-10s %-10s' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
                     )
+                if do_measured:
+                    retstr.append(' %10.4f' % angle.measure())
+                    if do_energy:
+                        retstr.append(' %10.4f' % angle.energy())
+                retstr.append('\n')
         else:
             atomsel = set(self.mask.Selected())
             atomsel2 = set(self.mask2.Selected())
@@ -1588,17 +1612,22 @@ class printAngles(Action):
                 if not found: continue
                 if angle.type is not None:
                     retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f\n' % (atom1.idx+1, atom1.name,
+                           '%10.4f %10.4f' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, angle.type.k,
                            angle.type.theteq)
                     )
                 else:
                     retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s\n' % (atom1.idx+1, atom1.name,
+                           '%-10s %-10s' % (atom1.idx+1, atom1.name,
                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
                            atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
                     )
+                if do_measured:
+                    retstr.append(' %10.4f' % angle.measure())
+                    if do_energy:
+                        retstr.append(' %10.4f' % angle.energy())
+                retstr.append('\n')
         return ''.join(retstr)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1632,9 +1661,17 @@ class printDihedrals(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%21s  %19s  %19s  %19s %10s %10s %10s %10s %10s\n' % (
+        retstr = ['%21s  %19s  %19s  %19s %10s %10s %10s %10s %10s' % (
                 'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
                 'Phase', 'EEL Scale', 'VDW Scale')]
+        do_measured = self.parm.coordinates is not None
+        do_energy = all(isinstance(d.type, (DihedralType, DihedralTypeList))
+                        for d in self.parm.dihedrals)
+        if do_measured:
+            retstr.append(' %10s' % 'Dihedral')
+            if do_energy:
+                retstr.append(' %10s' % 'Energy')
+        retstr.append('\n')
         # Loop through all of the bonds without and inc hydrogen
         if self.one_mask:
             atomsel = self.mask.Selection()
@@ -1685,12 +1722,17 @@ class printDihedrals(Action):
                     else:
                         scee = scnb = k = per = phase = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10s %10s %10s %10s %10s\n' %
+                           ' %7d %4s (%4s) %10s %10s %10s %10s %10s' %
                            (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
                             atom2.name, atom2.type, atom3.idx+1, atom3.name,
                             atom3.type, atom4.idx+1, atom4.name, atom4.type,
                             k, per, phase, scee, scnb)
                 )
+                if do_measured:
+                    retstr.append(' %10.4f' % dihedral.measure())
+                    if do_energy:
+                        retstr.append(' %10.4f' % dihedral.energy())
+                retstr.append('\n')
         else:
             atomsel = set(self.mask.Selected())
             atomsel2 = set(self.mask2.Selected())
@@ -1749,11 +1791,16 @@ class printDihedrals(Action):
                         scee = scnb = k = per = phase = 'N/A'
                 retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
                            '(%4s)  %7d %4s (%4s) %10s %10s %10s %10s '
-                           '%10s\n' % (char, atom1.idx+1, atom1.name,
+                           '%10s' % (char, atom1.idx+1, atom1.name,
                             atom1.type, atom2.idx+1, atom2.name, atom2.type,
                             atom3.idx+1, atom3.name, atom3.type, atom4.idx+1,
                             atom4.name, atom4.type, k, per, phase, scee, scnb)
                 )
+                if do_measured:
+                    retstr.append(' %10.4f' % dihedral.measure())
+                    if do_energy:
+                        retstr.append(' %10.4f' % dihedral.energy())
+                retstr.append('\n')
 
         return ''.join(retstr)
 
