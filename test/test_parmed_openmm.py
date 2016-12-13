@@ -534,13 +534,29 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                          get_fn('top_all36_prot.rtf'))
+                                              get_fn('top_all36_prot.rtf'),
+                                              get_fn('toppar_water_ions.str'))
         )
         params.write(get_fn('charmm_conv.xml', written=True),
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrell'
                      )
+        )
+
+    def test_ljforce_charmm(self):
+        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files"""
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                              get_fn('top_all36_prot.rtf'))
+        )
+        params.write(get_fn('charmm_conv_lj.xml', written=True),
+                     provenance=dict(
+                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                         Reference='MacKerrell'
+                     ),
+                     separate_ljforce=True
         )
 
     def test_not_write_residues_with_same_templhash(self):
