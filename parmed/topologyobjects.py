@@ -1404,9 +1404,9 @@ class ThreeParticleExtraPointFrame(object):
                 # Get angle from law of cosines
                 theteq = math.acos((dp1*dp1+dp2*dp2-d12*d12)/(2*dp1*dp2))
             else:
-                for angle in a1.angles:
-                    if a2 in angle and a2 is not angle.atom2: #TODO test angle.type is None
-                        theteq = angle.type.theteq * DEG_TO_RAD
+                for ang in a1.angles:
+                    if a2 in ang and a2 is not ang.atom2: #TODO test angle.type is None
+                        theteq = ang.type.theteq * DEG_TO_RAD
                         break
                 else:
                     assert False, "Could not find matching angle"
@@ -1445,8 +1445,8 @@ class ThreeParticleExtraPointFrame(object):
             b2, b3 = b3, b2
         # See if there is an angle with both b1 and b2 in it
         found = False
-        for angle in ep.parent.angles:
-            if b1 in angle and b2 in angle:
+        for ang in ep.parent.angles:
+            if b1 in ang and b2 in ang:
                 found = True
                 break
         if found:
@@ -1454,7 +1454,7 @@ class ThreeParticleExtraPointFrame(object):
             # using law of cosines
             r1 = b1.type.req
             r2 = b2.type.req
-            theta = angle.type.theteq * DEG_TO_RAD
+            theta = ang.type.theteq * DEG_TO_RAD
             req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
         else:
             # See if there is a bond between particles 2 and 3
@@ -1581,17 +1581,17 @@ class OutOfPlaneExtraPointFrame(object):
         req13 = b2.type.req
         # See if there is an angle with both b1 and b2 in it
         found = False
-        for angle in ep.parent.angles:
-            if b1 in angle and b2 in angle:
+        for ang in ep.parent.angles:
+            if b1 in ang and b2 in ang:
                 found = True
                 break
         if found:
             # Compute the 2-3 distance from the two bond lengths and the angles
             # using law of cosines
-            t213 = angle.theteq
+            t213 = ang.theteq
             r1 = b1.type.req
             r2 = b2.type.req
-            theta = angle.type.theteq * DEG_TO_RAD
+            theta = ang.type.theteq * DEG_TO_RAD
             req23 = math.sqrt(r1*r1 + r2*r2 - 2*r1*r2*math.cos(theta))
         else:
             # See if there is a bond between particles 2 and 3
