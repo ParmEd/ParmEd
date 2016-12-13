@@ -1015,7 +1015,7 @@ class TestTopologyObjects(unittest.TestCase):
         a4.xx, a4.xy, a4.xz = 0.1, 0.6, 1
         self.assertAlmostEqual(d3.measure(), 80.537677791974374)
         self.assertAlmostEqual(d3.energy(),
-                d3.type.phi_k*(1+math.cos(d3.type.per*d3.measure()*DEG_TO_RAD-d3.type.phase)))
+                d3.type.phi_k*(1+math.cos(d3.type.per*d3.measure()*DEG_TO_RAD-d3.type.phase*DEG_TO_RAD)))
         # Now delete dihedral 3
         d3.delete()
         self.assertNotIn(atoms[0], atoms[3].dihedral_partners)
