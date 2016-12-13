@@ -1063,6 +1063,17 @@ class TestChamberParm(TestCaseRelative):
         self.assertAlmostEqual(energies['improper'], 0.3344, delta=5e-4)
         self.assertAlmostEqual(energies['cmap'], -0.5239, delta=5e-4)
         self.assertRelativeEqual(energies['nonbonded'], 9.2210, places=4)
+        # Now check that the energy functions in topologyobjects are correct
+        self.assertAlmostEqual(sum(b.energy() for b in parm.bonds),
+                               energies['bond'])
+        self.assertAlmostEqual(sum(a.energy() for a in parm.angles),
+                               energies['angle'])
+        self.assertAlmostEqual(sum(a.energy() for a in parm.urey_bradleys),
+                               energies['urey_bradley'])
+        self.assertAlmostEqual(sum(d.energy() for d in parm.dihedrals),
+                               energies['dihedral'])
+        self.assertAlmostEqual(sum(i.energy() for i in parm.impropers),
+                               energies['improper'])
 
     def test_gb1_energy(self): # HCT (igb=1)
         """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""

@@ -10,7 +10,7 @@ from copy import copy
 import math
 from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
-from parmed.geometry import distance2, angle
+from parmed.geometry import distance2, angle, dihedral
 import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
@@ -1933,18 +1933,18 @@ class Angle(object):
         if None in (self.atom1, self.atom2, self.atom3):
             return None
         try:
-            return angle(self.atom1, self.atom2, self.atom3) * RAD_TO_DEG
+            return angle(self.atom1, self.atom2, self.atom3)
         except AttributeError:
             return None
 
     def energy(self):
-        """ Measures the current bond energy
+        """ Measures the current angle energy
 
         Returns
         -------
         energy : float or None
-            Bond strain energy in kcal/mol. Return value is None if either the
-            coordinates of either atom is not set or the bond type is not set
+            Angle strain energy in kcal/mol. Return value is None if either the
+            coordinates of either atom is not set or the angle type is not set
         """
         a = self.measure()
         if self.type is None or a is None:
@@ -2207,6 +2207,50 @@ class Dihedral(_FourAtomTerm):
             _delete_from_list(self.atom4._dihedral_partners, self.atom3)
 
         self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.type = None
+
+    def measure(self):
+        """ Measures the current dihedral angle
+
+        Returns
+        -------
+        measurement : float or None
+            If the atoms have coordinates, returns the dihedral angle between
+            the four atoms. If any coordinates are missing, returns None
+        """
+        if None in (self.atom1, self.atom2, self.atom3, self.atom4):
+            return None
+        try:
+            return dihedral(self.atom1, self.atom2, self.atom3, self.atom4)
+        except AttributeError:
+            return None
+
+    def energy(self):
+        """ Measures the current dihedral angle energy
+
+        Returns
+        -------
+        energy : float or None
+            Dihedral angle energy in kcal/mol. Return value is None if either
+            the coordinates of either atom is not set or the angle type is not
+            set
+        """
+        phi = self.measure()
+        if phi is None or self.type is None:
+            return None
+        phi *=  DEG_TO_RAD
+        if isinstance(self.type, DihedralType):
+            return self.type.phi_k * (
+                    1 + math.cos(self.type.per*phi - self.type.phase*DEG_TO_RAD)
+            )
+        elif isinstance(self.type, DihedralTypeList):
+            e = 0
+            for term in self.type:
+                e += self.phi_k * (1 + math.cos(term.per*phi -
+                                                term.phase*DEG_TO_RAD))
+            return e
+        else:
+            raise NotImplementedError('Only DihedralType and DihedralTypeList '
+                                      'are supported for energy calculations')
 
     def __repr__(self):
         if self.improper:
@@ -2503,7 +2547,7 @@ class DihedralTypeList(list, _ListItem):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class UreyBradley(object):
+class UreyBradley(Bond):
     """
     A Urey-Bradley angle type with a set of parameters. It has the same
     functional form as a bond, but it is defined between two atoms forming a
@@ -2687,6 +2731,38 @@ class Improper(_FourAtomTerm):
         selfset = set([self.atom2.idx, self.atom3.idx, self.atom4.idx])
         otherset = set([thing[1], thing[2], thing[3]])
         return selfset == otherset
+
+    def measure(self):
+        """ Measures the current torsional angle
+
+        Returns
+        -------
+        measurement : float or None
+            If the atoms have coordinates, returns the torsional angle between
+            the four atoms. If any coordinates are missing, returns None
+        """
+        if None in (self.atom1, self.atom2, self.atom3, self.atom4):
+            return None
+        try:
+            return dihedral(self.atom1, self.atom2, self.atom3, self.atom4)
+        except AttributeError:
+            return None
+
+    def energy(self):
+        """ Measures the current dihedral angle energy
+
+        Returns
+        -------
+        energy : float or None
+            Dihedral angle energy in kcal/mol. Return value is None if either
+            the coordinates of either atom is not set or the angle type is not
+            set
+        """
+        phi = self.measure()
+        if phi is None or self.type is None:
+            return None
+        dphi = (self.type.psi_eq - phi) * DEG_TO_RAD
+        return self.type.psi_k * dphi * dphi
 
     def delete(self):
         """
