@@ -1045,6 +1045,11 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         act = PT.printBonds(gasparm, '@3', '@1')
         self.assertEqual(str(act), saved.PRINT_BONDS_2MASKS)
 
+    def test_print_bonds_with_measurements(self):
+        """ Test printBonds on AmberParm with measurements """
+        act = PT.printBonds(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        self.assertEqual(str(act), saved.PRINT_BONDS_MEASURE)
+
     def test_print_angles(self):
         """ Test printAngles on AmberParm """
         act = PT.printAngles(gasparm, '@1')
@@ -1067,6 +1072,11 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
         act = PT.printAngles(gasparm, '@7 @5 @1')
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
+
+    def test_print_angles_with_measurements(self):
+        """ Test printBonds on AmberParm with measurements """
+        act = PT.printAngles(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        self.assertEqual(str(act), saved.PRINT_ANGLES_MEASURE)
 
     def test_print_dihedrals(self):
         """ Test printDihedrals on AmberParm """
@@ -1091,6 +1101,11 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         str(PT.printDihedrals(gasparm, ':1-10', ':2-11'))
         str(PT.printDihedrals(gasparm, ':*', ':1-10', ':1-10', ':*'))
         str(PT.printDihedrals(gasparm, ':*', ':*', ':1-10', ':1-10'))
+
+    def test_print_angles_with_measurements(self):
+        """ Test printBonds on AmberParm with measurements """
+        act = PT.printDihedrals(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        self.assertEqual(str(act), saved.PRINT_DIHEDRALS_MEASURE)
 
     def test_set_molecules(self):
         """ Test setMolecules on AmberParm """

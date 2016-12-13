@@ -34,7 +34,33 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertEqual(geo.distance2(a1, (3, 4, 0)), 25)
         self.assertEqual(geo.distance2((0, 0, 0), a2), 25)
 
-    def testBoxLengthsVectors(self):
+    def test_angle(self):
+        """ Tests the angle calculation """
+        a1, a2, a3 = Atom(), Atom(), Atom()
+        a1.xx = a1.xy = a1.xz = 0
+        a2.xx, a2.xy, a2.xz = 1, 0, 0
+        a3.xx, a3.xy, a3.xz = 1, 1, 0
+        self.assertAlmostEqual(geo.angle(a1, a2, a3), 90)
+        # Check pathological cases
+        a3.xx, a3.xy, a3.xz = 2, 0, 0
+        self.assertAlmostEqual(geo.angle(a1, a2, a3), 180)
+        a3.xx = a3.xy = a3.xz = 0
+        self.assertAlmostEqual(geo.angle(a1, a2, a3), 0)
+
+    def test_dihedral(self):
+        """ Tests calculating a torsion angle between 4 points """
+        a1, a2, a3, a4 = Atom(), Atom(), Atom(), Atom()
+        a1.xx, a1.xy, a1.xz = 1, 0, 0
+        a2.xx, a2.xy, a2.xz = 0, 0, 0
+        a3.xx, a3.xy, a3.xz = 0, 0, 1
+        a4.xx, a4.xy, a4.xz = 0.1, 0.6, 1
+        self.assertAlmostEqual(geo.dihedral(a1, a2, a3, a4), 80.537677791974374)
+        self.assertAlmostEqual(
+                geo.dihedral([1, 0, 0], [0, 0, 0], [0, 0, 1], [0.1, 0.6, 1]),
+                80.537677791974374
+        )
+
+    def test_box_lengths_vectors(self):
         """ Test converting box lengths/angles to vectors and back again """
         a, b, c = geo.box_lengths_and_angles_to_vectors(1, 1, 1, 90, 90, 90)
 
@@ -49,7 +75,7 @@ class TestChemistryGeometry(unittest.TestCase):
         self.assertEqualVectors(leng, (50, 50, 50))
         self.assertEqualVectors(ang, (rad, rad, rad))
 
-    def testCenterOfMass(self):
+    def test_center_of_mass(self):
         """ Tests the center-of-mass calculator """
         almost_equal = np.testing.assert_array_almost_equal
         # Make some systems we know the answer for

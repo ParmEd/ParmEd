@@ -24,7 +24,7 @@ Boston, MA 02111-1307, USA.
 from __future__ import division
 
 from collections import defaultdict
-from parmed import unit as u, Atom
+from parmed import unit as u
 from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
 from parmed.vec3 import Vec3
 from math import pi, cos, sin, sqrt, acos
@@ -232,18 +232,97 @@ def distance2(a1, a2):
     TypeError if a1 or a2 are not Atom or iterable
     ValueError if a1 or a2 are iterable, but do not have exactly 3 items
     """
-    if isinstance(a1, Atom):
-        x1, y1, z1 = a1.xx, a1.xy, a1.xz
-    else:
-        x1, y1, z1 = a1
-    if isinstance(a2, Atom):
-        x2, y2, z2 = a2.xx, a2.xy, a2.xz
-    else:
-        x2, y2, z2 = a2
+    x1, y1, z1 = _get_coords_from_atom_or_tuple(a1)
+    x2, y2, z2 = _get_coords_from_atom_or_tuple(a2)
     dx = x1 - x2
     dy = y1 - y2
     dz = z1 - z2
     return dx*dx + dy*dy + dz*dz
+
+def angle(a1, a2, a3):
+    """
+    Computes the cartesian angle between three atoms. Ignores periodic boundary
+    conditions.
+
+    Parameters
+    ----------
+    a1, a2, a3 : Atom or collection of 3 coordinates
+        The three atoms between whom the angle should be calculated (with a2
+        being the central atoms)
+
+    Returns
+    -------
+    ang : float
+        The angle between the vectors a1-a2 and a2-a3 in radians
+
+    Notes
+    -----
+    This is done in pure Python, so it should not be used for large numbers of
+    distance calculations. For that, use numpy-vectorized routines and the numpy
+    coordinate arrays
+
+    Raises
+    ------
+    TypeError if a1, a2, or a3 are not Atom or iterable
+    ValueError if a1, a2, or a3 are iterable, but do not have exactly 3 items
+    """
+    x1, y1, z1 = _get_coords_from_atom_or_tuple(a1)
+    x2, y2, z2 = _get_coords_from_atom_or_tuple(a2)
+    x3, y3, z3 = _get_coords_from_atom_or_tuple(a3)
+    v1 = np.array([x2 - x1, y2 - y1, z2 - z1])
+    v2 = np.array([x2 - x3, y2 - y3, z2 - z3])
+    l1 = np.sqrt(np.dot(v1, v1))
+    l2 = np.sqrt(np.dot(v2, v2))
+    cosa = np.dot(v1, v2) / (l1 * l2)
+    return np.degrees(np.arccos(cosa))
+
+def dihedral(a1, a2, a3, a4):
+    """
+    Computes the angle between three vectors made up of four points (all three
+    vectors share one point with one other vector)
+
+    Parameters
+    ----------
+    a1, a2, a3, a4 : Atom or collection of 4 coordinates
+        The four atoms between whom the torsion angle should be calculated (with
+        a1 and a4 being the two end-point atoms not shared between two vectors)
+
+    Returns
+    -------
+    dihed : float
+        The measured dihedral between the 4 points
+    """
+    p = np.array([
+           _get_coords_from_atom_or_tuple(a1),
+           _get_coords_from_atom_or_tuple(a2),
+           _get_coords_from_atom_or_tuple(a3),
+           _get_coords_from_atom_or_tuple(a4),
+    ])
+    v1 = p[1] - p[0]
+    v2 = p[1] - p[2]
+    v3 = p[3] - p[2]
+    # Take the cross product between v1-v2 and v2-v3
+    v1xv2 = _cross(v1, v2)
+    v2xv3 = _cross(v2, v3)
+    # Now find the angle between these cross-products
+    l1 = np.sqrt(np.dot(v1xv2, v1xv2))
+    l2 = np.sqrt(np.dot(v2xv3, v2xv3))
+    cosa = np.dot(v1xv2, v2xv3) / (l1 * l2)
+    return np.degrees(np.arccos(cosa))
+
+def _cross(v1, v2):
+    """ Computes the cross-product """
+    # Can't use np.cross for pypy, since it's not yet implemented
+    return np.array([v1[1]*v2[2] - v1[2]*v2[1],
+                     v1[2]*v2[0] - v1[0]*v2[2],
+                     v1[0]*v2[1] - v1[1]*v2[0]])
+
+
+def _get_coords_from_atom_or_tuple(a):
+    from parmed.topologyobjects import Atom
+    if isinstance(a, Atom):
+        return a.xx, a.xy, a.xz
+    return a
 
 # tuples are pairs of atomic numbers followed by the distance cutoff below which
 # they are considered "bonded". This is taken from Atom.cpp in cpptraj
