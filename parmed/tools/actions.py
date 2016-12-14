@@ -1483,7 +1483,9 @@ class printBonds(Action):
     """
     Prints all of the bonds (with their details) for the given atoms in the
     mask. If a second mask is given, only bonds in which one atom appears in
-    *each* list will be printed.
+    *each* list will be printed. If coordinates and parameter types are present,
+    also print the actual distance (in Angstroms) and energy (in kcal/mol) for
+    each printed bond.
     """
     usage = '[<mask> [<mask>] ]'
     def init(self, arg_list):
@@ -1540,7 +1542,10 @@ class printAngles(Action):
     mask. If a second mask is given, only atoms whose central atom is in the
     second mask and another atom is in the first mask is printed. If a third
     mask is given, the central atom must be in the second mask and the other two
-    atoms must appear in the first *and* third masks (in any order)
+    atoms must appear in the first *and* third masks (in any order).
+
+    If coordinates and parameter types are present, the value of the angle (in
+    degrees) and its energy (in kcal/mol) are reported for each printed angle.
     """
     usage = '[<mask> [<mask> [<mask>] ] ]'
     def init(self, arg_list):
@@ -1639,6 +1644,10 @@ class printDihedrals(Action):
     mask are printed. Ordering is important here, so the first atom must be in
     the first mask, the second atom in the second, etc. The order can be
     precisely reversed, but no other ordering is recognized.
+
+    If coordinates and parameter types are present, the value of the torsion
+    angle (in degrees) and the energy of each dihedral (in kcal/mol) are
+    reported for each printed dihedral.
     """
     usage = '[<mask> [<mask> [<mask> [<mask>] ] ] ]'
     def init(self, arg_list):

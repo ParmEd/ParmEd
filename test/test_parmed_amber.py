@@ -1679,6 +1679,7 @@ class TestAmberMask(unittest.TestCase):
         mask_wldcrd6 = mask.AmberMask(parm, '@*')
         mask_wldcrd7 = mask.AmberMask(parm, '@CA|@*')
         mult_op = mask.AmberMask(parm, '(!:1&@CA)|!:2')
+        mask_res12 = mask.AmberMask(parm, ':1 | :2 ')
 
         # Check all of the masks
         self.assertEqual(sum(mask_res1.Selection(prnlev=9)), 13)
@@ -1818,6 +1819,8 @@ class TestAmberMask(unittest.TestCase):
                     self.assertEqual(val, 0)
             else:
                 self.assertEqual(val, 1)
+
+        self.assertEqual({parm.atoms[i].residue.idx for i in mask_res12.Selected()}, {0, 1})
 
     def test_illegal_masks(self):
         """ Test bad mask strings """
