@@ -261,7 +261,7 @@ class FortranFormat(object):
 
 @add_metaclass(FileFormatType)
 class AmberFormat(object):
-    """ 
+    """
     A class that can parse and print files stored in the Amber topology or MDL
     format. In particular, these files have the general form:
 
@@ -659,7 +659,7 @@ class AmberFormat(object):
         # Next read number excluded atoms
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, natom)
         self.add_flag('NUMBER_EXCLUDED_ATOMS', '10I8', data=tmp_data)
-      
+
         # Next read nonbonded parm index
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, ntypes**2)
         self.add_flag('NONBONDED_PARM_INDEX', '10I8', data=tmp_data)
@@ -671,7 +671,7 @@ class AmberFormat(object):
         # Next read residue pointer
         tmp_data, line_idx = read_integer(line_idx, prmtop_lines, nres)
         self.add_flag('RESIDUE_POINTER', '10I8', data=tmp_data)
-   
+
         # Next read bond force constant
         tmp_data, line_idx = read_float(line_idx, prmtop_lines, numbnd)
         self.add_flag('BOND_FORCE_CONSTANT', '5E16.8', data=tmp_data)
