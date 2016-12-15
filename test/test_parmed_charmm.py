@@ -25,9 +25,6 @@ import warnings
 warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
 get_fn = utils.get_fn
 
-param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                                        get_fn('par_all22_prot.inp'))
-
 class TestCharmmCoords(utils.FileIOTestCase):
     """ Test CHARMM coordinate file parsers """
 
@@ -258,9 +255,11 @@ class TestCharmmPsf(utils.FileIOTestCase):
 
     def test_psf_atomic_number_assignment(self):
         """ Checks that atomic number is assigned if just PSF is read """
+        param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                                get_fn('par_all22_prot.inp'))
         psf1 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         psf2 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-        psf2.load_parameters(parmset=param22, copy_parameters=False)
+        psf2.load_parameters(parmset=param22)
         for a1, a2 in zip(psf1.atoms, psf2.atoms):
             self.assertEqual(a1.atomic_number, a2.atomic_number)
 
@@ -544,6 +543,8 @@ class TestCharmmPsf(utils.FileIOTestCase):
     def test_copy_parameters(self):
         """ Tests copy_parameters option in load_parameters """
 
+        param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                                get_fn('par_all22_prot.inp'))
         top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         top.load_parameters(parmset=param22, copy_parameters=False)
         b = param22.bond_types[(top.atoms[0].type, top.atoms[1].type)]
@@ -933,6 +934,8 @@ class TestCharmmParameters(utils.FileIOTestCase):
 
     def test_parameters_from_structure(self):
         """ Test creation of CharmmParameterSet from a Structure """
+        param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
+                                                get_fn('par_all22_prot.inp'))
         top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         top.load_parameters(param22)
         params = parameters.CharmmParameterSet.from_structure(top)
