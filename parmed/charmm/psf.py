@@ -10,10 +10,11 @@ from __future__ import division
 
 from contextlib import closing
 from copy import copy as _copy
+from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
+from parmed.periodic_table import element_by_mass, AtomicNum
 from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
                     AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
                     Atom, DihedralType, ImproperType, UnassignedAtomType)
-from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
 from parmed.structure import needs_openmm, Structure
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
@@ -223,7 +224,8 @@ class CharmmPsfFile(Structure):
                 charge = conv(words[6], float, 'partial charge')
                 mass = conv(words[7], float, 'atomic mass')
                 props = words[8:]
-                atom = Atom(name=name, type=attype, charge=charge, mass=mass)
+                atom = Atom(name=name, type=attype, charge=charge, mass=mass,
+                            atomic_number=AtomicNum[element_by_mass(mass)])
                 atom.props = props
                 self.add_atom(atom, resname, resid, chain=segid,
                               inscode=inscode, segid=segid)
