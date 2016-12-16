@@ -395,7 +395,7 @@ class AmberParm(AmberFormat, Structure):
         other = super(AmberParm, self).__copy__()
         other.initialize_topology()
         # Copy coordinates, box, etc. if applicable
-        other.coordinates = self.get_coordinates('all')
+        other.coordinates = _copy.copy(self.get_coordinates('all'))
         other._box = _copy.copy(self._box)
         # Now we should have a full copy
         return other
