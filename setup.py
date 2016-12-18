@@ -145,7 +145,7 @@ if __name__ == '__main__':
           version=versioneer.get_version(),
           description='Amber parameter file editor',
           author='Jason Swails',
-          author_email='jason.swails -at- gmail.com',
+          author_email='jason.swails@gmail.com',
           url='http://jswails.wikidot.com/parmed',
           license='LGPL (or GPL if released with AmberTools)',
           packages=packages,
