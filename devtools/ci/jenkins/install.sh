@@ -16,3 +16,5 @@ conda install -y -n myenv nglview -c bioconda
 conda install -y --no-deps pysander
 
 source activate myenv
+
+python setup.py install
