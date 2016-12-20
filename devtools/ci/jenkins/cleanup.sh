@@ -1,0 +1,1 @@
+/bin/rm -fr ./miniconda
