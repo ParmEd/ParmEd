@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 set -ex
 
-export PATH=$PWD/miniconda/bin:$PATH
 source activate myenv
 
 do_coverage() {
@@ -11,7 +10,7 @@ do_coverage() {
     coverage report -m
 }
 
-sh devtools/ci/pyflakes_check.sh
+bash devtools/ci/pyflakes_check.sh
 echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"

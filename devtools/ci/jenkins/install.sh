@@ -1,9 +1,10 @@
+#!/bin/bash
 conda update conda -y
 conda install --yes conda-build jinja2 binstar pip
 conda config --add channels omnia
 conda config --add channels ambermd
 
-conda create -y -n myenv python=$1 \
+conda create -y -n myenv python=$PYTHON_VERSION \
     numpy scipy pandas nose openmm coverage nose-timer \
     python-coveralls ambermini netCDF4
 conda update -y -n myenv --all
