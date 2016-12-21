@@ -14,3 +14,4 @@ node { // Python 3.5
     stage('InstallBuildTest') {
         sh 'docker build --build-arg PYTHON_VERSION=3.5 .'
     }
+}
