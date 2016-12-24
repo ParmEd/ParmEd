@@ -2093,13 +2093,13 @@ class TestRegistry(FileIOTestCase):
 
         self.assertRaises(ValueError, create_metaclass)
 
-    def test_load_file_errors(self):
-        """ Test error handling in load_file """
-        fn = get_fn('test.file', written=True)
-        with open(fn, 'w') as f:
-            pass
-        os.chmod(fn, int('311', 8))
-        self.assertRaises(IOError, lambda: formats.load_file(fn))
+#   def test_load_file_errors(self):
+#       """ Test error handling in load_file """
+#       fn = get_fn('test.file', written=True)
+#       with open(fn, 'w') as f:
+#           pass
+#       os.chmod(fn, int('311', 8))
+#       self.assertRaises(IOError, lambda: formats.load_file(fn))
 
 class TestFileDownloader(unittest.TestCase):
     """ Tests load_file with URLs for each format """
