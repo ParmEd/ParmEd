@@ -23,6 +23,4 @@ coverage run --source=parmed --parallel-mode -m \
     nose -vs --with-timer --timer-ok=5s --timer-warning=12s \
          --timer-filter=warning,error .
 do_coverage
-echo "Running coveralls"
-coveralls
 echo "Done!"
