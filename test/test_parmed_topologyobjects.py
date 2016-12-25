@@ -256,7 +256,7 @@ class TestTopologyObjects(unittest.TestCase):
         lja1.atom_type.set_lj_params(1.0, 2.0, 1.1, 2.1)
         self.assertEqual(lja1.epsilon, 1.0)
         self.assertEqual(lja1.rmin, 2.0)
-        self.assertEqual(lja1.sigma, 2.0*2**(-1/6)*2)
+        self.assertEqual(lja1.sigma, 2.0*2**(-1.0/6)*2)
         lja2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
                     mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         lja2.sigma = 1.0
@@ -264,13 +264,13 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(lja2.sigma_14, 1.0)
         lja2.sigma_14 = 1.5
         self.assertEqual(lja2.sigma_14, 1.5)
-        self.assertEqual(lja2.rmin_14, 1.5*2**(1/6)/2)
-        self.assertAlmostEqual(lja2.rmin, 2**(1/6)/2)
+        self.assertEqual(lja2.rmin_14, 1.5*2**(1.0/6)/2)
+        self.assertAlmostEqual(lja2.rmin, 2**(1.0/6)/2)
         lja3 = Atom(atomic_number=6, name='C3', type='CT', charge=0.0,
                     mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
         lja3.atom_type = AtomType('CX', 2, 12.01, 6)
         lja3.atom_type.set_lj_params(2.0, 3.0)
-        self.assertEqual(lja3.sigma_14, 3*2**(-1/6)*2)
+        self.assertEqual(lja3.sigma_14, 3*2**(-1.0/6)*2)
 #       lja4 = Atom(atomic_number=6, name='C4', type='CT', charge=-0.1,
 #                   mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
 #       lja5 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
@@ -737,11 +737,11 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(atype.rmin, 1.2)
         self.assertEqual(atype.epsilon_14, 1.0)
         self.assertEqual(atype.rmin_14, 1.2)
-        self.assertEqual(atype.sigma, 1.2*2**(-1/6)*2)
+        self.assertEqual(atype.sigma, 1.2*2**(-1.0/6)*2)
         self.assertEqual(atype.sigma_14, atype.sigma)
         # Now try setting sigma and make sure it also changes rmin
         atype.sigma = 1.2
-        self.assertEqual(atype.rmin, 1.2*2**(1/6)/2)
+        self.assertEqual(atype.rmin, 1.2*2**(1.0/6)/2)
         atom.atom_type = atype
         self.assertEqual(atom.epsilon, atype.epsilon)
         self.assertEqual(atom.sigma, atype.sigma)
@@ -1889,11 +1889,11 @@ class TestTopologyObjects(unittest.TestCase):
         # Now add the type
         nbet = NonbondedExceptionType(1.0, 2.0, chgscale=3.0)
         nbet2 = NonbondedExceptionType(1.1, 2.0, chgscale=3.0)
-        self.assertEqual(nbet.sigma, 2**(-1/6))
+        self.assertEqual(nbet.sigma, 2**(-1.0/6))
         self.assertEqual(nbet, nbet)
         self.assertNotEqual(nbet, nbet2)
         nbet2.sigma = 1.0
-        self.assertEqual(nbet2.rmin*2**(-1/6), nbet2.sigma)
+        self.assertEqual(nbet2.rmin*2**(-1.0/6), nbet2.sigma)
         nbe.type = nbet
         self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' %
                          (a1, a2, nbet))

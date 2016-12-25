@@ -381,10 +381,10 @@ class GromacsTopologyFile(Structure):
                     sig, eps = (float(x) for x in words[3:5])
                     sig *= 10 # Convert to Angstroms
                     eps *= u.kilojoule.conversion_factor_to(u.kilocalorie)
-                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(1/6))
-                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(1/6))
-                    params.atom_types[a1].add_nbfix(a2, sig*2**(1/6), eps)
-                    params.atom_types[a2].add_nbfix(a1, sig*2**(1/6), eps)
+                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(1.0/6))
+                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(1.0/6))
+                    params.atom_types[a1].add_nbfix(a2, sig*2**(1.0/6), eps)
+                    params.atom_types[a2].add_nbfix(a1, sig*2**(1.0/6), eps)
                 elif current_section == 'bondtypes':
                     a, b, t = self._parse_bondtypes(line)
                     params.bond_types[(a, b)] = t
@@ -523,7 +523,7 @@ class GromacsTopologyFile(Structure):
         nbe.funct = funct
         nbet = None
         if funct == 1 and len(words) >= 5:
-            sig = float(words[3]) * 2**(1/6)
+            sig = float(words[3]) * 2**(1.0/6)
             eps = float(words[4])
             if (sig, eps) in exc_types:
                 nbe.type = exc_types[(sig, eps)]
@@ -753,7 +753,7 @@ class GromacsTopologyFile(Structure):
         eps = float(words[sigidx+1]) * u.kilojoules_per_mole
         typ = AtomType(attype, None, mass, atnum,
                        bond_type=bond_type, charge=chg)
-        typ.set_lj_params(eps, sig*2**(1/6)/2)
+        typ.set_lj_params(eps, sig*2**(1.0/6)/2)
         return attype, typ
 
     def _parse_bondtypes(self, line):
@@ -857,7 +857,7 @@ class GromacsTopologyFile(Structure):
         a1, a2 = words[:2]
 #       funct = int(words[2]) # ... unused
         cs6, cs12 = (float(x) for x in words[3:5])
-        cs6 *= u.nanometers * 2**(1/6)
+        cs6 *= u.nanometers * 2**(1.0/6)
         cs12 *= u.kilojoules_per_mole
         return a1, a2, NonbondedExceptionType(cs6, cs12, self.defaults.fudgeQQ)
 
@@ -975,7 +975,7 @@ class GromacsTopologyFile(Structure):
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
                 eps *= self.defaults.fudgeLJ
-                pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
+                pairtype = NonbondedExceptionType(sig*2**(1.0/6), eps,
                             self.defaults.fudgeQQ, list=self.adjust_types)
                 self.adjust_types.append(pairtype)
                 pair.type = pairtype

@@ -2556,7 +2556,7 @@ class Structure(object):
                              nonbondedMethod)
         force.setReactionFieldDielectric(reactionFieldDielectric)
         # Now add the particles
-        sigma_scale = length_conv * 2 * 2**(-1/6)
+        sigma_scale = length_conv * 2 * 2**(-1.0/6)
         for atom in self.atoms:
             force.addParticle(atom.charge, atom.sigma*length_conv,
                               abs(atom.epsilon*ene_conv))
@@ -2585,7 +2585,7 @@ class Structure(object):
         # Add the exceptions from the dihedral list IFF no explicit exceptions
         # (or *adjusts*) have been specified. If dihedral.ignore_end is False, a
         # 1-4 with the appropriate scaling factor is used as the exception.
-        sigma_scale = 2**(-1/6) * length_conv
+        sigma_scale = 2**(-1.0/6) * length_conv
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':

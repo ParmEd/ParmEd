@@ -292,7 +292,7 @@ class ChamberParm(AmberParm):
 
         self.LJ_14_radius = []  # empty LJ_radii so it can be re-filled
         self.LJ_14_depth = []   # empty LJ_depths so it can be re-filled
-        one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1/6th power
+        one_sixth = 1.0 / 6.0 # we need to raise some numbers to the 1.0/6th power
 
         for i in range(ntypes):
             lj_index = self.parm_data["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1

@@ -801,7 +801,7 @@ class AmberParm(AmberFormat, Structure):
         self.LJ_radius = []  # empty LJ_radii so it can be re-filled
         self.LJ_depth = []   # empty LJ_depths so it can be re-filled
         self.LJ_types = {}   # empty LJ_types so it can be re-filled
-        one_sixth = 1 / 6    # we need to raise some numbers to the 1/6th power
+        one_sixth = 1.0/6    # we need to raise some numbers to the 1.0/6th power
 
         pd = self.parm_data
         acoef = pd['LENNARD_JONES_ACOEF']
@@ -843,9 +843,9 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
         pd = self.parm_data
         ntypes = self.pointers['NTYPES']
-        fac = 2**(-1/6) * 2
+        fac = 2**(-1.0/6) * 2
         LJ_sigma = [x*fac for x in self.LJ_radius]
-        fac = 2**(1/6)
+        fac = 2**(1.0/6)
         for i in range(ntypes):
             for j in range(i, ntypes):
                 index = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
@@ -880,11 +880,11 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        fac = 2**(-1/6) * 2
+        fac = 2**(-1.0/6) * 2
         LJ_sigma = [x*fac for x in self.LJ_radius]
         pd = self.parm_data
         ntypes = self.parm_data['POINTERS'][NTYPES]
-        fac = 2**(1/6)
+        fac = 2**(1.0/6)
         for i in range(ntypes):
             for j in range(ntypes):
                 idx = pd['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
@@ -1793,7 +1793,7 @@ class AmberParm(AmberFormat, Structure):
             bcoef = self.parm_data['LENNARD_JONES_BCOEF']
         nbidx = self.parm_data['NONBONDED_PARM_INDEX']
         ntypes = self.parm_data['POINTERS'][NTYPES]
-        sigma_scale = 2**(-1/6) * length_conv
+        sigma_scale = 2**(-1.0/6) * length_conv
         for ii in range(nonbfrc.getNumExceptions()):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
             if qq.value_in_unit(u.elementary_charge**2) == 0 and (
@@ -1823,8 +1823,8 @@ class AmberParm(AmberFormat, Structure):
                 epsilon = 0.0
                 sigma = 0.5
             elif idx >= 0:
-                # b / a == 2 / r^6 --> (a / b * 2)^(1/6) = rmin
-                rmin = (a / b * 2)**(1/6)
+                # b / a == 2 / r^6 --> (a / b * 2)^(1.0/6) = rmin
+                rmin = (a / b * 2)**(1.0/6)
                 epsilon = b / (2 * rmin**6) * ene_conv * one_scnb
                 sigma = rmin * sigma_scale
             nonbfrc.setExceptionParameters(ii, i, j, qq, sigma, epsilon)
@@ -1886,7 +1886,7 @@ class AmberParm(AmberFormat, Structure):
                 comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
             elif self.combining_rule == 'geometric':
                 comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-            fac = 2**(1/6)
+            fac = 2**(1.0/6)
             for dihedral in self.dihedrals:
                 if dihedral.ignore_end: continue
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
@@ -1927,7 +1927,7 @@ class AmberParm(AmberFormat, Structure):
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
             comb_sig = lambda sig1, sig2: sqrt(sig1 * sig2)
-        fac = 2**(1/6)
+        fac = 2**(1.0/6)
         for atom in self.atoms:
             if isinstance(atom, ExtraPoint): continue
             for batom in atom.bond_partners:

@@ -644,11 +644,11 @@ class Atom(_ListItem):
     @property
     def sigma(self):
         """ Lennard-Jones sigma parameter -- directly related to Rmin """
-        return self.rmin * 2**(-1/6) * 2
+        return self.rmin * 2**(-1.0/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self._rmin = value * 2**(1/6) / 2
+        self._rmin = value * 2**(1.0/6) / 2
 
     @property
     def epsilon(self):
@@ -687,12 +687,12 @@ class Atom(_ListItem):
             if (self.atom_type is UnassignedAtomType or
                     self.atom_type.rmin_14 is None):
                 return self.sigma
-            return self.atom_type.rmin_14 * 2**(-1/6) * 2
-        return self._rmin14 * 2**(-1/6) * 2
+            return self.atom_type.rmin_14 * 2**(-1.0/6) * 2
+        return self._rmin14 * 2**(-1.0/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self._rmin14 = value * 2**(1/6) / 2
+        self._rmin14 = value * 2**(1.0/6) / 2
 
     @property
     def epsilon_14(self):
@@ -4612,11 +4612,11 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
 
     @property
     def sigma(self):
-        return self.rmin * 2**(-1/6)
+        return self.rmin * 2**(-1.0/6)
 
     @sigma.setter
     def sigma(self, value):
-        self.rmin = value * 2**(1/6)
+        self.rmin = value * 2**(1.0/6)
 
     def __repr__(self):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
@@ -4731,7 +4731,7 @@ class AtomType(object):
         If set, it is the Lennard-Jones Rmin/2 parameter of this atom type in
         1-4 nonbonded interactions
     sigma : ``float``
-        This is the sigma parameter, which is just equal to Rmin*2^(1/6)
+        This is the sigma parameter, which is just equal to Rmin*2^(1.0/6)
     nbfix : ``dict(str:tuple)``
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
@@ -4884,21 +4884,21 @@ class AtomType(object):
 
     @property
     def sigma(self):
-        """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin * 2**(-1/6) * 2
+        """ Sigma is Rmin / 2^(1.0/6) """
+        return self.rmin * 2**(-1.0/6) * 2
 
     @sigma.setter
     def sigma(self, value):
-        self.rmin = value * 2**(1/6) / 2
+        self.rmin = value * 2**(1.0/6) / 2
 
     @property
     def sigma_14(self):
-        """ Sigma is Rmin / 2^(1/6) """
-        return self.rmin_14 * 2**(-1/6) * 2
+        """ Sigma is Rmin / 2^(1.0/6) """
+        return self.rmin_14 * 2**(-1.0/6) * 2
 
     @sigma_14.setter
     def sigma_14(self, value):
-        self.rmin_14 = value * 2**(1/6) / 2
+        self.rmin_14 = value * 2**(1.0/6) / 2
 
     def __str__(self):
         return self.name

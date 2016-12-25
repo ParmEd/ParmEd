@@ -382,7 +382,7 @@ def _process_nonbonded(struct, force):
             typemap[key] = atom_type = AtomType(atype_name, None, atom.mass,
                                                 atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
-        rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
+        rmin = sig.value_in_unit(u.angstroms) * 2**(1.0/6) / 2 # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
         atom_type.set_lj_params(eps, rmin)
         atom.atom_type = atom_type
@@ -416,7 +416,7 @@ def _process_nonbonded(struct, force):
             if q != 0:
                 raise ValueError("Can't scale charge product 0 to match %s" % q)
             chgscale = 1
-        nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
+        nbtype = NonbondedExceptionType(sig*2**(1.0/6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
         struct.adjust_types.append(nbtype)
     struct.adjust_types.claim()
