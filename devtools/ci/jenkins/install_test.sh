@@ -1,10 +1,5 @@
 #!/bin/bash
-# Create a new conda environment based off a random UUID to make sure we don't
-# collide with anybody else (but first make sure we are using the Jenkins-owned
-# Miniconda build so we don't have issues with permissions)
-module load conda/jenkins
-conda create -n ${GIT_COMMIT}-${PYTHON_VERSION} python=${PYTHON_VERSION}
-source activate ${GIT_COMMIT}-${PYTHON_VERSION}
+# Make sure we upgrade everything
 conda update conda -y
 conda install --yes conda-build jinja2 binstar pip
 conda config --add channels omnia
