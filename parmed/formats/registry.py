@@ -54,6 +54,20 @@ class FileFormatType(type):
                 PARSER_ARGUMENTS[name] = ()
         super(FileFormatType, cls).__init__(name, bases, dct)
 
+def get_id_format(filename):
+    for name, cls in iteritems(PARSER_REGISTRY):
+        if not hasattr(cls, 'id_format'):
+            continue
+        try:
+            if cls.id_format(filename):
+                break
+        except UnicodeDecodeError:
+            continue
+    else:
+        # We found no file format
+        raise FormatNotFound('Could not identify file format')
+    return name, cls
+
 def load_file(filename, *args, **kwargs):
     """
     Identifies the file format of the specified file and returns its parsed
@@ -169,17 +183,7 @@ def load_file(filename, *args, **kwargs):
     elif not os.access(filename, os.R_OK):
         raise IOError('%s does not have read permissions set' % filename)
 
-    for name, cls in iteritems(PARSER_REGISTRY):
-        if not hasattr(cls, 'id_format'):
-            continue
-        try:
-            if cls.id_format(filename):
-                break
-        except UnicodeDecodeError:
-            continue
-    else:
-        # We found no file format
-        raise FormatNotFound('Could not identify file format')
+    name, cls = get_id_format(filename)
 
     # We found a file format that is compatible. Parse it!
     other_args = PARSER_ARGUMENTS[name]
