@@ -13,6 +13,7 @@ from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
+from parmed.utils.six.moves import StringIO
 from parmed.utils.six import integer_types
 from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
@@ -1084,14 +1085,19 @@ class TestStructureSave(FileIOTestCase):
         self.sys2.save(get_fn('test2.pdb', written=True))
         self.sys3.save(get_fn('test3.pdb', written=True))
         self.sys4.save(get_fn('test4.pdb', written=True))
+        stringio_file = StringIO()
+        self.sys4.save(stringio_file, format='pdb')
+        stringio_file.seek(0)
         x1 = pmd.formats.PDBFile.parse(get_fn('test.pdb', written=True))
         x2 = pmd.formats.PDBFile.parse(get_fn('test2.pdb', written=True))
         x3 = pmd.formats.PDBFile.parse(get_fn('test3.pdb', written=True))
         x4 = pmd.formats.PDBFile.parse(get_fn('test4.pdb', written=True))
+        x5 = pmd.formats.PDBFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
         self.assertEqual([a.name for a in self.sys4.atoms], [a.name for a in x4.atoms])
+        self.assertEqual([a.name for a in self.sys4.atoms], [a.name for a in x5.atoms])
         # Make sure atom types as integers are preserved
         self.sys4.load_parameters(
                 pmd.charmm.CharmmParameterSet(
@@ -1110,12 +1116,17 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.cif', written=True))
         self.sys2.save(get_fn('test2.cif', written=True))
         self.sys3.save(get_fn('test3.cif', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='cif')
+        stringio_file.seek(0)
         x1 = pmd.formats.CIFFile.parse(get_fn('test.cif', written=True))
         x2 = pmd.formats.CIFFile.parse(get_fn('test2.cif', written=True))
         x3 = pmd.formats.CIFFile.parse(get_fn('test3.cif', written=True))
+        x4 = pmd.formats.CIFFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         # Try a gzip and a bzip2 file
         self.sys1.save(get_fn('test.cif.bz2', written=True))
         self.sys1.save(get_fn('test.cif.gz', written=True))

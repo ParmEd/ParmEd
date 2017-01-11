@@ -1424,9 +1424,10 @@ class Structure(object):
 
         Parameters
         ----------
-        fname : str
+        fname : str or file-like object
             Name of the file to save. If ``format`` is ``None`` (see below), the
-            file type will be determined based on the filename extension. If the
+            file type will be determined based on the filename extension. If ``fname``
+            is file-like object, ``format`` must be provided. If the
             type cannot be determined, a ValueError is raised.
         format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
@@ -1469,8 +1470,9 @@ class Structure(object):
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
-        if os.path.exists(fname) and not overwrite:
-            raise IOError('%s exists; not overwriting' % fname)
+        if not hasattr(fname, 'write'):
+            if os.path.exists(fname) and not overwrite:
+                raise IOError('%s exists; not overwriting' % fname)
         all_ints = True
         for atom in self.atoms:
             if (isinstance(atom.type, integer_types) and
