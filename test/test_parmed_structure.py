@@ -1111,6 +1111,10 @@ class TestStructureSave(FileIOTestCase):
         for a in self.sys4.atoms:
             self.assertIsInstance(a.type, int)
 
+        # raise if specifying file-like object and format is None
+        stringio_file = StringIO()
+        self.assertRaises(RuntimeError, lambda: self.sys4.save(stringio_file))
+
     def test_save_cif(self):
         """ Test saving various Structure instances as a PDBx/mmCIF """
         self.sys1.save(get_fn('test.cif', written=True))

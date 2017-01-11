@@ -1474,6 +1474,9 @@ class Structure(object):
         if not hasattr(fname, 'write'):
             if os.path.exists(fname) and not overwrite:
                 raise IOError('%s exists; not overwriting' % fname)
+        else:
+            if format is None:
+                raise RuntimeError('Must provide supported format if using file-like object')
         all_ints = True
         for atom in self.atoms:
             if (isinstance(atom.type, integer_types) and
