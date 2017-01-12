@@ -1363,12 +1363,17 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.gro', written=True))
         self.sys2.save(get_fn('test2.gro', written=True))
         self.sys3.save(get_fn('test3.gro', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='gro')
+        stringio_file.seek(0)
         x1 = pmd.gromacs.GromacsGroFile.parse(get_fn('test.gro', written=True))
         x2 = pmd.gromacs.GromacsGroFile.parse(get_fn('test2.gro', written=True))
         x3 = pmd.gromacs.GromacsGroFile.parse(get_fn('test3.gro', written=True))
+        x4 = pmd.gromacs.GromacsGroFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
 
     def test_save_rst7(self):
         """ Test saving various Structure instances as Amber ASCII restarts """
