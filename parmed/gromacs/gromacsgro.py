@@ -227,6 +227,8 @@ class GromacsGroFile(object):
             own_handle = True
         elif not hasattr(dest, 'write'):
             raise TypeError('dest must be a file name or file-like object')
+        else:
+            own_handle = False
 
         dest.write('GROningen MAchine for Chemical Simulation\n')
         dest.write('%5d\n' % len(struct.atoms))
