@@ -327,8 +327,11 @@ class AmberFormat(object):
         is_fmt : bool
             True if it is an Amber-style format, False otherwise
         """
-        with closing(genopen(filename, 'r')) as f:
-            lines = [f.readline() for i in range(5)]
+        if isinstance(filename, string_types):
+            with closing(genopen(filename, 'r')) as f:
+                lines = [f.readline() for i in range(5)]
+        elif hasattr(filename, 'readline'):
+                lines = [filename.readline() for i in range(5)]
 
         if lines[0].startswith('%VERSION'):
             return True

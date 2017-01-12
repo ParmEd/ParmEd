@@ -14,6 +14,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
+from parmed.utils.six import string_types
 import parmed.unit as u
 from parmed.vec3 import Vec3
 import warnings as _warnings
@@ -59,7 +60,14 @@ class _AmberAsciiCoordinateFile(object):
             self._writebox = False
         else:
             raise ValueError("%s mode must be 'r' or 'w'" % type(self).__name__)
-        self._file = genopen(fname, mode)
+        if isinstance(fname, string_types):
+            self._file = genopen(fname, mode)
+            self._own_handle = True
+        elif hasattr(fname, 'read'):
+            self._file = fname
+            self._own_handle = False
+        else:
+            raise RuntimeError("Don't know how to handle %s" % fname)
 
         self.natom = natom
         self.hasbox = hasbox
@@ -87,7 +95,8 @@ class _AmberAsciiCoordinateFile(object):
 
     def close(self):
         """ Close the open file handler """
-        self.closed or self._file.close()
+        if self._own_handle:
+            self.closed or self._file.close()
         self.closed = True
 
     def __del__(self):
@@ -132,9 +141,12 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         is_fmt : bool
             True if it is an Amber restart/inpcrd file. False otherwise
         """
-        f = genopen(filename, 'r')
-        lines = [f.readline() for i in range(5)]
-        f.close()
+        if isinstance(filename, string_types):
+            f = genopen(filename, 'r')
+            lines = [f.readline() for i in range(5)]
+            f.close()
+        elif hasattr(filename, 'readline'):
+            lines = [filename.readline() for i in range(5)]
         # Look for natom
         words = lines[1].split()
         if len(words) > 2 or len(words) < 1:

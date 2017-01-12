@@ -1387,15 +1387,19 @@ class TestStructureSave(FileIOTestCase):
         f2 = get_fn('test1.restrt', written=True)
         f3 = get_fn('test2.inpcrd', written=True)
         f4 = get_fn('test3.amberrst', written=True)
+        stringio_file = StringIO()
         self.sys1.save(f1)
         self.sys2.save(f2)
         self.sys3.save(f3)
         self.sys1.save(f4, format='rst7')
+        self.sys1.save(stringio_file, format='rst7')
+        stringio_file.seek(0)
 
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f1))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f2))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f3))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f4))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(stringio_file))
 
         np.testing.assert_allclose(self.sys1.coordinates,
                                    pmd.load_file(f1).coordinates[0],
