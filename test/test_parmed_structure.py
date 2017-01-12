@@ -1254,9 +1254,13 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.psf', written=True))
         self.sys2.save(get_fn('test2.psf', written=True))
         self.sys3.save(get_fn('test3.psf', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='psf')
+        stringio_file.seek(0)
         x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
         x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
         x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
+        x4 = pmd.charmm.CharmmPsfFile(stringio_file)
         # PSF files save "improper periodic" torsions under the improper list,
         # only moving them over to the dihedral list once parameters have been
         # assigned and the fact that it's a periodic improper torsion becomes
@@ -1282,6 +1286,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
