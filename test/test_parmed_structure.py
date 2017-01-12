@@ -1088,6 +1088,8 @@ class TestStructureSave(FileIOTestCase):
         stringio_file = StringIO()
         self.sys4.save(stringio_file, format='pdb')
         stringio_file.seek(0)
+        self.assertTrue(pmd.formats.PDBFile.id_format(stringio_file))
+        stringio_file.seek(0)
         x1 = pmd.formats.PDBFile.parse(get_fn('test.pdb', written=True))
         x2 = pmd.formats.PDBFile.parse(get_fn('test2.pdb', written=True))
         x3 = pmd.formats.PDBFile.parse(get_fn('test3.pdb', written=True))

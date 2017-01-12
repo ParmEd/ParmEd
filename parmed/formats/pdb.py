@@ -100,7 +100,7 @@ class PDBFile(object):
 
         Parameters
         ----------
-        filename : str
+        filename : str or file object
             Name of the file to check format for
 
         Returns
@@ -108,8 +108,15 @@ class PDBFile(object):
         is_fmt : bool
             True if it is a PDB file
         """
-        with closing(genopen(filename, 'r')) as f:
-            for line in f:
+        if isinstance(filename, string_types):
+            own_handle = True
+            fileobject = genopen(filename, 'r')
+        elif hasattr(filename, 'read'):
+            own_handle = False
+            fileobject = filename
+
+        try:
+            for line in fileobject:
                 if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
                         'MASTER', 'AUTHOR', 'CAVEAT', 'COMPND', 'EXPDTA',
                         'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
@@ -159,6 +166,9 @@ class PDBFile(object):
                 else:
                     return False
             return False
+        finally:
+            if own_handle:
+                fileobject.close()
 
     #===================================================
 
