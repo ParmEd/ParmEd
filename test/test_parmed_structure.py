@@ -1166,8 +1166,13 @@ class TestStructureSave(FileIOTestCase):
     def test_save_mol3(self):
         """ Test saving various Structure instances as Mol3 files """
         self.sys1.save(get_fn('test.mol3', written=True))
+        stringio_file = StringIO()
+        self.sys1.save(stringio_file, format='mol3')
+        stringio_file.seek(0)
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
+        x2 = pmd.formats.Mol2File.parse(stringio_file, structure=True)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x2.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         with open(get_fn('test.mol3', written=True), 'r') as f:
             for line in f:
