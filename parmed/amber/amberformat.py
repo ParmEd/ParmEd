@@ -492,45 +492,40 @@ class AmberFormat(object):
         version = None
 
         if isinstance(fname, string_types):
-            prm = genopen(fname, 'r')
-            own_handle = True
+            with closing(genopen(fname, 'r')) as prm:
+                lines = prm.readlines()
         else:
-            prm = fname
-            own_handle = False
+            lines = fname.readlines()
 
         # Open up the file and read the data into memory
-        try:
-            for line in prm:
-                if line[0] == '%':
-                    if line[0:8] == '%VERSION':
-                        self.version = line.strip()
-                        continue
-                    elif line[0:5] == '%FLAG':
-                        current_flag = line[6:].strip()
-                        self.formats[current_flag] = ''
-                        self.parm_data[current_flag] = []
-                        self.parm_comments[current_flag] = []
-                        self.flag_list.append(current_flag)
-                        continue
-                    elif line[0:8] == '%COMMENT':
-                        self.parm_comments[current_flag].append(line[9:].strip())
-                        continue
-                    elif line[0:7] == '%FORMAT':
-                        fmt = FortranFormat(fmtre.match(line).groups()[0])
-                        # RESIDUE_ICODE can have a lot of blank data...
-                        if current_flag == 'RESIDUE_ICODE':
-                            fmt.read = fmt._read_nostrip
-                        self.formats[current_flag] = fmt
-                        continue
-                try:
-                    self.parm_data[current_flag].extend(fmt.read(line))
-                except KeyError:
-                    if version is not None:
-                        raise
-                    break # Skip out of the loop down to the old-format parser
-        finally:
-            if own_handle:
-                prm.close()
+        for line in lines:
+            if line[0] == '%':
+                if line[0:8] == '%VERSION':
+                    self.version = line.strip()
+                    continue
+                elif line[0:5] == '%FLAG':
+                    current_flag = line[6:].strip()
+                    self.formats[current_flag] = ''
+                    self.parm_data[current_flag] = []
+                    self.parm_comments[current_flag] = []
+                    self.flag_list.append(current_flag)
+                    continue
+                elif line[0:8] == '%COMMENT':
+                    self.parm_comments[current_flag].append(line[9:].strip())
+                    continue
+                elif line[0:7] == '%FORMAT':
+                    fmt = FortranFormat(fmtre.match(line).groups()[0])
+                    # RESIDUE_ICODE can have a lot of blank data...
+                    if current_flag == 'RESIDUE_ICODE':
+                        fmt.read = fmt._read_nostrip
+                    self.formats[current_flag] = fmt
+                    continue
+            try:
+                self.parm_data[current_flag].extend(fmt.read(line))
+            except KeyError:
+                if version is not None:
+                    raise
+                break # Skip out of the loop down to the old-format parser
 
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
@@ -542,8 +537,7 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            with closing(genopen(self.name, 'r')) as f:
-                self.rdparm_old(f.readlines())
+            self.rdparm_old(lines)
         return
 
     #===================================================

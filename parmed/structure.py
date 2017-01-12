@@ -1428,8 +1428,7 @@ class Structure(object):
             Name of the file or file-like object to save. If ``format`` is 
             ``None`` (see below), the file type will be determined based on 
             the filename extension. If ``fname`` is file-like object,  ``format`` 
-            must be  provided and only {'pdb', 'cif', 'mol2'} formats 
-            are supported. If the type cannot be determined, a ValueError is raised.
+            must be  provided. If the type cannot be determined, a ValueError is raised.
         format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
