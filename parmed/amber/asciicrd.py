@@ -76,7 +76,8 @@ class _AmberAsciiCoordinateFile(object):
         self._full_lines_per_frame = self.natom * 3 // self.CRDS_PER_LINE
         self._nextras = self.natom * 3 - (self._full_lines_per_frame *
                                           self.CRDS_PER_LINE)
-        self.closed = False
+        if self._own_handle:
+            self.closed = False
         if self._status == 'old':
             self._parse()
         elif self._status == 'new':
