@@ -498,13 +498,15 @@ class AmberFormat(object):
         version = None
 
         if isinstance(fname, string_types):
-            with closing(genopen(fname, 'r')) as prm:
-                lines = prm.readlines()
+            prm = genopen(fname, 'r')
+            own_handle = True
         else:
-            lines = fname.readlines()
+            prm = fname
+            own_handle = True
+            assert hasattr(prm, 'read'), 'must be a file object'
 
         # Open up the file and read the data into memory
-        for line in lines:
+        for line in prm:
             if line[0] == '%':
                 if line[0:8] == '%VERSION':
                     self.version = line.strip()
@@ -533,6 +535,8 @@ class AmberFormat(object):
                     raise
                 break # Skip out of the loop down to the old-format parser
 
+        if own_handle:
+            prm.close()
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
             CHARGE_SCALE = CHARMM_ELECTROSTATIC
@@ -543,7 +547,7 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            self.rdparm_old(lines)
+            self.rdparm_old(self.name)
         return
 
     #===================================================
