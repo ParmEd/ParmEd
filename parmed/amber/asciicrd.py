@@ -95,8 +95,7 @@ class _AmberAsciiCoordinateFile(object):
 
     def close(self):
         """ Close the open file handler """
-        if self._own_handle:
-            self.closed or self._file.close()
+        self.closed or self._file.close()
         self.closed = True
 
     def __del__(self):
