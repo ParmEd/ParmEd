@@ -145,8 +145,11 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             f = genopen(filename, 'r')
             lines = [f.readline() for i in range(5)]
             f.close()
-        elif hasattr(filename, 'readline'):
+        elif (hasattr(filename, 'readline') and hasattr(filename, 'seek')
+              and hasattr(filename, 'tell')):
+            cur = filename.tell()
             lines = [filename.readline() for i in range(5)]
+            filename.seek(cur)
         # Look for natom
         words = lines[1].split()
         if len(words) > 2 or len(words) < 1:

@@ -330,8 +330,11 @@ class AmberFormat(object):
         if isinstance(filename, string_types):
             with closing(genopen(filename, 'r')) as f:
                 lines = [f.readline() for i in range(5)]
-        elif hasattr(filename, 'readline'):
-                lines = [filename.readline() for i in range(5)]
+        elif (hasattr(filename, 'readline') and hasattr(filename, 'seek')
+              and hasattr(filename, 'tell')):
+            cur = filename.tell()
+            lines = [filename.readline() for i in range(5)]
+            filename.seek(cur)
 
         if lines[0].startswith('%VERSION'):
             return True
