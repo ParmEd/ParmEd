@@ -88,6 +88,9 @@ class TestFileLoader(FileIOTestCase):
         self.assertIsInstance(parm, Structure)
         np.testing.assert_almost_equal(parm.box, inpcrd.box)
         np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
+        # dummy testing to assign box
+        # issue: 
+        parm.box = [0.]*6
 
     def test_load_amber_traj_ascii(self):
         """ Tests automatic loading of Amber mdcrd file """
