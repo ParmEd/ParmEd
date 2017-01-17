@@ -89,7 +89,7 @@ class TestFileLoader(FileIOTestCase):
         np.testing.assert_almost_equal(parm.box, inpcrd.box)
         np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
         # dummy testing to assign box
-        # issue: 
+        # issue #778
         parm.box = [0.]*6
 
     def test_load_amber_traj_ascii(self):
