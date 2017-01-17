@@ -201,7 +201,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self = cls(filename)
         if structure:
             obj = Structure()
-            for i in range(self.natom):
+            for _ in range(self.natom):
                 # fake
                 obj.add_atom(Atom(), resname='XXX', resnum=0)
             obj.box = self.box
