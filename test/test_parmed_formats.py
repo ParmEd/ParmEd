@@ -83,7 +83,6 @@ class TestFileLoader(FileIOTestCase):
 
     def test_load_amber_restart_ascii_as_structure(self):
         """ Tests automatic loading of Amber ASCII restart file to Structure """
-        # parm = formats.load_file(get_fn('trx.inpcrd'), structure=True)
         parm = pmd.load_file(get_fn('ala3_solv.rst7'), structure=True)
         inpcrd = pmd.load_file(get_fn('ala3_solv.rst7'))
         self.assertIsInstance(parm, Structure)
