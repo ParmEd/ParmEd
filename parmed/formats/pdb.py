@@ -1419,6 +1419,11 @@ class CIFFile(object):
             cell.appendAttribute('angle_gamma')
             cell.append(struct.box[:])
             cont.append(cell)
+        # symmetry
+        sym = containers.DataCategory('symmetry')
+        sym.appendAttribute('space_group_name_H-M')
+        sym.append(struct.space_group)
+        cont.append(sym)
         if coordinates is not None:
             coords = np.array(coordinates, copy=False, subok=True)
             try:
