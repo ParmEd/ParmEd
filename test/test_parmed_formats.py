@@ -1581,6 +1581,18 @@ class TestCIFStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_CIF('illegal'))
         self.assertRaises(IOError, lambda: download_CIF('#@#%'))
 
+    def test_cif_symmetry(self):
+        """ Tests that symmetry is parsed from mmCIF files correctly """
+        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+
+    def test_cif_space_group_written_from_structure(self):
+        parm = pmd.load_file(get_fn('SCM_A.pdb'))
+        self.assertEqual(parm.space_group, 'P 1 21 1')
+        written = get_fn('test.cif', written=True)
+        parm.write_cif(written)
+        parm2 = pmd.load_file(written)
+        self.assertEqual(parm2.space_group, 'P 1 21 1')
+
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
         cif = download_CIF('2koc')
