@@ -1259,13 +1259,16 @@ class CIFFile(object):
                 alphaid = cell.getAttributeIndex('angle_alpha')
                 betaid = cell.getAttributeIndex('angle_beta')
                 gammaid = cell.getAttributeIndex('angle_gamma')
-                spaceid = cell.getAttributeIndex('space_group_name_H-M')
                 row = cell.getRow(0)
                 struct.box = np.array(
                         [float(row[aid]), float(row[bid]), float(row[cid]),
                          float(row[alphaid]), float(row[betaid]),
                          float(row[gammaid])]
                 )
+            symmetry = cont.getObj('symmetry')
+            if symmetry is not None:
+                spaceid = symmetry.getAttributeIndex('space_group_name_H-M')
+                row = symmetry.getRow(0)
                 if spaceid != -1:
                     struct.space_group = row[spaceid]
             # Check for anisotropic B-factors
@@ -1318,9 +1321,6 @@ class CIFFile(object):
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping', PDBWarning)
-            symmetry_obj = cont.getObj('symmetry')
-            if symmetry_obj is not None:
-                struct.space_group = symmetry_obj.getRow(0)[1]
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
                     raise ValueError('Corrupt CIF; all models must have the '
@@ -1419,6 +1419,11 @@ class CIFFile(object):
             cell.appendAttribute('angle_gamma')
             cell.append(struct.box[:])
             cont.append(cell)
+        # symmetry
+        sym = containers.DataCategory('symmetry')
+        sym.appendAttribute('space_group_name_H-M')
+        sym.append([struct.space_group])
+        cont.append(sym)
         if coordinates is not None:
             coords = np.array(coordinates, copy=False, subok=True)
             try:
