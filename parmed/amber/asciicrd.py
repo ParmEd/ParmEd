@@ -15,6 +15,8 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
 from parmed.utils.six import string_types
+from parmed.structure import Structure
+from parmed.topologyobjects import Atom
 import parmed.unit as u
 from parmed.vec3 import Vec3
 import warnings as _warnings
@@ -209,6 +211,21 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self.time = float(time)
         super(AmberAsciiRestart, self).__init__(fname, natom, hasbox,
                                                 mode, title)
+
+    @classmethod
+    def parse(cls, filename, structure=False):
+        self = cls(filename)
+        if structure:
+            obj = Structure()
+            for _ in range(self.natom):
+                # fake
+                obj.add_atom(Atom(), resname='XXX', resnum=0)
+            obj.box = self.box
+            obj.coordinates = self.coordinates[0]
+            obj._coordinates = self.coordinates
+            return obj
+        else:
+            return self
 
     def _parse(self):
         """

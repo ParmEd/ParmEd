@@ -81,6 +81,17 @@ class TestFileLoader(FileIOTestCase):
         parm = formats.load_file(get_fn('trx.inpcrd'))
         self.assertIsInstance(parm, amber.AmberAsciiRestart)
 
+    def test_load_amber_restart_ascii_as_structure(self):
+        """ Tests automatic loading of Amber ASCII restart file to Structure """
+        parm = pmd.load_file(get_fn('ala3_solv.rst7'), structure=True)
+        inpcrd = pmd.load_file(get_fn('ala3_solv.rst7'))
+        self.assertIsInstance(parm, Structure)
+        np.testing.assert_almost_equal(parm.box, inpcrd.box)
+        np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
+        # dummy testing to assign box
+        # issue #778
+        parm.box = [0.]*6
+
     def test_load_amber_traj_ascii(self):
         """ Tests automatic loading of Amber mdcrd file """
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,
