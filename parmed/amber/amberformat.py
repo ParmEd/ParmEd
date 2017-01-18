@@ -535,8 +535,6 @@ class AmberFormat(object):
                     raise
                 break # Skip out of the loop down to the old-format parser
 
-        if own_handle:
-            prm.close()
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
             CHARGE_SCALE = CHARMM_ELECTROSTATIC
@@ -547,7 +545,10 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            self.rdparm_old(self.name)
+            prm.seek(0)
+            return self.rdparm_old(prm.readlines())
+        if own_handle:
+            prm.close()
         return
 
     #===================================================
