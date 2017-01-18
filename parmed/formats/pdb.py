@@ -1259,13 +1259,16 @@ class CIFFile(object):
                 alphaid = cell.getAttributeIndex('angle_alpha')
                 betaid = cell.getAttributeIndex('angle_beta')
                 gammaid = cell.getAttributeIndex('angle_gamma')
-                spaceid = cell.getAttributeIndex('space_group_name_H-M')
                 row = cell.getRow(0)
                 struct.box = np.array(
                         [float(row[aid]), float(row[bid]), float(row[cid]),
                          float(row[alphaid]), float(row[betaid]),
                          float(row[gammaid])]
                 )
+            symmetry = cont.getObj('symmetry')
+            if symmetry is not None:
+                spaceid = symmetry.getAttributeIndex('space_group_name_H-M')
+                row = symmetry.getRow(0)
                 if spaceid != -1:
                     struct.space_group = row[spaceid]
             # Check for anisotropic B-factors
