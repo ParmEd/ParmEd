@@ -1581,6 +1581,10 @@ class TestCIFStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_CIF('illegal'))
         self.assertRaises(IOError, lambda: download_CIF('#@#%'))
 
+    def test_cif_symmetry(self):
+        """ Tests that symmetry is parsed from mmCIF files correctly """
+        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
         cif = download_CIF('2koc')
