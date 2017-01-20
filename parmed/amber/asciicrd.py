@@ -69,7 +69,7 @@ class _AmberAsciiCoordinateFile(object):
             self._file = fname
             self._own_handle = False
         else:
-            raise RuntimeError("Don't know how to handle %s" % fname)
+            raise TypeError("Unsupported type for %s" % fname)
 
         self.natom = natom
         self.hasbox = hasbox
