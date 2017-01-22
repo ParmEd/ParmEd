@@ -2272,8 +2272,9 @@ class Dihedral(_FourAtomTerm):
         elif isinstance(self.type, DihedralTypeList):
             e = 0
             for term in self.type:
-                e += self.phi_k * (1 + math.cos(term.per*phi -
+                e += term.phi_k * (1 + math.cos(term.per*phi -
                                                 term.phase*DEG_TO_RAD))
+            e *= 0.5
             return e
         else:
             raise NotImplementedError('Only DihedralType and DihedralTypeList '
@@ -2553,11 +2554,12 @@ class DihedralTypeList(list, _ListItem):
             raise ValueError('Cannot convert R-B torsion with c5 != 0')
         if abs(c1 + c2 + c3 + c4) > TINY:
             raise ValueError('Cannot convert R-B torsion with c1+c2+c3+c4 != 0')
-        # These conversions are taken from InterMol
-        f1 = 2.0 * c1 + 3.0 * c3 / 2.0
+        # These conversions are based on the gromacs manual (2016.1, eqn 4.65)
+        f1 = -2.0 * c1 - 3.0 * c3 / 2.0
         f2 = -c2 - c4
-        f3 = c3 / 2.0
+        f3 = -c3 / 2.0
         f4 = -c4 / 4.0
+
         inst = cls()
         for i, f in enumerate((f1, f2, f3, f4)):
             if abs(f) > TINY:

@@ -1099,6 +1099,30 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIsNot(dtcp, dihed_types)
         self.assertEqual(hash(dtcp), hash(dihed_types[0]))
 
+        # check dihedral angle and energy
+        atoms = AtomList()
+        atoms.extend([Atom(list=atoms) for i in range(4)])
+        
+        f = [  0.,   -19.73, -13.12,   1.53,  -6.56]
+        #
+        # Coordinates HOOH
+        #
+        a1, a2, a3, a4 = atoms[:4]
+        a1.xx, a1.xy, a1.xz = 0.000000,    0.000000,   -0.000000
+        a2.xx, a2.xy, a2.xz = 0.000000,   -0.000000,    0.966700
+        a3.xx, a3.xy, a3.xz = 1.425871,    0.000000,    1.237188
+        a4.xx, a4.xy, a4.xz = 1.532691,    0.871896,    1.640791
+
+        dihedral_list = DihedralTypeList()
+        dihedral_list.append(DihedralType(f[0], 0, 180.0))
+        dihedral_list.append(DihedralType(f[1], 1, 180.0))
+        dihedral_list.append(DihedralType(f[2], 2, 180.0))
+        dihedral_list.append(DihedralType(f[3], 3, 180.0))
+        dihedral_list.append(DihedralType(f[4], 4, 180.0))
+        d = Dihedral(atoms[0], atoms[1], atoms[2], atoms[3], ignore_end=True,type=dihedral_list)
+        self.assertAlmostEqual(d.measure(), 113.362320189)
+        self.assertAlmostEqual(d.energy(), -28.2654260649)
+
     #=============================================
 
     @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
