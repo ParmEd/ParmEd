@@ -4,6 +4,7 @@ Tests parmed.formats package
 from __future__ import division
 import utils
 
+from copy import copy
 import numpy as np
 import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
@@ -867,6 +868,15 @@ class TestPDBStructure(FileIOTestCase):
                 self.assertFalse(line.startswith('ATOM'))
                 has_hetatms = has_hetatms or line.startswith('HETATM')
             self.assertTrue(has_hetatms)
+
+    def test_ter_copy(self):
+        """ Test that copying a Structure preserves TER card presence """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb')) * 5
+        fn = get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        parsed = read_PDB(fn)
+        self.assertEqual(sum([r.ter for r in parsed.residues]), 5)
+        self.assertEqual(sum([r.ter for r in copy(parsed).residues]), 5)
 
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
