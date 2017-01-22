@@ -621,6 +621,9 @@ class Structure(object):
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
+        # Transfer TER cards
+        for r1, r2 in zip(c.residues, self.residues):
+            r1.ter = r2.ter
         return c
 
     #===================================================
