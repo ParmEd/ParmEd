@@ -500,10 +500,11 @@ class AmberFormat(object):
         if isinstance(fname, string_types):
             prm = genopen(fname, 'r')
             own_handle = True
-        else:
+        elif hasattr(fname, 'read'):
             prm = fname
             own_handle = True
-            assert hasattr(prm, 'read'), 'must be a file object'
+        else:
+            raise TypeError('%s must be a file name or file-like object' % fname)
 
         # Open up the file and read the data into memory
         for line in prm:
