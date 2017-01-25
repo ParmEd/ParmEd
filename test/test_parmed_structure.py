@@ -13,6 +13,7 @@ from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
+from parmed.utils.six.moves import StringIO
 from parmed.utils.six import integer_types
 from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
@@ -1084,14 +1085,21 @@ class TestStructureSave(FileIOTestCase):
         self.sys2.save(get_fn('test2.pdb', written=True))
         self.sys3.save(get_fn('test3.pdb', written=True))
         self.sys4.save(get_fn('test4.pdb', written=True))
+        stringio_file = StringIO()
+        self.sys4.save(stringio_file, format='pdb')
+        stringio_file.seek(0)
+        self.assertTrue(pmd.formats.PDBFile.id_format(stringio_file))
+        stringio_file.seek(0)
         x1 = pmd.formats.PDBFile.parse(get_fn('test.pdb', written=True))
         x2 = pmd.formats.PDBFile.parse(get_fn('test2.pdb', written=True))
         x3 = pmd.formats.PDBFile.parse(get_fn('test3.pdb', written=True))
         x4 = pmd.formats.PDBFile.parse(get_fn('test4.pdb', written=True))
+        x5 = pmd.formats.PDBFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
         self.assertEqual([a.name for a in self.sys4.atoms], [a.name for a in x4.atoms])
+        self.assertEqual([a.name for a in self.sys4.atoms], [a.name for a in x5.atoms])
         # Make sure atom types as integers are preserved
         self.sys4.load_parameters(
                 pmd.charmm.CharmmParameterSet(
@@ -1105,17 +1113,26 @@ class TestStructureSave(FileIOTestCase):
         for a in self.sys4.atoms:
             self.assertIsInstance(a.type, int)
 
+        # raise if specifying file-like object and format is None
+        stringio_file = StringIO()
+        self.assertRaises(RuntimeError, lambda: self.sys4.save(stringio_file))
+
     def test_save_cif(self):
         """ Test saving various Structure instances as a PDBx/mmCIF """
         self.sys1.save(get_fn('test.cif', written=True))
         self.sys2.save(get_fn('test2.cif', written=True))
         self.sys3.save(get_fn('test3.cif', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='cif')
+        stringio_file.seek(0)
         x1 = pmd.formats.CIFFile.parse(get_fn('test.cif', written=True))
         x2 = pmd.formats.CIFFile.parse(get_fn('test2.cif', written=True))
         x3 = pmd.formats.CIFFile.parse(get_fn('test3.cif', written=True))
+        x4 = pmd.formats.CIFFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         # Try a gzip and a bzip2 file
         self.sys1.save(get_fn('test.cif.bz2', written=True))
         self.sys1.save(get_fn('test.cif.gz', written=True))
@@ -1133,12 +1150,17 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.mol2', written=True))
         self.sys2.save(get_fn('test2.mol2', written=True))
         self.sys3.save(get_fn('test3.mol2', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='mol2')
+        stringio_file.seek(0)
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol2', written=True), structure=True)
         x2 = pmd.formats.Mol2File.parse(get_fn('test2.mol2', written=True), structure=True)
         x3 = pmd.formats.Mol2File.parse(get_fn('test3.mol2', written=True), structure=True)
+        x4 = pmd.formats.Mol2File.parse(stringio_file, structure=True)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
@@ -1146,8 +1168,13 @@ class TestStructureSave(FileIOTestCase):
     def test_save_mol3(self):
         """ Test saving various Structure instances as Mol3 files """
         self.sys1.save(get_fn('test.mol3', written=True))
+        stringio_file = StringIO()
+        self.sys1.save(stringio_file, format='mol3')
+        stringio_file.seek(0)
         x1 = pmd.formats.Mol2File.parse(get_fn('test.mol3', written=True), structure=True)
+        x2 = pmd.formats.Mol2File.parse(stringio_file, structure=True)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
+        self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x2.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         with open(get_fn('test.mol3', written=True), 'r') as f:
             for line in f:
@@ -1161,16 +1188,22 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.parm7', written=True))
         self.sys2.save(get_fn('test2.parm7', written=True))
         self.sys3.save(get_fn('test3.parm7', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='amber')
+        stringio_file.seek(0)
         x1 = pmd.amber.LoadParm(get_fn('test.parm7', written=True))
         x2 = pmd.amber.LoadParm(get_fn('test2.parm7', written=True))
         x3 = pmd.amber.LoadParm(get_fn('test3.parm7', written=True))
+        x4 = pmd.amber.LoadParm(stringio_file)
         self.assertIsInstance(x1, pmd.amber.ChamberParm)
         self.assertIsInstance(x2, pmd.amber.AmberParm)
         self.assertIsInstance(x3, pmd.amber.AmberParm)
+        self.assertIsInstance(x4, pmd.amber.AmberParm)
         # Check equivalence of topologies
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
@@ -1229,9 +1262,13 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.psf', written=True))
         self.sys2.save(get_fn('test2.psf', written=True))
         self.sys3.save(get_fn('test3.psf', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='psf')
+        stringio_file.seek(0)
         x1 = pmd.charmm.CharmmPsfFile(get_fn('test.psf', written=True))
         x2 = pmd.charmm.CharmmPsfFile(get_fn('test2.psf', written=True))
         x3 = pmd.charmm.CharmmPsfFile(get_fn('test3.psf', written=True))
+        x4 = pmd.charmm.CharmmPsfFile(stringio_file)
         # PSF files save "improper periodic" torsions under the improper list,
         # only moving them over to the dihedral list once parameters have been
         # assigned and the fact that it's a periodic improper torsion becomes
@@ -1257,6 +1294,7 @@ class TestStructureSave(FileIOTestCase):
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
@@ -1295,13 +1333,18 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
         self.sys3.save(get_fn('test3.top', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='gromacs')
+        stringio_file.seek(0)
         x1 = pmd.gromacs.GromacsTopologyFile(get_fn('test.top', written=True))
         x2 = pmd.gromacs.GromacsTopologyFile(get_fn('test2.top', written=True))
         x3 = pmd.gromacs.GromacsTopologyFile(get_fn('test3.top', written=True))
+        x4 = pmd.gromacs.GromacsTopologyFile(stringio_file)
         # Check equivalence of topologies
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
         self.assertEqual(len(self.sys1.bonds), len(x1.bonds))
         self.assertEqual(len(self.sys2.bonds), len(x2.bonds))
         self.assertEqual(len(self.sys3.bonds), len(x3.bonds))
@@ -1328,12 +1371,17 @@ class TestStructureSave(FileIOTestCase):
         self.sys1.save(get_fn('test.gro', written=True))
         self.sys2.save(get_fn('test2.gro', written=True))
         self.sys3.save(get_fn('test3.gro', written=True))
+        stringio_file = StringIO()
+        self.sys3.save(stringio_file, format='gro')
+        stringio_file.seek(0)
         x1 = pmd.gromacs.GromacsGroFile.parse(get_fn('test.gro', written=True))
         x2 = pmd.gromacs.GromacsGroFile.parse(get_fn('test2.gro', written=True))
         x3 = pmd.gromacs.GromacsGroFile.parse(get_fn('test3.gro', written=True))
+        x4 = pmd.gromacs.GromacsGroFile.parse(stringio_file)
         self.assertEqual([a.name for a in self.sys1.atoms], [a.name for a in x1.atoms])
         self.assertEqual([a.name for a in self.sys2.atoms], [a.name for a in x2.atoms])
         self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x3.atoms])
+        self.assertEqual([a.name for a in self.sys3.atoms], [a.name for a in x4.atoms])
 
     def test_save_rst7(self):
         """ Test saving various Structure instances as Amber ASCII restarts """
@@ -1341,15 +1389,19 @@ class TestStructureSave(FileIOTestCase):
         f2 = get_fn('test1.restrt', written=True)
         f3 = get_fn('test2.inpcrd', written=True)
         f4 = get_fn('test3.amberrst', written=True)
+        stringio_file = StringIO()
         self.sys1.save(f1)
         self.sys2.save(f2)
         self.sys3.save(f3)
         self.sys1.save(f4, format='rst7')
+        self.sys1.save(stringio_file, format='rst7')
+        stringio_file.seek(0)
 
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f1))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f2))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f3))
         self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(f4))
+        self.assertTrue(pmd.amber.AmberAsciiRestart.id_format(stringio_file))
 
         np.testing.assert_allclose(self.sys1.coordinates,
                                    pmd.load_file(f1).coordinates[0],

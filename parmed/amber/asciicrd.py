@@ -14,6 +14,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass
 from parmed.utils.six.moves import range
+from parmed.utils.six import string_types
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom
 import parmed.unit as u
@@ -61,7 +62,14 @@ class _AmberAsciiCoordinateFile(object):
             self._writebox = False
         else:
             raise ValueError("%s mode must be 'r' or 'w'" % type(self).__name__)
-        self._file = genopen(fname, mode)
+        if isinstance(fname, string_types):
+            self._file = genopen(fname, mode)
+            self._own_handle = True
+        elif hasattr(fname, 'read'):
+            self._file = fname
+            self._own_handle = False
+        else:
+            raise TypeError("Unsupported type for %s" % fname)
 
         self.natom = natom
         self.hasbox = hasbox
@@ -70,7 +78,8 @@ class _AmberAsciiCoordinateFile(object):
         self._full_lines_per_frame = self.natom * 3 // self.CRDS_PER_LINE
         self._nextras = self.natom * 3 - (self._full_lines_per_frame *
                                           self.CRDS_PER_LINE)
-        self.closed = False
+        if self._own_handle:
+            self.closed = False
         if self._status == 'old':
             self._parse()
         elif self._status == 'new':
@@ -89,8 +98,9 @@ class _AmberAsciiCoordinateFile(object):
 
     def close(self):
         """ Close the open file handler """
-        self.closed or self._file.close()
-        self.closed = True
+        if self._own_handle:
+            self.closed or self._file.close()
+            self.closed = True
 
     def __del__(self):
         """ Make sure the open file handler is closed """
@@ -134,9 +144,15 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         is_fmt : bool
             True if it is an Amber restart/inpcrd file. False otherwise
         """
-        f = genopen(filename, 'r')
-        lines = [f.readline() for i in range(5)]
-        f.close()
+        if isinstance(filename, string_types):
+            f = genopen(filename, 'r')
+            lines = [f.readline() for i in range(5)]
+            f.close()
+        elif (hasattr(filename, 'readline') and hasattr(filename, 'seek')
+              and hasattr(filename, 'tell')):
+            cur = filename.tell()
+            lines = [filename.readline() for i in range(5)]
+            filename.seek(cur)
         # Look for natom
         words = lines[1].split()
         if len(words) > 2 or len(words) < 1:

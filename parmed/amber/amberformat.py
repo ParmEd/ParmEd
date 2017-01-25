@@ -327,8 +327,14 @@ class AmberFormat(object):
         is_fmt : bool
             True if it is an Amber-style format, False otherwise
         """
-        with closing(genopen(filename, 'r')) as f:
-            lines = [f.readline() for i in range(5)]
+        if isinstance(filename, string_types):
+            with closing(genopen(filename, 'r')) as f:
+                lines = [f.readline() for i in range(5)]
+        elif (hasattr(filename, 'readline') and hasattr(filename, 'seek')
+              and hasattr(filename, 'tell')):
+            cur = filename.tell()
+            lines = [filename.readline() for i in range(5)]
+            filename.seek(cur)
 
         if lines[0].startswith('%VERSION'):
             return True
@@ -438,9 +444,10 @@ class AmberFormat(object):
 
         # The optimized parser only works on local, uncompressed files
         # TODO: Add gzip and bzip2 support to the optimized reader
-        if (slow or fname.startswith('http://') or fname.startswith('https://')
-                or fname.startswith('ftp://')
-                or fname.endswith('.bz2') or fname.endswith('.gz')):
+        if (hasattr(fname, 'read') or slow
+            or fname.startswith('http://') or fname.startswith('https://')
+            or fname.startswith('ftp://')
+            or fname.endswith('.bz2') or fname.endswith('.gz')):
 
             return self.rdparm_slow(fname)
 
@@ -490,36 +497,44 @@ class AmberFormat(object):
         fmtre = re.compile(r'%FORMAT *\((.+)\)')
         version = None
 
+        if isinstance(fname, string_types):
+            prm = genopen(fname, 'r')
+            own_handle = True
+        elif hasattr(fname, 'read'):
+            prm = fname
+            own_handle = True
+        else:
+            raise TypeError('%s must be a file name or file-like object' % fname)
+
         # Open up the file and read the data into memory
-        with closing(genopen(fname, 'r')) as prm:
-            for line in prm:
-                if line[0] == '%':
-                    if line[0:8] == '%VERSION':
-                        self.version = line.strip()
-                        continue
-                    elif line[0:5] == '%FLAG':
-                        current_flag = line[6:].strip()
-                        self.formats[current_flag] = ''
-                        self.parm_data[current_flag] = []
-                        self.parm_comments[current_flag] = []
-                        self.flag_list.append(current_flag)
-                        continue
-                    elif line[0:8] == '%COMMENT':
-                        self.parm_comments[current_flag].append(line[9:].strip())
-                        continue
-                    elif line[0:7] == '%FORMAT':
-                        fmt = FortranFormat(fmtre.match(line).groups()[0])
-                        # RESIDUE_ICODE can have a lot of blank data...
-                        if current_flag == 'RESIDUE_ICODE':
-                            fmt.read = fmt._read_nostrip
-                        self.formats[current_flag] = fmt
-                        continue
-                try:
-                    self.parm_data[current_flag].extend(fmt.read(line))
-                except KeyError:
-                    if version is not None:
-                        raise
-                    break # Skip out of the loop down to the old-format parser
+        for line in prm:
+            if line[0] == '%':
+                if line[0:8] == '%VERSION':
+                    self.version = line.strip()
+                    continue
+                elif line[0:5] == '%FLAG':
+                    current_flag = line[6:].strip()
+                    self.formats[current_flag] = ''
+                    self.parm_data[current_flag] = []
+                    self.parm_comments[current_flag] = []
+                    self.flag_list.append(current_flag)
+                    continue
+                elif line[0:8] == '%COMMENT':
+                    self.parm_comments[current_flag].append(line[9:].strip())
+                    continue
+                elif line[0:7] == '%FORMAT':
+                    fmt = FortranFormat(fmtre.match(line).groups()[0])
+                    # RESIDUE_ICODE can have a lot of blank data...
+                    if current_flag == 'RESIDUE_ICODE':
+                        fmt.read = fmt._read_nostrip
+                    self.formats[current_flag] = fmt
+                    continue
+            try:
+                self.parm_data[current_flag].extend(fmt.read(line))
+            except KeyError:
+                if version is not None:
+                    raise
+                break # Skip out of the loop down to the old-format parser
 
         # convert charges to fraction-electrons
         if 'CTITLE' in self.parm_data:
@@ -531,8 +546,10 @@ class AmberFormat(object):
                 self.parm_data[self.charge_flag][i] = chg / CHARGE_SCALE
         # If we don't have a version, then read in an old-file topology
         if self.version is None:
-            with closing(genopen(self.name, 'r')) as f:
-                self.rdparm_old(f.readlines())
+            prm.seek(0)
+            return self.rdparm_old(prm.readlines())
+        if own_handle:
+            prm.close()
         return
 
     #===================================================
@@ -811,7 +828,13 @@ class AmberFormat(object):
             Name of the file to write the topology file to
         """
         # now that we know we will write the new prmtop file, open the new file
-        with closing(genopen(name, 'w')) as new_prm:
+        if isinstance(name, string_types):
+            new_prm = genopen(name, 'w')
+            own_handle = True
+        else:
+            new_prm = name
+            own_handle = False
+        try:
             # get current time to put into new prmtop file if we had a %VERSION
             self.set_version()
             # convert charges back to amber charges...
@@ -837,8 +860,9 @@ class AmberFormat(object):
                     new_prm.write('\n')
                     continue
                 self.formats[flag].write(self.parm_data[flag], new_prm)
-
-        new_prm.close() # close new prmtop
+        finally:
+            if own_handle:
+                new_prm.close()
 
         if self.charge_flag in self.parm_data.keys():
             # Convert charges back to electron-units
