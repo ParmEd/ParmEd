@@ -21,7 +21,7 @@ echo "Using nosetests...:"
 if [ "$PYTHON_VERSION" = "pypy" ]; then
     # Disable coverage with pypy, since it multiplies the time taken by 6 or
     # something ridiculous like that
-    nosetests -vs --with-timer --timer-ok=5s --timer-warning=12s \
+    nosetests -v --with-timer --timer-ok=5s --timer-warning=12s \
               --timer-filter=warning,error .
 else
     ./run_scripts.sh
@@ -29,7 +29,7 @@ else
     # the coverage package without sacrificing nose functionality
     test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv
     coverage run --source=parmed --parallel-mode -m \
-        nose -vs --with-timer --timer-ok=5s --timer-warning=12s \
+        nose -v --with-timer --timer-ok=5s --timer-warning=12s \
              --timer-filter=warning,error .
 fi
 test -z `which coverage 2>/dev/null` || do_coverage
