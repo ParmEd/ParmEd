@@ -135,7 +135,7 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc, disp=True, callback=None):
             more_options['callback'] = callback
         results = optimize.minimize(energy_function, parm.coordinates,
                                     method='L-BFGS-B', jac=True,
-                                    options=options
+                                    options=options,
                                     **more_options)
         parm.coordinates = results.x
     if not results.success:
