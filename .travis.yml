@@ -19,6 +19,6 @@ matrix:
     - { os: osx, env: PYTHON_VERSION=3.4 MINIMAL_PACKAGES=yes }
 
 install:
-    - source devtools/travis-ci/install.sh
+    - source devtools/ci/travis/install.sh
     - python setup.py install
-    - source devtools/travis-ci/runtest.sh
+    - source devtools/ci/travis/runtest.sh
