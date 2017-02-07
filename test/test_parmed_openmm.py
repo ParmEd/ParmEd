@@ -88,7 +88,7 @@ class TestOpenMM(FileIOTestCase):
         self.assertEqual(len(parm.bonds), len(structure.bonds))
 
     def test_load_topology_use_atom_id_as_typename(self):
-        """ Tests loading an OpenMM Topology and System instance """
+        """ Tests loading an OpenMM Topology and using Atom.id to name types """
         import warnings
         ommparm = app.AmberPrmtopFile(get_fn('complex.prmtop'))
         parm = load_file(get_fn('complex.prmtop'))

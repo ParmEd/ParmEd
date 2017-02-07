@@ -44,6 +44,9 @@ def load_topology(topology, system=None, xyz=None, box=None, use_atom_id_as_type
         information unless ``box`` (below) is also specified
     box : array of 6 floats
         Unit cell dimensions
+    use_atom_id_as_typename : bool, default=False
+        If True, use the OpenMM Atom.id attribute to name the created ParmEd
+        AtomType names.
 
     Returns
     -------
