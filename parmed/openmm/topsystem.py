@@ -24,7 +24,7 @@ from parmed.utils.six.moves import range
 import warnings
 
 @needs_openmm
-def load_topology(topology, system=None, xyz=None, box=None):
+def load_topology(topology, system=None, xyz=None, box=None, use_atom_id_as_typename=False):
     """
     Creates a :class:`parmed.structure.Structure` instance from an OpenMM
     Topology, optionally filling in parameters from a System
@@ -84,8 +84,12 @@ def load_topology(topology, system=None, xyz=None, box=None):
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
                 else:
+                    if use_atom_id_as_typename:
+                        atype = a.id
+                    else:
+                        atype = ''
                     atom = Atom(atomic_number=a.element.atomic_number,
-                                name=a.name, mass=a.element.mass)
+                                name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
                 atommap[a] = atom
     for a1, a2 in topology.bonds():
@@ -172,7 +176,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
         elif isinstance(force, mm.CMAPTorsionForce):
             _process_cmap(struct, force)
         elif isinstance(force, mm.NonbondedForce):
-            _process_nonbonded(struct, force)
+            _process_nonbonded(struct, force, use_atom_id_as_typename)
         elif isinstance(force, ignored_forces):
             continue
         else:
@@ -364,7 +368,7 @@ def _process_cmap(struct, force):
             struct.cmap_types.append(cmap_type)
     struct.cmap_types.claim()
 
-def _process_nonbonded(struct, force):
+def _process_nonbonded(struct, force, use_atom_id_as_typename):
     """ Adds nonbonded parameters to the structure """
     typemap = dict()
     element_typemap = defaultdict(int)
@@ -372,13 +376,17 @@ def _process_nonbonded(struct, force):
     for i in range(force.getNumParticles()):
         atom = struct.atoms[i]
         chg, sig, eps = force.getParticleParameters(i)
-        atype_name = Element[atom.atomic_number]
+        if use_atom_id_as_typename:
+            atype_name = atom.type
+        else:
+            atype_name = Element[atom.atomic_number]
         key = (atype_name, sig._value, eps._value)
         if key in typemap:
             atom_type = typemap[key]
         else:
-            element_typemap[atype_name] += 1
-            atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
+            if not use_atom_id_as_typename:
+                element_typemap[atype_name] += 1
+                atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
             typemap[key] = atom_type = AtomType(atype_name, None, atom.mass,
                                                 atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
