@@ -98,8 +98,7 @@ class TestOpenMM(FileIOTestCase, TestCaseRelative, EnergyTestCase):
         for pmd_atom, omm_atom in zip(parm.atoms, ommparm.topology.atoms()):
             omm_atom.id = pmd_atom.type
         structure = openmm.load_topology(ommparm.topology, system,
-                                         xyz=parm.positions,
-                                         use_atom_id_as_typename=True)
+                                         xyz=parm.positions)
 
         self.assertEqual(len(parm.atoms), len(structure.atoms))
         self.assertEqual([a.type for a in parm.atoms],
