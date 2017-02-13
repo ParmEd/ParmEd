@@ -14,7 +14,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
 fi
-sh devtools/travis-ci/pyflakes_check.sh
+sh devtools/ci/pyflakes_check.sh
 echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"
