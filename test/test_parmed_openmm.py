@@ -1,20 +1,23 @@
 """ Tests some OpenMM-specific functionality """
 from __future__ import print_function, division, absolute_import
 
-import math
-import numpy as np
-from parmed.utils.six.moves import StringIO
-import os
-import parmed as pmd
-from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
-import unittest
-from utils import get_fn, mm, app, has_openmm, FileIOTestCase
 from collections import OrderedDict
-
+import math
+import os
+import unittest
 import warnings
 
+import numpy as np
+
+import parmed as pmd
+from parmed.utils.six.moves import StringIO
+from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
+from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
+                   TestCaseRelative, EnergyTestCase)
+
+
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
-class TestOpenMM(FileIOTestCase):
+class TestOpenMM(FileIOTestCase, TestCaseRelative, EnergyTestCase):
 
     def setUp(self):
         super(TestOpenMM, self).setUp()
@@ -78,7 +81,6 @@ class TestOpenMM(FileIOTestCase):
 
     def test_load_topology(self):
         """ Tests loading an OpenMM Topology and System instance """
-        import warnings
         ommparm = app.AmberPrmtopFile(get_fn('complex.prmtop'))
         parm = load_file(get_fn('complex.prmtop'))
         system = ommparm.createSystem(implicitSolvent=app.OBC1)
@@ -86,6 +88,32 @@ class TestOpenMM(FileIOTestCase):
         self.assertEqual(len(parm.atoms), len(structure.atoms))
         self.assertEqual(len(parm.residues), len(structure.residues))
         self.assertEqual(len(parm.bonds), len(structure.bonds))
+
+    def test_load_topology_use_atom_id_as_typename(self):
+        """ Tests loading an OpenMM Topology and using Atom.id to name types """
+        ommparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        system = ommparm.createSystem(implicitSolvent=app.OBC1)
+
+        for pmd_atom, omm_atom in zip(parm.atoms, ommparm.topology.atoms()):
+            omm_atom.id = pmd_atom.type
+        structure = openmm.load_topology(ommparm.topology, system,
+                                         xyz=parm.positions)
+
+        self.assertEqual(len(parm.atoms), len(structure.atoms))
+        self.assertEqual([a.type for a in parm.atoms],
+                         [a.type for a in structure.atoms])
+        self.assertEqual(len(parm.residues), len(structure.residues))
+        self.assertEqual(len(parm.bonds), len(structure.bonds))
+
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(structure.positions)
+
+        self.check_energies(parm, con1, structure, con2)
+
+
 
     def test_load_topology_extra_bonds(self):
         """ Test loading extra bonds not in Topology """

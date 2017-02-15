@@ -621,6 +621,9 @@ class Structure(object):
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
+        # Transfer TER cards
+        for r1, r2 in zip(c.residues, self.residues):
+            r1.ter = r2.ter
         return c
 
     #===================================================
@@ -1424,10 +1427,11 @@ class Structure(object):
 
         Parameters
         ----------
-        fname : str
-            Name of the file to save. If ``format`` is ``None`` (see below), the
-            file type will be determined based on the filename extension. If the
-            type cannot be determined, a ValueError is raised.
+        fname : str or file-like object
+            Name of the file or file-like object to save. If ``format`` is 
+            ``None`` (see below), the file type will be determined based on 
+            the filename extension. If ``fname`` is file-like object,  ``format`` 
+            must be  provided. If the type cannot be determined, a ValueError is raised.
         format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
@@ -1469,8 +1473,12 @@ class Structure(object):
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
-        if os.path.exists(fname) and not overwrite:
-            raise IOError('%s exists; not overwriting' % fname)
+        if not hasattr(fname, 'write'):
+            if os.path.exists(fname) and not overwrite:
+                raise IOError('%s exists; not overwriting' % fname)
+        else:
+            if format is None:
+                raise RuntimeError('Must provide supported format if using file-like object')
         all_ints = True
         for atom in self.atoms:
             if (isinstance(atom.type, integer_types) and

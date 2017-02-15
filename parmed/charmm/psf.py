@@ -8,7 +8,6 @@ Date: April 20, 2014
 """
 from __future__ import division
 
-from contextlib import closing
 from copy import copy as _copy
 from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
                     AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
@@ -18,6 +17,7 @@ from parmed.structure import needs_openmm, Structure
 from parmed.utils.io import genopen
 from parmed.utils.six import wraps
 from parmed.utils.six.moves import zip, range
+from parmed.utils.six import string_types
 import re
 import warnings
 
@@ -177,21 +177,27 @@ class CharmmPsfFile(Structure):
             return
         conv = CharmmPsfFile._convert
         # Open the PSF and read the first line. It must start with "PSF"
-        with closing(genopen(psf_name, 'r')) as psf:
-            self.name = psf_name
-            line = psf.readline()
+        if isinstance(psf_name, string_types):
+            fileobj = genopen(psf_name, 'r')
+            own_handle = True
+        else:
+            fileobj = psf_name
+            own_handle = False
+        try:
+            self.name = psf_name if isinstance(psf_name, string_types) else ''
+            line = fileobj.readline()
             if not line.startswith('PSF'):
                 raise CharmmError('Unrecognized PSF file. First line is %s' %
                                   line.strip())
             # Store the flags
             psf_flags = line.split()[1:]
             # Now get all of the sections and store them in a dict
-            psf.readline()
+            fileobj.readline()
             # Now get all of the sections
             psfsections = _ZeroDict()
             while True:
                 try:
-                    sec, ptr, data = CharmmPsfFile._parse_psf_section(psf)
+                    sec, ptr, data = CharmmPsfFile._parse_psf_section(fileobj)
                 except _FileEOF:
                     break
                 psfsections[sec] = (ptr, data)
@@ -332,6 +338,9 @@ class CharmmPsfFile(Structure):
                 )
             self.unchange()
             self.flags = psf_flags
+        finally:
+            if own_handle:
+                fileobj.close()
 
     #===================================================
 

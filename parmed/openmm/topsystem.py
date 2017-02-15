@@ -19,7 +19,7 @@ from parmed.topologyobjects import (Atom, Bond, BondType, Angle, AngleType,
         RBTorsionType)
 from parmed import unit as u
 from parmed.utils.decorators import needs_openmm
-from parmed.utils.six import iteritems, string_types
+from parmed.utils.six import iteritems, string_types, integer_types
 from parmed.utils.six.moves import range
 import warnings
 
@@ -70,7 +70,10 @@ def load_topology(topology, system=None, xyz=None, box=None):
 
     Other CustomForces, including the CustomNonbondedForce used to implement
     NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be
-    processed and will result in an unknown functional form
+    processed and will result in an unknown functional form.
+
+    If an OpenMM Atom.id attribute is populated by a non-integer, it will be
+    used to name the corresponding ParmEd AtomType object.
     """
     import simtk.openmm as mm
     struct = Structure()
@@ -84,8 +87,10 @@ def load_topology(topology, system=None, xyz=None, box=None):
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
                 else:
+                    atype = (a.id if not isinstance(a.id, integer_types)
+                             else '')
                     atom = Atom(atomic_number=a.element.atomic_number,
-                                name=a.name, mass=a.element.mass)
+                                name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
                 atommap[a] = atom
     for a1, a2 in topology.bonds():
@@ -372,13 +377,15 @@ def _process_nonbonded(struct, force):
     for i in range(force.getNumParticles()):
         atom = struct.atoms[i]
         chg, sig, eps = force.getParticleParameters(i)
-        atype_name = Element[atom.atomic_number]
+        atype_name = (atom.type if atom.type != ''
+                      else Element[atom.atomic_number])
         key = (atype_name, sig._value, eps._value)
         if key in typemap:
             atom_type = typemap[key]
         else:
-            element_typemap[atype_name] += 1
-            atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
+            if atom.type == '':
+                element_typemap[atype_name] += 1
+                atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
             typemap[key] = atom_type = AtomType(atype_name, None, atom.mass,
                                                 atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)

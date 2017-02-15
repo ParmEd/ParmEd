@@ -810,6 +810,7 @@ class TestReadParm(FileIOTestCase):
         parm.rdparm(get_fn('old.prmtop'), slow=True)
         parm = parm.view_as(readparm.AmberParm)
         self._standard_parm_tests(parm)
+        self.assertRaises(TypeError, lambda: readparm.AmberFormat().rdparm_slow(object()))
 
     # Tests for individual prmtops
     def _standard_parm_tests(self, parm, has1012=False):

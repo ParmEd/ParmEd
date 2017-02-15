@@ -4,6 +4,7 @@ Tests parmed.formats package
 from __future__ import division
 import utils
 
+from copy import copy
 import numpy as np
 import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
@@ -80,6 +81,17 @@ class TestFileLoader(FileIOTestCase):
         """ Tests automatic loading of Amber ASCII restart file """
         parm = formats.load_file(get_fn('trx.inpcrd'))
         self.assertIsInstance(parm, amber.AmberAsciiRestart)
+
+    def test_load_amber_restart_ascii_as_structure(self):
+        """ Tests automatic loading of Amber ASCII restart file to Structure """
+        parm = pmd.load_file(get_fn('ala3_solv.rst7'), structure=True)
+        inpcrd = pmd.load_file(get_fn('ala3_solv.rst7'))
+        self.assertIsInstance(parm, Structure)
+        np.testing.assert_almost_equal(parm.box, inpcrd.box)
+        np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
+        # dummy testing to assign box
+        # issue #778
+        parm.box = [0.]*6
 
     def test_load_amber_traj_ascii(self):
         """ Tests automatic loading of Amber mdcrd file """
@@ -857,6 +869,15 @@ class TestPDBStructure(FileIOTestCase):
                 has_hetatms = has_hetatms or line.startswith('HETATM')
             self.assertTrue(has_hetatms)
 
+    def test_ter_copy(self):
+        """ Test that copying a Structure preserves TER card presence """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb')) * 5
+        fn = get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        parsed = read_PDB(fn)
+        self.assertEqual(sum([r.ter for r in parsed.residues]), 5)
+        self.assertEqual(sum([r.ter for r in copy(parsed).residues]), 5)
+
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
         pdbfile = read_PDB(get_fn('bigz.pdb'))
@@ -1569,6 +1590,18 @@ class TestCIFStructure(FileIOTestCase):
         self._check4lzt(read_CIF(fn))
         self.assertRaises(ValueError, lambda: download_CIF('illegal'))
         self.assertRaises(IOError, lambda: download_CIF('#@#%'))
+
+    def test_cif_symmetry(self):
+        """ Tests that symmetry is parsed from mmCIF files correctly """
+        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+
+    def test_cif_space_group_written_from_structure(self):
+        parm = pmd.load_file(get_fn('SCM_A.pdb'))
+        self.assertEqual(parm.space_group, 'P 1 21 1')
+        written = get_fn('test.cif', written=True)
+        parm.write_cif(written)
+        parm2 = pmd.load_file(written)
+        self.assertEqual(parm2.space_group, 'P 1 21 1')
 
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """

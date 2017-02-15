@@ -222,6 +222,7 @@ class GromacsGroFile(object):
             defined to enclose the solute with 0.5 nm clearance on all sides. If
             periodic box dimensions *are* defined, this variable has no effect.
         """
+        own_handle = False
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
             own_handle = True
