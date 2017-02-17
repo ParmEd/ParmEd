@@ -1383,7 +1383,7 @@ class GromacsTopologyFile(Structure):
 ''' % (fname, _username, _userid, _uname, now.strftime('%a. %B  %w %X %Y'),
        os.path.split(sys.argv[0])[1], __version__,
        os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
-       (' '.join(sys.argv)).encode('utf8').decode('unicode_escape')))
+       (' '.join(sys.argv)).encode('unicode_escape').decode('utf-8')))
             dest.write('\n[ defaults ]\n')
             dest.write('; nbfunc        comb-rule       gen-pairs       '
                         'fudgeLJ fudgeQQ\n')
