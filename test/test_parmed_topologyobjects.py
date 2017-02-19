@@ -6,18 +6,20 @@ By Jason Swails
 from __future__ import division
 
 import math
+import numpy as np
 from parmed.exceptions import MoleculeError, ParameterError
 from parmed.amber.readparm import AmberFormat
 from parmed.constants import DEG_TO_RAD
 import parmed.topologyobjects as topologyobjects
 from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
 from parmed.topologyobjects import *
+from parmed.structure import Structure
 import parmed.unit as u
 from parmed.utils.six import PY3
 from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
-from utils import get_fn
+from utils import get_fn, has_openmm
 import random
 import warnings
 
@@ -1069,6 +1071,12 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(len(dihed_types[0]), 4)
         self.assertEqual(repr(dihed_types[0]),
                 '<DihedralTypes %s>' % list.__repr__(dihed_types[0]))
+        # Now try DihedralTypeList.from_rbtorsion
+        self.assertRaises(ValueError, lambda:
+                DihedralTypeList.from_rbtorsion(RBTorsionType(1, 2, 3, 4, 5, 6)))
+        self.assertRaises(ValueError, lambda:
+                DihedralTypeList.from_rbtorsion(RBTorsionType(1, 2, 3, 4, 5, 0)))
+        dtl = DihedralTypeList.from_rbtorsion(RBTorsionType(1, 2, 3, -4, -1, 0))
         # Now test DihedralTypeList.__copy__
         cp = copy(dihed_types[0])
         self.assertIsNot(cp, dihed_types[0])
@@ -1090,6 +1098,59 @@ class TestTopologyObjects(unittest.TestCase):
         dtcp = copy(dihed_types[0])
         self.assertIsNot(dtcp, dihed_types)
         self.assertEqual(hash(dtcp), hash(dihed_types[0]))
+
+        # check dihedral angle and energy
+        atoms = AtomList()
+        atoms.extend([Atom(list=atoms) for i in range(4)])
+        
+        f = [  0.,   -19.73, -13.12,   1.53,  -6.56]
+        #
+        # Coordinates HOOH
+        #
+        a1, a2, a3, a4 = atoms[:4]
+        a1.xx, a1.xy, a1.xz = 0.000000,    0.000000,   -0.000000
+        a2.xx, a2.xy, a2.xz = 0.000000,   -0.000000,    0.966700
+        a3.xx, a3.xy, a3.xz = 1.425871,    0.000000,    1.237188
+        a4.xx, a4.xy, a4.xz = 1.532691,    0.871896,    1.640791
+
+        dihedral_list = DihedralTypeList()
+        dihedral_list.append(DihedralType(f[0], 0, 180.0))
+        dihedral_list.append(DihedralType(f[1], 1, 180.0))
+        dihedral_list.append(DihedralType(f[2], 2, 180.0))
+        dihedral_list.append(DihedralType(f[3], 3, 180.0))
+        dihedral_list.append(DihedralType(f[4], 4, 180.0))
+        d = Dihedral(atoms[0], atoms[1], atoms[2], atoms[3], ignore_end=True,type=dihedral_list)
+        self.assertAlmostEqual(d.measure(), 113.362320189)
+        self.assertAlmostEqual(d.energy(), -28.2654260649)
+
+    #=============================================
+
+    @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+    def test_rb_torsion_type_conversion_openmm(self):
+        """ Test energetics/forces of converted R-B torsion """
+        s1 = Structure()
+        s2 = Structure()
+        def add_atoms(struct):
+            struct.add_atom(Atom(name='A1', atomic_number=6), 'ALA', 1)
+            struct.add_atom(Atom(name='A2', atomic_number=6), 'ALA', 1)
+            struct.add_atom(Atom(name='A3', atomic_number=6), 'ALA', 1)
+            struct.add_atom(Atom(name='A4', atomic_number=6), 'ALA', 1)
+        add_atoms(s1)
+        add_atoms(s2)
+        crd = np.random.rand(4, 3)
+        s1.coordinates = crd.copy()
+        s1.rb_torsions.append(Dihedral(*s1.atoms))
+        dt = RBTorsionType(1, 2, 3, -4, -1, 0)
+        s1.rb_torsions[0].type = dt
+        s1.rb_torsion_types.append(dt)
+        s1.rb_torsion_types.claim()
+
+        s2.dihedrals.append(Dihedral(*s2.atoms))
+        dt = DihedralTypeList.from_rbtorsion(dt)
+        s2.dihedral_types.append(dt)
+        s2.dihedrals[0].type = dt
+        s2.coordinates = crd.copy()
+        s2.dihedral_types.claim()
 
     #=============================================
 
