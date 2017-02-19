@@ -56,3 +56,7 @@ coverage report -m
 coverage xml -o ../coverage.xml
 # Find the base directory of the report
 coveralls -y ../.coveralls.yml
+
+# Get rid of our environment
+source deactivate
+conda uninstall -yn ${CONDAENV} --all
