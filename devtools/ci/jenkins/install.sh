@@ -1,11 +1,16 @@
 #!/bin/bash
 CONDAENV=jenkins-parmed-${PYTHON_VERSION}
 
+# Load the appropriate modules. But the OS X build machine does not have modules (conda is in the
+# path by default). So make sure this command never errors. If it failed on Linux, the very next
+# conda command will fail due to a missing program
+module load conda || true
+
 # First remove the existing conda environment
 conda remove -yn ${CONDAENV} --all || true
 
 # Now create the conda environment
-conda create -n ${CONDAENV} --no-default-packages
+conda create -yn ${CONDAENV} --no-default-packages
 conda config --add channels omnia
 conda config --add channels ambermd
 
