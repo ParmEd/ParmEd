@@ -55,5 +55,4 @@ coverage combine
 coverage report -m
 coverage xml -o ../coverage.xml
 # Find the base directory of the report
-basedir=`python -c "import os, parmed as pmd; print(os.path.split(os.path.split(pmd.__file__)[0])[0])"`
-coveralls -b "$basedir" -y ../.coveralls.yml
+coveralls -y ../.coveralls.yml
