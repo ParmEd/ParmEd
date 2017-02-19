@@ -8,7 +8,7 @@ import warnings
 import numpy as np
 
 from parmed import load_file, gromacs, amber, openmm, charmm
-from parmed.exceptions import GromacsWarning
+from parmed.exceptions import GromacsWarning, ParameterError
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed.utils.six.moves import zip, range
 from parmed import unit as u, topologyobjects as to
@@ -241,6 +241,49 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
         cona.setPositions(gro.positions)
 
         self.check_energies(top, cong, parm, cona)
+
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+    def test_rb_torsion_conversion(self):
+        """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
+        top = get_fn(os.path.join('gmxtops', 'rb_torsions.top'))
+        gro = get_fn(os.path.join('gmxtops', 'rb_torsions.gro'))
+        top = load_file(top, xyz=gro)
+
+        # 4 types are defined but parmed adds entries to the dict for each
+        # ordering of the bondingtypes and one dihedral is symmetric
+        assert len(top.parameterset.rb_torsion_types) == 7
+
+        parm = amber.AmberParm.from_structure(top)
+        parm.save(get_fn('rb_torsions.prmtop', written=True))
+        parm.save(get_fn('rb_torsions.rst7', written=True))
+
+        sysg = top.createSystem()
+        sysa = parm.createSystem()
+
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
+
+        cong.setPositions(top.positions)
+        cona.setPositions(top.positions)
+
+        self.check_energies(top, cong, parm, cona)
+
+
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+    def test_unconvertable_rb_torsion(self):
+        """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
+        top = get_fn(os.path.join('gmxtops', 'unconvertable_rb_torsion.top'))
+        gro = get_fn(os.path.join('gmxtops', 'rb_torsions.gro'))
+        top = load_file(top, xyz=gro)
+
+        # 4 types are defined but parmed adds entries to the dict for each
+        # ordering of the bondingtypes and one dihedral is symmetric
+        assert len(top.parameterset.rb_torsion_types) == 7
+
+        self.assertRaises(ParameterError, lambda:
+                amber.AmberParm.from_structure(top)
+        )
+
 
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_complicated(self):
