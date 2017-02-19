@@ -17,6 +17,9 @@ conda install -yn ${CONDAENV} rdkit==2015.09.1 -c omnia
 conda install -yn ${CONDAENV} boost==1.59.0 -c omnia
 conda install -yn ${CONDAENV} nglview -c bioconda
 
+# Add PyRosetta4 to the PYTHONPATH so it will be available
+export PYTHONPATH=/usr/local/pyrosetta4/lib/python${PYTHON_VERSION}/site-packages
+
 # Make sure we don't install pysander prereqs, since that is just ParmEd!
 conda install -yn ${CONDAENV} --no-deps pysander
 
