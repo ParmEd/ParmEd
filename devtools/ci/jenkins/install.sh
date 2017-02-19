@@ -11,8 +11,10 @@ conda remove -yn ${CONDAENV} --all || true
 
 # Now create the conda environment
 conda create -yn ${CONDAENV} --no-default-packages python=${PYTHON_VERSION} --quiet
-conda config --add channels omnia
-conda config --add channels ambermd
+if [ "${label}" != "macos" ]; then
+    conda config --add channels omnia
+    conda config --add channels ambermd
+fi
 
 # Show the conda version
 conda --version
