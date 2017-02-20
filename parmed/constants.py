@@ -73,3 +73,6 @@ TINY = 1.0e-8
 SMALL = 1.0e-4
 TINY_DIGITS = int(_log10(TINY) + 0.5)
 SMALL_DIGITS = int(_log10(SMALL) + 0.5)
+
+# For I/O
+DEFAULT_ENCODING = 'UTF-8'
