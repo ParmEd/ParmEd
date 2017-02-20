@@ -280,7 +280,7 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
         # ordering of the bondingtypes and one dihedral is symmetric
         assert len(top.parameterset.rb_torsion_types) == 7
 
-        self.assertRaises(ParameterError, lambda:
+        self.assertRaises(ValueError, lambda:
                 amber.AmberParm.from_structure(top)
         )
 

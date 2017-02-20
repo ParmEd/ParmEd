@@ -344,9 +344,9 @@ class AmberParm(AmberFormat, Structure):
                 proper.type.list = struct.dihedral_types
 
         del struct.rb_torsions[:]
-        del struct.rb_torsion_types[:]
+        struct.rb_torsion_types.clear()
         if hasattr(struct, 'parameterset'):
-            del struct.parameterset.rb_torsion_types[:]
+            struct.parameterset.rb_torsion_types.clear()
 
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
