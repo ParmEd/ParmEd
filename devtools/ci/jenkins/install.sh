@@ -57,7 +57,9 @@ coverage combine
 coverage report -m
 coverage xml -o ../coverage.xml
 # Find the base directory of the report
-coveralls -y ../.coveralls.yml
+if [ "${label}" = "linux" ]; then
+    coveralls -y ../.coveralls.yml
+fi
 
 # Get rid of our environment
 source deactivate
