@@ -343,10 +343,10 @@ class AmberParm(AmberFormat, Structure):
                 struct.dihedral_types.append(proper.type)
                 proper.type.list = struct.dihedral_types
 
-        struct.rb_torsions.clear()
-        struct.rb_torsion_types.clear()
+        del struct.rb_torsions[:]
+        del struct.rb_torsion_types[:]
         if hasattr(struct, 'parameterset'):
-            struct.parameterset.rb_torsion_types.clear()
+            del struct.parameterset.rb_torsion_types[:]
 
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
