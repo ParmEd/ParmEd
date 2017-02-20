@@ -31,7 +31,9 @@ conda install --quiet -yn ${CONDAENV} nglview==0.5.1
 export PYTHONPATH=/usr/local/pyrosetta4/lib/python${PYTHON_VERSION}/site-packages
 
 # Make sure we don't install pysander prereqs, since that is just ParmEd!
-conda install --quiet -yn ${CONDAENV} --no-deps pysander
+if [ "${label}" = "linux" ]; then
+    conda install --quiet -yn ${CONDAENV} --no-deps pysander
+fi
 
 # Now enter this superamazingawesome environment we just created
 source activate ${CONDAENV}
