@@ -132,4 +132,4 @@ def genopen(name, mode='r'):
         else:
             return TextIOWrapper(open_url)
     else:
-        return open(name, mode)
+        return TextIOWrapper(open(name, mode+'b'))
