@@ -2537,8 +2537,7 @@ class DihedralTypeList(list, _ListItem):
 
         Raises
         ------
-        AttributeError if rbtorsion does not have the attributes c0, c1, c2, c3,
-        c4, and c5.
+        ValueError if all terms in rbtorsion are zero except for c0
 
         """
         c0 = rbtorsion.c0
