@@ -20,7 +20,7 @@ import os
 import sys
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
-                   HAS_GROMACS, FileIOTestCase)
+                   HAS_GROMACS, FileIOTestCase, create_random_structure)
 import warnings
 
 def reset_stringio(io):
@@ -146,6 +146,25 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pdb.atoms), 49)
         self.assertEqual(len(pdb.residues), 1)
         self.assertEqual(pdb.residues[0].name, 'SAM')
+
+    def test_load_pdb_with_negative_resnum(self):
+        """ Tests negative residue numbers in PDB writing """
+        # Make a random structure
+        struct = read_PDB(get_fn('4lzt.pdb'))
+        for i, residue in enumerate(struct.residues):
+            residue.number = i - 2
+        for i, atom in enumerate(struct.atoms):
+            atom.number = i - 2
+        mypdb = get_fn('negative_indexes.pdb', written=True)
+        struct.save(mypdb, renumber=False)
+        struct2 = read_PDB(mypdb)
+        self.assertEqual(len(struct.atoms), len(struct2.atoms))
+        self.assertEqual(len(struct.residues), len(struct2.residues))
+        # Now make sure the numbers are still negative
+        for i, atom in enumerate(struct2.atoms):
+            self.assertEqual(atom.number, i-2)
+        for i, residue in enumerate(struct2.residues):
+            self.assertEqual(residue.number, i-2)
 
     def test_load_cif(self):
         """ Tests automatic loading of PDBx/mmCIF files """
