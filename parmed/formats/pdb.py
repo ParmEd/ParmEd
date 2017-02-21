@@ -826,7 +826,6 @@ class PDBFile(object):
             standardize = lambda x: (x[:reslen], _is_hetatm(x))
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
-        last_rnumber = 0
         for model, coord in enumerate(coords):
             if coords.shape[0] > 1:
                 dest.write('MODEL      %5d\n' % (model+1))
@@ -849,7 +848,6 @@ class PDBFile(object):
                         anum = _number_truncated_to_n_digits(atom.number, 5)
                         rnum = _number_truncated_to_n_digits(res.number, 4)
                     last_number = anum
-                    last_rnumber = rnum
                     # Do any necessary name munging to respect the PDB spec
                     if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
                         aname = ' %-3s' % pa.name
