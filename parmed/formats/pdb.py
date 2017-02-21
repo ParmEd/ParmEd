@@ -90,8 +90,8 @@ def _is_hetatm(resname):
 def _number_truncated_to_n_digits(num, digits):
     """ Truncates the given number to the specified number of digits """
     if num < 0:
-        return - (-num % eval('1e%d' % (digits-1)))
-    return num % eval('1e%d' % digits)
+        return int(-(-num % eval('1e%d' % (digits-1))))
+    return int(num % eval('1e%d' % digits))
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -842,8 +842,8 @@ class PDBFile(object):
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
                     if renumber:
-                        anum = (atom.idx + 1 + nmore)
-                        rnum = (res.idx + 1)
+                        anum = _number_truncated_to_n_digits(atom.idx + 1 + nmore, 5)
+                        rnum = _number_truncated_to_n_digits(res.idx + 1, 4)
                     else:
                         anum = _number_truncated_to_n_digits(atom.number, 5)
                         rnum = _number_truncated_to_n_digits(res.number, 4)
