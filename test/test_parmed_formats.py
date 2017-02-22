@@ -20,7 +20,7 @@ import os
 import sys
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
-                   HAS_GROMACS, FileIOTestCase)
+                   HAS_GROMACS, FileIOTestCase, create_random_structure)
 import warnings
 
 def reset_stringio(io):
@@ -146,6 +146,25 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pdb.atoms), 49)
         self.assertEqual(len(pdb.residues), 1)
         self.assertEqual(pdb.residues[0].name, 'SAM')
+
+    def test_load_pdb_with_negative_resnum(self):
+        """ Tests negative residue numbers in PDB writing """
+        # Make a random structure
+        struct = read_PDB(get_fn('4lzt.pdb'))
+        for i, residue in enumerate(struct.residues):
+            residue.number = i - 2
+        for i, atom in enumerate(struct.atoms):
+            atom.number = i - 2
+        mypdb = get_fn('negative_indexes.pdb', written=True)
+        struct.save(mypdb, renumber=False)
+        struct2 = read_PDB(mypdb)
+        self.assertEqual(len(struct.atoms), len(struct2.atoms))
+        self.assertEqual(len(struct.residues), len(struct2.residues))
+        # Now make sure the numbers are still negative
+        for i, atom in enumerate(struct2.atoms):
+            self.assertEqual(atom.number, i-2)
+        for i, residue in enumerate(struct2.residues):
+            self.assertEqual(residue.number, i-2)
 
     def test_load_cif(self):
         """ Tests automatic loading of PDBx/mmCIF files """
@@ -1034,6 +1053,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
     def test_pdb_write_symmetry_data(self):
+        """ Tests writing PDB file with symmetry data """
         def assert_remark_290(parm, remark_290_lines):
             output = StringIO()
             parm.write_pdb(output)
@@ -1110,6 +1130,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
             self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
     def test_deprecations(self):
+        """ Test functions that raise deprecation warnings """
         fn = get_fn('blah', written=True)
         parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
@@ -1596,6 +1617,7 @@ class TestCIFStructure(FileIOTestCase):
         self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
 
     def test_cif_space_group_written_from_structure(self):
+        """ Tests CIF file writing with space groups """
         parm = pmd.load_file(get_fn('SCM_A.pdb'))
         self.assertEqual(parm.space_group, 'P 1 21 1')
         written = get_fn('test.cif', written=True)

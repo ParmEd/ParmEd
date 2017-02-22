@@ -85,7 +85,13 @@ def _is_hetatm(resname):
     if len(resname) != 3:
         return not (RNAResidue.has(resname) or DNAResidue.has(resname))
     return not (AminoAcidResidue.has(resname) or RNAResidue.has(resname)
-            or DNAResidue.has(resname))
+                or DNAResidue.has(resname))
+
+def _number_truncated_to_n_digits(num, digits):
+    """ Truncates the given number to the specified number of digits """
+    if num < 0:
+        return int(-(-num % eval('1e%d' % (digits-1))))
+    return int(num % eval('1e%d' % digits))
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -741,6 +747,11 @@ class PDBFile(object):
         written, as the PDB standard dictates that only one set of unit cells
         shall be present).
         """
+        # Determine if we have *any* atom or residue numbers set. If none of
+        # them are set, force renumbering
+        no_atom_numbers_assigned = {a.number for a in struct.atoms} == {-1}
+        no_residue_numbers_assigned = {r.number for r in struct.residues} == {-1}
+        renumber = renumber or (no_atom_numbers_assigned and no_residue_numbers_assigned)
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
         elif altlocs.lower() == 'first'[:len(altlocs)]:
@@ -788,6 +799,8 @@ class PDBFile(object):
                 raise TypeError("Coordinates has unexpected shape")
         else:
             coords = struct.get_coordinates('all')
+            if coords is None:
+                raise ValueError('Cannot write PDB file with no coordinates')
         # Create a function to process each atom and return which one we want
         # to print, based on our alternate location choice
         if altlocs == 'all':
@@ -813,7 +826,6 @@ class PDBFile(object):
             standardize = lambda x: (x[:reslen], _is_hetatm(x))
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
-        last_rnumber = 0
         for model, coord in enumerate(coords):
             if coords.shape[0] > 1:
                 dest.write('MODEL      %5d\n' % (model+1))
@@ -830,15 +842,12 @@ class PDBFile(object):
                     pa, others, (x, y, z) = print_atoms(atom, coord)
                     # Figure out the serial numbers we want to print
                     if renumber:
-                        anum = (atom.idx + 1 + nmore)
-                        rnum = (res.idx + 1)
+                        anum = _number_truncated_to_n_digits(atom.idx + 1 + nmore, 5)
+                        rnum = _number_truncated_to_n_digits(res.idx + 1, 4)
                     else:
-                        anum = (pa.number or last_number + 1)
-                        rnum = (atom.residue.number or last_rnumber + 1)
-                    anum = anum - anum // 100000 * 100000
-                    rnum = rnum - rnum // 10000 * 10000
+                        anum = _number_truncated_to_n_digits(pa.number, 5)
+                        rnum = _number_truncated_to_n_digits(res.number, 4)
                     last_number = anum
-                    last_rnumber = rnum
                     # Do any necessary name munging to respect the PDB spec
                     if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
                         aname = ' %-3s' % pa.name
@@ -849,7 +858,7 @@ class PDBFile(object):
                         rec = hetatomrec
                     else:
                         rec = atomrec
-                    dest.write(rec % (anum , aname, pa.altloc, resname,
+                    dest.write(rec % (anum, aname, pa.altloc, resname,
                                res.chain[:1], rnum, res.insertion_code[:1],
                                x, y, z, pa.occupancy, pa.bfactor, segid,
                                Element[pa.atomic_number].upper(), ''))
@@ -1442,6 +1451,8 @@ class CIFFile(object):
                 raise TypeError("Coordinates has unexpected shape")
         else:
             coords = struct.get_coordinates('all')
+            if coords is None:
+                raise ValueError('Cannot write CIF file with no coordinates')
         # Create a function to process each atom and return which one we want
         # to print, based on our alternate location choice
         if altlocs == 'all':
