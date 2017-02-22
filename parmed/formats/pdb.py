@@ -845,7 +845,7 @@ class PDBFile(object):
                         anum = _number_truncated_to_n_digits(atom.idx + 1 + nmore, 5)
                         rnum = _number_truncated_to_n_digits(res.idx + 1, 4)
                     else:
-                        anum = _number_truncated_to_n_digits(atom.number, 5)
+                        anum = _number_truncated_to_n_digits(pa.number, 5)
                         rnum = _number_truncated_to_n_digits(res.number, 4)
                     last_number = anum
                     # Do any necessary name munging to respect the PDB spec
@@ -858,7 +858,7 @@ class PDBFile(object):
                         rec = hetatomrec
                     else:
                         rec = atomrec
-                    dest.write(rec % (anum , aname, pa.altloc, resname,
+                    dest.write(rec % (anum, aname, pa.altloc, resname,
                                res.chain[:1], rnum, res.insertion_code[:1],
                                x, y, z, pa.occupancy, pa.bfactor, segid,
                                Element[pa.atomic_number].upper(), ''))

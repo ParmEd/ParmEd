@@ -1053,6 +1053,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
     def test_pdb_write_symmetry_data(self):
+        """ Tests writing PDB file with symmetry data """
         def assert_remark_290(parm, remark_290_lines):
             output = StringIO()
             parm.write_pdb(output)
@@ -1129,6 +1130,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
             self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
     def test_deprecations(self):
+        """ Test functions that raise deprecation warnings """
         fn = get_fn('blah', written=True)
         parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
@@ -1615,6 +1617,7 @@ class TestCIFStructure(FileIOTestCase):
         self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
 
     def test_cif_space_group_written_from_structure(self):
+        """ Tests CIF file writing with space groups """
         parm = pmd.load_file(get_fn('SCM_A.pdb'))
         self.assertEqual(parm.space_group, 'P 1 21 1')
         written = get_fn('test.cif', written=True)
