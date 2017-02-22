@@ -340,7 +340,6 @@ class AmberParm(AmberFormat, Structure):
                 proper.type = proper_type
                 struct.dihedrals.append(proper)
                 struct.dihedral_types.append(proper.type)
-                proper.type.list = struct.dihedral_types
 
         del struct.rb_torsions[:]
         del struct.rb_torsion_types[:]
