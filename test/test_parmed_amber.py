@@ -898,7 +898,11 @@ class TestParameterFiles(FileIOTestCase):
     def test_file_detection_frcmod(self):
         """ Tests the detection of Amber frcmod files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
-            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+            try:
+                self.assertTrue(parameters.AmberParameterSet.id_format(fname))
+            except Exception as e:
+                print('Unexpected failure with %s' % fname)
+                raise
         # Now try creating a bunch of non-frcmod files to test the file ID
         # discrimination
         fn = get_fn('test.frcmod', written=True)

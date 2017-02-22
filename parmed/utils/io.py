@@ -10,6 +10,7 @@ import os
 from parmed.utils.six import PY2
 from parmed.utils.six.moves.urllib.request import urlopen
 from parmed.utils.six.moves.urllib.error import HTTPError, URLError
+from parmed.constants import DEFAULT_ENCODING
 
 def genopen(name, mode='r'):
     """
@@ -132,4 +133,7 @@ def genopen(name, mode='r'):
         else:
             return TextIOWrapper(open_url)
     else:
-        return open(name, mode)
+        if PY2:
+            return open(name, mode)
+        else:
+            return open(name, mode, encoding=DEFAULT_ENCODING)
