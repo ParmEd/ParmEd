@@ -478,7 +478,7 @@ class PDBFile(object):
                                         inscode, segid)
                     else:
                         try:
-                            orig_atom = struct.atoms[atomno-1]
+                            last_atom = orig_atom = struct.atoms[atomno-1]
                         except IndexError:
                             raise PDBError('Extra atom in MODEL %d' % modelno)
                         if (orig_atom.residue.name != resname.strip()
