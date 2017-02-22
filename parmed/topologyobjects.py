@@ -9,6 +9,8 @@ from __future__ import division, print_function, absolute_import
 from copy import copy
 from functools import wraps
 import math
+import warnings
+
 from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
 from parmed.constants import (TINY, DEG_TO_RAD, RAD_TO_DEG ,
                               TINY_DIGITS as _TINY_DIGITS)
@@ -17,7 +19,6 @@ import parmed.unit as u
 from parmed.utils.decorators import deprecated
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import zip, range
-import warnings
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
@@ -31,10 +32,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
            'RBTorsionType', 'UnassignedAtomType']
 
-# Used for rounding in hash creation
-
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
-
 scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
 scale_factor = scale_factor.value_in_unit(u.picoseconds)
 akma_time_unit = u.BaseUnit(u.picosecond_base_unit.dimension, 'akma time',
@@ -2539,34 +2537,41 @@ class DihedralTypeList(list, _ListItem):
 
         Raises
         ------
-        AttributeError if rbtorsion does not have the attributes c0, c1, c2, c3,
-        c4, and c5.
+        ValueError if all terms in rbtorsion are zero except for c0
 
-        ValueError if c5 is not 0 and c1+c2+c3+c4 != 0
         """
-        # c0 is ignored (it only contributes a constant...)
+        c0 = rbtorsion.c0
         c1 = rbtorsion.c1
         c2 = rbtorsion.c2
         c3 = rbtorsion.c3
         c4 = rbtorsion.c4
         c5 = rbtorsion.c5
-        if c5 != 0:
-            raise ValueError('Cannot convert R-B torsion with c5 != 0')
-        if abs(c1 + c2 + c3 + c4) > TINY:
-            raise ValueError('Cannot convert R-B torsion with c1+c2+c3+c4 != 0')
-        # These conversions are based on the gromacs manual (2016.1, eqn 4.65)
-        f1 = -2.0 * c1 - 3.0 * c3 / 2.0
-        f2 = -c2 - c4
-        f3 = -c3 / 2.0
-        f4 = -c4 / 4.0
+
+        phi = 0 * u.degrees
+        fc0 = 1.0*c0 + 0.5*c2 + 0.3750*c4
+        fc1 = 1.0*c1 + 0.75*c3 + 0.6250*c5
+        fc2 = 0.5*c2 + 0.5*c4
+        fc3 = 0.25*c3 + 0.3125*c5
+        fc4 = 0.125*c4
+        fc5 = 0.0625*c5
 
         inst = cls()
-        for i, f in enumerate((f1, f2, f3, f4)):
+        for i, f in enumerate((fc1, fc2, fc3, fc4, fc5)):
             if abs(f) > TINY:
                 inst.append(
-                        DihedralType(f, i, 180, scee=rbtorsion.scee,
+                        DihedralType(f, i+1, phi, scee=rbtorsion.scee,
                                      scnb=rbtorsion.scnb)
                 )
+
+        if len(inst) == 0:
+            # All force constants were zeros:
+            if abs(fc0) < TINY:
+                inst.append(
+                        DihedralType(0.0, 0, phi, scee=rbtorsion.scee,
+                                     scnb=rbtorsion.scnb)
+                )
+            else:
+                raise ValueError('Unable to convert RB torsion to propers.')
         return inst
 
     @_exception_to_notimplemented

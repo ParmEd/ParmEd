@@ -22,6 +22,18 @@ Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
+import copy as _copy
+from collections import defaultdict
+from math import sqrt
+from warnings import warn
+
+import numpy as np
+try:
+    from simtk import openmm as mm
+    from simtk.openmm import app
+except ImportError:
+    mm = app = None
+
 from parmed.amber.amberformat import AmberFormat
 from parmed.amber.asciicrd import AmberAsciiRestart
 from parmed.amber.netcdffiles import NetCDFRestart
@@ -36,21 +48,13 @@ from parmed.periodic_table import AtomicNum, element_by_mass
 from parmed.residue import SOLVENT_NAMES, ALLION_NAMES
 from parmed.structure import Structure, needs_openmm
 from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
-                       BondType, AngleType, DihedralType, AtomType, ExtraPoint)
+                       BondType, AngleType, DihedralType, DihedralTypeList,
+                       AtomType, ExtraPoint)
 from parmed import unit as u
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import zip, range
 from parmed.vec3 import Vec3
-from collections import defaultdict
-import copy as _copy
-import numpy as np
-from math import sqrt
-try:
-    from simtk import openmm as mm
-    from simtk.openmm import app
-except ImportError:
-    mm = app = None
-from warnings import warn
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -315,19 +319,33 @@ class AmberParm(AmberFormat, Structure):
         if struct.unknown_functional:
             raise TypeError('Cannot instantiate an AmberParm from unknown '
                             'functional')
-        if (struct.urey_bradleys or struct.impropers or struct.rb_torsions or
-                struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
+        if (struct.urey_bradleys or struct.impropers or struct.cmaps or
+                struct.trigonal_angles or struct.pi_torsions or
                 struct.out_of_plane_bends or struct.stretch_bends or
                 struct.torsion_torsions or struct.multipole_frames):
-            if (struct.rb_torsions or struct.trigonal_angles or
-                    struct.pi_torsions or struct.out_of_plane_bends or
-                    struct.torsion_torsions or struct.multipole_frames or
-                    struct.stretch_bends):
+            if (struct.trigonal_angles or struct.pi_torsions or
+                    struct.out_of_plane_bends or struct.torsion_torsions or
+                    struct.multipole_frames or struct.stretch_bends):
                 raise TypeError('AmberParm does not support all of the '
                                 'parameters defined in the input Structure')
             # Maybe it just has CHARMM parameters?
             raise TypeError('AmberParm does not support all of the parameters '
                             'defined in the input Structure. Try ChamberParm')
+
+        # Convert all RB torsions to propers and delete the originals.
+        for dihedral in struct.rb_torsions:
+            proper_types = DihedralTypeList.from_rbtorsion(dihedral.type)
+            for proper_type in proper_types:
+                proper = _copy.copy(dihedral)
+                proper.type = proper_type
+                struct.dihedrals.append(proper)
+                struct.dihedral_types.append(proper.type)
+
+        del struct.rb_torsions[:]
+        del struct.rb_torsion_types[:]
+        struct.dihedrals.claim()
+        struct.dihedral_types.claim()
+
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()
         inst._add_missing_13_14()
