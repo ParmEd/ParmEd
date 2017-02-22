@@ -319,14 +319,13 @@ class AmberParm(AmberFormat, Structure):
         if struct.unknown_functional:
             raise TypeError('Cannot instantiate an AmberParm from unknown '
                             'functional')
-        if (struct.urey_bradleys or struct.impropers or
-                struct.cmaps or struct.trigonal_angles or struct.pi_torsions or
+        if (struct.urey_bradleys or struct.impropers or struct.cmaps or
+                struct.trigonal_angles or struct.pi_torsions or
                 struct.out_of_plane_bends or struct.stretch_bends or
                 struct.torsion_torsions or struct.multipole_frames):
-            if (struct.trigonal_angles or
-                    struct.pi_torsions or struct.out_of_plane_bends or
-                    struct.torsion_torsions or struct.multipole_frames or
-                    struct.stretch_bends):
+            if (struct.trigonal_angles or struct.pi_torsions or
+                    struct.out_of_plane_bends or struct.torsion_torsions or
+                    struct.multipole_frames or struct.stretch_bends):
                 raise TypeError('AmberParm does not support all of the '
                                 'parameters defined in the input Structure')
             # Maybe it just has CHARMM parameters?
@@ -344,9 +343,9 @@ class AmberParm(AmberFormat, Structure):
                 proper.type.list = struct.dihedral_types
 
         del struct.rb_torsions[:]
-        struct.rb_torsion_types.clear()
-        if hasattr(struct, 'parameterset'):
-            struct.parameterset.rb_torsion_types.clear()
+        del struct.rb_torsion_types[:]
+        struct.dihedrals.claim()
+        struct.dihedral_types.claim()
 
         inst = struct.copy(cls, split_dihedrals=True)
         inst.update_dihedral_exclusions()

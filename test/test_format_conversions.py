@@ -268,6 +268,49 @@ class TestGromacsToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
 
         self.check_energies(top, cong, parm, cona)
 
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+    def test_rb_torsion_conversion2(self):
+        """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
+        top = get_fn(os.path.join('05.OPLS', 'topol.top'))
+        gro = get_fn(os.path.join('05.OPLS', 'conf.gro'))
+        top = load_file(top, xyz=gro)
+
+        parm = amber.AmberParm.from_structure(top)
+        parm.save(get_fn('05opls.prmtop', written=True))
+        parm.save(get_fn('05opls.rst7', written=True))
+
+        sysg = top.createSystem()
+        sysa = parm.createSystem()
+
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
+
+        cong.setPositions(top.positions)
+        cona.setPositions(top.positions)
+
+        self.check_energies(top, cong, parm, cona)
+
+    @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
+    def test_rb_torsion_conversion3(self):
+        """ Check equal energies for Gromacs -> Amber conversion of Amber FF """
+        top = get_fn('2PPN_bulk.top')
+        gro = get_fn('2PPN_bulk.gro')
+        top = load_file(top, xyz=gro)
+
+        parm = amber.AmberParm.from_structure(top)
+        parm.save(get_fn('2PPN_bulk.prmtop', written=True))
+        parm.save(get_fn('2PPN_bulk.rst7', written=True))
+
+        sysg = top.createSystem()
+        sysa = parm.createSystem()
+
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
+
+        cong.setPositions(top.positions)
+        cona.setPositions(top.positions)
+
+        self.check_energies(top, cong, parm, cona)
 
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_unconvertable_rb_torsion(self):
