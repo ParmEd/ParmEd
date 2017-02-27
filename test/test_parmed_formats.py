@@ -1052,6 +1052,11 @@ class TestPDBStructure(FileIOTestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
+    def test_pdb_multimodel_parsing_bug_820(self):
+        """ Test model failing in parsing due to bug #820 in GitHub """
+        # Just make sure it does not raise an exception
+        self.assertEqual(len(download_PDB('1aaf').atoms), 893)
+
     def test_pdb_write_symmetry_data(self):
         """ Tests writing PDB file with symmetry data """
         def assert_remark_290(parm, remark_290_lines):
