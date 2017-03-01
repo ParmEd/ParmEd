@@ -3961,8 +3961,7 @@ class chamber(Action):
                     crdbox = crd.box[0]
             if coords.shape != (len(psf.atoms), 3):
                 raise ChamberError('Mismatch in number of coordinates (%d) and '
-                                   '3*number of atoms (%d)' % (len(coords),
-                                   3*len(psf.atoms)))
+                                   '3*number of atoms (%d)' % (len(coords), 3*len(psf.atoms)))
             # Set the coordinates now, since creating the parm may re-order the
             # atoms in order to maintain contiguous molecules
             psf.coordinates = coords
