@@ -256,12 +256,9 @@ class TestReadParm(FileIOTestCase):
         self.assertFalse(gasparm.has_cmap)
         self.assertEqual(gasparm.combining_rule, 'lorentz')
 
-        self.assertEqual([a.xx for a in gasparm.atoms],
-                         [a.xx for a in parm.atoms])
-        self.assertEqual([a.xy for a in gasparm.atoms],
-                         [a.xy for a in parm.atoms])
-        self.assertEqual([a.xz for a in gasparm.atoms],
-                         [a.xz for a in parm.atoms])
+        self.assertEqual([a.xx for a in gasparm.atoms], [a.xx for a in parm.atoms])
+        self.assertEqual([a.xy for a in gasparm.atoms], [a.xy for a in parm.atoms])
+        self.assertEqual([a.xz for a in gasparm.atoms], [a.xz for a in parm.atoms])
 
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
