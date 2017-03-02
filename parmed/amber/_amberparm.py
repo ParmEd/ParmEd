@@ -41,7 +41,7 @@ from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
             MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
             NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
             NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL)
+            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL, TRUNCATED_OCTAHEDRON_ANGLE)
 from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
 from parmed.geometry import box_lengths_and_angles_to_vectors
 from parmed.periodic_table import AtomicNum, element_by_mass
@@ -2098,20 +2098,12 @@ class AmberParm(AmberFormat, Structure):
             if self._box is None:
                 self._box = box
                 # We need to add topology information
-                if np.allclose(box[3:], 90):
-                    # Orthogonal
-                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
-                else:
-                    self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
                 if 'SOLVENT_POINTERS' not in self.flag_list:
-                    self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3,
-                                  after='IROTAT')
+                    self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3, after='IROTAT')
                 if 'ATOMS_PER_MOLECULE' not in self.flag_list:
-                    self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0],
-                                  after='SOLVENT_POINTERS')
+                    self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0], after='SOLVENT_POINTERS')
                 if 'BOX_DIMENSIONS' not in self.flag_list:
-                    self.add_flag('BOX_DIMENSIONS', '5E16.8',
-                                  data=[box[3], box[0], box[1], box[2]],
+                    self.add_flag('BOX_DIMENSIONS', '5E16.8', data=[box[3], box[0], box[1], box[2]],
                                   after='ATOMS_PER_MOLECULE')
                 try:
                     self.rediscover_molecules(fix_broken=False)
@@ -2123,6 +2115,15 @@ class AmberParm(AmberFormat, Structure):
                 self.load_pointers()
             else:
                 self._box = box
+
+            # Set IFBOX to the appropriate value here
+            if np.allclose(box[3:], 90):
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
+            elif np.allclose(box[3:], TRUNCATED_OCTAHEDRON_ANGLE, atol=0.02):
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
+            else:
+                # General triclinic
+                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 3
 
     #===================================================
 
