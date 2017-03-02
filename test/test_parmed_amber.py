@@ -270,6 +270,11 @@ class TestReadParm(FileIOTestCase):
         self.assertRaises(KeyError, lambda: parm.parm_data['BOX_DIMENSIONS'])
         self.assertEqual(parm.ptr('ifbox'), 0)
 
+        # Now check that IFBOX is set to 3 if we set the box to something non-orthogonal and
+        # non-octahedral
+        parm.box = [10, 10, 10, 90, 60, 90]
+        self.assertEqual(parm.ptr('ifbox'), 3)
+
         # Now check the restart file
         rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
         coords = rst.coordinates
