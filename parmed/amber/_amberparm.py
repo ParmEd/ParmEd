@@ -387,17 +387,17 @@ class AmberParm(AmberFormat, Structure):
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
         # here is to simply set that periodicity to 1.
-        for dt in inst.dihedral_types:
-            if dt.phi_k == 0 and dt.per == 0:
-                dt.per = 1.0
-            elif dt.per == 0:
-                warn('Periodicity of 0 detected with non-zero force constant. '
-                     'Changing periodicity to 1 and force constant to 0 to '
-                     'ensure 1-4 nonbonded pairs are properly identified. This '
-                     'might cause a shift in the energy, but will leave forces '
-                     'unaffected', AmberWarning)
-                dt.phi_k = 0.0
-                dt.per = 1.0
+#        for dt in inst.dihedral_types:
+#            if dt.phi_k == 0 and dt.per == 0:
+#                dt.per = 1.0
+#            elif dt.per == 0:
+#                warn('Periodicity of 0 detected with non-zero force constant. '
+#                     'Changing periodicity to 1 and force constant to 0 to '
+#                     'ensure 1-4 nonbonded pairs are properly identified. This '
+#                     'might cause a shift in the energy, but will leave forces '
+#                     'unaffected', AmberWarning)
+#                dt.phi_k = 0.0
+#                dt.per = 1.0
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
         n_copy = inst.pointers.get('NCOPY', 1)
