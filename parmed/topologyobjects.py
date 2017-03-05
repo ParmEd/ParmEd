@@ -2548,13 +2548,6 @@ class DihedralTypeList(list, _ListItem):
         c5 = rbtorsion.c5
 
         phi = 0 * u.degrees
-        fc0 = 1.0*c0 + 0.5*c2 + 0.3750*c4
-        fc1 = 1.0*c1 + 0.75*c3 + 0.6250*c5
-        fc2 = 0.5*c2 + 0.5*c4
-        fc3 = 0.25*c3 + 0.3125*c5
-        fc4 = 0.125*c4
-        fc5 = 0.0625*c5
-
         fc0 = (4 * c0 + 4 * c1 + 4 * c3 - c4 + 4 * c5 ) / 8.
         fc1 = (-8 * c1 - 6 * c3 - 5 * c5) / 8
         fc2 = (c2 + c4) / 2
