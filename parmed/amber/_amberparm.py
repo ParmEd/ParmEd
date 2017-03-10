@@ -35,7 +35,7 @@ from ..constants import (DEG_TO_RAD, IFBOX, IFCAP, IFPERT, MBONA, MBPER, MDPER,
                          NBPER, NCOPY, NDPER, NEXT, NGPER, NHPARM, NMXRS, NNB,
                          NPARM, NPHB, NPHIA, NPHIH, NPTRA, NRES, NTHETA,
                          NTHETH, NTYPES, NUMANG, NUMBND, NUMEXTRA, RAD_TO_DEG,
-                         SMALL, TINY, TRUNCATED_OCTAHEDRON_ANGLE)
+                         SMALL, TRUNCATED_OCTAHEDRON_ANGLE)
 from ..exceptions import AmberError, AmberWarning, MoleculeError
 from ..geometry import box_lengths_and_angles_to_vectors
 from ..periodic_table import AtomicNum, element_by_mass
