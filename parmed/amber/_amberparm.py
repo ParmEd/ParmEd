@@ -2089,8 +2089,8 @@ class AmberParm(AmberFormat, Structure):
                 if 'ATOMS_PER_MOLECULE' not in self.flag_list:
                     self.add_flag('ATOMS_PER_MOLECULE', '10I8', data=[0], after='SOLVENT_POINTERS')
                 if 'BOX_DIMENSIONS' not in self.flag_list:
-                    self.add_flag('BOX_DIMENSIONS', '5E16.8', data=[box[3], box[0], box[1], box[2]],
-                                  after='ATOMS_PER_MOLECULE')
+                    self.add_flag('BOX_DIMENSIONS', '5E16.8', after='ATOMS_PER_MOLECULE',
+                                  data=[box[0,3], box[0,0], box[0,1], box[0,2]])
                 try:
                     self.rediscover_molecules(fix_broken=False)
                 except MoleculeError:
