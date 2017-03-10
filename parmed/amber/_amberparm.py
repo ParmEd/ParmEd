@@ -28,33 +28,34 @@ from math import sqrt
 from warnings import warn
 
 import numpy as np
+
+from .. import unit as u
+from ..constants import (DEG_TO_RAD, IFBOX, IFCAP, IFPERT, MBONA, MBPER, MDPER,
+                         MGPER, MPHIA, MTHETA, NATOM, NATYP, NBONA, NBONH,
+                         NBPER, NCOPY, NDPER, NEXT, NGPER, NHPARM, NMXRS, NNB,
+                         NPARM, NPHB, NPHIA, NPHIH, NPTRA, NRES, NTHETA,
+                         NTHETH, NTYPES, NUMANG, NUMBND, NUMEXTRA, RAD_TO_DEG,
+                         SMALL, TINY, TRUNCATED_OCTAHEDRON_ANGLE)
+from ..exceptions import AmberError, AmberWarning, MoleculeError
+from ..geometry import box_lengths_and_angles_to_vectors
+from ..periodic_table import AtomicNum, element_by_mass
+from ..residue import ALLION_NAMES, SOLVENT_NAMES
+from ..structure import Structure, needs_openmm
+from ..topologyobjects import (Angle, AngleType, Atom, AtomList, AtomType,
+                               Bond, BondType, Dihedral, DihedralType,
+                               DihedralTypeList, ExtraPoint)
+from ..utils.six import iteritems, string_types
+from ..utils.six.moves import range, zip
+from ..vec3 import Vec3
+from .amberformat import AmberFormat
+from .asciicrd import AmberAsciiRestart
+from .netcdffiles import NetCDFRestart
+
 try:
     from simtk import openmm as mm
     from simtk.openmm import app
 except ImportError:
     mm = app = None
-
-from parmed.amber.amberformat import AmberFormat
-from parmed.amber.asciicrd import AmberAsciiRestart
-from parmed.amber.netcdffiles import NetCDFRestart
-from parmed.constants import (NATOM, NTYPES, NBONH, MBONA, NTHETH,
-            MTHETA, NPHIH, MPHIA, NHPARM, NPARM, NEXT, NRES, NBONA, NTHETA,
-            NPHIA, NUMBND, NUMANG, NPTRA, NATYP, NPHB, IFPERT, NBPER, NGPER,
-            NDPER, MBPER, MGPER, MDPER, IFBOX, NMXRS, IFCAP, NUMEXTRA, NCOPY,
-            NNB, TINY, RAD_TO_DEG, DEG_TO_RAD, SMALL, TRUNCATED_OCTAHEDRON_ANGLE)
-from parmed.exceptions import (AmberError, MoleculeError, AmberWarning)
-from parmed.geometry import box_lengths_and_angles_to_vectors
-from parmed.periodic_table import AtomicNum, element_by_mass
-from parmed.residue import SOLVENT_NAMES, ALLION_NAMES
-from parmed.structure import Structure, needs_openmm
-from parmed.topologyobjects import (Bond, Angle, Dihedral, AtomList, Atom,
-                       BondType, AngleType, DihedralType, DihedralTypeList,
-                       AtomType, ExtraPoint)
-from parmed import unit as u
-from parmed.utils.six import iteritems, string_types
-from parmed.utils.six.moves import zip, range
-from parmed.vec3 import Vec3
-
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -369,20 +370,10 @@ class AmberParm(AmberFormat, Structure):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
-        inst.box = _copy.copy(struct.box)
-        if struct.box is None:
-            inst.parm_data['POINTERS'][IFBOX] = 0
-            inst.pointers['IFBOX'] = 0
-        elif (abs(struct.box[3] - 90) > TINY or abs(struct.box[4] - 90) > TINY
-                or abs(struct.box[5] - 90) > TINY):
-            inst.parm_data['POINTERS'][IFBOX] = 2
-            inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = ([struct.box[3]] +
-                                                list(struct.box[:3]))
-        else:
-            inst.parm_data['POINTERS'][IFBOX] = 1
-            inst.pointers['IFBOX'] = 1
-            inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
+#       else:
+#           inst.parm_data['POINTERS'][IFBOX] = 1
+#           inst.pointers['IFBOX'] = 1
+#           inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
@@ -698,6 +689,7 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        self._set_ifbox()
         # Load the pointers dict
         self.load_pointers()
         # Mark atom list as unchanged
@@ -1276,10 +1268,11 @@ class AmberParm(AmberFormat, Structure):
         AmberError if any of the lengths are incorrect
         """
         def check_length(key, length, required=True):
-            if not required and key not in self.parm_data: return
+            if not required and key not in self.parm_data:
+                return
             if len(self.parm_data[key]) != length:
                 raise AmberError('FLAG %s has %d elements; expected %d' %
-                                     (key, len(self.parm_data[key]), length))
+                                 (key, len(self.parm_data[key]), length))
         natom = self.ptr('NATOM')
         check_length('ATOM_NAME', natom)
         check_length('CHARGE', natom)
@@ -1325,8 +1318,7 @@ class AmberParm(AmberFormat, Structure):
         check_length('HBOND_BCOEF', self.ptr('NPHB'))
         check_length('SOLVENT_POINTERS', 3, False)
         if 'SOLVENT_POINTERS' in self.parm_data:
-            check_length('ATOMS_PER_MOLECULE',
-                         self.parm_data['SOLVENT_POINTERS'][1], False)
+            check_length('ATOMS_PER_MOLECULE', self.parm_data['SOLVENT_POINTERS'][1], False)
 
     #===================================================
 
@@ -1371,8 +1363,7 @@ class AmberParm(AmberFormat, Structure):
         # to fill in the residue sequence IDs in the add_atom call above. Add it
         # in as a post-hoc addition now if that information is present
         if 'RESIDUE_NUMBER' in self.parm_data:
-            for res, num in zip(self.residues,
-                                self.parm_data['RESIDUE_NUMBER']):
+            for res, num in zip(self.residues, self.parm_data['RESIDUE_NUMBER']):
                 res.number = num
 
     #===================================================
@@ -1968,18 +1959,15 @@ class AmberParm(AmberFormat, Structure):
                             key = tuple(sorted([atom, datom]))
                             if key not in adjust_dict:
                                 if ignored_torsion is None:
-                                    ignored_torsion = DihedralType(0, 1, 0,
-                                                                   1e10, 1e10)
+                                    ignored_torsion = DihedralType(0, 1, 0, 1e10, 1e10)
                                     self.dihedral_types.append(ignored_torsion)
                                     ignored_torsion.list = self.dihedral_types
                                 tortype = ignored_torsion
-                            elif 0 in (adjust_dict[key].type.epsilon,
-                                       adjust_dict[key].type.rmin) and \
-                                    adjust_dict[key].type.chgscale == 0:
+                            elif 0 in (adjust_dict[key].type.epsilon, adjust_dict[key].type.rmin) \
+                                 and adjust_dict[key].type.chgscale == 0:
                                 if ignored_torsion is None:
-                                    ignored_torsion = \
-                                            DihedralType(0, 1, 0, 1e10, 1e10,
-                                                    list=self.dihedral_types)
+                                    ignored_torsion = DihedralType(0, 1, 0, 1e10, 1e10,
+                                                                   list=self.dihedral_types)
                                     self.dihedral_types.append(ignored_torsion)
                                 tortype = ignored_torsion
                             else:
@@ -2056,7 +2044,9 @@ class AmberParm(AmberFormat, Structure):
 
     @property
     def box(self):
-        return self._box
+        if self._box is not None:
+            return self._box[0]
+        return None
 
     @box.setter
     def box(self, value):
@@ -2065,14 +2055,11 @@ class AmberParm(AmberFormat, Structure):
         if value is None:
             # Delete all of the other box info in the prmtop
             self._box = None
-            self.parm_data['POINTERS'][IFBOX] = 0
-            self.pointers['IFBOX'] = 0
-            if 'IPTRES' in self.pointers: del self.pointers['IPTRES']
-            if 'NSPM' in self.pointers: del self.pointers['NSPM']
-            if 'NSPSOL' in self.pointers: del self.pointers['NSPSOL']
-            self.delete_flag('SOLVENT_POINTERS')
-            self.delete_flag('ATOMS_PER_MOLECULE')
-            self.delete_flag('BOX_DIMENSIONS')
+            for flag in ('IPTRES', 'NSPM', 'NSPSOL'):
+                if flag in self.pointers:
+                    del self.pointers[flag]
+            for flag in ('SOLVENT_POINTERS', 'ATOMS_PER_MOLECULE', 'BOX_DIMENSIONS'):
+                self.delete_flag(flag)
             self.hasbox = False
         else:
             if isinstance(value, np.ndarray):
@@ -2095,8 +2082,9 @@ class AmberParm(AmberFormat, Structure):
                     box[5] = box[5].value_in_unit(u.degrees)
             box = np.array(box, dtype=np.float64, copy=False, subok=True)
 
+            # We are adding a box for the first time, so make sure we add some flags
             if self._box is None:
-                self._box = box
+                self._box = box.reshape((-1, 6))
                 # We need to add topology information
                 if 'SOLVENT_POINTERS' not in self.flag_list:
                     self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3, after='IROTAT')
@@ -2114,16 +2102,20 @@ class AmberParm(AmberFormat, Structure):
                     pass
                 self.load_pointers()
             else:
-                self._box = box
+                self._box = box.reshape((-1, 6))
+        self._set_ifbox()
 
-            # Set IFBOX to the appropriate value here
-            if np.allclose(box[3:], 90):
-                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
-            elif np.allclose(box[3:], TRUNCATED_OCTAHEDRON_ANGLE, atol=0.02):
-                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
-            else:
-                # General triclinic
-                self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 3
+    def _set_ifbox(self):
+        """ Sets the IFBOX pointers to 1 (ortho), 2 (octahedral) , or 3 (other) """
+        if self.box is None:
+            self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 0
+        elif np.allclose(self.box[3:], 90):
+            self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 1
+        elif np.allclose(self.box[3:], TRUNCATED_OCTAHEDRON_ANGLE, atol=0.02):
+            self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 2
+        else:
+            # General triclinic
+            self.parm_data['POINTERS'][IFBOX] = self.pointers['IFBOX'] = 3
 
     #===================================================
 
@@ -2167,13 +2159,23 @@ class Rst7(object):
         """
         self.coordinates = []
         self.vels = None
-        self.box = None
+        self._box = None
         self.natom = natom
         self.title = title
         self.time = 0
         if filename is not None:
             self.filename = filename
             self._read(filename)
+
+    @property
+    def box(self):
+        return self._box
+    @box.setter
+    def box(self, value):
+        if value is None:
+            self._box = None
+        else:
+            self._box = np.array(value).reshape((-1, 6))[0]
 
     @classmethod
     def open(cls, filename):

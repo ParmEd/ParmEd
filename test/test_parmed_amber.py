@@ -769,7 +769,7 @@ class TestReadParm(FileIOTestCase):
         tmp.box = [3, 3, 3, 109, 109, 90]
         parm = readparm.AmberParm.from_structure(tmp)
         np.testing.assert_equal(parm.box, tmp.box)
-        self.assertEqual(parm.ptr('ifbox'), 2)
+        self.assertEqual(parm.ptr('ifbox'), 3)
         self.assertEqual(parm.parm_data['BOX_DIMENSIONS'], [109, 3, 3, 3])
 
         # Check that a loaded structure without periodicities is properly warned
