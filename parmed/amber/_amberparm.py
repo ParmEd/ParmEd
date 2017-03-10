@@ -370,10 +370,6 @@ class AmberParm(AmberFormat, Structure):
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
-#       else:
-#           inst.parm_data['POINTERS'][IFBOX] = 1
-#           inst.pointers['IFBOX'] = 1
-#           inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
@@ -395,6 +391,8 @@ class AmberParm(AmberFormat, Structure):
         if n_copy >= 2:
             inst._label_alternates()
 
+        # Setting box sets some of the flag data appropriately
+        inst.box = inst.get_box()
         return inst
 
     #===================================================
@@ -2080,11 +2078,11 @@ class AmberParm(AmberFormat, Structure):
                     box[4] = box[4].value_in_unit(u.degrees)
                 if u.is_quantity(box[5]):
                     box[5] = box[5].value_in_unit(u.degrees)
-            box = np.array(box, dtype=np.float64, copy=False, subok=True)
+            box = np.array(box, dtype=np.float64, copy=False, subok=True).reshape((-1, 6))
 
             # We are adding a box for the first time, so make sure we add some flags
             if self._box is None:
-                self._box = box.reshape((-1, 6))
+                self._box = box
                 # We need to add topology information
                 if 'SOLVENT_POINTERS' not in self.flag_list:
                     self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3, after='IROTAT')
@@ -2102,7 +2100,8 @@ class AmberParm(AmberFormat, Structure):
                     pass
                 self.load_pointers()
             else:
-                self._box = box.reshape((-1, 6))
+                self.parm_data['BOX_DIMENSIONS'] = [box[0,3], box[0,0], box[0,1], box[0,2]]
+                self._box = box
         self._set_ifbox()
 
     def _set_ifbox(self):
