@@ -256,12 +256,9 @@ class TestReadParm(FileIOTestCase):
         self.assertFalse(gasparm.has_cmap)
         self.assertEqual(gasparm.combining_rule, 'lorentz')
 
-        self.assertEqual([a.xx for a in gasparm.atoms],
-                         [a.xx for a in parm.atoms])
-        self.assertEqual([a.xy for a in gasparm.atoms],
-                         [a.xy for a in parm.atoms])
-        self.assertEqual([a.xz for a in gasparm.atoms],
-                         [a.xz for a in parm.atoms])
+        self.assertEqual([a.xx for a in gasparm.atoms], [a.xx for a in parm.atoms])
+        self.assertEqual([a.xy for a in gasparm.atoms], [a.xy for a in parm.atoms])
+        self.assertEqual([a.xz for a in gasparm.atoms], [a.xz for a in parm.atoms])
 
         # Now run the tests for the prmtop
         self._standard_parm_tests(parm)
@@ -269,6 +266,11 @@ class TestReadParm(FileIOTestCase):
         self.assertFalse(parm.amoeba)
         self.assertRaises(KeyError, lambda: parm.parm_data['BOX_DIMENSIONS'])
         self.assertEqual(parm.ptr('ifbox'), 0)
+
+        # Now check that IFBOX is set to 3 if we set the box to something non-orthogonal and
+        # non-octahedral
+        parm.box = [10, 10, 10, 90, 60, 90]
+        self.assertEqual(parm.ptr('ifbox'), 3)
 
         # Now check the restart file
         rst = readparm.Rst7.open(get_fn('trx.inpcrd'))
@@ -767,7 +769,7 @@ class TestReadParm(FileIOTestCase):
         tmp.box = [3, 3, 3, 109, 109, 90]
         parm = readparm.AmberParm.from_structure(tmp)
         np.testing.assert_equal(parm.box, tmp.box)
-        self.assertEqual(parm.ptr('ifbox'), 2)
+        self.assertEqual(parm.ptr('ifbox'), 3)
         self.assertEqual(parm.parm_data['BOX_DIMENSIONS'], [109, 3, 3, 3])
 
         # Check that a loaded structure without periodicities is properly warned

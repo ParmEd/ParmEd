@@ -17,7 +17,7 @@ from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
 
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
-class TestOpenMM(FileIOTestCase, TestCaseRelative, EnergyTestCase):
+class TestOpenMM(FileIOTestCase, EnergyTestCase):
 
     def setUp(self):
         super(TestOpenMM, self).setUp()

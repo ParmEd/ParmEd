@@ -64,18 +64,15 @@ class TestCaseRelative(unittest.TestCase):
             if delta is None:
                 if abs(round(ratio - 1, places)) == 0:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, 10**-places, ratio)
-                )
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, 10**-places, ratio))
             else:
                 if abs(ratio - 1) < delta:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, delta, ratio))
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, delta, ratio))
 
-class EnergyTestCase(unittest.TestCase):
+class EnergyTestCase(TestCaseRelative):
 
     def check_energies(self, parm1, con1, parm2, con2):
         ene1 = openmm.utils.energy_decomposition(parm1, con1)

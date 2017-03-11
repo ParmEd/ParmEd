@@ -443,8 +443,8 @@ Number of atoms:       2466
 Number of residues:    820
 Residue set:           ACE, NME, WAT
 Residue count:         ACE: 1, NME: 1, WAT: 818
-System volume (ang^3): 1.00
-System density (g/mL): 24591.940605
+System volume (ang^3): 27031.52
+System density (g/mL): 0.909751
 """
 
 SUMMARYA2 = """\
