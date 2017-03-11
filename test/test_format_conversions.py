@@ -58,7 +58,7 @@ class TestAmberToGromacs(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(top.box, parm.box)
 
 @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
-class TestGromacsToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
+class TestGromacsToAmber(FileIOTestCase, EnergyTestCase):
     """ Tests converting Gromacs top/gro files to Amber """
 
     def test_simple(self):
@@ -401,7 +401,7 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         self.assertEqual(nnormal+nimp, len(psf.dihedrals))
 
 @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
-class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
+class TestOpenMMToAmber(FileIOTestCase, EnergyTestCase):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """
@@ -425,7 +425,7 @@ class TestOpenMMToAmber(FileIOTestCase, TestCaseRelative, EnergyTestCase):
 
 
 @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
-class TestOpenMMToGromacs(FileIOTestCase, TestCaseRelative, EnergyTestCase):
+class TestOpenMMToGromacs(FileIOTestCase, EnergyTestCase):
     """
     Tests that OpenMM system/topology combo can be translated to other formats
     """

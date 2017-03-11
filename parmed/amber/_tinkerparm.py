@@ -20,22 +20,26 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
 import numpy as np
-from parmed.amber._amberparm import AmberParm
-from parmed.amber.amberformat import AmberFormat
-from parmed.constants import NATOM, NRES, IFBOX, RAD_TO_DEG, DEG_TO_RAD
-from parmed.formats.registry import load_file
-from parmed.topologyobjects import (Bond, BondType, PiTorsion, AngleType,
-                OutOfPlaneBendType, DihedralType, UreyBradley, Angle,
-                TrigonalAngle, OutOfPlaneBend, Dihedral, StretchBend,
-                TorsionTorsion, ChiralFrame, MultipoleFrame, NonbondedException,
-                StretchBendType, TorsionTorsionType,
-                AmoebaNonbondedExceptionType as NonbondedExceptionType)
-from parmed.exceptions import AmberError
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import range, zip
+
+from ..constants import DEG_TO_RAD, IFBOX, NATOM, NRES, RAD_TO_DEG
+from ..exceptions import AmberError
+from ..formats.registry import load_file
+from ..topologyobjects import \
+    AmoebaNonbondedExceptionType as NonbondedExceptionType
+from ..topologyobjects import (Angle, AngleType, Bond, BondType, ChiralFrame,
+                               Dihedral, DihedralType, MultipoleFrame,
+                               NonbondedException, OutOfPlaneBend,
+                               OutOfPlaneBendType, PiTorsion, StretchBend,
+                               StretchBendType, TorsionTorsion,
+                               TorsionTorsionType, TrigonalAngle, UreyBradley)
+from ..utils.six import string_types
+from ..utils.six.moves import range, zip
+from ._amberparm import AmberParm
+from .amberformat import AmberFormat
+
 
 class AmoebaParm(AmberParm):
     """

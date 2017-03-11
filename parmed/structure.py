@@ -1124,7 +1124,8 @@ class Structure(object):
                     oval[-1].funct = val.funct
             # Now tack on the "new" types copied from `other`
             for used, typ in zip(used_types, otypcp):
-                if used: otyp.append(typ)
+                if used:
+                    otyp.append(typ)
             if hasattr(otyp, 'claim'):
                 otyp.claim()
         copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
@@ -1133,58 +1134,40 @@ class Structure(object):
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.dihedrals, struct.dihedral_types,
                            self.dihedrals, self.dihedral_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
-                           'ignore_end'])
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper', 'ignore_end'])
         copy_valence_terms(struct.rb_torsions, struct.rb_torsion_types,
                            self.rb_torsions, self.rb_torsion_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
-                           'ignore_end'])
-        copy_valence_terms(struct.urey_bradleys, struct.urey_bradley_types,
-                           self.urey_bradleys, self.urey_bradley_types,
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.impropers, struct.improper_types,
-                           self.impropers, self.improper_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4'])
-        copy_valence_terms(struct.cmaps, struct.cmap_types,
-                           self.cmaps, self.cmap_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper', 'ignore_end'])
+        copy_valence_terms(struct.urey_bradleys, struct.urey_bradley_types, self.urey_bradleys,
+                           self.urey_bradley_types, ['atom1', 'atom2'])
+        copy_valence_terms(struct.impropers, struct.improper_types, self.impropers,
+                           self.improper_types, ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(struct.cmaps, struct.cmap_types, self.cmaps, self.cmap_types,
                            ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
         copy_valence_terms(struct.trigonal_angles, struct.trigonal_angle_types,
                            self.trigonal_angles, self.trigonal_angle_types,
                            ['atom1', 'atom2', 'atom3', 'atom4'])
-        copy_valence_terms(struct.out_of_plane_bends,
-                           struct.out_of_plane_bend_types,
-                           self.out_of_plane_bends,
-                           self.out_of_plane_bend_types,
+        copy_valence_terms(struct.out_of_plane_bends, struct.out_of_plane_bend_types,
+                           self.out_of_plane_bends, self.out_of_plane_bend_types,
                            ['atom1', 'atom2', 'atom3', 'atom4'])
         copy_valence_terms(struct.pi_torsions, struct.pi_torsion_types,
                            self.pi_torsions, self.pi_torsion_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
-                            'atom6'])
-        copy_valence_terms(struct.stretch_bends, struct.stretch_bend_types,
-                           self.stretch_bends, self.stretch_bend_types,
-                           ['atom1', 'atom2', 'atom3'])
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5', 'atom6'])
+        copy_valence_terms(struct.stretch_bends, struct.stretch_bend_types, self.stretch_bends,
+                           self.stretch_bend_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.torsion_torsions, struct.torsion_torsion_types,
                            self.torsion_torsions, self.torsion_torsion_types,
                            ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
         copy_valence_terms(struct.chiral_frames, [], self.chiral_frames, [],
                            ['atom1', 'atom2', 'chirality'])
-        copy_valence_terms(struct.multipole_frames, [], self.multipole_frames,
-                           [], ['atom', 'frame_pt_num', 'vectail', 'vechead',
-                           'nvec'])
+        copy_valence_terms(struct.multipole_frames, [], self.multipole_frames, [],
+                           ['atom', 'frame_pt_num', 'vectail', 'vechead', 'nvec'])
         copy_valence_terms(struct.adjusts, struct.adjust_types, self.adjusts,
                            self.adjust_types, ['atom1', 'atom2'])
-        copy_valence_terms(struct.donors, [], self.donors, [],
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.acceptors, [], self.acceptors, [],
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.groups, [], self.groups, [],
-                           ['atom', 'type', 'move'])
-        if self.box is not None:
-            try:
-                struct.box = self.box
-            except KeyError:
-                # will be handled in subclass
-                pass
+        copy_valence_terms(struct.donors, [], self.donors, [], ['atom1', 'atom2'])
+        copy_valence_terms(struct.acceptors, [], self.acceptors, [], ['atom1', 'atom2'])
+        copy_valence_terms(struct.groups, [], self.groups, [], ['atom', 'type', 'move'])
+        struct._box = self._box
         struct.symmetry = self.symmetry
         struct.space_group = self.space_group
         return struct
