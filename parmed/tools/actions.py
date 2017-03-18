@@ -1160,7 +1160,7 @@ IFBOX (Type of box: 1=orthogonal, 2=not, 0=none).= %d
 NMXRS (number of atoms in largest residue).......= %d
 IFCAP (1 if solvent cap exists)..................= %d
 NUMEXTRA (number of extra points in topology)....= %d
-""" % tuple(ptrs[:30])
+""" % tuple(ptrs[:31])
         if len(ptrs) == 32:
             ret_str += "NCOPY (number of PIMD slices/number of beads)....= %d\n" % ptrs[31]
         if self.parm.ptr('IFBOX'):
