@@ -2341,7 +2341,10 @@ class tiMerge(Action):
                                        'Recreate topology with the molecules to be merged adjacent '
                                        'in the PDB file.')
 
-        if self.parm.coordinates is None:
+        # self.parm.coordinates is a property that manipulates a numpy array, so get a copy of it
+        # here so we do not wind up accessing that property in an inner loop... EXPENSIVE!
+        coordinates = self.parm.coordinates
+        if coordinates is None:
             raise TiMergeError('Load coordinates before merging topology.')
 
         # we now have enough info to remap the atom indicies if an atom in
@@ -2403,7 +2406,7 @@ class tiMerge(Action):
             atm_i = mol1common[i]
             for j in range(len(mol2common)):
                 atm_j = mol2common[j]
-                diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
+                diff = coordinates[atm_i] - coordinates[atm_j]
                 if (np.abs(diff) < self.tol).sum() == 3:
                     mol2common_sort.append(atm_j)
 
@@ -2418,7 +2421,7 @@ class tiMerge(Action):
         for i in range(len(mol1common)):
             atm_i = mol1common[i]
             atm_j = mol2common[i]
-            diff = self.parm.coordinates[atm_i]-self.parm.coordinates[atm_j]
+            diff = coordinates[atm_i] - coordinates[atm_j]
             if (np.abs(diff) > self.tol).any():
                 raise TiMergeError('Common (nonsoftcore) atoms must have the ' # pragma: no cover
                                    'same coordinates.')
