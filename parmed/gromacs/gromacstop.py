@@ -269,7 +269,7 @@ class GromacsTopologyFile(Structure):
         """ Reads the topology file into the current instance """
         from parmed import gromacs as gmx
         params = self.parameterset = ParameterSet()
-        molecules = dict()
+        molecules = self.molecules = dict()
         bond_types = dict()
         angle_types = dict()
         ub_types = dict()
