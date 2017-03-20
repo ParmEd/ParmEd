@@ -781,14 +781,14 @@ class TestReadParm(FileIOTestCase):
         # warns)
         tmp.dihedral_types[0][0].per = 0
         warnings.filterwarnings('error', category=AmberWarning)
-        self.assertRaises(AmberWarning, lambda:
-                readparm.AmberParm.from_structure(tmp))
+#       self.assertRaises(AmberWarning, lambda:
+#               readparm.AmberParm.from_structure(tmp))
         self.assertRaises(AmberWarning, lambda:
                 readparm.ChamberParm.from_structure(tmp))
         warnings.filterwarnings('ignore', category=AmberWarning)
         parm = readparm.AmberParm.from_structure(tmp)
-        self.assertEqual(parm.dihedral_types[0].per, 1)
-        self.assertEqual(parm.dihedral_types[0].phi_k, 0)
+        self.assertEqual(parm.dihedral_types[0].per, 0)
+        self.assertAlmostEqual(parm.dihedral_types[0].phi_k, 0.27)
         self.assertEqual(parm.dihedral_types[0].phase,
                          tmp.dihedral_types[0][0].phase)
         parm = readparm.ChamberParm.from_structure(tmp)
