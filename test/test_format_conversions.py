@@ -340,12 +340,11 @@ class TestGromacsToAmber(FileIOTestCase, EnergyTestCase):
 	ene1 = openmm.utils.energy_decomposition(top, cong)
 	ene2 = openmm.utils.energy_decomposition(parm, cona)
 
-	self.assertAlmostEqual(ene1['total'], ene2['total'])
-	self.assertEqual(ene1['bond'], ene2['bond'])
-	self.assertEqual(ene1['angle'], ene2['angle'])
-	self.assertEqual(ene1['dihedral'], ene2['dihedral'])
-	self.assertEqual(ene1['nonbonded'], ene2['nonbonded'])
-	self.assertEqual(ene1['total'], ene2['total'])
+	self.assertAlmostEqual(ene1['bond'], ene2['bond'], places=15)
+	self.assertAlmostEqual(ene1['angle'], ene2['angle'], places=15)
+	self.assertAlmostEqual(ene1['dihedral'], ene2['dihedral'], places=15)
+	self.assertAlmostEqual(ene1['nonbonded'], ene2['nonbonded'], places=15)
+	self.assertAlmostEqual(ene1['total'], ene2['total'], places=15)
 
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_complicated(self):
