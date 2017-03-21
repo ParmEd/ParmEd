@@ -374,7 +374,7 @@ class AmberParm(AmberFormat, Structure):
         # present as a way to hack entries into the 1-4 pairlist. See
         # https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution
         # here is to simply set that periodicity to 1.
-        self._cleanup_dihedrals_with_periodicity_zero()
+        inst._cleanup_dihedrals_with_periodicity_zero()
         inst.remake_parm()
         inst._set_nonbonded_tables(nbfixes)
         n_copy = inst.pointers.get('NCOPY', 1)
