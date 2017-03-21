@@ -1072,8 +1072,6 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(repr(dihed_types[0]),
                 '<DihedralTypes %s>' % list.__repr__(dihed_types[0]))
         # Now try DihedralTypeList.from_rbtorsion
-        #self.assertRaises(ValueError, lambda:
-        #        DihedralTypeList.from_rbtorsion(RBTorsionType(1, 0, 0, 0, 0, 0)))
         dtl = DihedralTypeList.from_rbtorsion(RBTorsionType(1, 2, 3, -4, -1, 0))
         
         # Now test DihedralTypeList.__copy__
