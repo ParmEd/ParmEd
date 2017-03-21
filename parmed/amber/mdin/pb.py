@@ -27,11 +27,11 @@ class pb(object):
 
     def __init__(self):
         self.sander = {'epsin' : 1.0, 'epsout' : 80.0, 'smoothopt' : 1,
-                       'istrng' : 0.0, 'pbtemp' : 300.0, 'radiopt' : -1,
+                       'istrng' : 0.0, 'pbtemp' : 300.0, 'radiopt' : 1,
                        'dprob' : 1.4, 'iprob' : 2.0, 'npbopt' : 0, 'solvopt' : 1,
                        'accept' : 0.001, 'maxitn' : 100, 'fillratio' : 2.0,
                        'space' : 0.5, 'nbuffer' : 0, 'nfocus' : 2, 'fscale' : 8,
-                       'npbgrid' : 1, 'arcres' : 0.25, 'dbfopt' : 1, 'bcopt' : 5,
+                       'npbgrid' : 1, 'arcres' : 0.25, 'bcopt' : 5,
                        'scalec' : 0, 'eneopt' : 2, 'frcopt' : 0, 'cutfd' : 5.0,
                        'cutnb' : 0.0, 'nsnbr' : 1, 'nsnba' : 1, 'phiout' : 0,
                        'phiform' : 0, 'npbverb' : 0, 'npopt' : 2, 'decompopt' : 2,
@@ -44,8 +44,8 @@ class pb(object):
                        'pbkappa' : 0, 'radinc' : 0.8, 'expthresh' : 0.2,
                        'offx' : 0.0, 'offy' : 0.0, 'offz' : 0.0,
                        'sepbuf' : 4.0, 'mpopt' : 0, 'lmax' : 80, 'maxarcdot' : 1500,
-                       'epsmem': 1.0, 'membraneopt' : 0, 'sasopt' : 0, 'mthick' : 20,
-                       'mctrdz' : 0.0, 'poretype': 0, 'npbverb' : 0}
+                       'epsmem': 1.0, 'membraneopt' : 0, 'sasopt' : 0, 'mthick' : 40.0,
+                       'mctrdz' : 0.0, 'mprob' : 2.7, 'poretype': 1, 'npbverb' : 0}
 
         self.sanderAPBS = {'dime' : '0,0,0', 'pdime' : '0,0,0', 'cglen' : '0,0,0',
                            'fglen' : '0,0,0', 'grid' : '0,0,0', 'nlev' : 4,
