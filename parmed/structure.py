@@ -771,6 +771,7 @@ class Structure(object):
         partners arrays
         """
         set14 = set()
+        deferred_dihedrals = [] # to work around pmemd tossing pn=0 dihedrals
         for dihedral in self.dihedrals:
             if dihedral.ignore_end : continue
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
@@ -779,9 +780,16 @@ class Structure(object):
             elif (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
                 # Avoid double counting of 1-4 in a six-membered ring
                 dihedral.ignore_end = True
+            elif dihedral.type is not None and dihedral.type.per == 0:
+                deferred_dihedrals.append(dihedral)
             else:
                 set14.add((dihedral.atom1.idx, dihedral.atom4.idx))
                 set14.add((dihedral.atom4.idx, dihedral.atom1.idx))
+        # Only keep ignore_end = False if we *must*; i.e., if the exclusion it would have
+        # added was not added by anybody else
+        for dihedral in deferred_dihedrals:
+            if (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
+                dihedral.ignore_end = True
 
     #===================================================
 
