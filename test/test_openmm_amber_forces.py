@@ -147,3 +147,51 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
             for x1, x2 in zip(p, s):
                 self.assertAlmostEqual(x1, x2, places=3)
 
+
+    def test_gas_energy_conf_4(self):
+        """ Compare Amber and OpenMM gas phase energies and forces (topology 4) """
+        parm = AmberParm(get_fn('ethanol_T0.prmtop'), get_fn('ethanol_T0.rst7'))
+        self.assertEqual(parm.combining_rule, 'geometric')
+        system = parm.createSystem() # Default, no cutoff
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
+        sim.context.setPositions(parm.positions)
+        energies = energy_decomposition(parm, sim.context)
+#BOND    =        0.0239  ANGLE   =        0.0298  DIHED      =        0.0093
+#VDWAALS =        0.0000  EEL     =        6.7526  HBOND      =        0.0000
+#1-4 VDW =        0.0492  1-4 EEL =       -6.0430  RESTRAINT  =        0.0000
+        # Compare OpenMM energies with the Amber energies (above)
+        self.assertAlmostEqual(energies['bond'], 0.0239, places=4)
+        self.assertAlmostEqual(energies['angle'], 0.0298, places=4)
+        self.assertAlmostEqual(energies['dihedral'], 0.0093, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], 0.0000+6.7526+0.0492-6.0430, places=3)
+
+        # Now test the forces to make sure that they are computed correctly in
+        # the presence of extra points
+        pstate = sim.context.getState(getForces=True)
+        pf = pstate.getForces().value_in_unit(u.kilojoule_per_mole/u.nanometer)
+# gmx forces:
+#      f[    0]={ 1.73101e+02,  5.67250e+01, -4.02950e+01}
+#      f[    1]={-8.13704e+00, -1.79612e+01,  9.88537e+01}
+#      f[    2]={-2.83120e+01,  6.23352e+00, -5.47393e+00}
+#      f[    3]={-1.03312e+01, -1.00966e+01, -5.12129e+00}
+#      f[    4]={-1.69636e+02,  3.34850e+01, -1.73612e+02}
+#      f[    5]={ 4.19932e+00, -2.58283e+00,  1.29999e+02}
+#      f[    6]={ 3.02865e+01, -6.68331e+00, -2.99153e+01}
+#      f[    7]={ 1.00113e+02, -5.22480e+01,  4.80526e+01}
+#      f[    8]={-9.12828e+01, -6.87157e+00, -2.24877e+01}
+
+        gf = [  ( 1.73101e+02,  5.67250e+01, -4.02950e+01),
+                (-8.13704e+00, -1.79612e+01,  9.88537e+01),
+                (-2.83120e+01,  6.23352e+00, -5.47393e+00),
+                (-1.03312e+01, -1.00966e+01, -5.12129e+00),
+                (-1.69636e+02,  3.34850e+01, -1.73612e+02),
+                ( 4.19932e+00, -2.58283e+00,  1.29999e+02),
+                ( 3.02865e+01, -6.68331e+00, -2.99153e+01),
+                ( 1.00113e+02, -5.22480e+01,  4.80526e+01),
+                (-9.12828e+01, -6.87157e+00, -2.24877e+01)]
+        for p, s in zip(pf, gf):
+            for x1, x2 in zip(p, s):
+                self.assertAlmostEqual(x1, x2, places=3)
+
+
