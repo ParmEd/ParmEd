@@ -2111,7 +2111,8 @@ class AmberParm(AmberFormat, Structure):
         pmemd will always get that exception correct
         """
         dt = None
-        for dih in self.dihedral_types:
+        new_dihedrals = []
+        for dih in self.dihedrals:
             if dih.ignore_end or dih.type.per != 0:
                 continue
             # If we got here, ignore_end must be False and out periodicity must be 0. So add
@@ -2119,13 +2120,15 @@ class AmberParm(AmberFormat, Structure):
             if dt is None:
                 dt = DihedralType(0, 1, 0, dih.type.scee, dih.type.scnb, list=self.dihedral_types)
                 self.dihedral_types.append(dt)
-            self.dihedrals.append(
+            new_dihedrals.append(
                 Dihedral(dih.atom1, dih.atom2, dih.atom3, dih.atom4, improper=dih.improper,
-                         ignore_end=False)
+                         ignore_end=False, type=dt)
             )
             # Now that we added the above dihedral, we can start ignoring the end-group interactions
             # on this dihedral
             dih.ignore_end = True
+        if new_dihedrals:
+            self.dihedrals.extend(new_dihedrals)
 
     #===================================================
 
