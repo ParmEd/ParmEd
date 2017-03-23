@@ -12,6 +12,7 @@ import os
 import re
 import warnings
 from copy import copy as _copy
+from itertools import permutations
 
 from ..constants import TINY
 from ..exceptions import CharmmError, ParameterWarning
@@ -1039,11 +1040,15 @@ class CharmmParameterSet(ParameterSet):
         f.write('\nIMPROPERS\n')
         written = set()
         for key, typ in iteritems(self.improper_periodic_types):
-            sortkey = tuple(sorted(key))
-            if sortkey in written: continue
-            written.add(sortkey)
-            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                    (key[0], key[1], key[2], key[3], typ.phi_k, int(typ.per), typ.phase))
+            # third atom is central, so do all the permutations of the other keys. It's unclear what
+            # CHARMM expects exactly, so just spit out any combo that Amber would match (since that
+            # is the conversion being supported here)
+            for pkey in permutations([key[0], key[1], key[3]]):
+                permkey = (pkey[0], pkey[1], key[2], pkey[2])
+                if permkey in written: continue
+                written.add(permkey)
+                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' % (permkey[0], permkey[1],
+                        permkey[2], permkey[3], typ.phi_k, int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
             if key[2] == 'X':
                 key = (key[0], key[2], key[3], key[1])

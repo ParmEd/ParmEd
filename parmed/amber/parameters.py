@@ -371,9 +371,7 @@ class AmberParameterSet(ParameterSet):
         params : :class:`ParameterSet`
             The parameter set with all parameters defined in the Structure
         """
-        return super(AmberParameterSet, cls).from_structure(
-                struct, allow_unequal_duplicates=False
-        )
+        return super(AmberParameterSet, cls).from_structure(struct, allow_unequal_duplicates=False)
 
     #===================================================
 
