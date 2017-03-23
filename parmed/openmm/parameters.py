@@ -202,7 +202,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_urey_bradley(dest, skip_types)
             self._write_omm_dihedrals(dest, skip_types)
             self._write_omm_impropers(dest, skip_types)
-#           self._write_omm_rb_torsions(dest, skip_types)
+            self._write_omm_rb_torsions(dest, skip_types)
             self._write_omm_cmaps(dest, skip_types)
             self._write_omm_scripts(dest, skip_types)
             self._write_omm_nonbonded(dest, skip_types, separate_ljforce)
@@ -318,7 +318,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond type1="%s" type2="%s" length="%s" k="%s"/>\n'
+            dest.write('  <Bond class1="%s" class2="%s" length="%s" k="%s"/>\n'
                        % (a1, a2, bond.req*lconv, bond.k*kconv))
         dest.write(' </HarmonicBondForce>\n')
 
@@ -333,7 +333,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            dest.write('  <Angle type1="%s" type2="%s" type3="%s" '
+            dest.write('  <Angle class1="%s" class2="%s" class3="%s" '
                        'angle="%s" k="%s"/>\n' %
                        (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
         dest.write(' </HarmonicAngleForce>\n')
@@ -384,6 +384,29 @@ class OpenMMParameterSet(ParameterSet):
                         improp.phase*pconv, improp.phi_k*kconv)
             )
         dest.write(' </PeriodicTorsionForce>\n')
+
+    def _write_omm_rb_torsions(self, dest, skip_types):
+        if not self.rb_torsion_types and not self.improper_periodic_types: return
+        # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
+        # The from_structure method ensures that, even if the containing
+        # Structure has separate dihedral entries for each torsion
+        dest.write(' <RBTorsionForce>\n')
+        diheds_done = set()
+        pconv = u.degree.conversion_factor_to(u.radians)
+        kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
+        def nowild(name):
+            return name if name != 'X' else ''
+        for (a1, a2, a3, a4), dihed in iteritems(self.rb_torsion_types):
+            if any((a in skip_types for a in (a1, a2, a3, a4))): continue
+            if (a1, a2, a3, a4) in diheds_done: continue
+            diheds_done.add((a1, a2, a3, a4))
+            diheds_done.add((a4, a3, a2, a1))
+            dest.write('  <Proper class1="%s" class2="%s" class3="%s" '
+                       'class4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
+            for i, term in enumerate([dihed.c0,dihed.c1,dihed.c2,dihed.c3,dihed.c4,dihed.c5]):
+                dest.write(' c{}="{}"'.format(i, term*kconv))
+            dest.write('/>\n')
+        dest.write(' </RBTorsionForce>\n')
 
     def _write_omm_impropers(self, dest, skip_types):
         if not self.improper_types: return
@@ -485,7 +508,7 @@ class OpenMMParameterSet(ParameterSet):
         # Write NonbondedForce records.
         dest.write(' <NonbondedForce coulomb14scale="%s" lj14scale="%s">\n' %
                    (coulomb14scale, lj14scale))
-        dest.write('  <UseAttributeFromResidue name="charge"/>\n')
+        #dest.write('  <UseAttributeFromResidue name="charge"/>\n')
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
@@ -508,8 +531,9 @@ class OpenMMParameterSet(ParameterSet):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, abs(epsilon)))
+            charge = atom_type.charge
+            dest.write('  <Atom type="%s" charge="%s" sigma="%s" epsilon="%s"/>\n' %
+                       (name, charge, sigma, abs(epsilon)))
         dest.write(' </NonbondedForce>\n')
 
     def _write_omm_LennardJonesForce(self, dest, skip_types, separate_ljforce):
