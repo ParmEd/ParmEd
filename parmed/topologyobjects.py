@@ -936,7 +936,7 @@ class Atom(_ListItem):
         return not self > other
 
     def __repr__(self):
-        start = '<Atom %s:%s [%d]' % (self.name, self.type, self.idx)
+        start = '<Atom %s [%d]' % (self.name, self.idx)
         if self.residue is not None and hasattr(self.residue, 'idx'):
             return start + '; In %s %d>' % (self.residue.name, self.residue.idx)
         elif self.residue is not None:
