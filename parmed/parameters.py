@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, print_function
 import warnings
 from collections import OrderedDict
 from copy import copy
+from itertools import permutations
 
 from .exceptions import ParameterError, ParameterWarning
 from .topologyobjects import (AtomType, DihedralType, DihedralTypeList,
@@ -234,16 +235,17 @@ class ParameterSet(object):
         for dihedral in struct.dihedrals:
             if dihedral.type is None: continue
             if dihedral.improper:
-                # Make sure the central atom comes third
-                key = _find_improper_key(dihedral)
-                if key in params.improper_periodic_types:
-                    if (not allow_unequal_duplicates and
-                            params.improper_periodic_types[key] != dihedral.type):
-                        raise ParameterError('Unequal dihedral types defined between %s, %s, %s, '
-                                             'and %s' % key)
-                    continue # pragma: no cover
-                typ = copy(dihedral.type)
-                params.improper_periodic_types[key] = typ
+                # Make sure the central atom comes third, but add all permutations since it's not
+                # clear which particular ordering the various programs require
+                for key in _find_improper_keys(dihedral):
+                    if key in params.improper_periodic_types:
+                        if (not allow_unequal_duplicates and
+                                params.improper_periodic_types[key] != dihedral.type):
+                            raise ParameterError('Unequal dihedral types defined between %s, %s, '
+                                                 '%s, and %s' % key)
+                        continue # pragma: no cover
+                    typ = copy(dihedral.type)
+                    params.improper_periodic_types[key] = typ
             else:
                 key = (dihedral.atom1.type, dihedral.atom2.type,
                        dihedral.atom3.type, dihedral.atom4.type)
@@ -307,7 +309,7 @@ class ParameterSet(object):
         for improper in struct.impropers:
             if improper.type is None: continue
             key = (improper.atom1.type, improper.atom2.type,
-                    improper.atom3.type, improper.atom4.type)
+                   improper.atom3.type, improper.atom4.type)
             if key in params.improper_types:
                 if not allow_unequal_duplicates and params.improper_types[key] != improper.type:
                     raise ParameterError('Unequal improper types defined between '
@@ -456,7 +458,7 @@ def _find_ureybrad_key(urey):
         warnings.warn('Urey-Bradley %r shares multiple central atoms', ParameterWarning)
     return (a1.type, list(shared_bond_partners)[0].type, a2.type)
 
-def _find_improper_key(dih):
+def _find_improper_keys(dih):
     """ Finds the central atom (i.e., that bonded to everything else) """
     assert dih.improper, 'Should not be called on non-improper!'
     all_atoms = {dih.atom1, dih.atom2, dih.atom3, dih.atom4}
@@ -468,8 +470,9 @@ def _find_improper_key(dih):
                 break
         else:
             # This *is* the central atom
-            pkey = sorted([a.type for a in all_atoms if a is not atom])
-            return (pkey[0], pkey[1], atom.type, pkey[2])
+            for key in permutations([a.type for a in all_atoms if a is not atom]):
+                yield (key[0], key[1], atom.type, key[2])
+            return None # break out of the generator
     # If we got here, we found no central atom. *assume* it's the third spot already...
-    pkey = sorted([dih.atom1.type, dih.atom2.type, dih.atom4.type])
-    return (pkey[0], pkey[1], dih.atom3.type, pkey[2])
+    for key in permutations([dih.atom1.type, dih.atom2.type, dih.atom4.type]):
+        yield (key[0], key[1], dih.atom3.type, key[2])

@@ -1027,28 +1027,23 @@ class CharmmParameterSet(ParameterSet):
         written = set()
         for key, typ in iteritems(self.angle_types):
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
+            written.add(key)
+            written.add(tuple(reversed(key)))
             f.write('%-6s %-6s %-6s %7.2f %8.2f\n' % (key[0], key[1], key[2], typ.k, typ.theteq))
         f.write('\nDIHEDRALS\n')
         written = set()
         for key, typ in iteritems(self.dihedral_types):
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
-            for t in typ:
+            written.add(key)
+            written.add(tuple(reversed(key)))
+            for tor in typ:
                 f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], t.phi_k, int(t.per), t.phase))
+                        (key[0], key[1], key[2], key[3], tor.phi_k, int(tor.per), tor.phase))
         f.write('\nIMPROPERS\n')
         written = set()
         for key, typ in iteritems(self.improper_periodic_types):
-            # third atom is central, so do all the permutations of the other keys. It's unclear what
-            # CHARMM expects exactly, so just spit out any combo that Amber would match (since that
-            # is the conversion being supported here)
-            for pkey in permutations([key[0], key[1], key[3]]):
-                permkey = (pkey[0], pkey[1], key[2], pkey[2])
-                if permkey in written: continue
-                written.add(permkey)
-                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' % (permkey[0], permkey[1],
-                        permkey[2], permkey[3], typ.phi_k, int(typ.per), typ.phase))
+            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
+                    (key[0], key[1], key[2], key[3], typ.phi_k, int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
             if key[2] == 'X':
                 key = (key[0], key[2], key[3], key[1])
