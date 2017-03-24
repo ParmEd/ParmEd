@@ -12,7 +12,6 @@ import os
 import re
 import warnings
 from copy import copy as _copy
-from itertools import permutations
 
 from ..constants import TINY
 from ..exceptions import CharmmError, ParameterWarning
