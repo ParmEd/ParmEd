@@ -472,7 +472,7 @@ def _find_improper_keys(dih):
             # This *is* the central atom
             for key in permutations([a.type for a in all_atoms if a is not atom]):
                 yield (key[0], key[1], atom.type, key[2])
-            return None # break out of the generator
+            return # break out of the generator
     # If we got here, we found no central atom. *assume* it's the third spot already...
     for key in permutations([dih.atom1.type, dih.atom2.type, dih.atom4.type]):
         yield (key[0], key[1], dih.atom3.type, key[2])
