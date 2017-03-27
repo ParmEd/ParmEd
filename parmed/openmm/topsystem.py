@@ -312,8 +312,8 @@ def _process_improper(struct, force):
     # ParmEd and OpenMM use only these two eqns for the improper torsions:
     #  k*(theta-theta0)^2 vs. 0.5*k*(theta-theta0)^2
     # So only recognize the above 2 forms
-    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2', 'k*dtheta_torus',
-                   '0.5*k*dtheta_torus'):
+    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2', 'k*dtheta_torus^2',
+                   '0.5*k*dtheta_torus^2'):
         return False
     if eqn.startswith('0.5'):
         fac = 0.5
