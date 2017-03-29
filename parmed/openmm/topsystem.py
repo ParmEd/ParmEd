@@ -2,26 +2,29 @@
 Convert an OpenMM Topology into a Structure instance, optionally filling in
 parameters from a System
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+
+import warnings
+from collections import defaultdict
+
+import numpy as np
+
+from .. import unit as u
+from ..exceptions import OpenMMWarning
+from ..formats import load_file
+from ..geometry import box_vectors_to_lengths_and_angles
+from ..periodic_table import Element
+from ..structure import Structure
+from ..topologyobjects import (Angle, AngleType, Atom, AtomType, Bond, BondType, Cmap, CmapType,
+                               Dihedral, DihedralType, ExtraPoint, Improper, ImproperType,
+                               NonbondedException, NonbondedExceptionType, RBTorsionType,
+                               UreyBradley)
+from ..utils.decorators import needs_openmm
+from ..utils.six import integer_types, iteritems, string_types
+from ..utils.six.moves import range
 
 __all__ = ['load_topology']
 
-from collections import defaultdict
-import numpy as np
-from parmed.exceptions import OpenMMWarning
-from parmed.formats import load_file
-from parmed.geometry import box_vectors_to_lengths_and_angles
-from parmed.periodic_table import Element
-from parmed.structure import Structure
-from parmed.topologyobjects import (Atom, Bond, BondType, Angle, AngleType,
-        Dihedral, DihedralType, Improper, ImproperType, AtomType, ExtraPoint,
-        UreyBradley, NonbondedExceptionType, NonbondedException, Cmap, CmapType,
-        RBTorsionType)
-from parmed import unit as u
-from parmed.utils.decorators import needs_openmm
-from parmed.utils.six import iteritems, string_types, integer_types
-from parmed.utils.six.moves import range
-import warnings
 
 @needs_openmm
 def load_topology(topology, system=None, xyz=None, box=None):
@@ -87,8 +90,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
                 else:
-                    atype = (a.id if not isinstance(a.id, integer_types)
-                             else '')
+                    atype = a.id if not isinstance(a.id, integer_types) else ''
                     atom = Atom(atomic_number=a.element.atomic_number,
                                 name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
@@ -135,14 +137,13 @@ def load_topology(topology, system=None, xyz=None, box=None):
 
     # We have a system, try to extract parameters from it
     if len(struct.atoms) != system.getNumParticles():
-        raise TypeError('Topology and System have different numbers of atoms '
-                '(%d vs. %d)' % (len(struct.atoms), system.getNumParticles()))
+        raise TypeError('Topology and System have different numbers of atoms (%d vs. %d)' %
+                        (len(struct.atoms), system.getNumParticles()))
 
     processed_forces = set()
-    ignored_forces = (mm.CMMotionRemover, mm.AndersenThermostat,
-                      mm.MonteCarloBarostat, mm.MonteCarloAnisotropicBarostat,
-                      mm.MonteCarloMembraneBarostat, mm.CustomExternalForce,
-                      mm.GBSAOBCForce, mm.CustomGBForce)
+    ignored_forces = (mm.CMMotionRemover, mm.AndersenThermostat, mm.MonteCarloBarostat,
+                      mm.MonteCarloAnisotropicBarostat, mm.MonteCarloMembraneBarostat,
+                      mm.CustomExternalForce, mm.GBSAOBCForce, mm.CustomGBForce)
 
     if system.usesPeriodicBoundaryConditions():
         if not loaded_box:
@@ -150,9 +151,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
             leng, ang = box_vectors_to_lengths_and_angles(*vectors)
             leng = leng.value_in_unit(u.angstroms)
             ang = ang.value_in_unit(u.degrees)
-            struct.box = np.asarray(
-                    [leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]]
-            )
+            struct.box = np.asarray([leng[0], leng[1], leng[2], ang[0], ang[1], ang[2]])
     else:
         struct.box = None
 
@@ -172,8 +171,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
         elif isinstance(force, mm.CustomTorsionForce):
             if not _process_improper(struct, force):
                 struct.unknown_functional = True
-                warnings.warn('Unknown functional form of CustomTorsionForce',
-                              OpenMMWarning)
+                warnings.warn('Unknown functional form of CustomTorsionForce', OpenMMWarning)
         elif isinstance(force, mm.CMAPTorsionForce):
             _process_cmap(struct, force)
         elif isinstance(force, mm.NonbondedForce):
@@ -182,8 +180,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
             continue
         else:
             struct.unknown_functional = True
-            warnings.warn('Unsupported Force type %s' % type(force).__name__,
-                          OpenMMWarning)
+            warnings.warn('Unsupported Force type %s' % type(force).__name__, OpenMMWarning)
         processed_forces.add(type(force))
 
     return struct
@@ -284,8 +281,7 @@ def _process_rbtorsion(struct, force):
         ak, al = struct.atoms[k], struct.atoms[l]
         # TODO -- Fix this when OpenMM is fixed
         try:
-            key = (c0._value, c1._value, c2._value,
-                   c3._value, c4._value, c5._value)
+            key = (c0._value, c1._value, c2._value, c3._value, c4._value, c5._value)
             f = 1                          # pragma: no cover
         except AttributeError:             # pragma: no cover
             key = (c0, c1, c2, c3, c4, c5) # pragma: no cover
@@ -310,13 +306,16 @@ def _process_improper(struct, force):
         improper, and False otherwise
     """
     eqn = force.getEnergyFunction().replace(' ', '')
+    if ';' in eqn: # Just look at the first segment of the equation if there are multiple
+        eqn = eqn[:eqn.index(';')]
     # Don't try to be fancy with regexes for fear of making a possible mistake.
     # ParmEd and OpenMM use only these two eqns for the improper torsions:
     #  k*(theta-theta0)^2 vs. 0.5*k*(theta-theta0)^2
     # So only recognize the above 2 forms
-    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2'):
+    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2', 'k*dtheta_torus^2',
+                   '0.5*k*dtheta_torus^2'):
         return False
-    if eqn == '0.5*k*(theta-theta0)^2':
+    if eqn.startswith('0.5'):
         fac = 0.5
     else:
         fac = 1

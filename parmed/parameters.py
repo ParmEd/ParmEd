@@ -5,16 +5,18 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 """
-from __future__ import print_function, division
+from __future__ import absolute_import, division, print_function
 
-from parmed.exceptions import ParameterError, ParameterWarning
-from parmed.topologyobjects import (NoUreyBradley, DihedralTypeList,
-                AtomType, DihedralType, UnassignedAtomType)
-from parmed.utils.six.moves import range
-from parmed.utils.six import iteritems
+import warnings
 from collections import OrderedDict
 from copy import copy
-import warnings
+from itertools import permutations
+
+from .exceptions import ParameterError, ParameterWarning
+from .topologyobjects import (AtomType, DihedralType, DihedralTypeList,
+                              NoUreyBradley, UnassignedAtomType)
+from .utils.six import iteritems, itervalues
+from .utils.six.moves import range #pylint: disable=W0622,E0401
 
 class ParameterSet(object):
     """
@@ -23,59 +25,54 @@ class ParameterSet(object):
     Attributes
     ----------
     atom_types : dict(str:AtomType)
-        Dictionary mapping the names of the atom types to the corresponding
-        AtomType instances
+        Dictionary mapping the names of the atom types to the corresponding AtomType instances
     atom_types_int : dict(int:AtomType)
-        Dictionary mapping the serial indexes of the atom types to the
-        corresponding AtomType instances
-    atom_types_tuple : dict((str,int):AtomType)
-        Dictionary mapping the (name,number) tuple of the atom types to the
-        corresponding AtomType instances
-    bond_types : dict((str,str):AtomType)
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types involved in the bond to the BondType instances
-    angle_types : dict((str,str,str):AngleType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the AngleType instances
-    urey_bradley_types : dict((str,str,str):BondType)
-        Dictionary mapping the 3-element tuple of the names of the three atom
-        types involved in the angle to the BondType instances of the
-        Urey-Bradley terms
-    dihedral_types : dict((str,str,str,str):list(DihedralType))
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the dihedral to the DihedralType instances. Since each
-        torsion term can be a multiterm expansion, each item corresponding to a
-        key in this dict is a list of `DihedralType`s for each term in the
-        expansion
-    improper_types : dict((str,str,str,str):ImproperType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion to the ImproperType instances
-    improper_periodic_types : dict((str,str,str,str):DihedralType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the improper torsion (modeled as a Fourier series) to
-        the DihedralType instances
-    rb_torsion_types : dict((str,str,str,str):RBTorsionType)
-        Dictionary mapping the 4-element tuple of the names of the four atom
-        types involved in the Ryckaert-Bellemans torsion to the RBTorsionType
+        Dictionary mapping the serial indexes of the atom types to the corresponding AtomType
         instances
+    atom_types_tuple : dict((str,int):AtomType)
+        Dictionary mapping the (name,number) tuple of the atom types to the corresponding AtomType
+        instances
+    bond_types : dict((str,str):AtomType)
+        Dictionary mapping the 2-element tuple of the names of the two atom types involved in the
+        bond to the BondType instances
+    angle_types : dict((str,str,str):AngleType)
+        Dictionary mapping the 3-element tuple of the names of the three atom types involved in the
+        angle to the AngleType instances
+    urey_bradley_types : dict((str,str,str):BondType)
+        Dictionary mapping the 3-element tuple of the names of the three atom types involved in the
+        angle to the BondType instances of the Urey-Bradley terms
+    dihedral_types : dict((str,str,str,str):list(DihedralType))
+        Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+        dihedral to the DihedralType instances. Since each torsion term can be a multiterm
+        expansion, each item corresponding to a key in this dict is a list of `DihedralType`s for
+        each term in the expansion
+    improper_types : dict((str,str,str,str):ImproperType)
+        Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+        improper torsion to the ImproperType instances
+    improper_periodic_types : dict((str,str,str,str):DihedralType)
+        Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+        improper torsion (modeled as a Fourier series) to the DihedralType instances. Note, the
+        central atom should always be put in the *third* position of the key
+    rb_torsion_types : dict((str,str,str,str):RBTorsionType)
+        Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+        Ryckaert-Bellemans torsion to the RBTorsionType instances
     cmap_types : dict((str,str,str,str,str,str,str,str):CmapType)
-        Dictionary mapping the 5-element tuple of the names of the five atom
-        types involved in the correction map to the CmapType instances
+        Dictionary mapping the 5-element tuple of the names of the five atom types involved in the
+        correction map to the CmapType instances
     nbfix_types : dict((str,str):(float,float))
-        Dictionary mapping the 2-element tuple of the names of the two atom
-        types whose LJ terms are modified to the tuple of the (epsilon,rmin)
-        terms for that off-diagonal term
+        Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are
+        modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term
     pair_types : dict((str,str):NonbondedExceptionType)
-        Dictionary mapping the 2-element tuple of atom type names for which
-        explicit exclusion rules should be applied
+        Dictionary mapping the 2-element tuple of atom type names for which explicit exclusion rules
+        should be applied
     parametersets : list(str)
         List of parameter set names processed in the current ParameterSet
     residues : dict(str:ResidueTemplate|ResidueTemplateContainer)
-        A library of ResidueTemplate objects mapped to the residue name defined
-        in the force field library files
+        A library of ResidueTemplate objects mapped to the residue name defined in the force field
+        library files
     """
 
-    def __init__(self, *args):
+    def __init__(self):
         # Instantiate the list types
         self.atom_types = self.atom_types_str = OrderedDict()
         self.atom_types_int = OrderedDict()
@@ -200,26 +197,21 @@ class ParameterSet(object):
         found_dihed_type_list = dict()
         for atom in struct.atoms:
             if atom.atom_type in (UnassignedAtomType, None):
-                atom_type = AtomType(atom.type, None, atom.mass,
-                                     atom.atomic_number)
-                atom_type.set_lj_params(atom.epsilon, atom.rmin,
-                                        atom.epsilon_14, atom.rmin_14)
+                atom_type = AtomType(atom.type, None, atom.mass, atom.atomic_number)
+                atom_type.set_lj_params(atom.epsilon, atom.rmin, atom.epsilon_14, atom.rmin_14)
                 params.atom_types[atom.type] = atom_type
             else:
                 atom_type = copy(atom.atom_type)
                 params.atom_types[str(atom_type)] = atom_type
                 if atom_type.number is not None:
                     params.atom_types_int[int(atom_type)] = atom_type
-                    params.atom_types_tuple[(int(atom_type), str(atom_type))] =\
-                            atom_type
+                    params.atom_types_tuple[(int(atom_type), str(atom_type))] = atom_type
         for bond in struct.bonds:
             if bond.type is None: continue
             key = (bond.atom1.type, bond.atom2.type)
             if key in params.bond_types:
-                if (not allow_unequal_duplicates and
-                        params.bond_types[key] != bond.type):
-                    raise ParameterError('Unequal bond types defined between '
-                                         '%s and %s' % key)
+                if not allow_unequal_duplicates and params.bond_types[key] != bond.type:
+                    raise ParameterError('Unequal bond types defined between %s and %s' % key)
                 continue # pragma: no cover
             typ = copy(bond.type)
             key = (bond.atom1.type, bond.atom2.type)
@@ -229,10 +221,8 @@ class ParameterSet(object):
             if angle.type is None: continue
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
             if key in params.angle_types:
-                if (not allow_unequal_duplicates and
-                        params.angle_types[key] != angle.type):
-                    raise ParameterError('Unequal angle types defined between '
-                                         '%s, %s, and %s' % key)
+                if not allow_unequal_duplicates and params.angle_types[key] != angle.type:
+                    raise ParameterError('Unequal angle types defined between %s, %s, and %s' % key)
                 continue # pragma: no cover
             typ = copy(angle.type)
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
@@ -244,38 +234,36 @@ class ParameterSet(object):
                 params.urey_bradley_types[tuple(reversed(key))] = NoUreyBradley
         for dihedral in struct.dihedrals:
             if dihedral.type is None: continue
-            key = (dihedral.atom1.type, dihedral.atom2.type,
-                   dihedral.atom3.type, dihedral.atom4.type)
             if dihedral.improper:
+                # Make sure the central atom comes third, but add all permutations since it's not
+                # clear which particular ordering the various programs require
+                for key in _find_improper_keys(dihedral):
+                    if key in params.improper_periodic_types:
+                        if (not allow_unequal_duplicates and
+                                params.improper_periodic_types[key] != dihedral.type):
+                            raise ParameterError('Unequal dihedral types defined between %s, %s, '
+                                                 '%s, and %s' % key)
+                        continue # pragma: no cover
+                    typ = copy(dihedral.type)
+                    params.improper_periodic_types[key] = typ
+            else:
                 key = (dihedral.atom1.type, dihedral.atom2.type,
                        dihedral.atom3.type, dihedral.atom4.type)
-                if key in params.improper_periodic_types:
-                    if (not allow_unequal_duplicates and
-                            params.improper_periodic_types[key] != dihedral.type):
-                        raise ParameterError('Unequal dihedral types defined '
-                                        'between %s, %s, %s, and %s' % key)
-                    continue # pragma: no cover
-                typ = copy(dihedral.type)
-                params.improper_periodic_types[key] = typ
-            else:
                 # Proper dihedral. Look out for multi-term forms
-                if (key in params.dihedral_types and
-                        found_dihed_type_list[key]):
+                if key in params.dihedral_types and found_dihed_type_list[key]:
                     # Already found a multi-term dihedral type list
                     if not allow_unequal_duplicates:
                         if isinstance(dihedral.type, DihedralTypeList):
                             if params.dihedral_types[key] != dihedral.type:
-                                raise ParameterError('Unequal dihedral types '
-                                        'defined between %s, %s, %s, and %s' %
-                                        key)
+                                raise ParameterError('Unequal dihedral types defined between %s, '
+                                                     '%s, %s, and %s' % key)
                         elif isinstance(dihedral.type, DihedralType):
                             for dt in params.dihedral_types[key]:
                                 if dt == dihedral.type:
                                     break
                             else:
-                                raise ParameterError('Unequal dihedral types '
-                                        'defined between %s, %s, %s, and %s' %
-                                        key)
+                                raise ParameterError('Unequal dihedral types defined between %s, '
+                                                     '%s, %s, and %s' % key)
                     continue # pragma: no cover
                 elif key in params.dihedral_types:
                     # We have one term of a potentially multi-term dihedral.
@@ -291,11 +279,9 @@ class ParameterSet(object):
                         # with its periodicity does not already exist
                         for t in params.dihedral_types[key]:
                             if t.per == dihedral.type.per:
-                                if (not allow_unequal_duplicates and
-                                        t != dihedral.type):
-                                    raise ParameterError('Unequal dihedral '
-                                            'types defined bewteen %s, %s, %s, '
-                                            'and %s' % key)
+                                if not allow_unequal_duplicates and t != dihedral.type:
+                                    raise ParameterError('Unequal dihedral types defined bewteen '
+                                                         '%s, %s, %s, and %s' % key)
                                 break
                         else:
                             # If we got here, we did NOT find this periodicity.
@@ -323,25 +309,21 @@ class ParameterSet(object):
         for improper in struct.impropers:
             if improper.type is None: continue
             key = (improper.atom1.type, improper.atom2.type,
-                    improper.atom3.type, improper.atom4.type)
+                   improper.atom3.type, improper.atom4.type)
             if key in params.improper_types:
-                if (not allow_unequal_duplicates and
-                        params.improper_types[key] != improper.type):
-                    raise ParameterError('Unequal improper types defined '
-                            'between %s, %s, %s, and %s' % key)
+                if not allow_unequal_duplicates and params.improper_types[key] != improper.type:
+                    raise ParameterError('Unequal improper types defined between '
+                                         '%s, %s, %s, and %s' % key)
                 continue # pragma: no cover
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
             if cmap.type is None: continue
-            key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type,
-                    cmap.atom4.type, cmap.atom2.type, cmap.atom3.type,
-                    cmap.atom4.type, cmap.atom5.type)
+            key = (cmap.atom1.type, cmap.atom2.type, cmap.atom3.type, cmap.atom4.type,
+                   cmap.atom2.type, cmap.atom3.type, cmap.atom4.type, cmap.atom5.type)
             if key in params.cmap_types:
-                if (not allow_unequal_duplicates and
-                        cmap.type != params.cmap_types[key]):
-                    raise ParameterError('Unequal CMAP types defined between '
-                            '%s, %s, %s, %s, and %s' % (key[0], key[1], key[2],
-                                key[3], key[7]))
+                if not allow_unequal_duplicates and cmap.type != params.cmap_types[key]:
+                    raise ParameterError('Unequal CMAP types defined between %s, %s, %s, %s, and '
+                                         '%s' % (key[0], key[1], key[2], key[3], key[7]))
                 continue # pragma: no cover
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
@@ -352,8 +334,8 @@ class ParameterSet(object):
             key = _find_ureybrad_key(urey)
             if key is None: continue
             if urey_brads_preassigned and key not in params.urey_bradley_types:
-                warnings.warn('Angle corresponding to Urey-Bradley type not '
-                              'found', ParameterWarning)
+                warnings.warn('Angle corresponding to Urey-Bradley type not found',
+                              ParameterWarning)
             typ = copy(urey.type)
             params.urey_bradley_types[key] = typ
             params.urey_bradley_types[tuple(reversed(key))] = typ
@@ -368,20 +350,17 @@ class ParameterSet(object):
             if adjust.type is None: continue
             key = (adjust.atom1.type, adjust.atom2.type)
             if key in params.pair_types:
-                if (not allow_unequal_duplicates and
-                        params.pair_types[key] != adjust.type):
-                    raise ParameterError('Unequal pair types defined between '
-                                         '%s and %s' % key)
+                if not allow_unequal_duplicates and params.pair_types[key] != adjust.type:
+                    raise ParameterError('Unequal pair types defined between %s and %s' % key)
                 continue # pragma: no cover
             typ = copy(adjust.type)
             params.pair_types[key] = typ
             params.pair_types[tuple(reversed(key))] = typ
         # Trap for Amoeba potentials
-        if (struct.trigonal_angles or struct.out_of_plane_bends or
-                struct.torsion_torsions or struct.stretch_bends or
-                struct.trigonal_angles or struct.pi_torsions):
-            raise NotImplementedError('Cannot extract parameters from an '
-                                      'Amoeba-parametrized system yet')
+        if (struct.trigonal_angles or struct.out_of_plane_bends or struct.torsion_torsions or
+                struct.stretch_bends or struct.trigonal_angles or struct.pi_torsions):
+            raise NotImplementedError('Cannot extract parameters from an Amoeba-parametrized '
+                                      'system yet')
         return params
 
     def condense(self, do_dihedrals=True):
@@ -458,7 +437,7 @@ class ParameterSet(object):
     def typeify_templates(self):
         """ Assign atom types to atom names in templates """
         from parmed.modeller import ResidueTemplateContainer, ResidueTemplate
-        for name, residue in iteritems(self.residues):
+        for residue in itervalues(self.residues):
             if isinstance(residue, ResidueTemplateContainer):
                 for res in residue:
                     for atom in res:
@@ -476,6 +455,24 @@ def _find_ureybrad_key(urey):
     a1, a2 = urey.atom1, urey.atom2
     shared_bond_partners = set(a1.bond_partners) & set(a2.bond_partners)
     if len({a.type for a in shared_bond_partners}) != 1:
-        warnings.warn('Urey-Bradley %r shares multiple central atoms',
-                      ParameterWarning)
+        warnings.warn('Urey-Bradley %r shares multiple central atoms', ParameterWarning)
     return (a1.type, list(shared_bond_partners)[0].type, a2.type)
+
+def _find_improper_keys(dih):
+    """ Finds the central atom (i.e., that bonded to everything else) """
+    assert dih.improper, 'Should not be called on non-improper!'
+    all_atoms = {dih.atom1, dih.atom2, dih.atom3, dih.atom4}
+    for atom in all_atoms:
+        for oatom in all_atoms:
+            if oatom is atom:
+                continue
+            if oatom not in atom.bond_partners:
+                break
+        else:
+            # This *is* the central atom
+            for key in permutations([a.type for a in all_atoms if a is not atom]):
+                yield (key[0], key[1], atom.type, key[2])
+            return # break out of the generator
+    # If we got here, we found no central atom. *assume* it's the third spot already...
+    for key in permutations([dih.atom1.type, dih.atom2.type, dih.atom4.type]):
+        yield (key[0], key[1], dih.atom3.type, key[2])

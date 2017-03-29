@@ -119,14 +119,12 @@ class AmberParameterSet(ParameterSet):
                     line = f.readline()
                 if not line:
                     return False
-                if line.rstrip() not in ('MASS', 'BOND', 'ANGLE', 'ANGL',
-                                         'DIHE', 'DIHED', 'DIHEDRAL', 'IMPR',
-                                         'IMPROP', 'IMPROPER', 'NONB', 'NONBON',
+                if line.rstrip() not in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE', 'DIHED',
+                                         'DIHEDRAL', 'IMPR', 'IMPROP', 'IMPROPER', 'NONB', 'NONBON',
                                          'NONBOND', 'NONBONDED'):
                     return False
-            if line.rstrip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE',
-                                 'DIHED', 'DIHEDRAL', 'IMPR', 'IMPROP',
-                                 'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
+            if line.rstrip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE', 'DIHED', 'DIHEDRAL',
+                                 'IMPR', 'IMPROP', 'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
                                  'NONBONDED'):
                 return True # frcmod file
             # This must be an atom definition in the parm.dat file
@@ -163,23 +161,19 @@ class AmberParameterSet(ParameterSet):
                     if words[0][0].isalpha():
                         if words[0][1].isalpha():
                             key = words[0][0].upper() + words[0][1].lower()
-                            if (key in Mass and
-                                    abs(Mass[key] - float(words[1])) > 1):
-                                if (key[0] == 'C' and
-                                        abs(Mass['C'] - float(words[1])) > 1):
+                            if key in Mass and abs(Mass[key] - float(words[1])) > 1:
+                                if key[0] == 'C' and abs(Mass['C'] - float(words[1])) > 1:
                                     return False
                                 elif key[0] != 'C':
                                     return False
                             elif key not in Mass:
-                                if (key[0] in Mass and
-                                        abs(Mass[key[0]] - float(words[1])) > 1):
+                                if key[0] in Mass and abs(Mass[key[0]] - float(words[1])) > 1:
                                     return False
                                 else:
                                     return False
                         else:
                             key = words[0][0].upper()
-                            if (key in Mass and
-                                    abs(Mass[key] - float(words[1])) > 1):
+                            if key in Mass and abs(Mass[key] - float(words[1])) > 1:
                                 return False
                             elif key not in Mass:
                                 return False
@@ -283,8 +277,7 @@ class AmberParameterSet(ParameterSet):
             if composite:
                 newlines.append(''.join(composite))
             return newlines
-        lines = joinlines(map(lambda line:
-                    line if '#' not in line else line[:line.index('#')], f))
+        lines = joinlines(map(lambda line: line if '#' not in line else line[:line.index('#')], f))
         text = ''.join(lines)
         if own_handle: f.close()
         lowertext = text.lower() # commands are case-insensitive
@@ -301,16 +294,13 @@ class AmberParameterSet(ParameterSet):
                 params.load_parameters(_find_amber_file(fname, search_oldff))
             elif _loadoffre.findall(line):
                 fname = process_fname(_loadoffre.findall(line)[0])
-                params.residues.update(
-                    AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff))
-                )
+                params.residues.update(AmberOFFLibrary.parse(_find_amber_file(fname, search_oldff)))
             elif _loadmol2re.findall(line):
                 (resname, fname), = _loadmol2re.findall(line)
                 residue = Mol2File.parse(_find_amber_file(fname, search_oldff))
                 if isinstance(residue, ResidueTemplateContainer):
-                    warnings.warn('Multi-residue mol2 files not supported by '
-                                  'tleap. Loading anyway using names in mol2',
-                                  AmberWarning)
+                    warnings.warn('Multi-residue mol2 files not supported by tleap. Loading anyway '
+                                  'using names in mol2', AmberWarning)
                     for res in residue:
                         params.residues[res.name] = res
                 else:
@@ -325,12 +315,10 @@ class AmberParameterSet(ParameterSet):
             i = idx + len('addatomtypes')
             while i < len(text) and text[i] != '{':
                 if text[i] not in '\r\n\t ':
-                    raise ParameterError('Unsupported addAtomTypes syntax in '
-                                         'leaprc file')
+                    raise ParameterError('Unsupported addAtomTypes syntax in leaprc file')
                 i += 1
             if i == len(text):
-                raise ParameterError('Unsupported addAtomTypes syntax in '
-                                     'leaprc file')
+                raise ParameterError('Unsupported addAtomTypes syntax in leaprc file')
             # We are at our first brace
             chars = []
             nopen = 1
@@ -371,9 +359,7 @@ class AmberParameterSet(ParameterSet):
         params : :class:`ParameterSet`
             The parameter set with all parameters defined in the Structure
         """
-        return super(AmberParameterSet, cls).from_structure(
-                struct, allow_unequal_duplicates=False
-        )
+        return super(AmberParameterSet, cls).from_structure(struct, allow_unequal_duplicates=False)
 
     #===================================================
 
@@ -396,9 +382,8 @@ class AmberParameterSet(ParameterSet):
             for line in f:
                 if not line.strip():
                     return self._parse_frcmod(f, line)
-                elif line.strip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE',
-                                      'DIHED', 'DIHEDRAL', 'IMPR', 'IMPROP',
-                                      'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
+                elif line.strip() in ('MASS', 'BOND', 'ANGLE', 'ANGL', 'DIHE', 'DIHED', 'DIHEDRAL',
+                                      'IMPR', 'IMPROP', 'IMPROPER', 'NONB', 'NONBON', 'NONBOND',
                                       'NONBONDED'):
                     return self._parse_frcmod(f, line)
                 else:
@@ -523,8 +508,7 @@ class AmberParameterSet(ParameterSet):
             except ValueError:
                 raise ParameterError('Trouble parsing 10-12 terms')
             if acoef != 0 or bcoef != 0:
-                raise ParameterError('10-12 potential not supported in '
-                                     'AmberParameterSet currently')
+                raise ParameterError('10-12 potential not supported in AmberParameterSet currently')
             rawline = next(fiter)
         # Process 12-6 terms. Get Equivalencing first
         rawline = next(fiter)
@@ -560,9 +544,8 @@ class AmberParameterSet(ParameterSet):
                         self.atom_types[atyp].epsilon is not None):
                     if (abs(otyp.epsilon-self.atom_types[atyp].epsilon) > TINY
                             or abs(otyp.rmin-self.atom_types[atyp].rmin) > TINY):
-                        warnings.warn('Equivalency defined between %s and %s '
-                                      'but parameters are not equal' %
-                                      (otyp.name, atyp), AmberWarning)
+                        warnings.warn('Equivalency defined between %s and %s but parameters are '
+                                      'not equal' % (otyp.name, atyp), AmberWarning)
                         # Remove from equivalent types
                         equivalent_types[otyp.name].remove(atyp)
                         continue
@@ -585,8 +568,7 @@ class AmberParameterSet(ParameterSet):
         try:
             mass = float(words[1])
         except ValueError:
-            raise ParameterError('Could not convert mass to float [%s]'
-                                    % words[1])
+            raise ParameterError('Could not convert mass to float [%s]' % words[1])
         except IndexError:
             raise ParameterError('Error parsing MASS line. Not enough tokens')
         if words[0] in self.atom_types:
@@ -768,8 +750,7 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
 
         if style not in ('frcmod', 'parm'):
-            raise ValueError('style must be either frcmod or parm, not %s' %
-                             style)
+            raise ValueError('style must be either frcmod or parm, not %s' % style)
 
         outfile.write(title.rstrip('\r\n'))
         outfile.write('\n')
@@ -784,8 +765,7 @@ class AmberParameterSet(ParameterSet):
         for (a1, a2), typ in iteritems(self.bond_types):
             if id(typ) in done: continue
             done.add(id(typ))
-            outfile.write('%s-%s   %8.3f  %6.3f\n' %
-                          (a1.ljust(2), a2.ljust(2), typ.k, typ.req))
+            outfile.write('%s-%s   %8.3f  %6.3f\n' % (a1.ljust(2), a2.ljust(2), typ.k, typ.req))
         outfile.write('\n')
         # Write the angles
         outfile.write('ANGLE\n')
@@ -793,9 +773,8 @@ class AmberParameterSet(ParameterSet):
         for (a1, a2, a3), typ in iteritems(self.angle_types):
             if id(typ) in done: continue
             done.add(id(typ))
-            outfile.write('%s-%s-%s   %8.3f  %6.3f\n' %
-                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), typ.k,
-                           typ.theteq))
+            outfile.write('%s-%s-%s   %8.3f  %6.3f\n' % (a1.ljust(2), a2.ljust(2), a3.ljust(2),
+                                                         typ.k, typ.theteq))
         outfile.write('\n')
         # Write the dihedrals
         outfile.write('DIHE\n')
@@ -806,24 +785,22 @@ class AmberParameterSet(ParameterSet):
             if isinstance(typ, DihedralType) or len(typ) == 1:
                 if not isinstance(typ, DihedralType):
                     typ = typ[0]
-                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
-                              'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
-                              a3.ljust(2), a4.ljust(2), 1, typ.phi_k, typ.phase,
-                              typ.per, typ.scee, typ.scnb))
+                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
+                              (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1, typ.phi_k,
+                               typ.phase, typ.per, typ.scee, typ.scnb))
             else:
                 for dtyp in typ[:-1]:
-                    outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
-                                  'SCEE=%s SCNB=%s\n'%(a1.ljust(2), a2.ljust(2),
-                                  a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
-                                  dtyp.phase, -dtyp.per, dtyp.scee, dtyp.scnb))
+                    outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
+                                  (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1,
+                                   dtyp.phi_k, dtyp.phase, -dtyp.per, dtyp.scee, dtyp.scnb))
                 dtyp = typ[-1]
-                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    '
-                              'SCEE=%s SCNB=%s\n' % (a1.ljust(2), a2.ljust(2),
-                              a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
-                              dtyp.phase, dtyp.per, dtyp.scee, dtyp.scnb))
+                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
+                              (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
+                               dtyp.phase, dtyp.per, dtyp.scee, dtyp.scnb))
         outfile.write('\n')
         # Write the impropers
         outfile.write('IMPROPER\n')
+        written_impropers = dict()
         for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
             # Make sure wild-cards come at the beginning
             if a2 == 'X':
@@ -831,23 +808,27 @@ class AmberParameterSet(ParameterSet):
                 a1, a2, a3, a4 = a2, a4, a3, a1
             elif a4 == 'X':
                 a1, a2, a3, a4 = a4, a1, a3, a2
+            a1, a2, a4 = sorted([a1, a2, a4])
+            if (a1, a2, a3, a4) in written_impropers:
+                if written_impropers[(a1, a2, a3, a4)] != typ:
+                    raise ValueError('Multiple impropers with the same atom set not allowed')
+                continue
             outfile.write('%s-%s-%s-%s %14.8f %8.3f %5.1f\n' %
-                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2),
-                           typ.phi_k, typ.phase, typ.per))
+                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), typ.phi_k,
+                           typ.phase, typ.per))
+            written_impropers[(a1, a2, a3, a4)] = typ
         outfile.write('\n')
         # Write the LJ terms
         outfile.write('NONB\n')
         for atom, typ in iteritems(self.atom_types):
-            outfile.write('%s  %12.8f %12.8f\n' %
-                          (atom.ljust(2), typ.rmin, typ.epsilon))
+            outfile.write('%s  %12.8f %12.8f\n' % (atom.ljust(2), typ.rmin, typ.epsilon))
         outfile.write('\n')
         # Write the NBFIX terms
         if self.nbfix_types:
             outfile.write('LJEDIT\n')
             for (a1, a2), (eps, rmin) in iteritems(self.nbfix_types):
                 outfile.write('%s %s %12.8f %12.8f %12.8f %12.8f\n' %
-                              (a1.ljust(2), a2.ljust(2), eps, rmin/2,
-                               eps, rmin/2))
+                              (a1.ljust(2), a2.ljust(2), eps, rmin/2, eps, rmin/2))
 
         if own_handle:
             outfile.close()

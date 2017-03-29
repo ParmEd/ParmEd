@@ -2418,7 +2418,11 @@ class Structure(object):
         """
         if not self.impropers: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.CustomTorsionForce("k*(theta-theta0)^2")
+        energy_function = 'k*dtheta_torus^2;'
+        energy_function += 'dtheta_torus = dtheta - floor(dtheta/(2*pi)+0.5)*(2*pi);'
+        energy_function += 'dtheta = theta - theta0;'
+        energy_function += 'pi = %f;' % math.pi
+        force = mm.CustomTorsionForce(energy_function)
         force.addPerTorsionParameter('k')
         force.addPerTorsionParameter('theta0')
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
