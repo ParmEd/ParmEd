@@ -4,7 +4,7 @@ topology, and stream files.
 
 Author: Jason M. Swails
 Contributors:
-Date: Apr. 13, 2015
+Date: Mar. 26, 2017
 """
 from __future__ import absolute_import, division, print_function
 
@@ -1026,22 +1026,21 @@ class CharmmParameterSet(ParameterSet):
         written = set()
         for key, typ in iteritems(self.angle_types):
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
+            written.add(key)
+            written.add(tuple(reversed(key)))
             f.write('%-6s %-6s %-6s %7.2f %8.2f\n' % (key[0], key[1], key[2], typ.k, typ.theteq))
         f.write('\nDIHEDRALS\n')
         written = set()
         for key, typ in iteritems(self.dihedral_types):
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
-            for t in typ:
+            written.add(key)
+            written.add(tuple(reversed(key)))
+            for tor in typ:
                 f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], t.phi_k, int(t.per), t.phase))
+                        (key[0], key[1], key[2], key[3], tor.phi_k, int(tor.per), tor.phase))
         f.write('\nIMPROPERS\n')
         written = set()
-        for key, typ in iteritems(self.improper_periodic_types):
-            sortkey = tuple(sorted(key))
-            if sortkey in written: continue
-            written.add(sortkey)
+        for key, typ in sorted(iteritems(self.improper_periodic_types), key=lambda x: x[0]):
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.phi_k, int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
