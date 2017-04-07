@@ -833,8 +833,7 @@ class AmberParm(AmberFormat, Structure):
         This will undo any off-diagonal L-J modifications you may have made, so
         call this function with care.
         """
-        assert self.combining_rule in ('lorentz', 'geometric'), \
-                "Unrecognized combining rule"
+        assert self.combining_rule in ('lorentz', 'geometric'), "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
@@ -872,8 +871,7 @@ class AmberParm(AmberFormat, Structure):
             If True, off-diagonal elements in the combined Lennard-Jones matrix
             exist. If False, they do not.
         """
-        assert self.combining_rule in ('lorentz', 'geometric'), \
-                "Unrecognized combining rule"
+        assert self.combining_rule in ('lorentz', 'geometric'), "Unrecognized combining rule"
         if self.combining_rule == 'lorentz':
             comb_sig = lambda sig1, sig2: 0.5 * (sig1 + sig2)
         elif self.combining_rule == 'geometric':
@@ -1148,8 +1146,8 @@ class AmberParm(AmberFormat, Structure):
         force.setUseLongRangeCorrection(True)
         # Determine which nonbonded method we should use and transfer the
         # nonbonded cutoff
-        assert nonbondedMethod in (app.NoCutoff, app.CutoffNonPeriodic,
-                app.PME, app.Ewald, app.CutoffPeriodic), 'Bad nonbondedMethod'
+        assert nonbondedMethod in (app.NoCutoff, app.CutoffNonPeriodic, app.PME, app.Ewald,
+                                   app.CutoffPeriodic), 'Bad nonbondedMethod'
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
         elif nonbondedMethod is app.CutoffNonPeriodic:
@@ -1851,8 +1849,7 @@ class AmberParm(AmberFormat, Structure):
         """
         # We need to figure out what 1-4 scaling term to use if we don't have
         # explicit exceptions
-        assert self.combining_rule in ('lorentz', 'geometric'), \
-                "Unrecognized combining rule"
+        assert self.combining_rule in ('lorentz', 'geometric'), "Unrecognized combining rule"
         if not self.adjusts:
             scalings = defaultdict(int)
             for dih in self.dihedrals:
@@ -1884,9 +1881,8 @@ class AmberParm(AmberFormat, Structure):
             for dihedral in self.dihedrals:
                 if dihedral.ignore_end: continue
                 key = tuple(sorted([dihedral.atom1, dihedral.atom4]))
-                eref = sqrt(dihedral.atom1.epsilon_14*dihedral.atom4.epsilon_14)
-                rref = comb_sig(dihedral.atom1.sigma_14,
-                                dihedral.atom4.sigma_14) * fac
+                eref = sqrt(dihedral.atom1.epsilon_14 * dihedral.atom4.epsilon_14)
+                rref = comb_sig(dihedral.atom1.sigma_14, dihedral.atom4.sigma_14) * fac
                 if key in adjust_dict:
                     pair = adjust_dict[key]
                     if pair.type.epsilon == 0:
@@ -1899,8 +1895,7 @@ class AmberParm(AmberFormat, Structure):
                         scee = 1 / pair.type.chgscale
                     if ignore_inconsistent_vdw:
                         scnb = 1.0
-                    elif (abs(rref - pair.type.rmin) > SMALL and
-                            pair.type.epsilon != 0):
+                    elif abs(rref - pair.type.rmin) > SMALL and pair.type.epsilon != 0:
                         raise TypeError('Cannot translate exceptions')
                     if (abs(scnb - dihedral.type.scnb) < SMALL and
                             abs(scee - dihedral.type.scee) < SMALL):
@@ -1961,8 +1956,7 @@ class AmberParm(AmberFormat, Structure):
                                 rmin = pair.type.rmin
                                 # Compare it to the 1-4 parameters that are
                                 # already present
-                                eref = sqrt(pair.atom1.epsilon_14*
-                                            pair.atom2.epsilon_14)
+                                eref = sqrt(pair.atom1.epsilon_14 * pair.atom2.epsilon_14)
                                 if pair.type.epsilon == 0:
                                     scnb = 1e10
                                 else:
@@ -1971,8 +1965,7 @@ class AmberParm(AmberFormat, Structure):
                                     scee = 1e10
                                 else:
                                     scee = 1 / pair.type.chgscale
-                                rref = comb_sig(pair.atom1.sigma_14,
-                                                pair.atom2.sigma_14) * fac
+                                rref = comb_sig(pair.atom1.sigma_14, pair.atom2.sigma_14) * fac
                                 if abs(rmin - rref) > SMALL:
                                     if ignore_inconsistent_vdw:
                                         scnb = 1.0
@@ -2110,16 +2103,14 @@ class AmberParm(AmberFormat, Structure):
         terms that have pn==0, and simply add another dihedral with pn=1 and k=0 to ensure that
         pmemd will always get that exception correct
         """
-        dt = None
         new_dihedrals = []
         for dih in self.dihedrals:
             if dih.ignore_end or dih.type.per != 0:
                 continue
             # If we got here, ignore_end must be False and out periodicity must be 0. So add
             # another dihedral
-            if dt is None:
-                dt = DihedralType(0, 1, 0, dih.type.scee, dih.type.scnb, list=self.dihedral_types)
-                self.dihedral_types.append(dt)
+            dt = DihedralType(0, 1, 0, dih.type.scee, dih.type.scnb, list=self.dihedral_types)
+            self.dihedral_types.append(dt)
             new_dihedrals.append(
                 Dihedral(dih.atom1, dih.atom2, dih.atom3, dih.atom4, improper=dih.improper,
                          ignore_end=False, type=dt)
