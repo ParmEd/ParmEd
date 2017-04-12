@@ -371,8 +371,7 @@ class CharmmParameterSet(ParameterSet):
                                 for dt in dtl:
                                     dt.scee = scee
                     elif word.upper().startswith('GEOM'):
-                        if (self._declared_nbrules and
-                                self.combining_rule != 'geometric'):
+                        if self._declared_nbrules and self.combining_rule != 'geometric':
                             raise CharmmError('Cannot combine parameter files with different '
                                               'combining rules')
                         self.combining_rule = 'geometric'
@@ -436,7 +435,7 @@ class CharmmParameterSet(ParameterSet):
                 key = (min(type1, type2), max(type1, type2))
                 bond_type = BondType(k, req)
                 if key in self.bond_types:
-                    # See if the existing bond type list has a different value and replaces it with a warning
+                    # See if existing bond type has a different value and replaces it with a warning
                     if self.bond_types[key] != bond_type:
                         # Replace. Warn if they are different
                         warnings.warn('Replacing bond %r, %r with %r' %
@@ -629,16 +628,14 @@ class CharmmParameterSet(ParameterSet):
                                 _, dt0 = next(iteritems(self.dihedral_types))
                                 diff = abs(dt0[0].scee - scee)
                                 if diff > TINY:
-                                    raise CharmmError('Inconsistent 1-4 '
-                                                      'scalings')
+                                    raise CharmmError('Inconsistent 1-4 scalings')
                             else:
                                 scee = 1 / scee
                                 for key, dtl in iteritems(self.dihedral_types):
                                     for dt in dtl:
                                         dt.scee = scee
                         elif word.upper().startswith('GEOM'):
-                            if (self._declared_nbrules and
-                                    self.combining_rule != 'geometric'):
+                            if self._declared_nbrules and self.combining_rule != 'geometric':
                                 raise CharmmError('Cannot combine parameter files with different '
                                                   'combining rules')
                             self.combining_rule = 'geometric'
@@ -696,9 +693,9 @@ class CharmmParameterSet(ParameterSet):
         # If we had any CMAP terms, then the last one will not have been added
         # yet. Add it here
         if current_cmap is not None:
-            ty = CmapType(current_cmap_res, current_cmap_data)
-            self.cmap_types[current_cmap] = ty
-            self.cmap_types[current_cmap2] = ty
+            typ = CmapType(current_cmap_res, current_cmap_data)
+            self.cmap_types[current_cmap] = typ
+            self.cmap_types[current_cmap2] = typ
         # Now we're done. Load the nonbonded types into the relevant AtomType
         # instances. In order for this to work, all keys in nonbonded_types
         # must be in the self.atom_types_str dict. Raise a RuntimeError if this
@@ -1074,7 +1071,8 @@ class CharmmParameterSet(ParameterSet):
                     f.write(' %13.6f' % val)
                 f.write('\n\n\n')
         f.write('\nNONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -\ncutnb 14.0 '
-                'ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac %s wmin 1.5\n\n' % (1/scee))
+                'ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac %s wmin 1.5%s\n\n' %
+                (1/scee, ' GEOM' if self.combining_rule == 'geometric' else ''))
         for key, typ in iteritems(self.atom_types):
             f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon), typ.rmin))
             if typ.epsilon == typ.epsilon_14 and typ.rmin == typ.rmin_14:
