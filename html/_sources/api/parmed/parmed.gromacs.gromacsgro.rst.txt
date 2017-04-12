@@ -1,0 +1,7 @@
+parmed.gromacs.gromacsgro module
+================================
+
+.. automodule:: parmed.gromacs.gromacsgro
+    :members:
+    :undoc-members:
+    :show-inheritance:

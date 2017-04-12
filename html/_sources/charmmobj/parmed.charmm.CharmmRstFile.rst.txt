@@ -1,0 +1,35 @@
+parmed.charmm.CharmmRstFile
+===========================
+
+.. currentmodule:: parmed.charmm
+
+.. autoclass:: CharmmRstFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CharmmRstFile.__init__
+      ~CharmmRstFile.id_format
+      ~CharmmRstFile.scan
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CharmmRstFile.box
+      ~CharmmRstFile.coordinates
+      ~CharmmRstFile.coordinatesold
+      ~CharmmRstFile.positions
+      ~CharmmRstFile.positionsold
+      ~CharmmRstFile.velocities
+   
+   

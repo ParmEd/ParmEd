@@ -1,0 +1,7 @@
+parmed.tools.simulations.openmm module
+======================================
+
+.. automodule:: parmed.tools.simulations.openmm
+    :members:
+    :undoc-members:
+    :show-inheritance:

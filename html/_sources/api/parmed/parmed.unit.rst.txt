@@ -1,0 +1,27 @@
+parmed.unit package
+===================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.unit.basedimension
+   parmed.unit.baseunit
+   parmed.unit.constants
+   parmed.unit.mymatrix
+   parmed.unit.prefix
+   parmed.unit.quantity
+   parmed.unit.standard_dimensions
+   parmed.unit.unit
+   parmed.unit.unit_definitions
+   parmed.unit.unit_math
+   parmed.unit.unit_operators
+
+Module contents
+---------------
+
+.. automodule:: parmed.unit
+    :members:
+    :undoc-members:
+    :show-inheritance:

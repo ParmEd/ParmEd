@@ -1,0 +1,6 @@
+parmed.unit.is_quantity
+=======================
+
+.. currentmodule:: parmed.unit
+
+.. autofunction:: is_quantity

@@ -1,0 +1,120 @@
+parmed.amber.AmoebaParm
+=======================
+
+.. currentmodule:: parmed.amber
+
+.. autoclass:: AmoebaParm
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AmoebaParm.__init__
+      ~AmoebaParm.add_atom
+      ~AmoebaParm.add_atom_to_residue
+      ~AmoebaParm.add_flag
+      ~AmoebaParm.assign_bonds
+      ~AmoebaParm.copy
+      ~AmoebaParm.createSystem
+      ~AmoebaParm.delete_flag
+      ~AmoebaParm.fill_LJ
+      ~AmoebaParm.from_rawdata
+      ~AmoebaParm.from_structure
+      ~AmoebaParm.get_box
+      ~AmoebaParm.get_coordinates
+      ~AmoebaParm.has_1012
+      ~AmoebaParm.has_NBFIX
+      ~AmoebaParm.id_format
+      ~AmoebaParm.initialize_topology
+      ~AmoebaParm.is_changed
+      ~AmoebaParm.join_dihedrals
+      ~AmoebaParm.load_atom_info
+      ~AmoebaParm.load_dataframe
+      ~AmoebaParm.load_pointers
+      ~AmoebaParm.load_rst7
+      ~AmoebaParm.load_structure
+      ~AmoebaParm.mdin_skeleton
+      ~AmoebaParm.omm_add_constraints
+      ~AmoebaParm.omm_angle_force
+      ~AmoebaParm.omm_bond_force
+      ~AmoebaParm.omm_cmap_force
+      ~AmoebaParm.omm_dihedral_force
+      ~AmoebaParm.omm_gbsa_force
+      ~AmoebaParm.omm_improper_force
+      ~AmoebaParm.omm_nonbonded_force
+      ~AmoebaParm.omm_out_of_plane_bend_force
+      ~AmoebaParm.omm_pi_torsion_force
+      ~AmoebaParm.omm_rb_torsion_force
+      ~AmoebaParm.omm_set_virtual_sites
+      ~AmoebaParm.omm_stretch_bend_force
+      ~AmoebaParm.omm_torsion_torsion_force
+      ~AmoebaParm.omm_trigonal_angle_force
+      ~AmoebaParm.omm_urey_bradley_force
+      ~AmoebaParm.parse
+      ~AmoebaParm.prune_empty_terms
+      ~AmoebaParm.ptr
+      ~AmoebaParm.rdparm
+      ~AmoebaParm.rdparm_old
+      ~AmoebaParm.rdparm_slow
+      ~AmoebaParm.recalculate_LJ
+      ~AmoebaParm.rediscover_molecules
+      ~AmoebaParm.remake_parm
+      ~AmoebaParm.save
+      ~AmoebaParm.set_version
+      ~AmoebaParm.split
+      ~AmoebaParm.strip
+      ~AmoebaParm.to_dataframe
+      ~AmoebaParm.unchange
+      ~AmoebaParm.update_dihedral_exclusions
+      ~AmoebaParm.view_as
+      ~AmoebaParm.visualize
+      ~AmoebaParm.write_cif
+      ~AmoebaParm.write_parm
+      ~AmoebaParm.write_pdb
+      ~AmoebaParm.write_psf
+      ~AmoebaParm.write_rst7
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AmoebaParm.ANGLE_FORCE_GROUP
+      ~AmoebaParm.BOND_FORCE_GROUP
+      ~AmoebaParm.CMAP_FORCE_GROUP
+      ~AmoebaParm.DIHEDRAL_FORCE_GROUP
+      ~AmoebaParm.IMPROPER_FORCE_GROUP
+      ~AmoebaParm.NONBONDED_FORCE_GROUP
+      ~AmoebaParm.OUT_OF_PLANE_BEND_FORCE_GROUP
+      ~AmoebaParm.PI_TORSION_FORCE_GROUP
+      ~AmoebaParm.RB_TORSION_FORCE_GROUP
+      ~AmoebaParm.STRETCH_BEND_FORCE_GROUP
+      ~AmoebaParm.TORSION_TORSION_FORCE_GROUP
+      ~AmoebaParm.TRIGONAL_ANGLE_FORCE_GROUP
+      ~AmoebaParm.UREY_BRADLEY_FORCE_GROUP
+      ~AmoebaParm.amoeba
+      ~AmoebaParm.angles_inc_h
+      ~AmoebaParm.angles_without_h
+      ~AmoebaParm.bonds_inc_h
+      ~AmoebaParm.bonds_without_h
+      ~AmoebaParm.box
+      ~AmoebaParm.box_vectors
+      ~AmoebaParm.chamber
+      ~AmoebaParm.combining_rule
+      ~AmoebaParm.coordinates
+      ~AmoebaParm.dihedrals_inc_h
+      ~AmoebaParm.dihedrals_without_h
+      ~AmoebaParm.has_cmap
+      ~AmoebaParm.positions
+      ~AmoebaParm.topology
+      ~AmoebaParm.velocities
+      ~AmoebaParm.view
+   
+   

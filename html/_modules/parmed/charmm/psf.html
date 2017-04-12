@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.charmm.psf &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.charmm.psf &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,7 +59,6 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">closing</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span> <span class="k">as</span> <span class="n">_copy</span>
 <span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span>
                     <span class="n">AcceptorDonor</span><span class="p">,</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">NoUreyBradley</span><span class="p">,</span>
@@ -70,6 +68,7 @@
 <span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">string_types</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
@@ -229,21 +228,27 @@
             <span class="k">return</span>
         <span class="n">conv</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_convert</span>
         <span class="c1"># Open the PSF and read the first line. It must start with &quot;PSF&quot;</span>
-        <span class="k">with</span> <span class="n">closing</span><span class="p">(</span><span class="n">genopen</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">psf</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">psf_name</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="n">psf_name</span>
+            <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">psf_name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">psf_name</span><span class="p">,</span> <span class="n">string_types</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PSF&#39;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Unrecognized PSF file. First line is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                                   <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
             <span class="c1"># Store the flags</span>
             <span class="n">psf_flags</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
             <span class="c1"># Now get all of the sections and store them in a dict</span>
-            <span class="n">psf</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">fileobj</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="c1"># Now get all of the sections</span>
             <span class="n">psfsections</span> <span class="o">=</span> <span class="n">_ZeroDict</span><span class="p">()</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">sec</span><span class="p">,</span> <span class="n">ptr</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_parse_psf_section</span><span class="p">(</span><span class="n">psf</span><span class="p">)</span>
+                    <span class="n">sec</span><span class="p">,</span> <span class="n">ptr</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">CharmmPsfFile</span><span class="o">.</span><span class="n">_parse_psf_section</span><span class="p">(</span><span class="n">fileobj</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">_FileEOF</span><span class="p">:</span>
                     <span class="k">break</span>
                 <span class="n">psfsections</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
@@ -383,7 +388,10 @@
                                       <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">o</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unchange</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">psf_flags</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">psf_flags</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
+                <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="c1">#===================================================</span>
 
@@ -815,13 +823,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

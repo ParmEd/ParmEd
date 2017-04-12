@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.tools.actions module &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.tools.actions module &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -1437,17 +1437,14 @@ To find out what else will be changed, look at the output of printLJTypes.</p>
 <p>Use addLJType to change the Lennard-Jones parameters on a set of specific
 atoms.</p>
 <blockquote>
-<div><ul>
+<div><ul class="simple">
 <li><dl class="first docutils">
 <dt>&lt;mask&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">The selection of atoms to change the LJ type for. All atoms</span><dd><p class="first last">selected must have the same LJ type</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">The selection of atoms to change the LJ type for. All atoms</span><dd>selected must have the same LJ type</dd>
 </dl>
 </li>
-<li><p class="first">&lt;radius&gt; : Rmin/2 (van der Waals radius of the new type)</p>
-</li>
-<li><p class="first">&lt;depth&gt; : Well-depth (a.k.a., epsilon)</p>
-</li>
+<li>&lt;radius&gt; : Rmin/2 (van der Waals radius of the new type)</li>
+<li>&lt;depth&gt; : Well-depth (a.k.a., epsilon)</li>
 </ul>
 </div></blockquote>
 <p class="rubric">Methods</p>
@@ -1848,8 +1845,7 @@ treated via constant pH MD in Amber.</p>
 <dt id="parmed.tools.actions.netCharge">
 <em class="property">class </em><code class="descclassname">parmed.tools.actions.</code><code class="descname">netCharge</code><span class="sig-paren">(</span><em>input_parm</em>, <em>arg_list=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/actions.html#netCharge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.actions.netCharge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><code class="xref py py-class docutils literal"><span class="pre">parmed.tools.actions.Action</span></code></a></p>
-<p>Prints the total charge of all of the atoms given by the mask. Defaults to
-all atoms</p>
+<p>Prints the total charge of all of the atoms given by the mask. Defaults to all atoms</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -2136,7 +2132,9 @@ still computed (in different unit cells).</p>
 <dd><p>Bases: <a class="reference internal" href="#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><code class="xref py py-class docutils literal"><span class="pre">parmed.tools.actions.Action</span></code></a></p>
 <p>Prints all of the bonds (with their details) for the given atoms in the
 mask. If a second mask is given, only bonds in which one atom appears in
-<em>each</em> list will be printed.</p>
+<em>each</em> list will be printed. If coordinates and parameter types are present,
+also print the actual distance (in Angstroms) and energy (in kcal/mol) for
+each printed bond.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -2208,7 +2206,9 @@ mask. If a second mask is given, only bonds in which one atom appears in
 mask. If a second mask is given, only atoms whose central atom is in the
 second mask and another atom is in the first mask is printed. If a third
 mask is given, the central atom must be in the second mask and the other two
-atoms must appear in the first <em>and</em> third masks (in any order)</p>
+atoms must appear in the first <em>and</em> third masks (in any order).</p>
+<p>If coordinates and parameter types are present, the value of the angle (in
+degrees) and its energy (in kcal/mol) are reported for each printed angle.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -2281,6 +2281,9 @@ mask. If multiple masks are given, only dihedrals that have one atom in each
 mask are printed. Ordering is important here, so the first atom must be in
 the first mask, the second atom in the second, etc. The order can be
 precisely reversed, but no other ordering is recognized.</p>
+<p>If coordinates and parameter types are present, the value of the torsion
+angle (in degrees) and the energy of each dihedral (in kcal/mol) are
+reported for each printed dihedral.</p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -2433,21 +2436,16 @@ atoms in mask1, mask2, and mask3 (one angle between atom1 from mask1, atom1
 from mask2, and atom1 from mask3, another angle between atom2 from mask1,
 atom2 from mask2, and atom2 from mask3, etc.)</p>
 <blockquote>
-<div><ul>
-<li><p class="first">&lt;mask1&gt; : The selection of one of the end-atoms in each angle</p>
-</li>
-<li><p class="first">&lt;mask2&gt; : The selection of central atoms in each angle</p>
-</li>
-<li><p class="first">&lt;mask3&gt; : The selection of other end-atoms in each angle</p>
-</li>
+<div><ul class="simple">
+<li>&lt;mask1&gt; : The selection of one of the end-atoms in each angle</li>
+<li>&lt;mask2&gt; : The selection of central atoms in each angle</li>
+<li>&lt;mask3&gt; : The selection of other end-atoms in each angle</li>
 <li><dl class="first docutils">
 <dt>&lt;k&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Force constant in kcal/mol/radians^2 in energy expression</span><dd><p class="first last">k(THET - THETeq)^2</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Force constant in kcal/mol/radians^2 in energy expression</span><dd>k(THET - THETeq)^2</dd>
 </dl>
 </li>
-<li><p class="first">&lt;THETeq&gt; : Equilibrium angle (in <em>degrees</em>)</p>
-</li>
+<li>&lt;THETeq&gt; : Equilibrium angle (in <em>degrees</em>)</li>
 </ul>
 </div></blockquote>
 <p class="rubric">Methods</p>
@@ -2524,37 +2522,27 @@ atom1 in mask 3, and atom1 in mask 4.  A second dihedral will be placed
 around atom2 in mask 1, atom2 in mask 2, atom2 in mask 3, and atom2 in
 mask4.</p>
 <blockquote>
-<div><ul>
-<li><p class="first">&lt;mask1&gt; : Selection of one of the end-atoms for each dihedral</p>
-</li>
+<div><ul class="simple">
+<li>&lt;mask1&gt; : Selection of one of the end-atoms for each dihedral</li>
 <li><dl class="first docutils">
 <dt>&lt;mask2&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the middle atom bonded to &lt;mask1&gt; and</span><dd><p class="first last">&lt;mask3&gt; in each dihedral</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the middle atom bonded to &lt;mask1&gt; and</span><dd>&lt;mask3&gt; in each dihedral</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>&lt;mask3&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the other middle atom bonded to &lt;mask2&gt;</span><dd><p class="first last">and &lt;mask4&gt;</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Selection of the other middle atom bonded to &lt;mask2&gt;</span><dd>and &lt;mask4&gt;</dd>
 </dl>
 </li>
-<li><p class="first">&lt;mask4&gt; : Selection of the other end-atom in each dihedral</p>
-</li>
-<li><p class="first">&lt;phi_k&gt; : Force constant in kcal/mol</p>
-</li>
-<li><p class="first">&lt;per&gt; : Periodicity</p>
-</li>
-<li><p class="first">&lt;phase&gt; : Torsion phase shift</p>
-</li>
-<li><p class="first">&lt;scnb&gt; : 1-4 Lennard-Jones scaling constant (default 2.0)</p>
-</li>
-<li><p class="first">&lt;scee&gt; : 1-4 electrostatic scaling constant (default 1.2)</p>
-</li>
+<li>&lt;mask4&gt; : Selection of the other end-atom in each dihedral</li>
+<li>&lt;phi_k&gt; : Force constant in kcal/mol</li>
+<li>&lt;per&gt; : Periodicity</li>
+<li>&lt;phase&gt; : Torsion phase shift</li>
+<li>&lt;scnb&gt; : 1-4 Lennard-Jones scaling constant (default 2.0)</li>
+<li>&lt;scee&gt; : 1-4 electrostatic scaling constant (default 1.2)</li>
 <li><dl class="first docutils">
 <dt>&lt;type&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Type of dihedral, either &#8220;improper&#8221; or &#8220;normal&#8221;.</span><dd><p class="first last">Default is &#8220;normal&#8221;</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Type of dihedral, either &#8220;improper&#8221; or &#8220;normal&#8221;.</span><dd>Default is &#8220;normal&#8221;</dd>
 </dl>
 </li>
 </ul>
@@ -3262,25 +3250,20 @@ parms currently loaded in the ParmEd parm list. startnum has no effect on
 the generated prmtops, but it can be used to control the names of the
 outputted topology files.</p>
 <blockquote>
-<div><ul>
-<li><p class="first">&lt;nparm&gt; : Number of topology files that will be generated</p>
-</li>
+<div><ul class="simple">
+<li>&lt;nparm&gt; : Number of topology files that will be generated</li>
 <li><dl class="first docutils">
 <dt>&lt;other_parm&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">The other parm object used in interpolation if more</span><dd><p class="first last">than 2 parms are present (first parm is active one)</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">The other parm object used in interpolation if more</span><dd>than 2 parms are present (first parm is active one)</dd>
 </dl>
 </li>
-<li><p class="first">eleconly : Only do charge interpolation</p>
-</li>
+<li>eleconly : Only do charge interpolation</li>
 <li><dl class="first docutils">
 <dt>&lt;prefix&gt;</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Generated parm objects will be written as &lt;prefix&gt;.#, where</span><dd><p class="first last"># starts from &lt;num&gt; and increases by 1</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Generated parm objects will be written as &lt;prefix&gt;.#, where</span><dd># starts from &lt;num&gt; and increases by 1</dd>
 </dl>
 </li>
-<li><p class="first">&lt;num&gt; : Starting number for file names (see &lt;prefix&gt; above)</p>
-</li>
+<li>&lt;num&gt; : Starting number for file names (see &lt;prefix&gt; above)</li>
 </ul>
 </div></blockquote>
 <p class="rubric">Methods</p>
@@ -3924,7 +3907,7 @@ following options and keywords are supported:</p>
 <p class="rubric">Examples</p>
 <p># Using AMBER
 import parmed as pmd
-parm = pmd.load_file(&#8216;prmtop&#8217;, xyz=&#8217;rst7&#8217;) 
+parm = pmd.load_file(&#8216;prmtop&#8217;, xyz=&#8217;rst7&#8217;)
 pmd.tools.energy(parm, &#8216;igb 8&#8217;).execute()</p>
 <p># Using Openmm
 pmd.tools.energy(parm, &#8216;igb 5 omm&#8217;).execute()</p>
@@ -4001,15 +3984,12 @@ pmd.tools.energy(parm, &#8216;igb 5 omm&#8217;).execute()</p>
 <dd><p>Bases: <a class="reference internal" href="#parmed.tools.actions.Action" title="parmed.tools.actions.Action"><code class="xref py py-class docutils literal"><span class="pre">parmed.tools.actions.Action</span></code></a></p>
 <p>This action deletes any bonds that occur between the atoms in two masks.</p>
 <blockquote>
-<div><ul>
-<li><p class="first">&lt;mask1&gt; : Amber mask defining one of the atoms in a bond</p>
-</li>
-<li><p class="first">&lt;mask2&gt; : Amber mask defining the other atom in the bond</p>
-</li>
+<div><ul class="simple">
+<li>&lt;mask1&gt; : Amber mask defining one of the atoms in a bond</li>
+<li>&lt;mask2&gt; : Amber mask defining the other atom in the bond</li>
 <li><dl class="first docutils">
 <dt>[verbose]</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Print out every bond that is deleted as well as the</span><dd><p class="first last">number of other valence terms that were eliminated.</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Print out every bond that is deleted as well as the</span><dd>number of other valence terms that were eliminated.</dd>
 </dl>
 </li>
 </ul>
@@ -4384,32 +4364,27 @@ minimized structure</p>
 Note, if your Gromacs topology file requires any include topology files, you
 will need to have Gromacs installed for this to work.</p>
 <blockquote>
-<div><ul>
-<li><p class="first">&lt;top_file&gt;: The Gromacs topology file to load</p>
-</li>
+<div><ul class="simple">
+<li>&lt;top_file&gt;: The Gromacs topology file to load</li>
 <li><dl class="first docutils">
 <dt>&lt;coord_file&gt;: The coordinate file to load into the system. Can be any</dt>
-<dd><p class="first last">recognized format (GRO, PDB, mmCIF, inpcrd, etc.)</p>
-</dd>
+<dd>recognized format (GRO, PDB, mmCIF, inpcrd, etc.)</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>define &lt;DEFINE[=VAR]&gt;: Preprocessor defines that control the</dt>
-<dd><p class="first last">processing of the Gromacs topology file.</p>
-</dd>
+<dd>processing of the Gromacs topology file.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>topdir &lt;directory&gt;: The directory containing all Gromacs include</dt>
-<dd><p class="first last">topology files. This is only necessary if Gromacs is not
-installed in a location that ParmEd can find.</p>
-</dd>
+<dd>topology files. This is only necessary if Gromacs is not
+installed in a location that ParmEd can find.</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>radii &lt;radiusset&gt;: The GB radius set to use. Can be &#8216;mbondi&#8217;, &#8216;bondi&#8217;,</dt>
-<dd><p class="first last">&#8216;mbondi2&#8217;, or &#8216;amber6&#8217;. Default is mbondi</p>
-</dd>
+<dd>&#8216;mbondi2&#8217;, or &#8216;amber6&#8217;. Default is mbondi</dd>
 </dl>
 </li>
 </ul>
@@ -4507,7 +4482,7 @@ example:</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.tools.actions.txt"
+      <li><a href="../../_sources/api/parmed/parmed.tools.actions.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -4534,12 +4509,12 @@ example:</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -1,0 +1,6 @@
+parmed.amber.LoadParm
+=====================
+
+.. currentmodule:: parmed.amber
+
+.. autofunction:: LoadParm

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber.mask &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber.mask &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -63,7 +62,7 @@
 <span class="c1">#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
 
 <div class="viewcode-block" id="AmberMask"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.AmberMask">[docs]</a><span class="k">class</span> <span class="nc">AmberMask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; </span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    What is hopefully a fully-fledged Amber mask parser implemented in Python.</span>
 
 <span class="sd">    Parameters</span>
@@ -78,8 +77,8 @@
 
 <div class="viewcode-block" id="AmberMask.__init__"><a class="viewcode-back" href="../../../amberobj/parmed.amber.AmberMask.html#parmed.amber.AmberMask.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parm</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parm</span> <span class="o">=</span> <span class="n">parm</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span></div>
-      
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
     <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -89,7 +88,7 @@
 
 <div class="viewcode-block" id="AmberMask.Selected"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.mask.html#parmed.amber.AmberMask.Selected">[docs]</a>    <span class="k">def</span> <span class="nf">Selected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Generator that returns the indexes of selected atoms</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        invert : bool, optional</span>
@@ -175,7 +174,7 @@
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">):</span>
             <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="c1"># skip whitespace</span>
-            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span> 
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isspace</span><span class="p">():</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">continue</span>
             <span class="c1"># If p is an operator, is the last character, or is a ()...</span>
@@ -262,11 +261,11 @@
                 <span class="k">if</span> <span class="n">flag</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-      
+
         <span class="k">return</span> <span class="n">infix</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="c1"># terminating _ for next step</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_isOperator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if a character is an operator &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">char</span> <span class="ow">in</span> <span class="s1">&#39;!&amp;|&lt;&gt;&#39;</span>
@@ -276,7 +275,7 @@
     <span class="k">def</span> <span class="nf">_isOperand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">char</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determines if a character is an operand &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">*/%-?,&#39;.=+&quot;</span> <span class="ow">or</span> <span class="n">char</span><span class="o">.</span><span class="n">isalnum</span><span class="p">())</span>
-   
+
     <span class="c1">#======================================================</span>
 
     <span class="k">def</span> <span class="nf">_torpn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">infix</span><span class="p">,</span> <span class="n">prnlev</span><span class="p">):</span>
@@ -396,7 +395,7 @@
         <span class="k">return</span> <span class="n">pmask</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_neg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Negates a given mask &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">pmask1</span><span class="o">.</span><span class="n">Not</span><span class="p">()</span>
@@ -473,7 +472,7 @@
                 <span class="n">buffer</span> <span class="o">+=</span> <span class="n">p</span>
                 <span class="n">buffer_p</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="ow">and</span> <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">buffer_p</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> 
+                    <span class="k">if</span> <span class="n">buffer_p</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ptoken</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span>
                                           <span class="n">ptoken</span><span class="p">[</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span><span class="p">):</span>
                         <span class="n">reslist</span> <span class="o">=</span> <span class="n">ALL</span>
                     <span class="k">elif</span> <span class="n">reslist</span> <span class="o">==</span> <span class="n">NUMLIST</span><span class="p">:</span>
@@ -545,7 +544,7 @@
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="n">buffer</span> <span class="o">+=</span> <span class="n">p</span>
             <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_atnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -609,7 +608,7 @@
             <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="n">buffer</span> <span class="o">+=</span> <span class="n">p</span>
             <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="s1">&#39;,&#39;</span> <span class="ow">or</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">instring</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="n">dash</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">at1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">buffer</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_resnum_select</span><span class="p">(</span><span class="n">at1</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -648,13 +647,13 @@
             <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_atnum_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">at1</span><span class="p">,</span> <span class="n">at2</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array between atom numbers at1 and at2 &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">at1</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">at2</span><span class="p">):</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_resnum_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">res1</span><span class="p">,</span> <span class="n">res2</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array between residues res1 and res2 &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
@@ -662,7 +661,7 @@
             <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;=</span> <span class="n">res1</span> <span class="ow">and</span> <span class="n">res</span> <span class="o">&lt;=</span> <span class="n">res2</span><span class="p">:</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_atname_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atname</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array with all atom names of a given name &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">atname</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
@@ -681,7 +680,7 @@
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="n">_nameMatch</span><span class="p">(</span><span class="n">atname</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">key</span><span class="p">)))</span>
 
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_resname_select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resname</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Fills a _mask array with all residue names of a given name &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
@@ -689,9 +688,9 @@
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="k">elif</span> <span class="n">resname</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
                 <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="nb">int</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span> <span class="o">==</span> <span class="n">atm</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-            
+
     <span class="c1">#======================================================</span>
-   
+
     <span class="k">def</span> <span class="nf">_binop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">pmask1</span><span class="p">,</span> <span class="n">pmask2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Does a binary operation on a pair of masks &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">:</span>
@@ -719,8 +718,8 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines if atnam1 matches atnam2, where atnam1 can have * as a wildcard</span>
 <span class="sd">    and spaces are ignored. atnam2 should come from the prmtop. We&#39;ll use regex</span>
-<span class="sd">    to do this. </span>
-<span class="sd">   </span>
+<span class="sd">    to do this.</span>
+
 <span class="sd">    We will replace * with a regex that will match any alphanumeric character</span>
 <span class="sd">    0 or more times: * --&gt; \\w*</span>
 
@@ -767,7 +766,7 @@
         <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s1">&#39;_mask is a fixed-length array!&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">And</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">natom</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">MaskError</span><span class="p">(</span><span class="s2">&quot;_mask: and() requires another mask of equal size!&quot;</span><span class="p">)</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
@@ -781,7 +780,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="n">new_mask</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">or</span> <span class="n">other</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">new_mask</span>
-   
+
     <span class="k">def</span> <span class="nf">Not</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">new_mask</span> <span class="o">=</span> <span class="n">_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">natom</span><span class="p">):</span>
@@ -823,13 +822,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

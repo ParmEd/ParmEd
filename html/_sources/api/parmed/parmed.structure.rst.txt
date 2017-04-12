@@ -1,0 +1,7 @@
+parmed.structure module
+=======================
+
+.. automodule:: parmed.structure
+    :members:
+    :undoc-members:
+    :show-inheritance:

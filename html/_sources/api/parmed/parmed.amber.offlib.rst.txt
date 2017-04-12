@@ -1,0 +1,7 @@
+parmed.amber.offlib module
+==========================
+
+.. automodule:: parmed.amber.offlib
+    :members:
+    :undoc-members:
+    :show-inheritance:

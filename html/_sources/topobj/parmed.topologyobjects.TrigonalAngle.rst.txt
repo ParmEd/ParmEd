@@ -1,0 +1,23 @@
+parmed.topologyobjects.TrigonalAngle
+====================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: TrigonalAngle
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TrigonalAngle.__init__
+      ~TrigonalAngle.delete
+   
+   
+
+   
+   
+   

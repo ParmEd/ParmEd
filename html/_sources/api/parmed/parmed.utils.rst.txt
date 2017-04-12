@@ -1,0 +1,30 @@
+parmed.utils package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    parmed.utils.fortranformat
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.utils.decorators
+   parmed.utils.io
+   parmed.utils.netcdf
+   parmed.utils.pairlist
+   parmed.utils.pandautils
+   parmed.utils.six
+   parmed.utils.timer
+
+Module contents
+---------------
+
+.. automodule:: parmed.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

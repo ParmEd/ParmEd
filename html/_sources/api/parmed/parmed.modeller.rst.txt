@@ -1,0 +1,18 @@
+parmed.modeller package
+=======================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.modeller.residue
+   parmed.modeller.standardtemplates
+
+Module contents
+---------------
+
+.. automodule:: parmed.modeller
+    :members:
+    :undoc-members:
+    :show-inheritance:

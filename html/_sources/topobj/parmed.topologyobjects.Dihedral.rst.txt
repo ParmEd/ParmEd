@@ -1,0 +1,32 @@
+parmed.topologyobjects.Dihedral
+===============================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: Dihedral
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Dihedral.__init__
+      ~Dihedral.delete
+      ~Dihedral.energy
+      ~Dihedral.measure
+      ~Dihedral.same_atoms
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Dihedral.funct
+   
+   

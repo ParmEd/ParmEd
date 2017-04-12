@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.tools.simulations.sanderapi &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.tools.simulations.sanderapi &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
+    <link rel="search" title="Search" href="../../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -155,7 +154,7 @@
             <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;     EHbond   = </span><span class="si">%20.7f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">hbond</span><span class="p">)</span>
         <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">TOTAL    = </span><span class="si">%20.7f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="minimize"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.simulations.sanderapi.html#parmed.tools.simulations.sanderapi.minimize">[docs]</a><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">igb</span><span class="p">,</span> <span class="n">saltcon</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">maxcyc</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="minimize"><a class="viewcode-back" href="../../../../api/parmed/parmed.tools.simulations.sanderapi.html#parmed.tools.simulations.sanderapi.minimize">[docs]</a><span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">igb</span><span class="p">,</span> <span class="n">saltcon</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">maxcyc</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Minimizes a snapshot. Use the existing System if it exists &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_SANDER</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">SimulationError</span><span class="p">(</span><span class="s1">&#39;Could not import sander&#39;</span><span class="p">)</span>
@@ -182,9 +181,13 @@
         <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">tot</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">sander</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">parm</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">box</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
         <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">maxiter</span><span class="o">=</span><span class="n">maxcyc</span><span class="p">,</span> <span class="n">disp</span><span class="o">=</span><span class="n">disp</span><span class="p">,</span> <span class="n">gtol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">more_options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
+            <span class="n">more_options</span><span class="p">[</span><span class="s1">&#39;callback&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">callback</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">energy_function</span><span class="p">,</span> <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span>
                                     <span class="n">method</span><span class="o">=</span><span class="s1">&#39;L-BFGS-B&#39;</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                    <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+                                    <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">more_options</span><span class="p">)</span>
         <span class="n">parm</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">x</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Problem minimizing structure with scipy and sander:&#39;</span><span class="p">,</span>
@@ -220,13 +223,13 @@
         <li class="right" >
           <a href="../../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -1,0 +1,7 @@
+parmed.scripts module
+=====================
+
+.. automodule:: parmed.scripts
+    :members:
+    :undoc-members:
+    :show-inheritance:

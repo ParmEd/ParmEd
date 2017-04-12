@@ -1,0 +1,6 @@
+parmed.openmm.load_topology
+===========================
+
+.. currentmodule:: parmed.openmm
+
+.. autofunction:: load_topology

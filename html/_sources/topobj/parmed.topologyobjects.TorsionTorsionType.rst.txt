@@ -1,0 +1,28 @@
+parmed.topologyobjects.TorsionTorsionType
+=========================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: TorsionTorsionType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TorsionTorsionType.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TorsionTorsionType.idx
+   
+   

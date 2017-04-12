@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.topologyobjects.Dihedral &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.topologyobjects.Dihedral &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../index.html" />
-    <link rel="up" title="The topologyobjects module" href="../topologyobjects.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
       </ul>
     </div>  
@@ -142,6 +141,12 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.delete" title="parmed.topologyobjects.Dihedral.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this dihedral from the atoms that make it up.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.energy" title="parmed.topologyobjects.Dihedral.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current dihedral angle energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.measure" title="parmed.topologyobjects.Dihedral.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current dihedral angle</td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.same_atoms" title="parmed.topologyobjects.Dihedral.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>Determines if this dihedral has the same atoms (or atom indexes) as</td>
 </tr>
@@ -164,6 +169,12 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.delete" title="parmed.topologyobjects.Dihedral.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this dihedral from the atoms that make it up.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.energy" title="parmed.topologyobjects.Dihedral.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current dihedral angle energy</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.measure" title="parmed.topologyobjects.Dihedral.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current dihedral angle</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.Dihedral.same_atoms" title="parmed.topologyobjects.Dihedral.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>Determines if this dihedral has the same atoms (or atom indexes) as</td>
@@ -189,6 +200,45 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 removes this dihedral from the <cite>dihedrals</cite> list for atom1, atom2, atom3,
 and atom4 as well as removing each atom form each others&#8217; dihedral
 partner lists</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Dihedral.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Dihedral.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Dihedral.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current dihedral angle energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Dihedral angle energy in kcal/mol. Return value is None if either
+the coordinates of either atom is not set or the angle type is not
+set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Dihedral.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#Dihedral.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Dihedral.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current dihedral angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the dihedral angle between
+the four atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -237,7 +287,7 @@ iterable</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/topobj/parmed.topologyobjects.Dihedral.txt"
+      <li><a href="../_sources/topobj/parmed.topologyobjects.Dihedral.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -264,13 +314,13 @@ iterable</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

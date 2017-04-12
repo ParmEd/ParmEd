@@ -1,0 +1,41 @@
+parmed.topologyobjects.DihedralTypeList
+=======================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: DihedralTypeList
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DihedralTypeList.__init__
+      ~DihedralTypeList.append
+      ~DihedralTypeList.clear
+      ~DihedralTypeList.copy
+      ~DihedralTypeList.count
+      ~DihedralTypeList.extend
+      ~DihedralTypeList.from_rbtorsion
+      ~DihedralTypeList.index
+      ~DihedralTypeList.insert
+      ~DihedralTypeList.pop
+      ~DihedralTypeList.remove
+      ~DihedralTypeList.reverse
+      ~DihedralTypeList.sort
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DihedralTypeList.idx
+      ~DihedralTypeList.penalty
+   
+   

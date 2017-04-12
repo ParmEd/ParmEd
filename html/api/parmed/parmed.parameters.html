@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.parameters module &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.parameters module &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -55,7 +55,7 @@ topology files and extracts all parameters from the parameter files</p>
 <p>Author: Jason M. Swails</p>
 <dl class="class">
 <dt id="parmed.parameters.ParameterSet">
-<em class="property">class </em><code class="descclassname">parmed.parameters.</code><code class="descname">ParameterSet</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.parameters.</code><code class="descname">ParameterSet</code><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Stores a parameter set defining a force field</p>
 <p class="rubric">Attributes</p>
@@ -90,7 +90,7 @@ topology files and extracts all parameters from the parameter files</p>
 <td>(dict((str,str,str,str):ImproperType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion to the ImproperType instances</td>
 </tr>
 <tr class="row-odd"><td>improper_periodic_types</td>
-<td>(dict((str,str,str,str):DihedralType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion (modeled as a Fourier series) to the DihedralType instances</td>
+<td>(dict((str,str,str,str):DihedralType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion (modeled as a Fourier series) to the DihedralType instances. Note, the central atom should always be put in the <em>third</em> position of the key</td>
 </tr>
 <tr class="row-even"><td>rb_torsion_types</td>
 <td>(dict((str,str,str,str):RBTorsionType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the Ryckaert-Bellemans torsion to the RBTorsionType instances</td>
@@ -238,7 +238,7 @@ periodicity found if no matching DihedralTypeList is found.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.parameters.txt"
+      <li><a href="../../_sources/api/parmed/parmed.parameters.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -265,12 +265,12 @@ periodicity found if no matching DihedralTypeList is found.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

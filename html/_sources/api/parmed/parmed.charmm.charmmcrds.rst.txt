@@ -1,0 +1,7 @@
+parmed.charmm.charmmcrds module
+===============================
+
+.. automodule:: parmed.charmm.charmmcrds
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.amber.asciicrd module
+============================
+
+.. automodule:: parmed.amber.asciicrd
+    :members:
+    :undoc-members:
+    :show-inheritance:

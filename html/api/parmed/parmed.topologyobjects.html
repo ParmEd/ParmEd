@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.topologyobjects module &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.topologyobjects module &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -105,6 +105,12 @@ between atoms 1 and 2 or atoms 2 and 3.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle.delete" title="parmed.topologyobjects.Angle.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this angle from the atoms that make it up.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle.energy" title="parmed.topologyobjects.Angle.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current angle energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle.measure" title="parmed.topologyobjects.Angle.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current angle</td>
+</tr>
 </tbody>
 </table>
 <dl class="method">
@@ -115,12 +121,50 @@ this angle from the <cite>angles</cite> list for atom1, atom2, and atom3 as well
 removing each atom form each others&#8217; angle partner lists</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.topologyobjects.Angle.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Angle.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Angle.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current angle energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Angle strain energy in kcal/mol. Return value is None if either the
+coordinates of either atom is not set or the angle type is not set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Angle.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Angle.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Angle.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the angle between the three
+atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.topologyobjects.AngleType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">AngleType</code><span class="sig-paren">(</span><em>k</em>, <em>theteq</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#AngleType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.AngleType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>An angle type with a set of angle parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -937,6 +981,12 @@ collection</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond.delete" title="parmed.topologyobjects.Bond.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this bond from the atoms that make it up.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond.energy" title="parmed.topologyobjects.Bond.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current bond energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond.measure" title="parmed.topologyobjects.Bond.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current bond</td>
+</tr>
 </tbody>
 </table>
 <dl class="method">
@@ -945,6 +995,44 @@ collection</p>
 <dd><p>Deletes this bond from the atoms that make it up. This method removes
 this bond from the <cite>bonds</cite> list for both atom1 and atom2 as well as
 removing atom1 from atom2.bond_partners and vice versa.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Bond.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Bond.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current bond energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Bond strain energy in kcal/mol. Return value is None if either the
+coordinates of either atom is not set or the bond type is not set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Bond.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Bond.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Bond.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current bond</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the distance between the two
+atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -958,7 +1046,7 @@ removing atom1 from atom2.bond_partners and vice versa.</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.BondType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">BondType</code><span class="sig-paren">(</span><em>k</em>, <em>req</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#BondType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.BondType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>A bond type with a set of bond parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1199,7 +1287,7 @@ sequence of 5 indexes</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.CmapType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">CmapType</code><span class="sig-paren">(</span><em>resolution</em>, <em>grid</em>, <em>comments=None</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#CmapType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.CmapType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>A CMAP type with a potential energy interpoloation grid mapping out the 2-D
 potential of coupled torsions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1371,6 +1459,12 @@ between atoms 1 and 2, between atoms 2 and 3, or between atoms 3 and 4.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.delete" title="parmed.topologyobjects.Dihedral.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this dihedral from the atoms that make it up.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.energy" title="parmed.topologyobjects.Dihedral.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current dihedral angle energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.measure" title="parmed.topologyobjects.Dihedral.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current dihedral angle</td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral.same_atoms" title="parmed.topologyobjects.Dihedral.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>Determines if this dihedral has the same atoms (or atom indexes) as</td>
 </tr>
@@ -1385,10 +1479,49 @@ and atom4 as well as removing each atom form each others&#8217; dihedral
 partner lists</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.topologyobjects.Dihedral.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Dihedral.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Dihedral.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current dihedral angle energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Dihedral angle energy in kcal/mol. Return value is None if either
+the coordinates of either atom is not set or the angle type is not
+set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.topologyobjects.Dihedral.funct">
 <code class="descname">funct</code><a class="headerlink" href="#parmed.topologyobjects.Dihedral.funct" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Dihedral.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Dihedral.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Dihedral.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current dihedral angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the dihedral angle between
+the four atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="parmed.topologyobjects.Dihedral.same_atoms">
@@ -1428,7 +1561,7 @@ iterable</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.DihedralType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">DihedralType</code><span class="sig-paren">(</span><em>phi_k</em>, <em>per</em>, <em>phase</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#DihedralType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>A dihedral type with a set of dihedral parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1575,22 +1708,25 @@ keyword-only argument. Default is <code class="docutils literal"><span class="pr
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="parmed.topologyobjects.DihedralTypeList.from_rbtorsion"><code class="xref py py-obj docutils literal"><span class="pre">from_rbtorsion</span></code></a>(rbtorsion)</td>
+<td>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans torsion.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.insert" title="parmed.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.insert" title="parmed.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
 <td>L.insert(index, object) &#8211; insert object before index</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
 <td>Raises IndexError if list is empty or index is out of range.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
 <td>Raises ValueError if the value is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
 <td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.DihedralTypeList.html#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
 <td></td>
 </tr>
 </tbody>
@@ -1645,6 +1781,28 @@ warning if it does so</p>
 <dt id="parmed.topologyobjects.DihedralTypeList.extend">
 <code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.topologyobjects.DihedralTypeList.from_rbtorsion">
+<em class="property">classmethod </em><code class="descname">from_rbtorsion</code><span class="sig-paren">(</span><em>rbtorsion</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#DihedralTypeList.from_rbtorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans
+torsion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rbtorsion</strong> : RBTorsionType</p>
+<blockquote>
+<div><p>The R-B torsion type to convert to a series of proper torsions</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if all terms in rbtorsion are zero except for c0</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.topologyobjects.DihedralTypeList.idx">
@@ -1758,6 +1916,12 @@ of the atoms are duplicates.</p>
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.delete" title="parmed.topologyobjects.Improper.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Improper from the atoms that make it up.</td>
 </tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.energy" title="parmed.topologyobjects.Improper.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current dihedral angle energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.measure" title="parmed.topologyobjects.Improper.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current torsional angle</td>
+</tr>
 <tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper.same_atoms" title="parmed.topologyobjects.Improper.same_atoms"><code class="xref py py-obj docutils literal"><span class="pre">same_atoms</span></code></a>(thing)</td>
 <td>An improper has the same 4 atoms if atom1 is the same for both and the</td>
 </tr>
@@ -1772,6 +1936,45 @@ and atom4</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="parmed.topologyobjects.Improper.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Improper.energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current dihedral angle energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Dihedral angle energy in kcal/mol. Return value is None if either
+the coordinates of either atom is not set or the angle type is not
+set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.Improper.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Improper.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current torsional angle</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the torsional angle between
+the four atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="parmed.topologyobjects.Improper.same_atoms">
 <code class="descname">same_atoms</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#Improper.same_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.Improper.same_atoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>An improper has the same 4 atoms if atom1 is the same for both and the
@@ -1783,7 +1986,7 @@ other 3 can be in any order</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.ImproperType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">ImproperType</code><span class="sig-paren">(</span><em>psi_k</em>, <em>psi_eq</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#ImproperType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.ImproperType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>An improper type with a set of improper torsion parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2413,7 +2616,7 @@ is used in the AMOEBA force field</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.StretchBendType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">StretchBendType</code><span class="sig-paren">(</span><em>k1</em>, <em>k2</em>, <em>req1</em>, <em>req2</em>, <em>theteq</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#StretchBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.StretchBendType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>A stretch-bend type with two distances and an angle in AMOEBA</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2639,7 +2842,7 @@ sequence of 5 indexes</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.TorsionTorsionType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">TorsionTorsionType</code><span class="sig-paren">(</span><em>dims</em>, <em>ang1</em>, <em>ang2</em>, <em>f</em>, <em>dfda1=None</em>, <em>dfda2=None</em>, <em>d2fda1da2=None</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#TorsionTorsionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.TorsionTorsionType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>The type containing the parameter maps for the Amoeba torsion-torsion
 potentials. It contains the original potential as well as interpolated first
 and second derivatives for the AMOEBA force field.</p>
@@ -2958,7 +3161,7 @@ has one, and deletes any item in which it is set to <cite>False</cite></p>
 <dl class="class">
 <dt id="parmed.topologyobjects.UreyBradley">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">UreyBradley</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#UreyBradley"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.UreyBradley" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Bond</span></code></a></p>
 <p>A Urey-Bradley angle type with a set of parameters. It has the same
 functional form as a bond, but it is defined between two atoms forming a
 valence angle separated by two bonds.</p>
@@ -2999,6 +3202,18 @@ Urey-Bradley valence angle</p>
 <span class="go">True</span>
 </pre></div>
 </div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley.order" title="parmed.topologyobjects.UreyBradley.order"><code class="xref py py-obj docutils literal"><span class="pre">order</span></code></a></td>
+<td>Bond order.</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -3008,6 +3223,12 @@ Urey-Bradley valence angle</p>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley.delete" title="parmed.topologyobjects.UreyBradley.delete"><code class="xref py py-obj docutils literal"><span class="pre">delete</span></code></a>()</td>
 <td>Deletes this Urey-Bradley from the atoms that make it up.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley.energy" title="parmed.topologyobjects.UreyBradley.energy"><code class="xref py py-obj docutils literal"><span class="pre">energy</span></code></a>()</td>
+<td>Measures the current bond energy</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="../../topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley.measure" title="parmed.topologyobjects.UreyBradley.measure"><code class="xref py py-obj docutils literal"><span class="pre">measure</span></code></a>()</td>
+<td>Measures the current bond</td>
 </tr>
 </tbody>
 </table>
@@ -3019,12 +3240,56 @@ removes this urey-bradley from the <cite>urey_bradleys</cite> list for atom1 and
 atom2.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="parmed.topologyobjects.UreyBradley.energy">
+<code class="descname">energy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current bond energy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>energy</strong> : float or None</p>
+<blockquote class="last">
+<div><p>Bond strain energy in kcal/mol. Return value is None if either the
+coordinates of either atom is not set or the bond type is not set</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="parmed.topologyobjects.UreyBradley.measure">
+<code class="descname">measure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Measures the current bond</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>measurement</strong> : float or None</p>
+<blockquote class="last">
+<div><p>If the atoms have coordinates, returns the distance between the two
+atoms. If any coordinates are missing, returns None</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parmed.topologyobjects.UreyBradley.order">
+<code class="descname">order</code><a class="headerlink" href="#parmed.topologyobjects.UreyBradley.order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bond order. See description in <a class="reference internal" href="../../topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> argument list</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="parmed.topologyobjects.OutOfPlaneBendType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">OutOfPlaneBendType</code><span class="sig-paren">(</span><em>k</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>An angle type with a set of angle parameters</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -4157,7 +4422,7 @@ cross-product</p>
 <dl class="class">
 <dt id="parmed.topologyobjects.RBTorsionType">
 <em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">RBTorsionType</code><span class="sig-paren">(</span><em>c0</em>, <em>c1</em>, <em>c2</em>, <em>c3</em>, <em>c4</em>, <em>c5</em>, <em>scee=1.0</em>, <em>scnb=1.0</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/topologyobjects.html#RBTorsionType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.RBTorsionType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ParameterType</span></code>, <code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects._ListItem</span></code></p>
 <p>A Ryckaert-Bellemans type with a set of dihedral parameters</p>
 <p class="rubric">Notes</p>
 <p>Two <a href="#id37"><span class="problematic" id="id38">`</span></a>RBTorsionType`s are equal if their coefficients are all equal</p>
@@ -4214,7 +4479,7 @@ cross-product</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.topologyobjects.txt"
+      <li><a href="../../_sources/api/parmed/parmed.topologyobjects.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -4241,12 +4506,12 @@ cross-product</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

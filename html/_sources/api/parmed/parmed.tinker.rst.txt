@@ -1,0 +1,20 @@
+parmed.tinker package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.tinker.parameterfile
+   parmed.tinker.system
+   parmed.tinker.tinkerfiles
+   parmed.tinker.topologyobjects
+
+Module contents
+---------------
+
+.. automodule:: parmed.tinker
+    :members:
+    :undoc-members:
+    :show-inheritance:

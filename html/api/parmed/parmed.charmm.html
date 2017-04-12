@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.charmm package &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.charmm package &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -70,35 +70,31 @@
 <p>This package contains code for reading CHARMM structure files for setting up a
 simulation with CHARMM; specifically PSF, PAR, RTF, and STR files</p>
 <blockquote>
-<div><ul>
+<div><ul class="simple">
 <li><dl class="first docutils">
 <dt>PAR</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Parameter file (PRM) &#8211; this contains all of the force field</span><dd><p class="first last">parameters (e.g., bond lengths and strengths) for all of the atom
-types</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Parameter file (PRM) &#8211; this contains all of the force field</span><dd>parameters (e.g., bond lengths and strengths) for all of the atom
+types</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>RTF</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Residue Topology File &#8211; this file contains the residue</span><dd><p class="first last">connectivity tables as well as a definition of all of the atom
+ <span class="classifier-delimiter">:</span> <span class="classifier">Residue Topology File &#8211; this file contains the residue</span><dd>connectivity tables as well as a definition of all of the atom
 types. Also contains an internal coordinate representation of the
-residues</p>
-</dd>
+residues</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>PSF</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Protein Structure File &#8211; this is the main file type in CHARMM</span><dd><p class="first last">simulations that defines all of the residues in a system as well as
-the atom types and connectivity between the atoms</p>
-</dd>
+ <span class="classifier-delimiter">:</span> <span class="classifier">Protein Structure File &#8211; this is the main file type in CHARMM</span><dd>simulations that defines all of the residues in a system as well as
+the atom types and connectivity between the atoms</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt>STR</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">Stream file &#8211; Source of additional information and CHARMM commands</span><dd><p class="first last">that can contain RTF and PAR information. Allows users to define
+ <span class="classifier-delimiter">:</span> <span class="classifier">Stream file &#8211; Source of additional information and CHARMM commands</span><dd>that can contain RTF and PAR information. Allows users to define
 additional parameters without &#8216;contaminating&#8217; the original force
-field parameter files</p>
-</dd>
+field parameter files</dd>
 </dl>
 </li>
 </ul>
@@ -1028,11 +1024,6 @@ Lorentz-Berthelot combining rules.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>This method calls update_dihedral_exclusions, which might alter the
-<code class="docutils literal"><span class="pre">ignore_end</span></code> attribute of some
-<a class="reference internal" href="../../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></code></a> instances based on any
-changes that might have been made to the bonds and angles since the last
-time it was called.</p>
 <p>Subclasses of Structure for which this nonbonded treatment is inadequate
 should override this method to implement what is needed.</p>
 <p>If nrexcl is set to 3 and no exception parameters are stored in the
@@ -1232,11 +1223,12 @@ suffix and <code class="docutils literal"><span class="pre">format</span></code>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like object</p>
 <blockquote>
-<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
-file type will be determined based on the filename extension. If the
-type cannot be determined, a ValueError is raised.</p>
+<div><p>Name of the file or file-like object to save. If <code class="docutils literal"><span class="pre">format</span></code> is 
+<code class="docutils literal"><span class="pre">None</span></code> (see below), the file type will be determined based on 
+the filename extension. If <code class="docutils literal"><span class="pre">fname</span></code> is file-like object,  <code class="docutils literal"><span class="pre">format</span></code> 
+must be  provided. If the type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
@@ -2219,7 +2211,7 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.charmm.txt"
+      <li><a href="../../_sources/api/parmed/parmed.charmm.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -2246,12 +2238,12 @@ file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

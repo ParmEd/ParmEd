@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.geometry module &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.geometry module &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -65,6 +65,40 @@ PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
 with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.</p>
+<dl class="function">
+<dt id="parmed.geometry.angle">
+<code class="descclassname">parmed.geometry.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the cartesian angle between three atoms. Ignores periodic boundary
+conditions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2, a3</strong> : Atom or collection of 3 coordinates</p>
+<blockquote>
+<div><p>The three atoms between whom the angle should be calculated (with a2
+being the central atoms)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ang</strong> : float</p>
+<blockquote>
+<div><p>The angle between the vectors a1-a2 and a2-a3 in radians</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if a1, a2, or a3 are not Atom or iterable</strong></p>
+<p class="last"><strong>ValueError if a1, a2, or a3 are iterable, but do not have exactly 3 items</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>This is done in pure Python, so it should not be used for large numbers of
+distance calculations. For that, use numpy-vectorized routines and the numpy
+coordinate arrays</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="parmed.geometry.box_lengths_and_angles_to_vectors">
 <code class="descclassname">parmed.geometry.</code><code class="descname">box_lengths_and_angles_to_vectors</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em>, <em>alpha</em>, <em>beta</em>, <em>gamma</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#box_lengths_and_angles_to_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_lengths_and_angles_to_vectors" title="Permalink to this definition">¶</a></dt>
@@ -184,6 +218,32 @@ be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="parmed.geometry.dihedral">
+<code class="descclassname">parmed.geometry.</code><code class="descname">dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.dihedral" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the angle between three vectors made up of four points (all three
+vectors share one point with one other vector)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2, a3, a4</strong> : Atom or collection of 4 coordinates</p>
+<blockquote>
+<div><p>The four atoms between whom the torsion angle should be calculated (with
+a1 and a4 being the two end-point atoms not shared between two vectors)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dihed</strong> : float</p>
+<blockquote class="last">
+<div><p>The measured dihedral between the 4 points</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="parmed.geometry.distance2">
 <code class="descclassname">parmed.geometry.</code><code class="descname">distance2</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#distance2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.distance2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the cartesian distance between two atoms. Ignores periodic boundary
@@ -264,7 +324,7 @@ written by Peter Eastman</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.geometry.txt"
+      <li><a href="../../_sources/api/parmed/parmed.geometry.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -291,12 +351,12 @@ written by Peter Eastman</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

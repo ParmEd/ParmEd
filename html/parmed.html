@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using parmed &#8212; ParmEd 2.5.0 documentation</title>
+    <title>Using parmed &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -26,7 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="index.html" />
     <link rel="next" title="The API for ParmEd Command-line Utilities" href="parmed_api.html" />
     <link rel="prev" title="Seeding OpenMM Simulations with PyRosetta and ParmEd" href="omm_rosetta.html" /> 
   </head>
@@ -46,7 +46,7 @@
         <li class="right" >
           <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -545,14 +545,15 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 <div class="highlight-none"><div class="highlight"><pre><span></span>printAngles [&lt;mask&gt; [&lt;mask&gt; [&lt;mask&gt;] ] ]
 </pre></div>
 </div>
-<p>Prints all of the angles (with their details) for the given atoms in the mask. If a second mask is given, only atoms whose central atom is in the second mask and another atom is in the first mask is printed. If a third mask is given, the central atom must be in the second mask and the other two atoms must appear in the first <em>and</em> third masks (in any order)</p>
+<p>Prints all of the angles (with their details) for the given atoms in the mask. If a second mask is given, only atoms whose central atom is in the second mask and another atom is in the first mask is printed. If a third mask is given, the central atom must be in the second mask and the other two atoms must appear in the first <em>and</em> third masks (in any order).</p>
+<p>If coordinates and parameter types are present, the value of the angle (in degrees) and its <a class="reference internal" href="#energy">energy</a> (in kcal/mol) are reported for each printed angle.</p>
 </div>
 <div class="section" id="printbonds">
 <h3>printBonds<a class="headerlink" href="#printbonds" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-none"><div class="highlight"><pre><span></span>printBonds [&lt;mask&gt; [&lt;mask&gt;] ]
 </pre></div>
 </div>
-<p>Prints all of the bonds (with their details) for the given atoms in the mask. If a second mask is given, only bonds in which one atom appears in <em>each</em> list will be printed.</p>
+<p>Prints all of the bonds (with their details) for the given atoms in the mask. If a second mask is given, only bonds in which one atom appears in <em>each</em> list will be printed. If coordinates and parameter types are present, also print the actual distance (in Angstroms) and <a class="reference internal" href="#energy">energy</a> (in kcal/mol) for each printed bond.</p>
 </div>
 <div class="section" id="printdetails">
 <h3>printDetails<a class="headerlink" href="#printdetails" title="Permalink to this headline">¶</a></h3>
@@ -567,6 +568,7 @@ is available via the <a href="#id1"><span class="problematic" id="id2">help_</sp
 </pre></div>
 </div>
 <p>Prints all of the dihedrals (with their details) for the given atoms in the mask. If multiple masks are given, only dihedrals that have one atom in each mask are printed. Ordering is important here, so the first atom must be in the first mask, the second atom in the second, etc. The order can be precisely reversed, but no other ordering is recognized.</p>
+<p>If coordinates and parameter types are present, the value of the torsion angle (in degrees) and the <a class="reference internal" href="#energy">energy</a> of each dihedral (in kcal/mol) are reported for each printed dihedral.</p>
 </div>
 <div class="section" id="printflags">
 <h3>printFlags<a class="headerlink" href="#printflags" title="Permalink to this headline">¶</a></h3>
@@ -1069,7 +1071,7 @@ that action.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/parmed.txt"
+      <li><a href="_sources/parmed.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -1102,12 +1104,12 @@ that action.</p>
         <li class="right" >
           <a href="omm_rosetta.html" title="Seeding OpenMM Simulations with PyRosetta and ParmEd"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

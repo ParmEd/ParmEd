@@ -1,0 +1,7 @@
+parmed.rdkit.rdkit module
+=========================
+
+.. automodule:: parmed.rdkit.rdkit
+    :members:
+    :undoc-members:
+    :show-inheritance:

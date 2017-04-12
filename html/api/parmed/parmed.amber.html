@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber package &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber package &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -573,6 +573,9 @@ same for each of those functions.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.amber.AmberAsciiRestart.id_format" title="parmed.amber.AmberAsciiRestart.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
 <td>Identifies the file type as an Amber restart/inpcrd file</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.AmberAsciiRestart.parse" title="parmed.amber.AmberAsciiRestart.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <dl class="attribute">
@@ -635,6 +638,11 @@ same for each of those functions.</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="classmethod">
+<dt id="parmed.amber.AmberAsciiRestart.parse">
+<em class="property">classmethod </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.AmberAsciiRestart.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="parmed.amber.AmberAsciiRestart.positions">
@@ -3564,11 +3572,12 @@ suffix and <code class="docutils literal"><span class="pre">format</span></code>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like object</p>
 <blockquote>
-<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
-file type will be determined based on the filename extension. If the
-type cannot be determined, a ValueError is raised.</p>
+<div><p>Name of the file or file-like object to save. If <code class="docutils literal"><span class="pre">format</span></code> is 
+<code class="docutils literal"><span class="pre">None</span></code> (see below), the file type will be determined based on 
+the filename extension. If <code class="docutils literal"><span class="pre">fname</span></code> is file-like object,  <code class="docutils literal"><span class="pre">format</span></code> 
+must be  provided. If the type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
@@ -5564,11 +5573,12 @@ suffix and <code class="docutils literal"><span class="pre">format</span></code>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like object</p>
 <blockquote>
-<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
-file type will be determined based on the filename extension. If the
-type cannot be determined, a ValueError is raised.</p>
+<div><p>Name of the file or file-like object to save. If <code class="docutils literal"><span class="pre">format</span></code> is 
+<code class="docutils literal"><span class="pre">None</span></code> (see below), the file type will be determined based on 
+the filename extension. If <code class="docutils literal"><span class="pre">fname</span></code> is file-like object,  <code class="docutils literal"><span class="pre">format</span></code> 
+must be  provided. If the type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
@@ -7676,11 +7686,12 @@ suffix and <code class="docutils literal"><span class="pre">format</span></code>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like object</p>
 <blockquote>
-<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
-file type will be determined based on the filename extension. If the
-type cannot be determined, a ValueError is raised.</p>
+<div><p>Name of the file or file-like object to save. If <code class="docutils literal"><span class="pre">format</span></code> is 
+<code class="docutils literal"><span class="pre">None</span></code> (see below), the file type will be determined based on 
+the filename extension. If <code class="docutils literal"><span class="pre">fname</span></code> is file-like object,  <code class="docutils literal"><span class="pre">format</span></code> 
+must be  provided. If the type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
@@ -8158,19 +8169,22 @@ to that file. Default is an empty string</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.box_vectors" title="parmed.amber.Rst7.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.box" title="parmed.amber.Rst7.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.Rst7.box_vectors" title="parmed.amber.Rst7.box_vectors"><code class="xref py py-obj docutils literal"><span class="pre">box_vectors</span></code></a></td>
 <td>Unit cell vectors with units</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.Rst7.hasbox" title="parmed.amber.Rst7.hasbox"><code class="xref py py-obj docutils literal"><span class="pre">hasbox</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.hasbox" title="parmed.amber.Rst7.hasbox"><code class="xref py py-obj docutils literal"><span class="pre">hasbox</span></code></a></td>
 <td>Whether or not this Rst7 has unit cell information</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.hasvels" title="parmed.amber.Rst7.hasvels"><code class="xref py py-obj docutils literal"><span class="pre">hasvels</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.Rst7.hasvels" title="parmed.amber.Rst7.hasvels"><code class="xref py py-obj docutils literal"><span class="pre">hasvels</span></code></a></td>
 <td>Whether or not this Rst7 has velocities</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.Rst7.positions" title="parmed.amber.Rst7.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.positions" title="parmed.amber.Rst7.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
 <td>Atomic coordinates with units</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.Rst7.velocities" title="parmed.amber.Rst7.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.Rst7.velocities" title="parmed.amber.Rst7.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
 <td>Atomic velocities in units of angstroms/picoseconds</td>
 </tr>
 </tbody>
@@ -8193,6 +8207,11 @@ to that file. Default is an empty string</p>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="parmed.amber.Rst7.box">
+<code class="descname">box</code><a class="headerlink" href="#parmed.amber.Rst7.box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="parmed.amber.Rst7.box_vectors">
 <code class="descname">box_vectors</code><a class="headerlink" href="#parmed.amber.Rst7.box_vectors" title="Permalink to this definition">¶</a></dt>
@@ -8658,7 +8677,7 @@ and then returns an instance of the appropriate type.</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.amber.txt"
+      <li><a href="../../_sources/api/parmed/parmed.amber.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -8685,12 +8704,12 @@ and then returns an instance of the appropriate type.</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -1,0 +1,37 @@
+parmed.charmm.CharmmParameterSet
+================================
+
+.. currentmodule:: parmed.charmm
+
+.. autoclass:: CharmmParameterSet
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CharmmParameterSet.__init__
+      ~CharmmParameterSet.condense
+      ~CharmmParameterSet.from_parameterset
+      ~CharmmParameterSet.from_structure
+      ~CharmmParameterSet.load_set
+      ~CharmmParameterSet.read_parameter_file
+      ~CharmmParameterSet.read_stream_file
+      ~CharmmParameterSet.read_topology_file
+      ~CharmmParameterSet.typeify_templates
+      ~CharmmParameterSet.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CharmmParameterSet.combining_rule
+   
+   

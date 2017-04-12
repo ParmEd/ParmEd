@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm package &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm package &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
@@ -25,8 +26,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -72,7 +72,7 @@
 <p>This is a collection of all of the OpenMM functionality supported in ParmEd</p>
 <dl class="class">
 <dt id="parmed.openmm.StateDataReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">StateDataReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>step=True</em>, <em>time=True</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=True</em>, <em>volume=False</em>, <em>density=False</em>, <em>separator='</em>, <em>'</em>, <em>systemMass=None</em>, <em>energyUnit=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em>, <em>timeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;time&quot;)</em>, <em>name=&quot;picosecond&quot;</em>, <em>symbol=&quot;ps&quot;): 1.0})</em>, <em>volumeUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;length&quot;)</em>, <em>name=&quot;angstrom&quot;</em>, <em>symbol=&quot;A&quot;): 3.0})</em>, <em>densityUnit=Unit({BaseUnit(base_dim=BaseDimension(&quot;mass&quot;)</em>, <em>name=&quot;gram&quot;</em>, <em>symbol=&quot;g&quot;): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;item&quot;</em>, <em>symbol=&quot;&quot;): -1.0</em>, <em>ScaledUnit(factor=0.001</em>, <em>master=decimeter**3</em>, <em>name='milliliter'</em>, <em>symbol='mL'): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/reporters.html#StateDataReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.StateDataReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>This class acts as a state data reporter for OpenMM simulations, but it is a
 little more generalized. Notable differences are:</p>
@@ -768,7 +768,9 @@ that are implemented as CustomForce objects. In particular, quadratic
 improper torsions, when recognized, will be extracted.</p>
 <p>Other CustomForces, including the CustomNonbondedForce used to implement
 NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be
-processed and will result in an unknown functional form</p>
+processed and will result in an unknown functional form.</p>
+<p>If an OpenMM Atom.id attribute is populated by a non-integer, it will be
+used to name the corresponding ParmEd AtomType object.</p>
 </dd></dl>
 
 <dl class="class">
@@ -856,7 +858,7 @@ result, this function may require a significant amount of memory.</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition</code><span class="sig-paren">(</span><em>structure</em>, <em>context</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition" title="Permalink to this definition">¶</a></dt>
 <dd><p>This computes the energy of every force group in the given structure and
 computes the energy for each force group for the given Context.  Note, the
 context must have positions already assigned.</p>
@@ -893,7 +895,7 @@ with the energy of that group in</p>
 
 <dl class="function">
 <dt id="parmed.openmm.energy_decomposition_system">
-<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>structure</em>, <em>system</em>, <em>platform=None</em>, <em>nrg=Unit({BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0</em>, <em>ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">parmed.openmm.</code><code class="descname">energy_decomposition_system</code><span class="sig-paren">(</span><em>structure</em>, <em>system</em>, <em>platform=None</em>, <em>nrg=Unit({ScaledUnit(factor=4.184</em>, <em>master=kilojoule</em>, <em>name='kilocalorie'</em>, <em>symbol='kcal'): 1.0</em>, <em>BaseUnit(base_dim=BaseDimension(&quot;amount&quot;)</em>, <em>name=&quot;mole&quot;</em>, <em>symbol=&quot;mol&quot;): -1.0})</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/utils.html#energy_decomposition_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.energy_decomposition_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function computes the energy contribution for all of the different
 force groups.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -992,7 +994,7 @@ parameter type that is used)</p>
 <tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.OpenMMParameterSet.typeify_templates" title="parmed.openmm.OpenMMParameterSet.typeify_templates"><code class="xref py py-obj docutils literal"><span class="pre">typeify_templates</span></code></a>()</td>
 <td>Assign atom types to atom names in templates</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.OpenMMParameterSet.write" title="parmed.openmm.OpenMMParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;provenance,&nbsp;write_unused])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.OpenMMParameterSet.write" title="parmed.openmm.OpenMMParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(dest[,&nbsp;provenance,&nbsp;write_unused,&nbsp;...])</td>
 <td>Write the parameter set to an XML file for use with OpenMM</td>
 </tr>
 </tbody>
@@ -1153,7 +1155,7 @@ file.</p>
 
 <dl class="method">
 <dt id="parmed.openmm.OpenMMParameterSet.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>dest</em>, <em>provenance=None</em>, <em>write_unused=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.OpenMMParameterSet.write" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write</code><span class="sig-paren">(</span><em>dest</em>, <em>provenance=None</em>, <em>write_unused=True</em>, <em>separate_ljforce=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/openmm/parameters.html#OpenMMParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.OpenMMParameterSet.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the parameter set to an XML file for use with OpenMM</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1189,12 +1191,26 @@ provenance = {&#8216;Reference&#8217; : [&#8216;Nature&#8217;, &#8216;Cell&#8217
 </div></blockquote>
 </div></blockquote>
 <p><strong>write_unused</strong> : bool</p>
-<blockquote class="last">
+<blockquote>
 <div><p>If False: a) residue templates using unavailable atom types will not
 be written, b) atom types that are not used in any of the residue
 templates remaining and parameters including those atom types will
 not be written. A ParameterWarning is issued if any such residues are
 found in a).</p>
+</div></blockquote>
+<p><strong>separate_ljforce</strong> : bool</p>
+<blockquote class="last">
+<div><p>If True will use a separate LennardJonesForce to create a
+CostumNonbondedForce to compute L-J interactions. It will set sigma
+to 1 and epsilon to 0 in the NonbondedForce so that the
+NonbondedForce  only calculates the electrostatic contribution. It
+should be set to True when converting a CHARMM force field file that
+doesn&#8217;t have pair-specific  L-J modifications (NBFIX in CHARMM) so
+that the ffxml conversion is compatible with the main charmm36.xml file.
+Note:
+&#8212;-
+When pair-specific L-J modifications are present (NBFIX in CHARMM), this
+behavior is always present and this flag is ignored.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1232,7 +1248,7 @@ removed if it is provided).</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.openmm.txt"
+      <li><a href="../../_sources/api/parmed/parmed.openmm.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -1259,12 +1275,12 @@ removed if it is provided).</p>
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

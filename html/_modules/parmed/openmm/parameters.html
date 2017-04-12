@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.parameters &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm.parameters &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -169,7 +168,7 @@
 
         <span class="k">return</span> <span class="n">new_params</span></div>
 
-<div class="viewcode-block" id="OpenMMParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.parameters.html#parmed.openmm.OpenMMParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">provenance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">write_unused</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="OpenMMParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.openmm.parameters.html#parmed.openmm.OpenMMParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">provenance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">write_unused</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">separate_ljforce</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the parameter set to an XML file for use with OpenMM</span>
 
 <span class="sd">        Parameters</span>
@@ -203,6 +202,18 @@
 <span class="sd">            templates remaining and parameters including those atom types will</span>
 <span class="sd">            not be written. A ParameterWarning is issued if any such residues are</span>
 <span class="sd">            found in a).</span>
+<span class="sd">        separate_ljforce : bool</span>
+<span class="sd">            If True will use a separate LennardJonesForce to create a</span>
+<span class="sd">            CostumNonbondedForce to compute L-J interactions. It will set sigma</span>
+<span class="sd">            to 1 and epsilon to 0 in the NonbondedForce so that the</span>
+<span class="sd">            NonbondedForce  only calculates the electrostatic contribution. It</span>
+<span class="sd">            should be set to True when converting a CHARMM force field file that</span>
+<span class="sd">            doesn&#39;t have pair-specific  L-J modifications (NBFIX in CHARMM) so</span>
+<span class="sd">            that the ffxml conversion is compatible with the main charmm36.xml file.</span>
+<span class="sd">            Note:</span>
+<span class="sd">            ----</span>
+<span class="sd">            When pair-specific L-J modifications are present (NBFIX in CHARMM), this</span>
+<span class="sd">            behavior is always present and this flag is ignored.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -245,7 +256,8 @@
 <span class="c1">#           self._write_omm_rb_torsions(dest, skip_types)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_cmaps</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_scripts</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_nonbonded</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_nonbonded</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">,</span> <span class="n">separate_ljforce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_omm_LennardJonesForce</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">,</span> <span class="n">separate_ljforce</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/ForceField&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
@@ -491,7 +503,7 @@
             <span class="p">)</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;/CmapTorsionForce&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_omm_nonbonded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_omm_nonbonded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">,</span> <span class="n">separate_ljforce</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span> <span class="k">return</span>
         <span class="c1"># Compute conversion factors for writing in natrual OpenMM units.</span>
         <span class="n">length_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometer</span><span class="p">)</span>
@@ -535,6 +547,10 @@
                 <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
                 <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span> <span class="ow">or</span> <span class="n">separate_ljforce</span><span class="p">:</span>
+                <span class="c1"># turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0</span>
             <span class="c1"># Ensure we don&#39;t have sigma = 0</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">epsilon</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
@@ -547,18 +563,66 @@
                        <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)))</span>
         <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;/NonbondedForce&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_write_omm_LennardJonesForce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">,</span> <span class="n">separate_ljforce</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">separate_ljforce</span><span class="p">:</span> <span class="k">return</span>
+        <span class="c1"># Convert Conversion factors for writing in natural OpenMM units</span>
+        <span class="n">length_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">angstrom</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">nanometer</span><span class="p">)</span>
+        <span class="n">ene_conv</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalories</span><span class="o">.</span><span class="n">conversion_factor_to</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoules</span><span class="p">)</span>
+
+        <span class="n">scnb</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">dt</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">:</span> <span class="n">scnb</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scnb</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Cannot currently handle mixed 1-4 &#39;</span>
+                    <span class="s1">&#39;scaling: L-J Scaling factors </span><span class="si">%s</span><span class="s1"> detected&#39;</span> <span class="o">%</span>
+                    <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">scnb</span><span class="p">])))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scnb</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">lj14scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">scnb</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lj14scale</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_scnb</span>
+
+        <span class="c1"># write L-J records</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;LennardJonesForce lj14scale=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">lj14scale</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">skip_types</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">atom_type</span><span class="o">.</span><span class="n">rmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">length_conv</span>  <span class="c1"># in md_unit_system</span>
+                <span class="n">epsilon</span> <span class="o">=</span> <span class="n">atom_type</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">*</span> <span class="n">ene_conv</span> <span class="c1"># in md_unit_system</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Dummy atom</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span>
+                <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="c1"># Ensure we don&#39;t have sigma = 0</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sigma</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">epsilon</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">):</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1"># reset sigma = 1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For atom type &#39;</span><span class="si">%s</span><span class="s2">&#39;, sigma = 0 but &quot;</span>
+                                     <span class="s2">&quot;epsilon != 0.&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;Atom type=&quot;</span><span class="si">%s</span><span class="s1">&quot; sigma=&quot;</span><span class="si">%s</span><span class="s1">&quot; epsilon=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                       <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">epsilon</span><span class="p">)))</span>
+
+        <span class="c1"># write NBFIX records</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">atom_types</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">):</span>
+            <span class="n">emin</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">ene_conv</span>
+            <span class="n">rmin</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">length_conv</span>
+            <span class="c1"># convert to sigma</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rmin</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="mi">6</span><span class="p">))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  &lt;NBFixPair type1=&quot;</span><span class="si">%s</span><span class="s1">&quot; type2=&quot;</span><span class="si">%s</span><span class="s1">&quot; sigma=&quot;</span><span class="si">%s</span><span class="s1">&quot; epsilon=&quot;</span><span class="si">%s</span><span class="s1">&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
+                       <span class="p">(</span><span class="n">atom_types</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">atom_types</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">emin</span><span class="p">))</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39; &lt;/LennardJonesForce&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
     <span class="k">def</span> <span class="nf">_write_omm_scripts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">skip_types</span><span class="p">):</span>
         <span class="c1"># Not currently implemented, so throw an exception if any unsupported</span>
         <span class="c1"># options are specified</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">==</span> <span class="s1">&#39;geometric&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Geometric combining rule not currently &#39;</span>
-                                      <span class="s1">&#39;supported.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">for</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="n">nbfix</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nbfix_types</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">any</span><span class="p">((</span><span class="n">a</span> <span class="ow">in</span> <span class="n">skip_types</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">))):</span>
-                    <span class="k">continue</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;NBFIX not currently supported&#39;</span><span class="p">)</span></div>
+                                      <span class="s1">&#39;supported.&#39;</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -589,13 +653,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

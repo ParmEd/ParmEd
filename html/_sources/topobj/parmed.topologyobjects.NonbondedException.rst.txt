@@ -1,0 +1,22 @@
+parmed.topologyobjects.NonbondedException
+=========================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: NonbondedException
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NonbondedException.__init__
+   
+   
+
+   
+   
+   

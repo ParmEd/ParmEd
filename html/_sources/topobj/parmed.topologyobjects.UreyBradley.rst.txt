@@ -1,0 +1,31 @@
+parmed.topologyobjects.UreyBradley
+==================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: UreyBradley
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UreyBradley.__init__
+      ~UreyBradley.delete
+      ~UreyBradley.energy
+      ~UreyBradley.measure
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UreyBradley.order
+   
+   

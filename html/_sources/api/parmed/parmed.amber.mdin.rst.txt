@@ -1,0 +1,21 @@
+parmed.amber.mdin package
+=========================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.amber.mdin.cntrl
+   parmed.amber.mdin.ewald
+   parmed.amber.mdin.mdin
+   parmed.amber.mdin.pb
+   parmed.amber.mdin.qmmm
+
+Module contents
+---------------
+
+.. automodule:: parmed.amber.mdin
+    :members:
+    :undoc-members:
+    :show-inheritance:

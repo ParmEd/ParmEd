@@ -1,0 +1,25 @@
+parmed.openmm.StateDataReporter
+===============================
+
+.. currentmodule:: parmed.openmm
+
+.. autoclass:: StateDataReporter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~StateDataReporter.__init__
+      ~StateDataReporter.describeNextReport
+      ~StateDataReporter.finalize
+      ~StateDataReporter.report
+   
+   
+
+   
+   
+   

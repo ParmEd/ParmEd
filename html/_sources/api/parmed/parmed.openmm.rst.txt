@@ -1,0 +1,21 @@
+parmed.openmm package
+=====================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.openmm.parameters
+   parmed.openmm.reporters
+   parmed.openmm.topsystem
+   parmed.openmm.utils
+   parmed.openmm.xmlfile
+
+Module contents
+---------------
+
+.. automodule:: parmed.openmm
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+parmed.utils.timer module
+=========================
+
+.. automodule:: parmed.utils.timer
+    :members:
+    :undoc-members:
+    :show-inheritance:

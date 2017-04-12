@@ -1,0 +1,7 @@
+parmed.tinker.topologyobjects module
+====================================
+
+.. automodule:: parmed.tinker.topologyobjects
+    :members:
+    :undoc-members:
+    :show-inheritance:

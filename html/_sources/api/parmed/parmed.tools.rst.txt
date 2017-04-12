@@ -1,0 +1,35 @@
+parmed.tools package
+====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    parmed.tools.gui
+    parmed.tools.simulations
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.tools.actions
+   parmed.tools.add1264
+   parmed.tools.addljtype
+   parmed.tools.argumentlist
+   parmed.tools.changeradii
+   parmed.tools.checkvalidity
+   parmed.tools.coarsegrain
+   parmed.tools.exceptions
+   parmed.tools.logos
+   parmed.tools.parmed_cmd
+   parmed.tools.parmlist
+
+Module contents
+---------------
+
+.. automodule:: parmed.tools
+    :members:
+    :undoc-members:
+    :show-inheritance:

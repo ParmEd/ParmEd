@@ -1,0 +1,119 @@
+parmed.amber.AmberParm
+======================
+
+.. currentmodule:: parmed.amber
+
+.. autoclass:: AmberParm
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AmberParm.__init__
+      ~AmberParm.add_atom
+      ~AmberParm.add_atom_to_residue
+      ~AmberParm.add_flag
+      ~AmberParm.assign_bonds
+      ~AmberParm.copy
+      ~AmberParm.createSystem
+      ~AmberParm.delete_flag
+      ~AmberParm.fill_LJ
+      ~AmberParm.from_rawdata
+      ~AmberParm.from_structure
+      ~AmberParm.get_box
+      ~AmberParm.get_coordinates
+      ~AmberParm.has_1012
+      ~AmberParm.has_NBFIX
+      ~AmberParm.id_format
+      ~AmberParm.initialize_topology
+      ~AmberParm.is_changed
+      ~AmberParm.join_dihedrals
+      ~AmberParm.load_atom_info
+      ~AmberParm.load_dataframe
+      ~AmberParm.load_pointers
+      ~AmberParm.load_rst7
+      ~AmberParm.load_structure
+      ~AmberParm.omm_add_constraints
+      ~AmberParm.omm_angle_force
+      ~AmberParm.omm_bond_force
+      ~AmberParm.omm_cmap_force
+      ~AmberParm.omm_dihedral_force
+      ~AmberParm.omm_gbsa_force
+      ~AmberParm.omm_improper_force
+      ~AmberParm.omm_nonbonded_force
+      ~AmberParm.omm_out_of_plane_bend_force
+      ~AmberParm.omm_pi_torsion_force
+      ~AmberParm.omm_rb_torsion_force
+      ~AmberParm.omm_set_virtual_sites
+      ~AmberParm.omm_stretch_bend_force
+      ~AmberParm.omm_torsion_torsion_force
+      ~AmberParm.omm_trigonal_angle_force
+      ~AmberParm.omm_urey_bradley_force
+      ~AmberParm.parse
+      ~AmberParm.prune_empty_terms
+      ~AmberParm.ptr
+      ~AmberParm.rdparm
+      ~AmberParm.rdparm_old
+      ~AmberParm.rdparm_slow
+      ~AmberParm.recalculate_LJ
+      ~AmberParm.rediscover_molecules
+      ~AmberParm.remake_parm
+      ~AmberParm.save
+      ~AmberParm.set_version
+      ~AmberParm.split
+      ~AmberParm.strip
+      ~AmberParm.to_dataframe
+      ~AmberParm.unchange
+      ~AmberParm.update_dihedral_exclusions
+      ~AmberParm.view_as
+      ~AmberParm.visualize
+      ~AmberParm.write_cif
+      ~AmberParm.write_parm
+      ~AmberParm.write_pdb
+      ~AmberParm.write_psf
+      ~AmberParm.write_rst7
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AmberParm.ANGLE_FORCE_GROUP
+      ~AmberParm.BOND_FORCE_GROUP
+      ~AmberParm.CMAP_FORCE_GROUP
+      ~AmberParm.DIHEDRAL_FORCE_GROUP
+      ~AmberParm.IMPROPER_FORCE_GROUP
+      ~AmberParm.NONBONDED_FORCE_GROUP
+      ~AmberParm.OUT_OF_PLANE_BEND_FORCE_GROUP
+      ~AmberParm.PI_TORSION_FORCE_GROUP
+      ~AmberParm.RB_TORSION_FORCE_GROUP
+      ~AmberParm.STRETCH_BEND_FORCE_GROUP
+      ~AmberParm.TORSION_TORSION_FORCE_GROUP
+      ~AmberParm.TRIGONAL_ANGLE_FORCE_GROUP
+      ~AmberParm.UREY_BRADLEY_FORCE_GROUP
+      ~AmberParm.amoeba
+      ~AmberParm.angles_inc_h
+      ~AmberParm.angles_without_h
+      ~AmberParm.bonds_inc_h
+      ~AmberParm.bonds_without_h
+      ~AmberParm.box
+      ~AmberParm.box_vectors
+      ~AmberParm.chamber
+      ~AmberParm.combining_rule
+      ~AmberParm.coordinates
+      ~AmberParm.dihedrals_inc_h
+      ~AmberParm.dihedrals_without_h
+      ~AmberParm.has_cmap
+      ~AmberParm.positions
+      ~AmberParm.topology
+      ~AmberParm.velocities
+      ~AmberParm.view
+   
+   

@@ -1,0 +1,32 @@
+parmed.charmm.CharmmCrdFile
+===========================
+
+.. currentmodule:: parmed.charmm
+
+.. autoclass:: CharmmCrdFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CharmmCrdFile.__init__
+      ~CharmmCrdFile.id_format
+      ~CharmmCrdFile.write
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CharmmCrdFile.box
+      ~CharmmCrdFile.coordinates
+      ~CharmmCrdFile.positions
+   
+   

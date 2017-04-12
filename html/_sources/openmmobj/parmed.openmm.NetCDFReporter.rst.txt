@@ -1,0 +1,25 @@
+parmed.openmm.NetCDFReporter
+============================
+
+.. currentmodule:: parmed.openmm
+
+.. autoclass:: NetCDFReporter
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~NetCDFReporter.__init__
+      ~NetCDFReporter.describeNextReport
+      ~NetCDFReporter.finalize
+      ~NetCDFReporter.report
+   
+   
+
+   
+   
+   

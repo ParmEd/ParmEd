@@ -1,0 +1,7 @@
+parmed.formats.pdbx.PdbxContainers module
+=========================================
+
+.. automodule:: parmed.formats.pdbx.PdbxContainers
+    :members:
+    :undoc-members:
+    :show-inheritance:

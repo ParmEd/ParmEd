@@ -1,0 +1,7 @@
+parmed.amber.mask module
+========================
+
+.. automodule:: parmed.amber.mask
+    :members:
+    :undoc-members:
+    :show-inheritance:

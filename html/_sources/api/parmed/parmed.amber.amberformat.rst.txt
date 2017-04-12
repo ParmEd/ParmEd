@@ -1,0 +1,7 @@
+parmed.amber.amberformat module
+===============================
+
+.. automodule:: parmed.amber.amberformat
+    :members:
+    :undoc-members:
+    :show-inheritance:

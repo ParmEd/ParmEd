@@ -1,0 +1,23 @@
+parmed.openmm.XmlFile
+=====================
+
+.. currentmodule:: parmed.openmm
+
+.. autoclass:: XmlFile
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~XmlFile.id_format
+      ~XmlFile.parse
+   
+   
+
+   
+   
+   

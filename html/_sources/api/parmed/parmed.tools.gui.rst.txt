@@ -1,0 +1,19 @@
+parmed.tools.gui package
+========================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.tools.gui.guiactions
+   parmed.tools.gui.guifiletools
+   parmed.tools.gui.guitools
+
+Module contents
+---------------
+
+.. automodule:: parmed.tools.gui
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,32 @@
+parmed.topologyobjects.AtomType
+===============================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: AtomType
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AtomType.__init__
+      ~AtomType.add_nbfix
+      ~AtomType.set_lj_params
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AtomType.bond_type
+      ~AtomType.sigma
+      ~AtomType.sigma_14
+   
+   

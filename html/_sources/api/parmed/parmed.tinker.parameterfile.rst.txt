@@ -1,0 +1,7 @@
+parmed.tinker.parameterfile module
+==================================
+
+.. automodule:: parmed.tinker.parameterfile
+    :members:
+    :undoc-members:
+    :show-inheritance:

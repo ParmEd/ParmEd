@@ -1,0 +1,19 @@
+parmed.formats.pdbx package
+===========================
+
+Submodules
+----------
+
+.. toctree::
+
+   parmed.formats.pdbx.PdbxContainers
+   parmed.formats.pdbx.PdbxReader
+   parmed.formats.pdbx.PdbxWriter
+
+Module contents
+---------------
+
+.. automodule:: parmed.formats.pdbx
+    :members:
+    :undoc-members:
+    :show-inheritance:

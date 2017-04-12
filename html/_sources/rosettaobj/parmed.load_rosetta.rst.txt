@@ -1,0 +1,6 @@
+parmed.load_rosetta
+===================
+
+.. currentmodule:: parmed
+
+.. autofunction:: load_rosetta

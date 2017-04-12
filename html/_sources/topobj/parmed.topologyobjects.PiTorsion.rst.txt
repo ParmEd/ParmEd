@@ -1,0 +1,22 @@
+parmed.topologyobjects.PiTorsion
+================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: PiTorsion
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~PiTorsion.__init__
+   
+   
+
+   
+   
+   

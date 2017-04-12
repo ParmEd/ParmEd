@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber._tinkerparm &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber._tinkerparm &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -72,22 +71,26 @@
 <span class="sd">Foundation, Inc., 59 Temple Place - Suite 330,</span>
 <span class="sd">Boston, MA 02111-1307, USA.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">parmed.amber._amberparm</span> <span class="k">import</span> <span class="n">AmberParm</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.amberformat</span> <span class="k">import</span> <span class="n">AmberFormat</span>
-<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="k">import</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span><span class="p">,</span> <span class="n">DEG_TO_RAD</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">load_file</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">PiTorsion</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span>
-                <span class="n">OutOfPlaneBendType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span>
-                <span class="n">TrigonalAngle</span><span class="p">,</span> <span class="n">OutOfPlaneBend</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">StretchBend</span><span class="p">,</span>
-                <span class="n">TorsionTorsion</span><span class="p">,</span> <span class="n">ChiralFrame</span><span class="p">,</span> <span class="n">MultipoleFrame</span><span class="p">,</span> <span class="n">NonbondedException</span><span class="p">,</span>
-                <span class="n">StretchBendType</span><span class="p">,</span> <span class="n">TorsionTorsionType</span><span class="p">,</span>
-                <span class="n">AmoebaNonbondedExceptionType</span> <span class="k">as</span> <span class="n">NonbondedExceptionType</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">AmberError</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">AmberError</span>
+<span class="kn">from</span> <span class="nn">..formats.registry</span> <span class="k">import</span> <span class="n">load_file</span>
+<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="k">import</span> \
+    <span class="n">AmoebaNonbondedExceptionType</span> <span class="k">as</span> <span class="n">NonbondedExceptionType</span>
+<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">ChiralFrame</span><span class="p">,</span>
+                               <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span> <span class="n">MultipoleFrame</span><span class="p">,</span>
+                               <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">OutOfPlaneBend</span><span class="p">,</span>
+                               <span class="n">OutOfPlaneBendType</span><span class="p">,</span> <span class="n">PiTorsion</span><span class="p">,</span> <span class="n">StretchBend</span><span class="p">,</span>
+                               <span class="n">StretchBendType</span><span class="p">,</span> <span class="n">TorsionTorsion</span><span class="p">,</span>
+                               <span class="n">TorsionTorsionType</span><span class="p">,</span> <span class="n">TrigonalAngle</span><span class="p">,</span> <span class="n">UreyBradley</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="k">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">._amberparm</span> <span class="k">import</span> <span class="n">AmberParm</span>
+<span class="kn">from</span> <span class="nn">.amberformat</span> <span class="k">import</span> <span class="n">AmberFormat</span>
+
 
 <div class="viewcode-block" id="AmoebaParm"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.html#parmed.amber.AmoebaParm">[docs]</a><span class="k">class</span> <span class="nc">AmoebaParm</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -1315,13 +1318,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

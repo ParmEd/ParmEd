@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.charmm.CharmmPsfFile &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.charmm.CharmmPsfFile &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,8 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../index.html" />
-    <link rel="up" title="The parmed.charmm package" href="../charmm.html" />
     <link rel="prev" title="The parmed.charmm package" href="../charmm.html" /> 
   </head>
   <body role="document">
@@ -43,7 +42,7 @@
         <li class="right" >
           <a href="../charmm.html" title="The parmed.charmm package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../charmm.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
       </ul>
     </div>  
@@ -368,13 +367,16 @@ instance from the data.</p>
 <tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.update_dihedral_exclusions" title="parmed.charmm.CharmmPsfFile.update_dihedral_exclusions"><code class="xref py py-obj docutils literal"><span class="pre">update_dihedral_exclusions</span></code></a>()</td>
 <td>Nonbonded exclusions and exceptions have the following priority:</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_cif" title="parmed.charmm.CharmmPsfFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.visualize" title="parmed.charmm.CharmmPsfFile.visualize"><code class="xref py py-obj docutils literal"><span class="pre">visualize</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
+<td>Use nglview for visualization.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_cif" title="parmed.charmm.CharmmPsfFile.write_cif"><code class="xref py py-obj docutils literal"><span class="pre">write_cif</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from the current Structure instance</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_pdb" title="parmed.charmm.CharmmPsfFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_pdb" title="parmed.charmm.CharmmPsfFile.write_pdb"><code class="xref py py-obj docutils literal"><span class="pre">write_pdb</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;...])</td>
 <td>Write a PDB file from a Structure instance</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_psf" title="parmed.charmm.CharmmPsfFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
+<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmPsfFile.write_psf" title="parmed.charmm.CharmmPsfFile.write_psf"><code class="xref py py-obj docutils literal"><span class="pre">write_psf</span></code></a>(struct,&nbsp;dest[,&nbsp;vmd])</td>
 <td>Writes a PSF file from the stored molecule</td>
 </tr>
 </tbody>
@@ -1110,11 +1112,6 @@ Lorentz-Berthelot combining rules.</p>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>This method calls update_dihedral_exclusions, which might alter the
-<code class="docutils literal"><span class="pre">ignore_end</span></code> attribute of some
-<a class="reference internal" href="../topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Dihedral</span></code></a> instances based on any
-changes that might have been made to the bonds and angles since the last
-time it was called.</p>
 <p>Subclasses of Structure for which this nonbonded treatment is inadequate
 should override this method to implement what is needed.</p>
 <p>If nrexcl is set to 3 and no exception parameters are stored in the
@@ -1314,11 +1311,12 @@ suffix and <code class="docutils literal"><span class="pre">format</span></code>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str or file-like object</p>
 <blockquote>
-<div><p>Name of the file to save. If <code class="docutils literal"><span class="pre">format</span></code> is <code class="docutils literal"><span class="pre">None</span></code> (see below), the
-file type will be determined based on the filename extension. If the
-type cannot be determined, a ValueError is raised.</p>
+<div><p>Name of the file or file-like object to save. If <code class="docutils literal"><span class="pre">format</span></code> is 
+<code class="docutils literal"><span class="pre">None</span></code> (see below), the file type will be determined based on 
+the filename extension. If <code class="docutils literal"><span class="pre">fname</span></code> is file-like object,  <code class="docutils literal"><span class="pre">format</span></code> 
+must be  provided. If the type cannot be determined, a ValueError is raised.</p>
 </div></blockquote>
 <p><strong>format</strong> : str, optional</p>
 <blockquote>
@@ -1688,7 +1686,7 @@ closed</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/charmmobj/parmed.charmm.CharmmPsfFile.txt"
+      <li><a href="../_sources/charmmobj/parmed.charmm.CharmmPsfFile.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -1718,13 +1716,13 @@ closed</p>
         <li class="right" >
           <a href="../charmm.html" title="The parmed.charmm package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../charmm.html" >The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

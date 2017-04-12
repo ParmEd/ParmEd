@@ -1,0 +1,22 @@
+parmed.topologyobjects.MultipoleFrame
+=====================================
+
+.. currentmodule:: parmed.topologyobjects
+
+.. autoclass:: MultipoleFrame
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MultipoleFrame.__init__
+   
+   
+
+   
+   
+   

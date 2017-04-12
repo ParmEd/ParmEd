@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.openmm.load_topology &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.openmm.load_topology &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
@@ -26,8 +27,6 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../index.html" />
-    <link rel="up" title="OpenMM Functionality" href="../openmm.html" />
     <link rel="next" title="parmed.openmm.energy_decomposition" href="parmed.openmm.energy_decomposition.html" /> 
   </head>
   <body role="document">
@@ -43,7 +42,7 @@
         <li class="right" >
           <a href="parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &#187;</li> 
       </ul>
     </div>  
@@ -110,7 +109,9 @@ that are implemented as CustomForce objects. In particular, quadratic
 improper torsions, when recognized, will be extracted.</p>
 <p>Other CustomForces, including the CustomNonbondedForce used to implement
 NBFIX (off-diagonal L-J modifications) and the 12-6-4 potential, will not be
-processed and will result in an unknown functional form</p>
+processed and will result in an unknown functional form.</p>
+<p>If an OpenMM Atom.id attribute is populated by a non-integer, it will be
+used to name the corresponding ParmEd AtomType object.</p>
 </dd></dl>
 
 </div>
@@ -124,7 +125,7 @@ processed and will result in an unknown functional form</p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/openmmobj/parmed.openmm.load_topology.txt"
+      <li><a href="../_sources/openmmobj/parmed.openmm.load_topology.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -154,13 +155,13 @@ processed and will result in an unknown functional form</p>
         <li class="right" >
           <a href="parmed.openmm.energy_decomposition.html" title="parmed.openmm.energy_decomposition"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../openmm.html" >OpenMM Functionality</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

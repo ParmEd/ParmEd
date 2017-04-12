@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>parmed.amber._amberparm &#8212; ParmEd 2.5.0 documentation</title>
+    <title>parmed.amber._amberparm &#8212; ParmEd  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,10 +14,11 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '2.5.0',
+        VERSION:     '',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
@@ -25,9 +26,7 @@
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="top" title="ParmEd 2.5.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" /> 
+    <link rel="search" title="Search" href="../../../search.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -39,7 +38,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -74,35 +73,40 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
 
-<span class="kn">from</span> <span class="nn">parmed.amber.amberformat</span> <span class="k">import</span> <span class="n">AmberFormat</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.asciicrd</span> <span class="k">import</span> <span class="n">AmberAsciiRestart</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.netcdffiles</span> <span class="k">import</span> <span class="n">NetCDFRestart</span>
-<span class="kn">from</span> <span class="nn">parmed.constants</span> <span class="k">import</span> <span class="p">(</span><span class="n">NATOM</span><span class="p">,</span> <span class="n">NTYPES</span><span class="p">,</span> <span class="n">NBONH</span><span class="p">,</span> <span class="n">MBONA</span><span class="p">,</span> <span class="n">NTHETH</span><span class="p">,</span>
-            <span class="n">MTHETA</span><span class="p">,</span> <span class="n">NPHIH</span><span class="p">,</span> <span class="n">MPHIA</span><span class="p">,</span> <span class="n">NHPARM</span><span class="p">,</span> <span class="n">NPARM</span><span class="p">,</span> <span class="n">NEXT</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">NBONA</span><span class="p">,</span> <span class="n">NTHETA</span><span class="p">,</span>
-            <span class="n">NPHIA</span><span class="p">,</span> <span class="n">NUMBND</span><span class="p">,</span> <span class="n">NUMANG</span><span class="p">,</span> <span class="n">NPTRA</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span> <span class="n">NPHB</span><span class="p">,</span> <span class="n">IFPERT</span><span class="p">,</span> <span class="n">NBPER</span><span class="p">,</span> <span class="n">NGPER</span><span class="p">,</span>
-            <span class="n">NDPER</span><span class="p">,</span> <span class="n">MBPER</span><span class="p">,</span> <span class="n">MGPER</span><span class="p">,</span> <span class="n">MDPER</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">NMXRS</span><span class="p">,</span> <span class="n">IFCAP</span><span class="p">,</span> <span class="n">NUMEXTRA</span><span class="p">,</span> <span class="n">NCOPY</span><span class="p">,</span>
-            <span class="n">NNB</span><span class="p">,</span> <span class="n">TINY</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span><span class="p">,</span> <span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">SMALL</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="p">(</span><span class="n">AmberError</span><span class="p">,</span> <span class="n">MoleculeError</span><span class="p">,</span> <span class="n">AmberWarning</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed.geometry</span> <span class="k">import</span> <span class="n">box_lengths_and_angles_to_vectors</span>
-<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="k">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
-<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="k">import</span> <span class="n">SOLVENT_NAMES</span><span class="p">,</span> <span class="n">ALLION_NAMES</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">needs_openmm</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Bond</span><span class="p">,</span> <span class="n">Angle</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span>
-                       <span class="n">BondType</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">zip</span><span class="p">,</span> <span class="nb">range</span>
-<span class="kn">from</span> <span class="nn">parmed.vec3</span> <span class="k">import</span> <span class="n">Vec3</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">_copy</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">sqrt</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="p">(</span><span class="n">DEG_TO_RAD</span><span class="p">,</span> <span class="n">IFBOX</span><span class="p">,</span> <span class="n">IFCAP</span><span class="p">,</span> <span class="n">IFPERT</span><span class="p">,</span> <span class="n">MBONA</span><span class="p">,</span> <span class="n">MBPER</span><span class="p">,</span> <span class="n">MDPER</span><span class="p">,</span>
+                         <span class="n">MGPER</span><span class="p">,</span> <span class="n">MPHIA</span><span class="p">,</span> <span class="n">MTHETA</span><span class="p">,</span> <span class="n">NATOM</span><span class="p">,</span> <span class="n">NATYP</span><span class="p">,</span> <span class="n">NBONA</span><span class="p">,</span> <span class="n">NBONH</span><span class="p">,</span>
+                         <span class="n">NBPER</span><span class="p">,</span> <span class="n">NCOPY</span><span class="p">,</span> <span class="n">NDPER</span><span class="p">,</span> <span class="n">NEXT</span><span class="p">,</span> <span class="n">NGPER</span><span class="p">,</span> <span class="n">NHPARM</span><span class="p">,</span> <span class="n">NMXRS</span><span class="p">,</span> <span class="n">NNB</span><span class="p">,</span>
+                         <span class="n">NPARM</span><span class="p">,</span> <span class="n">NPHB</span><span class="p">,</span> <span class="n">NPHIA</span><span class="p">,</span> <span class="n">NPHIH</span><span class="p">,</span> <span class="n">NPTRA</span><span class="p">,</span> <span class="n">NRES</span><span class="p">,</span> <span class="n">NTHETA</span><span class="p">,</span>
+                         <span class="n">NTHETH</span><span class="p">,</span> <span class="n">NTYPES</span><span class="p">,</span> <span class="n">NUMANG</span><span class="p">,</span> <span class="n">NUMBND</span><span class="p">,</span> <span class="n">NUMEXTRA</span><span class="p">,</span> <span class="n">RAD_TO_DEG</span><span class="p">,</span>
+                         <span class="n">SMALL</span><span class="p">,</span> <span class="n">TRUNCATED_OCTAHEDRON_ANGLE</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">AmberError</span><span class="p">,</span> <span class="n">AmberWarning</span><span class="p">,</span> <span class="n">MoleculeError</span>
+<span class="kn">from</span> <span class="nn">..geometry</span> <span class="k">import</span> <span class="n">box_lengths_and_angles_to_vectors</span>
+<span class="kn">from</span> <span class="nn">..periodic_table</span> <span class="k">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
+<span class="kn">from</span> <span class="nn">..residue</span> <span class="k">import</span> <span class="n">ALLION_NAMES</span><span class="p">,</span> <span class="n">SOLVENT_NAMES</span>
+<span class="kn">from</span> <span class="nn">..structure</span> <span class="k">import</span> <span class="n">Structure</span><span class="p">,</span> <span class="n">needs_openmm</span>
+<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span>
+                               <span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span>
+                               <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="k">import</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">..vec3</span> <span class="k">import</span> <span class="n">Vec3</span>
+<span class="kn">from</span> <span class="nn">.amberformat</span> <span class="k">import</span> <span class="n">AmberFormat</span>
+<span class="kn">from</span> <span class="nn">.asciicrd</span> <span class="k">import</span> <span class="n">AmberAsciiRestart</span>
+<span class="kn">from</span> <span class="nn">.netcdffiles</span> <span class="k">import</span> <span class="n">NetCDFRestart</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">simtk</span> <span class="k">import</span> <span class="n">openmm</span> <span class="k">as</span> <span class="n">mm</span>
     <span class="kn">from</span> <span class="nn">simtk.openmm</span> <span class="k">import</span> <span class="n">app</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">mm</span> <span class="o">=</span> <span class="n">app</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
 
 <span class="c1"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -367,19 +371,33 @@
         <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot instantiate an AmberParm from unknown &#39;</span>
                             <span class="s1">&#39;functional&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">urey_bradleys</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">impropers</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span> <span class="ow">or</span>
-                <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">urey_bradleys</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">impropers</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">cmaps</span> <span class="ow">or</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span> <span class="ow">or</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span><span class="p">):</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span>
-                    <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span>
-                    <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span> <span class="ow">or</span>
-                    <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">trigonal_angles</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">pi_torsions</span> <span class="ow">or</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">out_of_plane_bends</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">torsion_torsions</span> <span class="ow">or</span>
+                    <span class="n">struct</span><span class="o">.</span><span class="n">multipole_frames</span> <span class="ow">or</span> <span class="n">struct</span><span class="o">.</span><span class="n">stretch_bends</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;AmberParm does not support all of the &#39;</span>
                                 <span class="s1">&#39;parameters defined in the input Structure&#39;</span><span class="p">)</span>
             <span class="c1"># Maybe it just has CHARMM parameters?</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;AmberParm does not support all of the parameters &#39;</span>
                             <span class="s1">&#39;defined in the input Structure. Try ChamberParm&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Convert all RB torsions to propers and delete the originals.</span>
+        <span class="k">for</span> <span class="n">dihedral</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span><span class="p">:</span>
+            <span class="n">proper_types</span> <span class="o">=</span> <span class="n">DihedralTypeList</span><span class="o">.</span><span class="n">from_rbtorsion</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">proper_type</span> <span class="ow">in</span> <span class="n">proper_types</span><span class="p">:</span>
+                <span class="n">proper</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dihedral</span><span class="p">)</span>
+                <span class="n">proper</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">proper_type</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proper</span><span class="p">)</span>
+                <span class="n">struct</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proper</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+
+        <span class="k">del</span> <span class="n">struct</span><span class="o">.</span><span class="n">rb_torsions</span><span class="p">[:]</span>
+        <span class="k">del</span> <span class="n">struct</span><span class="o">.</span><span class="n">rb_torsion_types</span><span class="p">[:]</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
+        <span class="n">struct</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
+
         <span class="n">inst</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">split_dihedrals</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">update_dihedral_exclusions</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">_add_missing_13_14</span><span class="p">()</span>
@@ -403,41 +421,19 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">_add_standard_flags</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NATOM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NATOM</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
-        <span class="n">inst</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span>
-                <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-</span> <span class="mi">90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">TINY</span><span class="p">):</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">([</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span> <span class="o">+</span>
-                                                <span class="nb">list</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">inst</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">90</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">box</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
         <span class="c1"># pmemd likes to skip torsions with periodicities of 0, which may be</span>
         <span class="c1"># present as a way to hack entries into the 1-4 pairlist. See</span>
         <span class="c1"># https://github.com/ParmEd/ParmEd/pull/145 for discussion. The solution</span>
         <span class="c1"># here is to simply set that periodicity to 1.</span>
-        <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">inst</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">dt</span><span class="o">.</span><span class="n">per</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">dt</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="k">elif</span> <span class="n">dt</span><span class="o">.</span><span class="n">per</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Periodicity of 0 detected with non-zero force constant. &#39;</span>
-                     <span class="s1">&#39;Changing periodicity to 1 and force constant to 0 to &#39;</span>
-                     <span class="s1">&#39;ensure 1-4 nonbonded pairs are properly identified. This &#39;</span>
-                     <span class="s1">&#39;might cause a shift in the energy, but will leave forces &#39;</span>
-                     <span class="s1">&#39;unaffected&#39;</span><span class="p">,</span> <span class="n">AmberWarning</span><span class="p">)</span>
-                <span class="n">dt</span><span class="o">.</span><span class="n">phi_k</span> <span class="o">=</span> <span class="mf">0.0</span>
-                <span class="n">dt</span><span class="o">.</span><span class="n">per</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">_cleanup_dihedrals_with_periodicity_zero</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">remake_parm</span><span class="p">()</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">_set_nonbonded_tables</span><span class="p">(</span><span class="n">nbfixes</span><span class="p">)</span>
         <span class="n">n_copy</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">pointers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;NCOPY&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">n_copy</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">_label_alternates</span><span class="p">()</span>
 
+        <span class="c1"># Setting box sets some of the flag data appropriately</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">get_box</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
     <span class="c1">#===================================================</span>
@@ -446,6 +442,9 @@
         <span class="sd">&quot;&quot;&quot; Needs to copy a few additional data structures &quot;&quot;&quot;</span>
         <span class="n">other</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AmberParm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__copy__</span><span class="p">()</span>
         <span class="n">other</span><span class="o">.</span><span class="n">initialize_topology</span><span class="p">()</span>
+        <span class="c1"># Copy coordinates, box, etc. if applicable</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">))</span>
+        <span class="n">other</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_box</span><span class="p">)</span>
         <span class="c1"># Now we should have a full copy</span>
         <span class="k">return</span> <span class="n">other</span>
 
@@ -729,6 +728,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_xfer_bond_info</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xfer_angle_info</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xfer_dihedral_info</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ifbox</span><span class="p">()</span>
         <span class="c1"># Load the pointers dict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_pointers</span><span class="p">()</span>
         <span class="c1"># Mark atom list as unchanged</span>
@@ -884,8 +884,7 @@
 <span class="sd">        This will undo any off-diagonal L-J modifications you may have made, so</span>
 <span class="sd">        call this function with care.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> \
-                <span class="s2">&quot;Unrecognized combining rule&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> <span class="s2">&quot;Unrecognized combining rule&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">==</span> <span class="s1">&#39;lorentz&#39;</span><span class="p">:</span>
             <span class="n">comb_sig</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig1</span> <span class="o">+</span> <span class="n">sig2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">==</span> <span class="s1">&#39;geometric&#39;</span><span class="p">:</span>
@@ -923,8 +922,7 @@
 <span class="sd">            If True, off-diagonal elements in the combined Lennard-Jones matrix</span>
 <span class="sd">            exist. If False, they do not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> \
-                <span class="s2">&quot;Unrecognized combining rule&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> <span class="s2">&quot;Unrecognized combining rule&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">==</span> <span class="s1">&#39;lorentz&#39;</span><span class="p">:</span>
             <span class="n">comb_sig</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">sig1</span><span class="p">,</span> <span class="n">sig2</span><span class="p">:</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig1</span> <span class="o">+</span> <span class="n">sig2</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="o">==</span> <span class="s1">&#39;geometric&#39;</span><span class="p">:</span>
@@ -1183,17 +1181,14 @@
                     <span class="n">idx</span> <span class="o">=</span> <span class="n">nbidx</span><span class="p">[</span><span class="n">ntypes</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="k">continue</span>
                     <span class="n">ccoef</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">ntypes</span><span class="o">*</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">parm_ccoef</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">*</span> <span class="n">cfac</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;ccoef&#39;</span><span class="p">,</span>
-                    <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">ccoef</span><span class="p">))</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;ccoef&#39;</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">ccoef</span><span class="p">))</span>
             <span class="c1"># Copy the exclusions</span>
             <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nonbfrc</span><span class="o">.</span><span class="n">getNumExceptions</span><span class="p">()):</span>
                 <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">qq</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">ee</span> <span class="o">=</span> <span class="n">nonbfrc</span><span class="o">.</span><span class="n">getExceptionParameters</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span>
                 <span class="n">force</span><span class="o">.</span><span class="n">addExclusion</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">has1012</span><span class="p">:</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;ahcoef&#39;</span><span class="p">,</span>
-                    <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">ahcoef</span><span class="p">))</span>
-            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;bhcoef&#39;</span><span class="p">,</span>
-                    <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">bhcoef</span><span class="p">))</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;ahcoef&#39;</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">ahcoef</span><span class="p">))</span>
+            <span class="n">force</span><span class="o">.</span><span class="n">addTabulatedFunction</span><span class="p">(</span><span class="s1">&#39;bhcoef&#39;</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">Discrete2DFunction</span><span class="p">(</span><span class="n">ntypes</span><span class="p">,</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">bhcoef</span><span class="p">))</span>
         <span class="c1"># Copy the switching function information to the CustomNonbondedForce</span>
         <span class="k">if</span> <span class="n">nonbfrc</span><span class="o">.</span><span class="n">getUseSwitchingFunction</span><span class="p">():</span>
             <span class="n">force</span><span class="o">.</span><span class="n">setUseSwitchingFunction</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -1202,8 +1197,8 @@
         <span class="n">force</span><span class="o">.</span><span class="n">setUseLongRangeCorrection</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Determine which nonbonded method we should use and transfer the</span>
         <span class="c1"># nonbonded cutoff</span>
-        <span class="k">assert</span> <span class="n">nonbondedMethod</span> <span class="ow">in</span> <span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">,</span>
-                <span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">Ewald</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">),</span> <span class="s1">&#39;Bad nonbondedMethod&#39;</span>
+        <span class="k">assert</span> <span class="n">nonbondedMethod</span> <span class="ow">in</span> <span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">PME</span><span class="p">,</span> <span class="n">app</span><span class="o">.</span><span class="n">Ewald</span><span class="p">,</span>
+                                   <span class="n">app</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">),</span> <span class="s1">&#39;Bad nonbondedMethod&#39;</span>
         <span class="k">if</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">:</span>
             <span class="n">force</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">mm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="o">.</span><span class="n">NoCutoff</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">nonbondedMethod</span> <span class="ow">is</span> <span class="n">app</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">:</span>
@@ -1307,10 +1302,11 @@
 <span class="sd">        AmberError if any of the lengths are incorrect</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">check_length</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span> <span class="k">return</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
+                <span class="k">return</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">!=</span> <span class="n">length</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">AmberError</span><span class="p">(</span><span class="s1">&#39;FLAG </span><span class="si">%s</span><span class="s1"> has </span><span class="si">%d</span><span class="s1"> elements; expected </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                     <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">length</span><span class="p">))</span>
+                                 <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span> <span class="n">length</span><span class="p">))</span>
         <span class="n">natom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s1">&#39;NATOM&#39;</span><span class="p">)</span>
         <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;ATOM_NAME&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="p">)</span>
         <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;CHARGE&#39;</span><span class="p">,</span> <span class="n">natom</span><span class="p">)</span>
@@ -1356,8 +1352,7 @@
         <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;HBOND_BCOEF&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ptr</span><span class="p">(</span><span class="s1">&#39;NPHB&#39;</span><span class="p">))</span>
         <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;SOLVENT_POINTERS&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
-            <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span>
-                         <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">check_length</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="c1">#===================================================</span>
 
@@ -1402,8 +1397,7 @@
         <span class="c1"># to fill in the residue sequence IDs in the add_atom call above. Add it</span>
         <span class="c1"># in as a post-hoc addition now if that information is present</span>
         <span class="k">if</span> <span class="s1">&#39;RESIDUE_NUMBER&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">res</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">,</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;RESIDUE_NUMBER&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">res</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;RESIDUE_NUMBER&#39;</span><span class="p">]):</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">num</span>
 
     <span class="c1">#===================================================</span>
@@ -1696,30 +1690,34 @@
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;DIHEDRALS_INC_HYDROGEN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dihed_array</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">dihed_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals_inc_h</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">dihed</span> <span class="ow">in</span> <span class="n">dihed_list</span><span class="p">:</span>
+            <span class="n">imp_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">improper</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">end_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">ignore_end</span> <span class="k">else</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dihed_array</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">end_sign</span><span class="p">,</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">imp_sign</span><span class="p">,</span>
                                     <span class="n">dihed</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dihed_array</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">end_sign</span><span class="p">,</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">imp_sign</span><span class="p">,</span>
                                     <span class="n">dihed</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NPHIH</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihed_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NPHIH&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihed_list</span><span class="p">)</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;DIHEDRALS_WITHOUT_HYDROGEN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dihed_array</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">dihed_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedrals_without_h</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">dihed</span> <span class="ow">in</span> <span class="n">dihed_list</span><span class="p">:</span>
+            <span class="n">imp_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">improper</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">end_sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">ignore_end</span> <span class="k">else</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">dihed_array</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">end_sign</span><span class="p">,</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">imp_sign</span><span class="p">,</span>
                                     <span class="n">dihed</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">dihed_array</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dihed</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">dihed</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">dihed</span><span class="o">.</span><span class="n">signs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom3</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">end_sign</span><span class="p">,</span>
+                                    <span class="n">dihed</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">idx</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="n">imp_sign</span><span class="p">,</span>
                                     <span class="n">dihed</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">NPHIA</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">MPHIA</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihed_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NPHIA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;MPHIA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dihed_list</span><span class="p">)</span>
@@ -1902,8 +1900,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># We need to figure out what 1-4 scaling term to use if we don&#39;t have</span>
         <span class="c1"># explicit exceptions</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> \
-                <span class="s2">&quot;Unrecognized combining rule&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">combining_rule</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;lorentz&#39;</span><span class="p">,</span> <span class="s1">&#39;geometric&#39;</span><span class="p">),</span> <span class="s2">&quot;Unrecognized combining rule&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjusts</span><span class="p">:</span>
             <span class="n">scalings</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">dih</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
@@ -1935,9 +1932,8 @@
             <span class="k">for</span> <span class="n">dihedral</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">ignore_end</span><span class="p">:</span> <span class="k">continue</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="p">]))</span>
-                <span class="n">eref</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">epsilon_14</span><span class="o">*</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">)</span>
-                <span class="n">rref</span> <span class="o">=</span> <span class="n">comb_sig</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">,</span>
-                                <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">)</span> <span class="o">*</span> <span class="n">fac</span>
+                <span class="n">eref</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="o">*</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">)</span>
+                <span class="n">rref</span> <span class="o">=</span> <span class="n">comb_sig</span><span class="p">(</span><span class="n">dihedral</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">,</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">atom4</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">)</span> <span class="o">*</span> <span class="n">fac</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">adjust_dict</span><span class="p">:</span>
                     <span class="n">pair</span> <span class="o">=</span> <span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -1950,8 +1946,7 @@
                         <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">chgscale</span>
                     <span class="k">if</span> <span class="n">ignore_inconsistent_vdw</span><span class="p">:</span>
                         <span class="n">scnb</span> <span class="o">=</span> <span class="mf">1.0</span>
-                    <span class="k">elif</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rref</span> <span class="o">-</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SMALL</span> <span class="ow">and</span>
-                            <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="k">elif</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rref</span> <span class="o">-</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SMALL</span> <span class="ow">and</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot translate exceptions&#39;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">scnb</span> <span class="o">-</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">scnb</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">SMALL</span> <span class="ow">and</span>
                             <span class="nb">abs</span><span class="p">(</span><span class="n">scee</span> <span class="o">-</span> <span class="n">dihedral</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">scee</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">SMALL</span><span class="p">):</span>
@@ -1995,18 +1990,15 @@
                             <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">atom</span><span class="p">,</span> <span class="n">datom</span><span class="p">]))</span>
                             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adjust_dict</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="n">ignored_torsion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                                    <span class="n">ignored_torsion</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
-                                                                   <span class="mi">1</span><span class="n">e10</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">)</span>
+                                    <span class="n">ignored_torsion</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">)</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ignored_torsion</span><span class="p">)</span>
                                     <span class="n">ignored_torsion</span><span class="o">.</span><span class="n">list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span>
                                 <span class="n">tortype</span> <span class="o">=</span> <span class="n">ignored_torsion</span>
-                            <span class="k">elif</span> <span class="mi">0</span> <span class="ow">in</span> <span class="p">(</span><span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span>
-                                       <span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span> <span class="ow">and</span> \
-                                    <span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">chgscale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="k">elif</span> <span class="mi">0</span> <span class="ow">in</span> <span class="p">(</span><span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">rmin</span><span class="p">)</span> \
+                                 <span class="ow">and</span> <span class="n">adjust_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">chgscale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                                 <span class="k">if</span> <span class="n">ignored_torsion</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                                    <span class="n">ignored_torsion</span> <span class="o">=</span> \
-                                            <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">,</span>
-                                                    <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
+                                    <span class="n">ignored_torsion</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">,</span> <span class="mi">1</span><span class="n">e10</span><span class="p">,</span>
+                                                                   <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ignored_torsion</span><span class="p">)</span>
                                 <span class="n">tortype</span> <span class="o">=</span> <span class="n">ignored_torsion</span>
                             <span class="k">else</span><span class="p">:</span>
@@ -2015,8 +2007,7 @@
                                 <span class="n">rmin</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">rmin</span>
                                 <span class="c1"># Compare it to the 1-4 parameters that are</span>
                                 <span class="c1"># already present</span>
-                                <span class="n">eref</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">epsilon_14</span><span class="o">*</span>
-                                            <span class="n">pair</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">)</span>
+                                <span class="n">eref</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">epsilon_14</span> <span class="o">*</span> <span class="n">pair</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">epsilon_14</span><span class="p">)</span>
                                 <span class="k">if</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                                     <span class="n">scnb</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e10</span>
                                 <span class="k">else</span><span class="p">:</span>
@@ -2025,21 +2016,17 @@
                                     <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e10</span>
                                 <span class="k">else</span><span class="p">:</span>
                                     <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">pair</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">chgscale</span>
-                                <span class="n">rref</span> <span class="o">=</span> <span class="n">comb_sig</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">,</span>
-                                                <span class="n">pair</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">)</span> <span class="o">*</span> <span class="n">fac</span>
+                                <span class="n">rref</span> <span class="o">=</span> <span class="n">comb_sig</span><span class="p">(</span><span class="n">pair</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">,</span> <span class="n">pair</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">sigma_14</span><span class="p">)</span> <span class="o">*</span> <span class="n">fac</span>
                                 <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">rmin</span> <span class="o">-</span> <span class="n">rref</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SMALL</span><span class="p">:</span>
                                     <span class="k">if</span> <span class="n">ignore_inconsistent_vdw</span><span class="p">:</span>
                                         <span class="n">scnb</span> <span class="o">=</span> <span class="mf">1.0</span>
                                     <span class="k">else</span><span class="p">:</span>
-                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                                                <span class="s1">&#39;Cannot translate exceptions&#39;</span>
-                                        <span class="p">)</span>
+                                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Cannot translate exceptions&#39;</span><span class="p">)</span>
                                 <span class="n">tortype</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">scee</span><span class="p">,</span> <span class="n">scnb</span><span class="p">,</span>
                                                        <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tortype</span><span class="p">)</span>
-                        <span class="n">dihedral</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">batom</span><span class="p">,</span> <span class="n">aatom</span><span class="p">,</span> <span class="n">datom</span><span class="p">,</span>
-                                            <span class="n">ignore_end</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                            <span class="nb">type</span><span class="o">=</span><span class="n">tortype</span><span class="p">)</span>
+                        <span class="n">dihedral</span> <span class="o">=</span> <span class="n">Dihedral</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">batom</span><span class="p">,</span> <span class="n">aatom</span><span class="p">,</span> <span class="n">datom</span><span class="p">,</span> <span class="n">ignore_end</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                            <span class="n">improper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">tortype</span><span class="p">)</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dihedral</span><span class="p">)</span>
                         <span class="n">n14</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">aatom</span> <span class="ow">in</span> <span class="n">atom</span><span class="o">.</span><span class="n">angle_partners</span> <span class="o">+</span> <span class="n">atom</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
@@ -2083,7 +2070,9 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="nd">@box</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -2092,14 +2081,11 @@
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Delete all of the other box info in the prmtop</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="s1">&#39;IPTRES&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IPTRES&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s1">&#39;NSPM&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NSPM&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s1">&#39;NSPSOL&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span> <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;NSPSOL&#39;</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delete_flag</span><span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delete_flag</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">delete_flag</span><span class="p">(</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;IPTRES&#39;</span><span class="p">,</span> <span class="s1">&#39;NSPM&#39;</span><span class="p">,</span> <span class="s1">&#39;NSPSOL&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">flag</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="n">flag</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">,</span> <span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span> <span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delete_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hasbox</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -2120,26 +2106,19 @@
                     <span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]):</span>
                     <span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">box</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">degrees</span><span class="p">)</span>
-            <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
+            <span class="c1"># We are adding a box for the first time, so make sure we add some flags</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="n">box</span>
                 <span class="c1"># We need to add topology information</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:],</span> <span class="mi">90</span><span class="p">):</span>
-                    <span class="c1"># Orthogonal</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
                 <span class="k">if</span> <span class="s1">&#39;SOLVENT_POINTERS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">,</span> <span class="s1">&#39;3I8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                                  <span class="n">after</span><span class="o">=</span><span class="s1">&#39;IROTAT&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">,</span> <span class="s1">&#39;3I8&#39;</span><span class="p">,</span> <span class="n">num_items</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">after</span><span class="o">=</span><span class="s1">&#39;IROTAT&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span> <span class="s1">&#39;10I8&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                  <span class="n">after</span><span class="o">=</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span> <span class="s1">&#39;10I8&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">after</span><span class="o">=</span><span class="s1">&#39;SOLVENT_POINTERS&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="s1">&#39;BOX_DIMENSIONS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag_list</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span>
-                                  <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
-                                  <span class="n">after</span><span class="o">=</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_flag</span><span class="p">(</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">,</span> <span class="s1">&#39;5E16.8&#39;</span><span class="p">,</span> <span class="n">after</span><span class="o">=</span><span class="s1">&#39;ATOMS_PER_MOLECULE&#39;</span><span class="p">,</span>
+                                  <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">rediscover_molecules</span><span class="p">(</span><span class="n">fix_broken</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">MoleculeError</span><span class="p">:</span>
@@ -2149,7 +2128,49 @@
                     <span class="k">pass</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">load_pointers</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;BOX_DIMENSIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]]</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="n">box</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ifbox</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_ifbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets the IFBOX pointers to 1 (ortho), 2 (octahedral) , or 3 (other) &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:],</span> <span class="mi">90</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">:],</span> <span class="n">TRUNCATED_OCTAHEDRON_ANGLE</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">0.02</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># General triclinic</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parm_data</span><span class="p">[</span><span class="s1">&#39;POINTERS&#39;</span><span class="p">][</span><span class="n">IFBOX</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pointers</span><span class="p">[</span><span class="s1">&#39;IFBOX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">_cleanup_dihedrals_with_periodicity_zero</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For torsions with only a single term and a periodicity set to 0, make sure pmemd still</span>
+<span class="sd">        properly recognizes the necessary exception parameters. update_dihedral_exclusions will</span>
+<span class="sd">        make sure that if a dihedral has a type pn0 *and* ignore_end is set to False (which means</span>
+<span class="sd">        that it is required to specify exclusions), then it is the *only* torsion between those</span>
+<span class="sd">        atoms in the system. This allows us to scan through our dihedrals, look for significant</span>
+<span class="sd">        terms that have pn==0, and simply add another dihedral with pn=1 and k=0 to ensure that</span>
+<span class="sd">        pmemd will always get that exception correct</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_dihedrals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dih</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dih</span><span class="o">.</span><span class="n">ignore_end</span> <span class="ow">or</span> <span class="n">dih</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">per</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># If we got here, ignore_end must be False and out periodicity must be 0. So add</span>
+            <span class="c1"># another dihedral</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">DihedralType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">scee</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">scnb</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+            <span class="n">new_dihedrals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Dihedral</span><span class="p">(</span><span class="n">dih</span><span class="o">.</span><span class="n">atom1</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom2</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom3</span><span class="p">,</span> <span class="n">dih</span><span class="o">.</span><span class="n">atom4</span><span class="p">,</span> <span class="n">improper</span><span class="o">=</span><span class="n">dih</span><span class="o">.</span><span class="n">improper</span><span class="p">,</span>
+                         <span class="n">ignore_end</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># Now that we added the above dihedral, we can start ignoring the end-group interactions</span>
+            <span class="c1"># on this dihedral</span>
+            <span class="n">dih</span><span class="o">.</span><span class="n">ignore_end</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">new_dihedrals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dihedrals</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_dihedrals</span><span class="p">)</span>
 
     <span class="c1">#===================================================</span>
 
@@ -2193,13 +2214,23 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vels</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">natom</span> <span class="o">=</span> <span class="n">natom</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box</span>
+    <span class="nd">@box</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Rst7.open"><a class="viewcode-back" href="../../../api/parmed/parmed.amber.readparm.html#parmed.amber.Rst7.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
@@ -2398,13 +2429,13 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd 2.5.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.8.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>
