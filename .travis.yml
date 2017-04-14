@@ -20,6 +20,6 @@ matrix:
 
 install:
     - source devtools/ci/travis/install.sh
-    - python setup.py install
+    - pip install .
     - python -c "import parmed; print(parmed.__version__)"
     - source devtools/ci/travis/runtest.sh
