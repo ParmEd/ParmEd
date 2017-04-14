@@ -1779,6 +1779,11 @@ class Bond(object):
         except AttributeError:
             return None
 
+    def umeasure(self):
+        """ Same as "measure", but with units """
+        m = self.measure()
+        return m * u.angstroms if m is not None else None
+
     def energy(self):
         """ Measures the current bond energy
 
@@ -1793,6 +1798,11 @@ class Bond(object):
             return None
         dx = d - self.type.req
         return self.type.k * dx * dx
+
+    def uenergy(self):
+        """ Same as energy(), but with units """
+        ene = self.energy()
+        return ene * u.kilocalories_per_mole if ene is not None else None
 
     def __repr__(self):
         return '<%s %r--%r; type=%r>' % (type(self).__name__, self.atom1, self.atom2, self.type)
@@ -1843,8 +1853,6 @@ class BondType(_ParameterType, _ListItem):
     1
     """
 
-    _UNITS = dict(k=u.kilocalories_per_mole / u.angstroms**2, req=u.angstroms)
-
     def __init__(self, k, req, list=None):
         _ParameterType.__init__(self)
         self._k = _strip_units(k, u.kilocalories_per_mole/u.angstrom**2)
@@ -1886,11 +1894,11 @@ class BondType(_ParameterType, _ListItem):
 
     @k.setter
     def k(self, value):
-        self._k = _strip_units(value, self._UNITS['k'])
+        self._k = _strip_units(value, u.kilocalories_per_mole / u.angstroms**2)
 
     @property
     def uk(self):
-        return self.k * self._UNITS['k']
+        return self.k * u.kilocalories_per_mole / u.angstroms**2
 
     @property
     def req(self):
@@ -1956,13 +1964,12 @@ class Angle(object):
         atom2.angle_to(atom3)
         self.funct = 1
 
-    def __contains__(self, thing):
+    def __contains__(self, obj):
         """ Quick and easy way to see if an Atom or a Bond is in this Angle """
-        if isinstance(thing, Atom):
-            return (thing is self.atom1 or thing is self.atom2 or
-                    thing is self.atom3)
-        return ((self.atom1 in thing and self.atom2 in thing) or
-                (self.atom2 in thing and self.atom3 in thing))
+        if isinstance(obj, Atom):
+            return obj is self.atom1 or obj is self.atom2 or obj is self.atom3
+        return ((self.atom1 in obj and self.atom2 in obj) or
+                (self.atom2 in obj and self.atom3 in obj))
 
     def delete(self):
         """
@@ -1999,6 +2006,11 @@ class Angle(object):
         except AttributeError:
             return None
 
+    def umeasure(self):
+        """ Same as measure(), but with units """
+        m = self.measure()
+        return m * u.degrees if m is not None else None
+
     def energy(self):
         """ Measures the current angle energy
 
@@ -2014,9 +2026,14 @@ class Angle(object):
         da = (a - self.type.theteq) * DEG_TO_RAD
         return self.type.k * da * da
 
+    def uenergy(self):
+        """ Same as energy(), but with units """
+        ene = self.energy()
+        return ene * u.kilocalories_per_mole if ene is not None else None
+
     def __repr__(self):
-        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__,
-                self.atom1, self.atom2, self.atom3, self.type)
+        return '<%s %r--%r--%r; type=%r>' % (type(self).__name__, self.atom1, self.atom2,
+                                             self.atom3, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2065,19 +2082,17 @@ class AngleType(_ParameterType, _ListItem):
     """
     def __init__(self, k, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
-        self.theteq = _strip_units(theteq, u.degrees)
+        self._k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
+        self._theteq = _strip_units(theteq, u.degrees)
         self._idx = -1
         self.list = list
 
     @_exception_to_notimplemented
     def __eq__(self, other):
-        return (abs(self.k - other.k) < TINY and
-                abs(self.theteq - other.theteq) < TINY)
+        return abs(self.k - other.k) < TINY and abs(self.theteq - other.theteq) < TINY
 
     def __repr__(self):
-        return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__,
-                self.k, self.theteq)
+        return '<%s; k=%.3f, theteq=%.3f>' % (type(self).__name__, self.k, self.theteq)
 
     def __copy__(self):
         return AngleType(self.k, self.theteq)
@@ -2085,14 +2100,36 @@ class AngleType(_ParameterType, _ListItem):
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.k, _TINY_DIGITS),
-                     round(self.theteq, _TINY_DIGITS)))
+        return hash((round(self.k, _TINY_DIGITS), round(self.theteq, _TINY_DIGITS)))
+
+    @property
+    def k(self):
+        return self._k
+
+    @k.setter
+    def k(self, value):
+        self._k = _strip_units(value, u.kilocalories_per_mole / u.radians**2)
+
+    @property
+    def uk(self):
+        return self.k * u.kilocalories_per_mole / u.radians**2
+
+    @property
+    def theteq(self):
+        return self._theteq
+
+    @theteq.setter
+    def theteq(self, value):
+        self._theteq = _strip_units(value, u.degrees)
+
+    @property
+    def utheteq(self):
+        return  self.theteq * u.degrees
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Dihedral(_FourAtomTerm):
-    """
-    A valence dihedral between 4 atoms separated by three covalent bonds.
+    """ A valence dihedral between 4 atoms separated by three covalent bonds.
 
     Parameters
     ----------
@@ -2143,8 +2180,7 @@ class Dihedral(_FourAtomTerm):
     True
     """
 
-    def __init__(self, atom1, atom2, atom3, atom4, improper=False,
-                 ignore_end=False, type=None):
+    def __init__(self, atom1, atom2, atom3, atom4, improper=False, ignore_end=False, type=None):
         _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
         # improper _implies_ ignore_end
         ignore_end = improper or ignore_end
@@ -2170,8 +2206,7 @@ class Dihedral(_FourAtomTerm):
     @property
     def funct(self):
         if self._funct is None:
-            if self.type is not None and isinstance(self.type,
-                    DihedralTypeList):
+            if self.type is not None and isinstance(self.type, DihedralTypeList):
                 return 9
             elif self.type is not None and isinstance(self.type, RBTorsionType):
                 return 3
@@ -2183,9 +2218,7 @@ class Dihedral(_FourAtomTerm):
         self._funct = value
 
     def __contains__(self, thing):
-        """
-        Quick and easy way to find out if an Atom or Bond is in this Dihedral
-        """
+        """ Quick and easy way to find out if an Atom or Bond is in this Dihedral """
         if isinstance(thing, Atom):
             return _FourAtomTerm.__contains__(self, thing)
         # A dihedral is made up of 3 bonds
@@ -2230,13 +2263,13 @@ class Dihedral(_FourAtomTerm):
                      self.atom3 is thing.atom3 and self.atom4 is thing.atom4) or
                     (self.atom1 is thing.atom4 and self.atom2 is thing.atom3 and
                      self.atom4 is thing.atom1)
-            )
+                   )
         thing = list(thing)
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 4:
-            raise TypeError('comparative %s has %d elements! Expect 4.'
-                            % (type(thing).__name__, len(thing)))
+            raise TypeError('comparative %s has %d elements! Expect 4.' %
+                            (type(thing).__name__, len(thing)))
         # Compare starting_index, since we may not have an index right now
         return ( (self.atom1.idx == thing[0] and
                 self.atom2.idx == thing[1] and
@@ -2281,8 +2314,8 @@ class Dihedral(_FourAtomTerm):
         Returns
         -------
         measurement : float or None
-            If the atoms have coordinates, returns the dihedral angle between
-            the four atoms. If any coordinates are missing, returns None
+            If the atoms have coordinates, returns the dihedral angle between the four atoms in
+            degrees. If any coordinates are missing, returns None
         """
         if None in (self.atom1, self.atom2, self.atom3, self.atom4):
             return None
@@ -2290,6 +2323,11 @@ class Dihedral(_FourAtomTerm):
             return dihedral(self.atom1, self.atom2, self.atom3, self.atom4)
         except AttributeError:
             return None
+
+    def umeasure(self):
+        """ Same as measure(), but with units """
+        m = self.measure()
+        return m * u.degrees if m is not None else None
 
     def energy(self):
         """ Measures the current dihedral angle energy
@@ -2319,6 +2357,11 @@ class Dihedral(_FourAtomTerm):
         else:
             raise NotImplementedError('Only DihedralType and DihedralTypeList '
                                       'are supported for energy calculations')
+
+    def uenergy(self):
+        """ Same as energy(), but with units """
+        ene = self.energy()
+        return ene * u.kilocalories_per_mole if ene is not None else None
 
     def __repr__(self):
         if self.improper:
@@ -2391,9 +2434,9 @@ class DihedralType(_ParameterType, _ListItem):
         """ DihedralType constructor """
         _ParameterType.__init__(self)
         self.locked = True
-        self.phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
+        self._phi_k = _strip_units(phi_k, u.kilocalories_per_mole)
         self.per = int(per)
-        self.phase = _strip_units(phase, u.degrees)
+        self._phase = _strip_units(phase, u.degrees)
         self.scee = scee
         self.scnb = scnb
         self.list = list
@@ -2404,10 +2447,8 @@ class DihedralType(_ParameterType, _ListItem):
 
     @_exception_to_notimplemented
     def __eq__(self, other):
-        return (abs(self.phi_k - other.phi_k) < TINY and
-                self.per == other.per and
-                abs(self.phase - other.phase) < TINY and
-                abs(self.scee - other.scee) < TINY and
+        return (abs(self.phi_k - other.phi_k) < TINY and self.per == other.per and
+                abs(self.phase - other.phase) < TINY and abs(self.scee - other.scee) < TINY and
                 abs(self.scnb - other.scnb) < TINY)
 
     def __repr__(self):
@@ -2417,17 +2458,38 @@ class DihedralType(_ParameterType, _ListItem):
         return ''.join(retstr)
 
     def __copy__(self):
-        return DihedralType(self.phi_k, self.per, self.phase, self.scee,
-                            self.scnb)
+        return DihedralType(self.phi_k, self.per, self.phase, self.scee, self.scnb)
 
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.phi_k, _TINY_DIGITS),
-                     round(self.per, _TINY_DIGITS),
-                     round(self.phase, _TINY_DIGITS),
-                     round(self.scee, _TINY_DIGITS),
+        return hash((round(self.phi_k, _TINY_DIGITS), round(self.per, _TINY_DIGITS),
+                     round(self.phase, _TINY_DIGITS), round(self.scee, _TINY_DIGITS),
                      round(self.scnb, _TINY_DIGITS)))
+
+    @property
+    def phi_k(self):
+        return self._phi_k
+
+    @phi_k.setter
+    def phi_k(self, value):
+        self.phi_k = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uphi_k(self):
+        return self.phi_k * u.kilocalories_per_mole
+
+    @property
+    def phase(self):
+        return self._phase
+
+    @phase.setter
+    def phase(self, value):
+        self._phase = _strip_units(value, u.degrees)
+
+    @property
+    def uphase(self):
+        return self.phase * u.degrees
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2493,12 +2555,12 @@ class RBTorsionType(_ParameterType, _ListItem):
 
     def __init__(self, c0, c1, c2, c3, c4, c5, scee=1.0, scnb=1.0, list=None):
         _ParameterType.__init__(self)
-        self.c0 = _strip_units(c0, u.kilocalories_per_mole)
-        self.c1 = _strip_units(c1, u.kilocalories_per_mole)
-        self.c2 = _strip_units(c2, u.kilocalories_per_mole)
-        self.c3 = _strip_units(c3, u.kilocalories_per_mole)
-        self.c4 = _strip_units(c4, u.kilocalories_per_mole)
-        self.c5 = _strip_units(c5, u.kilocalories_per_mole)
+        self._c0 = _strip_units(c0, u.kilocalories_per_mole)
+        self._c1 = _strip_units(c1, u.kilocalories_per_mole)
+        self._c2 = _strip_units(c2, u.kilocalories_per_mole)
+        self._c3 = _strip_units(c3, u.kilocalories_per_mole)
+        self._c4 = _strip_units(c4, u.kilocalories_per_mole)
+        self._c5 = _strip_units(c5, u.kilocalories_per_mole)
         self.scee = scee
         self.scnb = scnb
         self.list = list
@@ -2528,12 +2590,81 @@ class RBTorsionType(_ParameterType, _ListItem):
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.c0, _TINY_DIGITS),
-                     round(self.c1, _TINY_DIGITS),
-                     round(self.c2, _TINY_DIGITS),
-                     round(self.c3, _TINY_DIGITS),
-                     round(self.c4, _TINY_DIGITS),
-                     round(self.c5, _TINY_DIGITS)))
+        return hash((round(self.c0, _TINY_DIGITS), round(self.c1, _TINY_DIGITS),
+                     round(self.c2, _TINY_DIGITS), round(self.c3, _TINY_DIGITS),
+                     round(self.c4, _TINY_DIGITS), round(self.c5, _TINY_DIGITS)))
+
+    @property
+    def c0(self):
+        return self._c0
+
+    @c0.setter
+    def c0(self, value):
+        self._c0 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc0(self):
+        return self.c0 * u.kilocalories_per_mole
+
+    @property
+    def c1(self):
+        return self._c1
+
+    @c1.setter
+    def c1(self, value):
+        self._c1 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc1(self):
+        return self.c2 * u.kilocalories_per_mole
+
+    @property
+    def c2(self):
+        return self._c2
+
+    @c2.setter
+    def c2(self, value):
+        self._c2 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc2(self):
+        return self.c2 * u.kilocalories_per_mole
+
+    @property
+    def c3(self):
+        return self._c3
+
+    @c3.setter
+    def c3(self, value):
+        self._c3 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc3(self):
+        return self.c3 * u.kilocalories_per_mole
+
+    @property
+    def c4(self):
+        return self._c4
+
+    @c4.setter
+    def c4(self, value):
+        self._c4 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc4(self):
+        return self.c4 * u.kilocalories_per_mole
+
+    @property
+    def c5(self):
+        return self._c5
+
+    @c5.setter
+    def c5(self, value):
+        self._c5 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uc5(self):
+        return self.c5 * u.kilocalories_per_mole
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2590,27 +2721,21 @@ class DihedralTypeList(list, _ListItem):
         c5 = rbtorsion.c5
 
         phi = 0 * u.degrees
-        fc0 = (4 * c0 + 4 * c1 + 4 * c3 - c4 + 4 * c5 ) / 8.
+        fc0 = (4 * c0 + 4 * c1 + 4 * c3 - c4 + 4 * c5) / 8.
         fc1 = (-8 * c1 - 6 * c3 - 5 * c5) / 8
         fc2 = (c2 + c4) / 2
         fc3 = (-4 * c3 - 5 * c5) / 16
-        fc4 =  c4 / 8
+        fc4 = c4 / 8
         fc5 = -c5 / 16
-        
+
         inst = cls()
         for i, f in enumerate((fc0, fc1, fc2, fc3, fc4, fc5)):
             if abs(f) > TINY:
-                inst.append(
-                        DihedralType(f, i, phi, scee=rbtorsion.scee,
-                                     scnb=rbtorsion.scnb)
-                )
+                inst.append(DihedralType(f, i, phi, scee=rbtorsion.scee, scnb=rbtorsion.scnb))
         if len(inst) == 0:
             # All force constants were zeros:
             if abs(fc0) < TINY:
-                inst.append(
-                        DihedralType(0.0, 0, phi, scee=rbtorsion.scee,
-                                     scnb=rbtorsion.scnb)
-                )
+                inst.append(DihedralType(0.0, 0, phi, scee=rbtorsion.scee, scnb=rbtorsion.scnb))
             else:
                 raise ValueError('Unable to convert RB torsion to propers.')
         return inst
@@ -2656,9 +2781,8 @@ class DihedralTypeList(list, _ListItem):
                                   'with same periodicity', ParameterWarning)
                     self[i] = other
                 else:
-                    raise ParameterError('Cannot add two DihedralType '
-                                         'instances with the same periodicity '
-                                         'to the same DihedralTypeList')
+                    raise ParameterError('Cannot add two DihedralType instances with the same '
+                                         'periodicity to the same DihedralTypeList')
         list.append(self, other)
 
     @property
@@ -2778,8 +2902,7 @@ class UreyBradley(Bond):
         self.atom1 = self.atom2 = self.type = None
 
     def __repr__(self):
-        return '<%s %r--%r; type=%r>' % (type(self).__name__,
-                self.atom1, self.atom2, self.type)
+        return '<%s %r--%r; type=%r>' % (type(self).__name__, self.atom1, self.atom2, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -2886,6 +3009,11 @@ class Improper(_FourAtomTerm):
         except AttributeError:
             return None
 
+    def umeasure(self):
+        """ Same as measure(), but with units """
+        m = self.measure()
+        return m * u.degrees if m is not None else None
+
     def energy(self):
         """ Measures the current dihedral angle energy
 
@@ -2901,6 +3029,11 @@ class Improper(_FourAtomTerm):
             return None
         dphi = (self.type.psi_eq - phi) * DEG_TO_RAD
         return self.type.psi_k * dphi * dphi
+
+    def uenergy(self):
+        """ Same as energy(), but with units """
+        ene = self.energy()
+        return ene * u.kilocalories_per_mole if ene is not None else None
 
     def delete(self):
         """
@@ -2967,8 +3100,8 @@ class ImproperType(_ParameterType, _ListItem):
     """
     def __init__(self, psi_k, psi_eq, list=None):
         _ParameterType.__init__(self)
-        self.psi_k = _strip_units(psi_k, u.kilocalories_per_mole/u.radians**2)
-        self.psi_eq = _strip_units(psi_eq, u.degrees)
+        self._psi_k = _strip_units(psi_k, u.kilocalories_per_mole/u.radians**2)
+        self._psi_eq = _strip_units(psi_eq, u.degrees)
         self.list = list
         self._idx = -1
 
@@ -2978,8 +3111,7 @@ class ImproperType(_ParameterType, _ListItem):
                 abs(self.psi_eq - other.psi_eq) < TINY)
 
     def __repr__(self):
-        return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__,
-                self.psi_k, self.psi_eq)
+        return '<%s; psi_k=%.3f, psi_eq=%.3f>' % (type(self).__name__, self.psi_k, self.psi_eq)
 
     def __copy__(self):
         return ImproperType(self.psi_k, self.psi_eq)
@@ -2987,8 +3119,31 @@ class ImproperType(_ParameterType, _ListItem):
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.psi_k, _TINY_DIGITS),
-                     round(self.psi_eq, _TINY_DIGITS)))
+        return hash((round(self.psi_k, _TINY_DIGITS), round(self.psi_eq, _TINY_DIGITS)))
+
+    @property
+    def psi_k(self):
+        return self._psi_k
+
+    @psi_k.setter
+    def psi_k(self, value):
+        self._psi_k = _strip_units(value, u.kilocalories_per_mole / u.radians**2)
+
+    @property
+    def upsi_k(self):
+        return self.psi_k * u.kilocalories_per_mole / u.radians ** 2
+
+    @property
+    def psi_eq(self):
+        return self._psi_eq
+
+    @psi_eq.setter
+    def psi_eq(self, value):
+        self._psi_eq = _strip_units(value, u.degrees)
+
+    @property
+    def upsi_eq(self):
+        return self.psi_eq * u.degrees
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3052,8 +3207,7 @@ class Cmap(object):
         self.funct = 1
 
     @classmethod
-    def extended(cls, atom1, atom2, atom3, atom4,
-                 atom5, atom6, atom7, atom8, type=None):
+    def extended(cls, atom1, atom2, atom3, atom4, atom5, atom6, atom7, atom8, type=None):
         """
         Alternative constructor for correction maps defined with 8 atoms (each
         torsion being separately specified). Correction maps are, to the best of
@@ -3123,8 +3277,7 @@ class Cmap(object):
         # Here, atoms are expected to index from 0 (Python standard) if we
         # are comparing with a list or tuple
         if len(thing) != 5:
-            raise MoleculeError('CMAP can compare to 5 elements, not %d' %
-                                len(thing))
+            raise MoleculeError('CMAP can compare to 5 elements, not %d' % len(thing))
         return ((self.atom1.idx == thing[0] and self.atom2.idx == thing[1] and
                  self.atom3.idx == thing[2] and self.atom4.idx == thing[3] and
                  self.atom5.idx == thing[4]) or
@@ -3143,13 +3296,11 @@ class Cmap(object):
         _delete_from_list(self.atom4.cmaps, self)
         _delete_from_list(self.atom5.cmaps, self)
 
-        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = None
-        self.type = None
+        self.atom1 = self.atom2 = self.atom3 = self.atom4 = self.atom5 = self.type = None
 
     def __repr__(self):
         return '<%s; %r--%r--%r--%r--%r; type=%r>' % (type(self).__name__,
-                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5,
-                self.type)
+                self.atom1, self.atom2, self.atom3, self.atom4, self.atom5, self.type)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3305,12 +3456,12 @@ class _CmapGrid(object):
         if isinstance(idx, tuple):
             if idx[0] >= self.resolution or idx[1] >= self.resolution:
                 raise IndexError('_CmapGrid: Index out of range')
-            self._data[self.resolution*idx[0]+idx[1]] = val
+            self._data[self.resolution*idx[0]+idx[1]] = _strip_units(val, u.kilocalories_per_mole)
         else:
             try:
                 indices = range(*idx.indices(len(self._data)))
             except AttributeError:
-                self._data[idx] = val
+                self._data[idx] = _strip_units(val, u.kilocalories_per_mole)
             else:
                 try:
                     lenval = len(val)
@@ -3318,12 +3469,12 @@ class _CmapGrid(object):
                     lenval = 1
                 if lenval == 1:
                     for x in indices:
-                        self._data[x] = val
+                        self._data[x] = _strip_units(val, u.kilocalories_per_mole)
                 elif lenval != len(indices):
                     raise ValueError('Wrong number of values setting a slice')
                 else:
                     for x, y in zip(indices, val):
-                        self._data[x] = y
+                        self._data[x] = _strip_units(y, u.kilocalories_per_mole)
 
     def __len__(self):
         return len(self._data)
@@ -3506,7 +3657,7 @@ class OutOfPlaneBendType(_ParameterType, _ListItem):
     """
     def __init__(self, k, list=None):
         _ParameterType.__init__(self)
-        self.k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
+        self._k = _strip_units(k, u.kilocalories_per_mole/u.radians**2)
         self._idx = -1
         self.list = list
 
@@ -3524,6 +3675,18 @@ class OutOfPlaneBendType(_ParameterType, _ListItem):
 
     def __hash__(self):
         return hash(round(self.k, _TINY_DIGITS))
+
+    @property
+    def k(self):
+        return self._k
+
+    @k.setter
+    def k(self, value):
+        self._k = _strip_units(value, u.kilocalories_per_mole / u.radians**2)
+
+    @property
+    def uk(self):
+        return self.k * u.kilocalories_per_mole / u.radians**2
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -3688,11 +3851,11 @@ class StretchBendType(_ParameterType, _ListItem):
     """
     def __init__(self, k1, k2, req1, req2, theteq, list=None):
         _ParameterType.__init__(self)
-        self.k1 = _strip_units(k1, u.kilocalories_per_mole/u.radian)
-        self.k2 = _strip_units(k2, u.kilocalories_per_mole/u.radian)
-        self.req1 = _strip_units(req1, u.angstrom)
-        self.req2 = _strip_units(req2, u.angstrom)
-        self.theteq = _strip_units(theteq, u.degrees)
+        self._k1 = _strip_units(k1, u.kilocalories_per_mole/(u.radian * u.angstroms))
+        self._k2 = _strip_units(k2, u.kilocalories_per_mole/(u.radian * u.angstroms))
+        self._req1 = _strip_units(req1, u.angstrom)
+        self._req2 = _strip_units(req2, u.angstrom)
+        self._theteq = _strip_units(theteq, u.degrees)
         self._idx = -1
         self.list = list
 
@@ -3716,11 +3879,69 @@ class StretchBendType(_ParameterType, _ListItem):
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.k1, _TINY_DIGITS),
-                     round(self.k2, _TINY_DIGITS),
-                     round(self.req1, _TINY_DIGITS),
-                     round(self.req2, _TINY_DIGITS),
+        return hash((round(self.k1, _TINY_DIGITS), round(self.k2, _TINY_DIGITS),
+                     round(self.req1, _TINY_DIGITS), round(self.req2, _TINY_DIGITS),
                      round(self.theteq, _TINY_DIGITS)))
+
+    @property
+    def k1(self):
+        return self._k1
+
+    @k1.setter
+    def k1(self, value):
+        self._k1 = _strip_units(value, u.kilocalories_per_mole/(u.radian * u.angstroms))
+
+    @property
+    def uk1(self):
+        return self.k1 * u.kilocalories_per_mole / (u.radian * u.angstroms)
+
+    @property
+    def k2(self):
+        return self._k2
+
+    @k2.setter
+    def k2(self, value):
+        self._k2 = _strip_units(value, u.kilocalories_per_mole/(u.radian * u.angstroms))
+
+    @property
+    def uk2(self):
+        return self.k2 * u.kilocalories_per_mole / (u.radian * u.angstroms)
+
+    @property
+    def req1(self):
+        return self._req1
+
+    @req1.setter
+    def req1(self, value):
+        self._req1 = _strip_units(value, u.angstrom)
+
+    @property
+    def ureq1(self):
+        return self._req1 * u.angstroms
+
+    @property
+    def req2(self):
+        return self._req2
+
+    @req2.setter
+    def req2(self, value):
+        self._req2 = _strip_units(value, u.angstrom)
+
+    @property
+    def ureq2(self):
+        return self.req2 * u.angstroms
+
+    @property
+    def theteq(self):
+        return self._theteq
+
+    @theteq.setter
+    def theteq(self, value):
+        self._theteq = _strip_units(value, u.degrees)
+
+    @property
+    def utheteq(self):
+        return self.theteq * u.degrees
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -5041,8 +5262,7 @@ assert UnassignedAtomType is _UnassignedAtomType(), "Not a singleton"
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class AcceptorDonor(object):
-    """
-    Just a holder for donors and acceptors in CHARMM speak
+    """ Just a holder for donors and acceptors in CHARMM speak
 
     Parameters
     ----------
@@ -5065,8 +5285,7 @@ class AcceptorDonor(object):
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class Group(object):
-    """
-    An 'interacting' group defined by CHARMM PSF files
+    """ An 'interacting' group defined by CHARMM PSF files
 
     Parameters
     ----------
@@ -5091,8 +5310,7 @@ class Group(object):
 
     @_exception_to_notimplemented
     def __eq__(self, other):
-        return (self.atom is other.atom and self.type == other.type and
-                self.move == other.move)
+        return (self.atom is other.atom and self.type == other.type and self.move == other.move)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
