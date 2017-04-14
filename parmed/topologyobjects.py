@@ -4,45 +4,39 @@ as atoms, residues, bonds, angles, etc.
 
 by Jason Swails
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
-from copy import copy
-from functools import wraps
 import math
 import warnings
+from copy import copy
+from functools import wraps
 
-from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
-from parmed.constants import (TINY, DEG_TO_RAD, RAD_TO_DEG ,
-                              TINY_DIGITS as _TINY_DIGITS)
-from parmed.geometry import distance2, angle, dihedral
 import parmed.unit as u
+from parmed.constants import TINY_DIGITS as _TINY_DIGITS
+from parmed.constants import DEG_TO_RAD, RAD_TO_DEG, TINY
+from parmed.exceptions import MoleculeError, ParameterError, ParameterWarning
+from parmed.geometry import angle, dihedral, distance2
 from parmed.utils.decorators import deprecated
-from parmed.utils.six import string_types, iteritems
-from parmed.utils.six.moves import zip, range
+from parmed.utils.six import iteritems, string_types
+from parmed.utils.six.moves import range, zip
 
-__all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType',
-           'ChiralFrame', 'Cmap', 'CmapType', 'Dihedral', 'DihedralType',
-           'DihedralTypeList', 'Improper', 'ImproperType', 'MultipoleFrame',
-           'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList',
-           'StretchBend', 'StretchBendType', 'TorsionTorsion',
-           'TorsionTorsionType', 'TrigonalAngle', 'TrackedList', 'UreyBradley',
-           'OutOfPlaneBendType', 'NonbondedException', 'NonbondedExceptionType',
-           'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group', 'AtomType',
-           'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
-           'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame',
-           'RBTorsionType', 'UnassignedAtomType']
+__all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'ChiralFrame', 'Cmap',
+           'CmapType', 'Dihedral', 'DihedralType', 'DihedralTypeList', 'Improper', 'ImproperType',
+           'MultipoleFrame', 'OutOfPlaneBend', 'PiTorsion', 'Residue', 'ResidueList', 'StretchBend',
+           'StretchBendType', 'TorsionTorsion', 'TorsionTorsionType', 'TrigonalAngle', 'AtomType',
+           'TrackedList', 'UreyBradley', 'OutOfPlaneBendType', 'NonbondedException', 'Group',
+           'NonbondedExceptionType', 'AmoebaNonbondedExceptionType', 'AcceptorDonor',
+           'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame', 'RBTorsionType',
+           'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'UnassignedAtomType']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
 scale_factor = scale_factor.value_in_unit(u.picoseconds)
-akma_time_unit = u.BaseUnit(u.picosecond_base_unit.dimension, 'akma time',
-                            symbol='aks')
+akma_time_unit = u.BaseUnit(u.picosecond_base_unit.dimension, 'akma time', symbol='aks')
 akma_time_unit.define_conversion_factor_to(u.picosecond_base_unit, scale_factor)
-akma_unit_system = u.UnitSystem([
-        u.angstrom_base_unit, u.dalton_base_unit, akma_time_unit,
-        u.elementary_charge_base_unit, u.kelvin_base_unit,
-        u.mole_base_unit, u.radian_base_unit]
-)
+akma_unit_system = u.UnitSystem([u.angstrom_base_unit, u.dalton_base_unit, akma_time_unit,
+                                 u.elementary_charge_base_unit, u.kelvin_base_unit,
+                                 u.mole_base_unit, u.radian_base_unit])
 
 def _strip_units(value, unit=None):
     """
@@ -60,10 +54,7 @@ def _strip_units(value, unit=None):
     return value
 
 def _exception_to_notimplemented(func):
-    """
-    Wraps comparison operators to return NotImplemented instead of raising an
-    AttributeError
-    """
+    """ Wraps comparison operators to return NotImplemented instead of raising an AttributeError """
     @wraps(func)
     def wrapper(self, other):
         try:

@@ -897,8 +897,7 @@ class Structure(object):
         for i, res in enumerate(self.residues[:-1]):
             templ = _res_in_templlib(res, all_residues)
             # TER cards and changing chains prevents bonding to the next residue
-            if res.ter or (res.chain and
-                    (res.chain != self.residues[i+1].chain)):
+            if res.ter or (res.chain and res.chain != self.residues[i+1].chain):
                 continue
             ntempl = _res_in_templlib(self.residues[i+1], all_residues)
             if templ is None and ntempl is None:
