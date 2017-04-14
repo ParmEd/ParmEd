@@ -4915,8 +4915,8 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
 
     def __init__(self, rmin, epsilon, chgscale=1.0, list=None):
         _ParameterType.__init__(self)
-        self.rmin = _strip_units(rmin, u.angstroms)
-        self.epsilon = _strip_units(epsilon, u.kilocalories_per_mole)
+        self._rmin = _strip_units(rmin, u.angstroms)
+        self._epsilon = _strip_units(epsilon, u.kilocalories_per_mole)
         self.chgscale = chgscale
         self._idx = None
         self.list = list
@@ -4929,21 +4929,47 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
     def sigma(self, value):
         self.rmin = value * 2**(1/6)
 
+    @property
+    def usigma(self):
+        return self.sigma * u.angstroms
+
+    @property
+    def rmin(self):
+        return self._rmin
+
+    @rmin.setter
+    def rmin(self, value):
+        self._rmin = _strip_units(value, u.angstroms)
+
+    @property
+    def urmin(self):
+        return self.rmin * u.angstroms
+
+    @property
+    def epsilon(self):
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        self._epsilon = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uepsilon(self):
+        return self.epsilon * u.kilocalories_per_mole
+
     def __repr__(self):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
                 type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
     @_exception_to_notimplemented
     def __eq__(self, other):
-        return (abs(self.rmin - other.rmin) < TINY and
-                abs(self.epsilon - other.epsilon) < TINY and
+        return (abs(self.rmin - other.rmin) < TINY and abs(self.epsilon - other.epsilon) < TINY and
                 abs(self.chgscale - other.chgscale) < TINY)
 
     __getstate__ = _getstate_with_exclusions()
 
     def __hash__(self):
-        return hash((round(self.rmin, _TINY_DIGITS),
-                     round(self.epsilon, _TINY_DIGITS),
+        return hash((round(self.rmin, _TINY_DIGITS), round(self.epsilon, _TINY_DIGITS),
                      round(self.chgscale, _TINY_DIGITS)))
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -4992,9 +5018,10 @@ class AmoebaNonbondedExceptionType(NonbondedExceptionType):
                 abs(self.mutual_weight - other.mutual_weight) < TINY)
 
     def __copy__(self):
-        return AmoebaNonbondedExceptionType(self.vdw_weight,
-                self.multipole_weight, self.direct_weight, self.polar_weight,
-                self.mutual_weight)
+        return AmoebaNonbondedExceptionType(
+            self.vdw_weight, self.multipole_weight, self.direct_weight, self.polar_weight,
+            self.mutual_weight
+        )
 
     __getstate__ = _getstate_with_exclusions()
 
@@ -5071,8 +5098,7 @@ class AtomType(object):
     HA: 1
     """
 
-    def __init__(self, name, number, mass, atomic_number=-1, bond_type=None,
-                 charge=0.0):
+    def __init__(self, name, number, mass, atomic_number=-1, bond_type=None, charge=0.0):
         if number is None and name is not None:
             # If we were given an integer, assign it to number. Otherwise,
             # assign it to the name
@@ -5085,10 +5111,10 @@ class AtomType(object):
         else:
             self.name = name
             self.number = int(number)
-        self.mass = mass
+        self._mass = _strip_units(mass, u.daltons)
         self.atomic_number = atomic_number
         # We have no LJ parameters as of yet
-        self.epsilon = self.rmin = self.epsilon_14 = self.rmin_14 = None
+        self._epsilon = self._rmin = self._epsilon_14 = self._rmin_14 = None
         # Store each NBFIX term as a dict with the atom type string matching to
         # a 2-element tuple that is rmin, epsilon
         self.nbfix = dict()
@@ -5203,6 +5229,10 @@ class AtomType(object):
         self.rmin = value * 2**(1/6) / 2
 
     @property
+    def usigma(self):
+        return self.sigma * u.angstroms
+
+    @property
     def sigma_14(self):
         """ Sigma is Rmin / 2^(1/6) """
         return self.rmin_14 * 2**(-1/6) * 2
@@ -5210,6 +5240,58 @@ class AtomType(object):
     @sigma_14.setter
     def sigma_14(self, value):
         self.rmin_14 = value * 2**(1/6) / 2
+
+    @property
+    def usigma_14(self):
+        return self.sigma_14 * u.angstroms
+
+    @property
+    def rmin(self):
+        return self._rmin
+
+    @rmin.setter
+    def rmin(self, value):
+        self._rmin = _strip_units(value, u.angstroms)
+
+    @property
+    def urmin(self):
+        return self.rmin * u.angstroms
+
+    @property
+    def epsilon(self):
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, value):
+        self._epsilon = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uepsilon(self):
+        return self.epsilon * u.kilocalories_per_mole
+
+    @property
+    def rmin_14(self):
+        return self._rmin_14
+
+    @rmin_14.setter
+    def rmin_14(self, value):
+        self._rmin_14 = _strip_units(value, u.angstroms)
+
+    @property
+    def urmin_14(self):
+        return self.rmin_14 * u.angstroms
+
+    @property
+    def epsilon_14(self):
+        return self._epsilon_14
+
+    @epsilon_14.setter
+    def epsilon_14(self, value):
+        self._epsilon_14 = _strip_units(value, u.kilocalories_per_mole)
+
+    @property
+    def uepsilon_14(self):
+        return self.epsilon_14 * u.kilocalories_per_mole
 
     def __str__(self):
         return self.name

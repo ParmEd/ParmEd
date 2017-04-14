@@ -257,14 +257,17 @@ class TestTopologyObjects(unittest.TestCase):
         lja1.atom_type = AtomType('CT', 1, 12.01, 6)
         lja1.atom_type.set_lj_params(1.0, 2.0, 1.1, 2.1)
         self.assertEqual(lja1.epsilon, 1.0)
+        self.assertEqual(lja1.uepsilon, 1.0*u.kilocalories_per_mole)
         self.assertEqual(lja1.rmin, 2.0)
+        self.assertEqual(lja1.urmin, 2.0 * u.angstroms)
         self.assertEqual(lja1.sigma, 2.0*2**(-1/6)*2)
+        self.assertEqual(lja1.usigma, 2.0*2**(-1/6)*2 * u.angstroms)
         lja2 = Atom(atomic_number=6, name='C2', type='CT', charge=0.1,
                     mass=12.01, nb_idx=1, solvent_radius=1.8, tree='M')
-        lja2.sigma = 1.0
+        lja2.sigma = 0.1 * u.nanometers
         self.assertEqual(lja2.sigma, 1.0)
         self.assertEqual(lja2.sigma_14, 1.0)
-        lja2.sigma_14 = 1.5
+        lja2.sigma_14 = 0.15 * u.nanometers
         self.assertEqual(lja2.sigma_14, 1.5)
         self.assertEqual(lja2.rmin_14, 1.5*2**(1/6)/2)
         self.assertAlmostEqual(lja2.rmin, 2**(1/6)/2)
@@ -1594,10 +1597,24 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(strbnd.type.idx, 0)
         self.assertIs(strbnd.type.list, strbnds)
         self.assertEqual(strbnd.type.k1, 10)
+        self.assertEqual(strbnd.type.uk1, 10*u.kilocalories_per_mole / (u.radians*u.angstroms))
         self.assertEqual(strbnd.type.k2, 11)
+        self.assertEqual(strbnd.type.uk2, 11*u.kilocalories_per_mole / (u.radians*u.angstroms))
         self.assertEqual(strbnd.type.req1, 1.1)
+        self.assertEqual(strbnd.type.ureq1, 1.1 * u.angstroms)
         self.assertEqual(strbnd.type.req2, 1.2)
+        self.assertEqual(strbnd.type.ureq2, 1.2 * u.angstroms)
         self.assertEqual(strbnd.type.theteq, 109.0)
+        self.assertEqual(strbnd.type.utheteq, 109.0 * u.degrees)
+        typ = StretchBendType(1, 2, 3, 4, 5)
+        typ.k1 = typ.k2 = 4.184 * u.kilojoules_per_mole / (u.radians * u.angstroms)
+        typ.req1 = typ.req2 = 0.5 * u.nanometers
+        typ.theteq = math.pi * u.radians
+        self.assertEqual(typ.k1, 1)
+        self.assertEqual(typ.k2, 1)
+        self.assertEqual(typ.req1, 5)
+        self.assertEqual(typ.req2, 5)
+        self.assertEqual(typ.theteq, 180)
         # Test the StretchBendType.__copy__ method
         cp = copy(strbnd.type)
         self.assertIsNot(cp, strbnd.type)
@@ -2003,17 +2020,27 @@ class TestTopologyObjects(unittest.TestCase):
         nbet = NonbondedExceptionType(1.0, 2.0, chgscale=3.0)
         nbet2 = NonbondedExceptionType(1.1, 2.0, chgscale=3.0)
         self.assertEqual(nbet.sigma, 2**(-1/6))
+        self.assertEqual(nbet.usigma, 2**(-1/6) * u.angstroms)
+        self.assertEqual(nbet.urmin, 1.0 * u.angstroms)
+        self.assertEqual(nbet.uepsilon, 2.0 * u.kilocalories_per_mole)
         self.assertEqual(nbet, nbet)
         self.assertNotEqual(nbet, nbet2)
         nbet2.sigma = 1.0
         self.assertEqual(nbet2.rmin*2**(-1/6), nbet2.sigma)
         nbe.type = nbet
-        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' %
-                         (a1, a2, nbet))
+        self.assertEqual(repr(nbe), '<NonbondedException; %r and %r, type=%r>' % (a1, a2, nbet))
         cp = copy(nbet)
         self.assertIsNot(cp, nbet)
         self.assertEqual(hash(cp), hash(nbet))
         self.assertIn(cp, {nbet})
+        # Check units of assignments
+        nbet.sigma = 0.1 * u.nanometers
+        self.assertEqual(nbet.sigma, 1)
+        nbet.rmin = 0.1 * u.nanometers
+        self.assertEqual(nbet.rmin, 1)
+        nbet.epsilon = 4.184 * u.kilojoules_per_mole
+        self.assertEqual(nbet.epsilon, 1)
+        nbet.sigma_14 = 0.2 * u.nanometers
 
     #=============================================
 
