@@ -330,6 +330,30 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a.charge, 0.3)
         self.assertEqual(at.charge, 0.5)
 
+        # Test that units get stripped on assignment and that unit-ed attributes have units
+        a = Atom(name='CA')
+        a.charge = (0.1 * u.elementary_charge).in_units_of(u.coulomb)
+        self.assertEqual(a.charge, 0.1)
+        self.assertEqual(a.ucharge, 0.1 * u.elementary_charge)
+        a.rmin = 0.1 * u.nanometers
+        self.assertEqual(a.rmin, 1)
+        self.assertEqual(a.urmin, 1*u.angstroms)
+        a.sigma = 0.1 * u.nanometers
+        self.assertEqual(a.sigma, 1)
+        self.assertEqual(a.usigma, 1*u.angstroms)
+        a.epsilon = (1 * u.kilocalories_per_mole).in_units_of(u.kilojoules_per_mole)
+        self.assertEqual(a.epsilon, 1)
+        self.assertEqual(a.uepsilon, 1*u.kilocalories_per_mole)
+        a.rmin_14 = 0.11 * u.nanometers
+        self.assertEqual(a.rmin_14, 1.1)
+        self.assertEqual(a.urmin_14, 1.1*u.angstroms)
+        a.sigma_14 = 0.11 * u.nanometers
+        self.assertEqual(a.sigma_14, 1.1)
+        self.assertEqual(a.usigma_14, 1.1*u.angstroms)
+        a.epsilon = (1.1 * u.kilocalories_per_mole).in_units_of(u.kilojoules_per_mole)
+        self.assertEqual(a.epsilon, 1.1)
+        self.assertEqual(a.uepsilon, 1.1*u.kilocalories_per_mole)
+
     #=============================================
 
     def test_atom_type(self):
@@ -805,8 +829,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(bond3.type.idx, 2)
         self.assertIs(bond1.type.list, bond_types)
         # Now test energy calculations
-        self.assertAlmostEqual(bond2.energy(),
-                bond2.type.k*(bond2.measure() - bond2.type.req)**2)
+        self.assertAlmostEqual(bond2.energy(), bond2.type.k*(bond2.measure() - bond2.type.req)**2)
         # Test the BondTypes.__copy__ method
         cp = copy(bond_types[0])
         self.assertIsNot(cp, bond_types[0])
@@ -833,6 +856,16 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertRaises(MoleculeError, lambda: Bond(a1, a1))
         self.assertRaises(MoleculeError, lambda: a1.bond_to(a1))
         self.assertRaises(KeyError, lambda: d[BondType(10.001, 1.0)])
+        # Units
+        bt = BondType(10.0 * u.kilojoules_per_mole / u.angstroms**2, 0.1 * u.nanometers)
+        self.assertEqual(bt.k, 10.0 / 4.184)
+        self.assertEqual(bt.req, 1)
+        bt.k = 11 * u.kilojoules_per_mole / u.angstroms**2
+        self.assertEqual(bt.k, 11/4.184)
+        bt.req = 0.11 * u.nanometers
+        self.assertEqual(bt.req, 1.1)
+        self.assertEqual(bt.uk, (11/4.184) * u.kilocalories_per_mole / u.angstroms**2)
+        self.assertEqual(bt.ureq, 1.1 * u.angstroms)
 
     #=============================================
 
@@ -1715,27 +1748,15 @@ class TestTopologyObjects(unittest.TestCase):
 
         # Check segid assignment
         self.assertEqual(res.segid, 'SYS')
-        # Deprecated behavior
-        self.assertRaises(DeprecationWarning, lambda: res[0].segid)
-        def tmp():
-            res[0].segid = 'SYS1'
-        self.assertRaises(DeprecationWarning, tmp)
-        warnings.filterwarnings('ignore', category=DeprecationWarning,
-                                module='parmed')
-        tmp()
-        self.assertEqual(res[0].segid, 'SYS1')
-        self.assertEqual(res.segid, 'SYS1')
-        warnings.filterwarnings('error', category=DeprecationWarning,
-                                module='parmed')
 
         # __repr__ testing
         self.assertEqual(repr(atoms[0]), '<Atom CA [0]; In ALA -1>')
-        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
-        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS1>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS>')
+        self.assertEqual(repr(res), '<Residue ALA[-1]; segid=SYS>')
         res.chain = 'B'
         res.insertion_code = 'B'
         self.assertEqual(repr(res),
-                '<Residue ALA[-1]; chain=B; insertion_code=B; segid=SYS1>')
+                '<Residue ALA[-1]; chain=B; insertion_code=B; segid=SYS>')
 
         # Try deleting all of our atoms
         while len(res):
