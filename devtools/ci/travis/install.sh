@@ -41,6 +41,6 @@ else # Otherwise, CPython... go through conda
     fi
     source activate myenv
     if [ -z "$MINIMAL_PACKAGES" ]; then
-        pip uninstall parmed # from ambertools
+        pip uninstall parmed -y # from ambertools
     fi
 fi # CPython
