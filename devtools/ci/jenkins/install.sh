@@ -61,4 +61,3 @@ fi
 
 # Get rid of our environment
 source deactivate
-conda uninstall -yn ${CONDAENV} --all
