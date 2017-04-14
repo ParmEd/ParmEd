@@ -338,22 +338,22 @@ class TestTopologyObjects(unittest.TestCase):
         a.charge = (0.1 * u.elementary_charge).in_units_of(u.coulomb)
         self.assertEqual(a.charge, 0.1)
         self.assertEqual(a.ucharge, 0.1 * u.elementary_charge)
-        a.rmin = 0.1 * u.nanometers
+        a.rmin = 1
         self.assertEqual(a.rmin, 1)
         self.assertEqual(a.urmin, 1*u.angstroms)
-        a.sigma = 0.1 * u.nanometers
+        a.sigma = 1
         self.assertEqual(a.sigma, 1)
         self.assertEqual(a.usigma, 1*u.angstroms)
-        a.epsilon = (1 * u.kilocalories_per_mole).in_units_of(u.kilojoules_per_mole)
+        a.epsilon = 1
         self.assertEqual(a.epsilon, 1)
         self.assertEqual(a.uepsilon, 1*u.kilocalories_per_mole)
-        a.rmin_14 = 0.11 * u.nanometers
+        a.rmin_14 = 1.1
         self.assertEqual(a.rmin_14, 1.1)
         self.assertEqual(a.urmin_14, 1.1*u.angstroms)
-        a.sigma_14 = 0.11 * u.nanometers
+        a.sigma_14 = 1.1
         self.assertEqual(a.sigma_14, 1.1)
         self.assertEqual(a.usigma_14, 1.1*u.angstroms)
-        a.epsilon = (1.1 * u.kilocalories_per_mole).in_units_of(u.kilojoules_per_mole)
+        a.epsilon = 1.1
         self.assertEqual(a.epsilon, 1.1)
         self.assertEqual(a.uepsilon, 1.1*u.kilocalories_per_mole)
 
@@ -868,11 +868,11 @@ class TestTopologyObjects(unittest.TestCase):
         bt = BondType(10.0 * u.kilojoules_per_mole / u.angstroms**2, 0.1 * u.nanometers)
         self.assertEqual(bt.k, 10.0 / 4.184)
         self.assertEqual(bt.req, 1)
-        bt.k = 11 * u.kilojoules_per_mole / u.angstroms**2
-        self.assertEqual(bt.k, 11/4.184)
-        bt.req = 0.11 * u.nanometers
+        bt.k = 11
+        self.assertEqual(bt.k, 11)
+        bt.req = 1.1
         self.assertEqual(bt.req, 1.1)
-        self.assertEqual(bt.uk, (11/4.184) * u.kilocalories_per_mole / u.angstroms**2)
+        self.assertEqual(bt.uk, 11 * u.kilocalories_per_mole / u.angstroms**2)
         self.assertEqual(bt.ureq, 1.1 * u.angstroms)
 
     #=============================================
@@ -1241,19 +1241,19 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(rb.c3, 4)
         self.assertEqual(rb.c4, 5)
         self.assertEqual(rb.c5, 6)
-        rb.c0 = rb.c1 = rb.c2 = rb.c3 = rb.c4 = rb.c5 = 1 * u.kilojoules_per_mole
-        self.assertEqual(rb.c0, 1 / 4.184)
-        self.assertEqual(rb.c1, 1 / 4.184)
-        self.assertEqual(rb.c2, 1 / 4.184)
-        self.assertEqual(rb.c3, 1 / 4.184)
-        self.assertEqual(rb.c4, 1 / 4.184)
-        self.assertEqual(rb.c5, 1 / 4.184)
-        self.assertEqual(rb.uc0, (1 / 4.184) * u.kilocalories_per_mole)
-        self.assertEqual(rb.uc1, (1 / 4.184) * u.kilocalories_per_mole)
-        self.assertEqual(rb.uc2, (1 / 4.184) * u.kilocalories_per_mole)
-        self.assertEqual(rb.uc3, (1 / 4.184) * u.kilocalories_per_mole)
-        self.assertEqual(rb.uc4, (1 / 4.184) * u.kilocalories_per_mole)
-        self.assertEqual(rb.uc5, (1 / 4.184) * u.kilocalories_per_mole)
+        rb.c0 = rb.c1 = rb.c2 = rb.c3 = rb.c4 = rb.c5 = 1
+        self.assertEqual(rb.c0, 1)
+        self.assertEqual(rb.c1, 1)
+        self.assertEqual(rb.c2, 1)
+        self.assertEqual(rb.c3, 1)
+        self.assertEqual(rb.c4, 1)
+        self.assertEqual(rb.c5, 1)
+        self.assertEqual(rb.uc0, 1 * u.kilocalories_per_mole)
+        self.assertEqual(rb.uc1, 1 * u.kilocalories_per_mole)
+        self.assertEqual(rb.uc2, 1 * u.kilocalories_per_mole)
+        self.assertEqual(rb.uc3, 1 * u.kilocalories_per_mole)
+        self.assertEqual(rb.uc4, 1 * u.kilocalories_per_mole)
+        self.assertEqual(rb.uc5, 1 * u.kilocalories_per_mole)
 
     #=============================================
 
@@ -1266,8 +1266,7 @@ class TestTopologyObjects(unittest.TestCase):
         b3 = Bond(atoms[0], atoms[2])
         a1 = Angle(atoms[0], atoms[1], atoms[2])
         u1 = UreyBradley(atoms[0], atoms[2], BondType(10.0, 1.0))
-        self.assertEqual(repr(u1), '<UreyBradley %r--%r; type=%r>' %
-                         (atoms[0], atoms[2], u1.type))
+        self.assertEqual(repr(u1), '<UreyBradley %r--%r; type=%r>' % (atoms[0], atoms[2], u1.type))
         # Test containers
         self.assertIn(atoms[0], u1)
         self.assertIn(atoms[2], u1)
@@ -1283,8 +1282,7 @@ class TestTopologyObjects(unittest.TestCase):
         atoms[0].xx = atoms[0].xy = atoms[0].xz = 0
         atoms[2].xx = atoms[2].xy = atoms[2].xz = 1
         self.assertAlmostEqual(u1.measure(), math.sqrt(3))
-        self.assertAlmostEqual(u1.energy(),
-                               u1.type.k*(u1.measure()-u1.type.req)**2)
+        self.assertAlmostEqual(u1.energy(), u1.type.k*(u1.measure()-u1.type.req)**2)
         # Test error checking
         self.assertRaises(MoleculeError, lambda: UreyBradley(atoms[0], atoms[0]))
 
@@ -1309,8 +1307,8 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(imp.type.idx, 0)
         self.assertEqual(imp.type.psi_k, 10.0)
         self.assertEqual(imp.type.psi_eq, 180.0)
-        imp.type.psi_eq = 3 * u.radians
-        imp.type.psi_k = 4.184 * u.kilojoules_per_mole / u.radians**2
+        imp.type.psi_eq = 3 * 180 / math.pi
+        imp.type.psi_k = 1
         self.assertEqual(imp.type.upsi_k, 1 * u.kilocalories_per_mole / u.radians**2)
         self.assertEqual(imp.type.upsi_eq, 3 * 180 / math.pi * u.degrees)
         self.assertTrue(imp.same_atoms((0, 1, 2, 3)))
@@ -1531,8 +1529,7 @@ class TestTopologyObjects(unittest.TestCase):
         bonds.append(Bond(atoms[3], atoms[1]))
         bonds.append(Bond(atoms[0], atoms[2]))
         t1 = OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[3])
-        t2 = OutOfPlaneBend(atoms[4], atoms[5], atoms[6], atoms[7],
-                            OutOfPlaneBendType(50.0))
+        t2 = OutOfPlaneBend(atoms[4], atoms[5], atoms[6], atoms[7], OutOfPlaneBendType(50.0))
         t1.type = OutOfPlaneBendType(50.0)
         self.assertIsNot(t1.type, t2.type)
         self.assertEqual(t1.type, t2.type)
@@ -1548,11 +1545,10 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIn(bonds[1], t1)
         self.assertIn(bonds[2], t1)
         self.assertNotIn(bonds[3], t1)
-        self.assertRaises(MoleculeError, lambda:
-                          OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[1]))
+        self.assertRaises(MoleculeError, lambda: OutOfPlaneBend(atoms[0], atoms[1], atoms[2], atoms[1]))
         self.assertEqual(t1.type.k, 50)
         self.assertEqual(repr(t1), '<OutOfPlaneBend; %r--(%r,%r,%r); type=%r>' %
-                (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
+                                   (atoms[1], atoms[0], atoms[2], atoms[3], t1.type))
         cp = OutOfPlaneBendType(50.0)
         self.assertIsNot(cp, t1.type)
         self.assertEqual(hash(cp), hash(t1.type))
@@ -1587,8 +1583,7 @@ class TestTopologyObjects(unittest.TestCase):
         atoms = TrackedList()
         atoms.extend([Atom(list=atoms) for i in range(3)])
         bonds = [Bond(atoms[0], atoms[1]), Bond(atoms[1], atoms[2])]
-        strbnd = StretchBend(atoms[0], atoms[1], atoms[2],
-                             StretchBendType(10.0, 11.0, 1.1, 1.2, 109.0))
+        strbnd = StretchBend(atoms[0], atoms[1], atoms[2], StretchBendType(10.0, 11.0, 1.1, 1.2, 109.0))
         strbnds = TrackedList()
         strbnds.append(strbnd.type)
         strbnd.type.list = strbnds
@@ -1606,15 +1601,6 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(strbnd.type.ureq2, 1.2 * u.angstroms)
         self.assertEqual(strbnd.type.theteq, 109.0)
         self.assertEqual(strbnd.type.utheteq, 109.0 * u.degrees)
-        typ = StretchBendType(1, 2, 3, 4, 5)
-        typ.k1 = typ.k2 = 4.184 * u.kilojoules_per_mole / (u.radians * u.angstroms)
-        typ.req1 = typ.req2 = 0.5 * u.nanometers
-        typ.theteq = math.pi * u.radians
-        self.assertEqual(typ.k1, 1)
-        self.assertEqual(typ.k2, 1)
-        self.assertEqual(typ.req1, 5)
-        self.assertEqual(typ.req2, 5)
-        self.assertEqual(typ.theteq, 180)
         # Test the StretchBendType.__copy__ method
         cp = copy(strbnd.type)
         self.assertIsNot(cp, strbnd.type)
@@ -2033,14 +2019,6 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertIsNot(cp, nbet)
         self.assertEqual(hash(cp), hash(nbet))
         self.assertIn(cp, {nbet})
-        # Check units of assignments
-        nbet.sigma = 0.1 * u.nanometers
-        self.assertEqual(nbet.sigma, 1)
-        nbet.rmin = 0.1 * u.nanometers
-        self.assertEqual(nbet.rmin, 1)
-        nbet.epsilon = 4.184 * u.kilojoules_per_mole
-        self.assertEqual(nbet.epsilon, 1)
-        nbet.sigma_14 = 0.2 * u.nanometers
 
     #=============================================
 
