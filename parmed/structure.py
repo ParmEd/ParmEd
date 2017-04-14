@@ -21,31 +21,34 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function
 
+import math
+import os
 from collections import defaultdict
 from copy import copy
-import math
+
 import numpy as np
-import os
-from parmed.constants import DEG_TO_RAD, SMALL
-from parmed.exceptions import ParameterError
-from parmed.geometry import (box_lengths_and_angles_to_vectors,
-        box_vectors_to_lengths_and_angles, STANDARD_BOND_LENGTHS_SQUARED,
-        distance2)
-from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
-        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
-        TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-        UnassignedAtomType)
-from parmed import unit as u, residue
-from parmed.utils import tag_molecules, PYPY, find_atom_pairs
-from parmed.utils.decorators import needs_openmm
-from parmed.utils.six import string_types, integer_types, iteritems
-from parmed.utils.six.moves import zip, range
-from parmed.vec3 import Vec3
+
+from . import unit as u
+from . import residue
+from .constants import DEG_TO_RAD, SMALL
+from .exceptions import ParameterError
+from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
+                       box_vectors_to_lengths_and_angles, distance2)
+from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
+                              Dihedral, DihedralType, DihedralTypeList, ExtraPoint, Group, Improper,
+                              MultipoleFrame, NonbondedException, NoUreyBradley, OutOfPlaneBend,
+                              OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
+                              ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
+                              TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
+                              UreyBradley)
+from .utils import PYPY, find_atom_pairs, tag_molecules
+from .utils.decorators import needs_openmm
+from .utils.six import integer_types, iteritems, string_types
+from .utils.six.moves import range, zip
+from .vec3 import Vec3
+
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -771,6 +774,7 @@ class Structure(object):
         partners arrays
         """
         set14 = set()
+        deferred_dihedrals = [] # to work around pmemd tossing pn=0 dihedrals
         for dihedral in self.dihedrals:
             if dihedral.ignore_end : continue
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
@@ -779,9 +783,19 @@ class Structure(object):
             elif (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
                 # Avoid double counting of 1-4 in a six-membered ring
                 dihedral.ignore_end = True
+            elif isinstance(dihedral.type, DihedralType) and dihedral.type.per == 0:
+                # This needs to be done to work around a "feature" in pmemd where periodicity=0
+                # torsions are thrown away. Since AmberParm never has any DihedralTypeList, we only
+                # need to defer periodicity=0 torsions for DihedralType torsions.
+                deferred_dihedrals.append(dihedral)
             else:
                 set14.add((dihedral.atom1.idx, dihedral.atom4.idx))
                 set14.add((dihedral.atom4.idx, dihedral.atom1.idx))
+        # Only keep ignore_end = False if we *must*; i.e., if the exclusion it would have
+        # added was not added by anybody else
+        for dihedral in deferred_dihedrals:
+            if (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
+                dihedral.ignore_end = True
 
     #===================================================
 

@@ -323,10 +323,20 @@ class TestGromacsToAmber(FileIOTestCase, EnergyTestCase):
         # ordering of the bondingtypes and one dihedral is symmetric
         assert len(top.parameterset.rb_torsion_types) == 7
 
-        self.assertRaises(ValueError, lambda:
-                amber.AmberParm.from_structure(top)
-        )
+        parm = amber.AmberParm.from_structure(top)
+        parm.save(get_fn('rb_torsions.prmtop', written=True))
+        parm.save(get_fn('rb_torsions.rst7', written=True))
 
+        sysg = top.createSystem()
+        sysa = parm.createSystem()
+
+        cong = mm.Context(sysg, mm.VerletIntegrator(0.001), CPU)
+        cona = mm.Context(sysa, mm.VerletIntegrator(0.001), CPU)
+
+        cong.setPositions(top.positions)
+        cona.setPositions(top.positions)
+
+        self.check_energies(top, cong, parm, cona)
 
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_complicated(self):
