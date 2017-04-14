@@ -39,4 +39,5 @@ else # Otherwise, CPython... go through conda
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes=1.0.0 \
             coverage nose-timer python-coveralls
     fi
+    source activate myenv
 fi # CPython
