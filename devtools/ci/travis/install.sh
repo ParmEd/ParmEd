@@ -35,8 +35,6 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv boost==1.59.0 -c omnia
         conda install -y -n myenv nglview -c bioconda
         conda install -y ambertools=17.0.0 -c http://ambermd.org/downloads/ambertools-rc/conda/
-        python -c "import sander; print(sander)"
-        python -c "import parmed; print(parmed)"
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes=1.0.0 \
@@ -44,4 +42,6 @@ else # Otherwise, CPython... go through conda
     fi
 
     source activate myenv
+    python -c "import sander; print(sander)"
+    python -c "import parmed; print(parmed)"
 fi # CPython
