@@ -40,4 +40,7 @@ else # Otherwise, CPython... go through conda
             coverage nose-timer python-coveralls
     fi
     source activate myenv
+    if [ -z "$MINIMAL_PACKAGES" ]; then
+        pip uninstall parmed # from ambertools
+    fi
 fi # CPython
