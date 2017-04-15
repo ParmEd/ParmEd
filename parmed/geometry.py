@@ -207,9 +207,7 @@ def center_of_mass(coordinates, masses):
     return np.average(coordinates, weights=masses, axis=0)
 
 def distance2(a1, a2):
-    """
-    Computes the cartesian distance between two atoms. Ignores periodic boundary
-    conditions.
+    """ Computes the cartesian distance between two atoms. Ignores periodic boundary conditions.
 
     Parameters
     ----------
@@ -240,9 +238,7 @@ def distance2(a1, a2):
     return dx*dx + dy*dy + dz*dz
 
 def angle(a1, a2, a3):
-    """
-    Computes the cartesian angle between three atoms. Ignores periodic boundary
-    conditions.
+    """ Computes the cartesian angle between three atoms. Ignores periodic boundary conditions.
 
     Parameters
     ----------
@@ -253,7 +249,7 @@ def angle(a1, a2, a3):
     Returns
     -------
     ang : float
-        The angle between the vectors a1-a2 and a2-a3 in radians
+        The angle between the vectors a1-a2 and a2-a3 in degrees
 
     Notes
     -----
@@ -290,14 +286,12 @@ def dihedral(a1, a2, a3, a4):
     Returns
     -------
     dihed : float
-        The measured dihedral between the 4 points
+        The measured dihedral between the 4 points in degrees
     """
-    p = np.array([
-           _get_coords_from_atom_or_tuple(a1),
-           _get_coords_from_atom_or_tuple(a2),
-           _get_coords_from_atom_or_tuple(a3),
-           _get_coords_from_atom_or_tuple(a4),
-    ])
+    p = np.array([_get_coords_from_atom_or_tuple(a1),
+                  _get_coords_from_atom_or_tuple(a2),
+                  _get_coords_from_atom_or_tuple(a3),
+                  _get_coords_from_atom_or_tuple(a4)])
     v1 = p[1] - p[0]
     v2 = p[1] - p[2]
     v3 = p[3] - p[2]
@@ -331,43 +325,43 @@ _OFFSET = 0.20 # offset for what is considered a bond
 _DEFAULT_CUTOFF = (1.6 + _OFFSET)**2
 STANDARD_BOND_LENGTHS_SQUARED = defaultdict(lambda: _DEFAULT_CUTOFF)
 STANDARD_BOND_LENGTHS_SQUARED.update({
-        # Self-bonds
-        (1, 1) : (0.74 + _OFFSET)**2,
-        (6, 6) : (1.54 + _OFFSET)**2,
-        (7, 7) : (1.45 + _OFFSET)**2,
-        (8, 8) : (1.48 + _OFFSET)**2,
-        (15, 15) : (2.21 + _OFFSET)**2,
-        (16, 16) : (2.05 + _OFFSET)**2,
-        # H-
-        (1, 6) : (1.09 + _OFFSET)**2, (6, 1) : (1.09 + _OFFSET)**2,
-        (1, 7) : (1.01 + _OFFSET)**2, (7, 1) : (1.01 + _OFFSET)**2,
-        (1, 8) : (0.96 + _OFFSET)**2, (8, 1) : (0.96 + _OFFSET)**2,
-        (1, 15) : (1.44 + _OFFSET)**2, (15, 1) : (1.44 + _OFFSET)**2,
-        (1, 16) : (1.34 + _OFFSET)**2, (16, 1) : (1.34 + _OFFSET)**2,
-        # C-
-        (6, 7) : (1.47 + _OFFSET)**2, (7, 6) : (1.47 + _OFFSET)**2,
-        (6, 8) : (1.43 + _OFFSET)**2, (8, 6) : (1.43 + _OFFSET)**2,
-        (6, 9) : (1.35 + _OFFSET)**2, (9, 6) : (1.35 + _OFFSET)**2,
-        (6, 15) : (1.84 + _OFFSET)**2, (15, 6) : (1.84 + _OFFSET)**2,
-        (6, 16) : (1.82 + _OFFSET)**2, (16, 6) : (1.82 + _OFFSET)**2,
-        (6, 17) : (1.77 + _OFFSET)**2, (17, 6) : (1.77 + _OFFSET)**2,
-        (6, 35) : (1.94 + _OFFSET)**2, (35, 6) : (1.94 + _OFFSET)**2,
-        # N-
-        (7, 8) : (1.40 + _OFFSET)**2, (8, 7) : (1.40 + _OFFSET)**2,
-        (7, 9) : (1.36 + _OFFSET)**2, (9, 7) : (1.36 + _OFFSET)**2,
-        (7, 15) : (1.71 + _OFFSET)**2, (15, 7) : (1.71 + _OFFSET)**2,
-        (7, 16) : (1.68 + _OFFSET)**2, (16, 7) : (1.68 + _OFFSET)**2,
-        (7, 17) : (1.75 + _OFFSET)**2, (17, 7) : (1.75 + _OFFSET)**2,
-        # O-
-        (8, 9) : (1.42 + _OFFSET)**2, (9, 8) : (1.42 + _OFFSET)**2,
-        (8, 15) : (1.63 + _OFFSET)**2, (15, 8) : (1.63 + _OFFSET)**2,
-        (8, 16) : (1.48 + _OFFSET)**2, (16, 8) : (1.48 + _OFFSET)**2,
-        # F-
-        (9, 15) : (1.54 + _OFFSET)**2, (15, 9) : (1.54 + _OFFSET)**2,
-        (9, 16) : (1.56 + _OFFSET)**2, (16, 9) : (1.56 + _OFFSET)**2,
-        # P-
-        (15, 16) : (1.86 + _OFFSET)**2, (16, 15) : (1.86 + _OFFSET)**2,
-        (15, 17) : (2.03 + _OFFSET)**2, (17, 15) : (2.03 + _OFFSET)**2,
-        # S-
-        (16, 17) : (2.07 + _OFFSET)**2, (17, 16) : (2.07 + _OFFSET)**2,
+    # Self-bonds
+    (1, 1) : (0.74 + _OFFSET)**2,
+    (6, 6) : (1.54 + _OFFSET)**2,
+    (7, 7) : (1.45 + _OFFSET)**2,
+    (8, 8) : (1.48 + _OFFSET)**2,
+    (15, 15) : (2.21 + _OFFSET)**2,
+    (16, 16) : (2.05 + _OFFSET)**2,
+    # H-
+    (1, 6) : (1.09 + _OFFSET)**2, (6, 1) : (1.09 + _OFFSET)**2,
+    (1, 7) : (1.01 + _OFFSET)**2, (7, 1) : (1.01 + _OFFSET)**2,
+    (1, 8) : (0.96 + _OFFSET)**2, (8, 1) : (0.96 + _OFFSET)**2,
+    (1, 15) : (1.44 + _OFFSET)**2, (15, 1) : (1.44 + _OFFSET)**2,
+    (1, 16) : (1.34 + _OFFSET)**2, (16, 1) : (1.34 + _OFFSET)**2,
+    # C-
+    (6, 7) : (1.47 + _OFFSET)**2, (7, 6) : (1.47 + _OFFSET)**2,
+    (6, 8) : (1.43 + _OFFSET)**2, (8, 6) : (1.43 + _OFFSET)**2,
+    (6, 9) : (1.35 + _OFFSET)**2, (9, 6) : (1.35 + _OFFSET)**2,
+    (6, 15) : (1.84 + _OFFSET)**2, (15, 6) : (1.84 + _OFFSET)**2,
+    (6, 16) : (1.82 + _OFFSET)**2, (16, 6) : (1.82 + _OFFSET)**2,
+    (6, 17) : (1.77 + _OFFSET)**2, (17, 6) : (1.77 + _OFFSET)**2,
+    (6, 35) : (1.94 + _OFFSET)**2, (35, 6) : (1.94 + _OFFSET)**2,
+    # N-
+    (7, 8) : (1.40 + _OFFSET)**2, (8, 7) : (1.40 + _OFFSET)**2,
+    (7, 9) : (1.36 + _OFFSET)**2, (9, 7) : (1.36 + _OFFSET)**2,
+    (7, 15) : (1.71 + _OFFSET)**2, (15, 7) : (1.71 + _OFFSET)**2,
+    (7, 16) : (1.68 + _OFFSET)**2, (16, 7) : (1.68 + _OFFSET)**2,
+    (7, 17) : (1.75 + _OFFSET)**2, (17, 7) : (1.75 + _OFFSET)**2,
+    # O-
+    (8, 9) : (1.42 + _OFFSET)**2, (9, 8) : (1.42 + _OFFSET)**2,
+    (8, 15) : (1.63 + _OFFSET)**2, (15, 8) : (1.63 + _OFFSET)**2,
+    (8, 16) : (1.48 + _OFFSET)**2, (16, 8) : (1.48 + _OFFSET)**2,
+    # F-
+    (9, 15) : (1.54 + _OFFSET)**2, (15, 9) : (1.54 + _OFFSET)**2,
+    (9, 16) : (1.56 + _OFFSET)**2, (16, 9) : (1.56 + _OFFSET)**2,
+    # P-
+    (15, 16) : (1.86 + _OFFSET)**2, (16, 15) : (1.86 + _OFFSET)**2,
+    (15, 17) : (2.03 + _OFFSET)**2, (17, 15) : (2.03 + _OFFSET)**2,
+    # S-
+    (16, 17) : (2.07 + _OFFSET)**2, (17, 16) : (2.07 + _OFFSET)**2,
 })
