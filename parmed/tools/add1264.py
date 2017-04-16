@@ -157,6 +157,17 @@ def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
                     # There are two C4 terms need to add together between two
                     # different ions
                     result[idx] += c4 / WATER_POL * pol * tunfactor
+
+    # Print the C4 parameters
+    print('Print the C4 parameters (shown with only one decimal place) : ')
+    for i in range(0, ntypes):
+        for j in range(0, i+1):
+            # Get index
+            idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*j+i]-1
+            print('C4 = %8.1f' %result[idx])
+            print('    between the atom type(s) : ',typdict[i+1])
+            print('    and the atom types(s) : ', typdict[j+1])
+
     return result
 
 def _get_params(fname):
