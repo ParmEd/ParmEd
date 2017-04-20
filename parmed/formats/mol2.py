@@ -10,6 +10,7 @@ from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
 from parmed.periodic_table import element_by_name, AtomicNum
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
+from parmed.periodic_table import element_by_name, AtomicNum
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond
 from parmed.utils.io import genopen
@@ -154,6 +155,8 @@ class Mol2File(object):
                     words = line.split()
                     id = int(words[0])
                     name = words[1]
+                    elem = element_by_name(name)
+                    atomic_number = AtomicNum[elem]
                     x = float(words[2])
                     y = float(words[3])
                     z = float(words[4])
@@ -176,7 +179,8 @@ class Mol2File(object):
                     if last_residue is None:
                         last_residue = (resid, resname)
                         restemp.name = resname
-                    atom = Atom(name=name, type=typ, number=id, charge=charge)
+                    atom = Atom(name=name, atomic_number=atomic_number,type=typ,
+                                number=id, charge=charge)
                     atom.xx, atom.xy, atom.xz = x, y, z
                     struct.add_atom(atom, resname, resid)
                     if last_residue != (resid, resname):
