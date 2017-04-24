@@ -811,6 +811,11 @@ class CharmmParameterSet(ParameterSet):
                             atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
+                        elif line[:6].upper() == 'DELETE':
+                            words = line.split()
+                            name = words[2].upper()
+                            atom = Atom(name=name)
+                            res.delete.append(atom)
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
