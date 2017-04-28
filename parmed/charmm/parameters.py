@@ -858,10 +858,13 @@ class CharmmParameterSet(ParameterSet):
                                 elif tok.upper().startswith('LAST'):
                                     tpatches[resname] = val
                         elif line[:5].upper() == 'DELETE':
-                            pass
-                        elif line[:4].upper() == 'IMPR':
-                            it = iter([w.upper() for w in line.split()[1:]])
+                            words = line.split()
+                            name = words[2].upper()
+                            res.delete.append(name)
+                        elif line[:4].upper() == 'IMPR' or line[:4].upper() == 'IMPH':
+                            it = iter(w.upper() for w in line.split()[1:])
                             for a1, a2, a3, a4 in zip(it, it, it, it):
+                                res._impr.append((a1, a2, a3, a4))
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
