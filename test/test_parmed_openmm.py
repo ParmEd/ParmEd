@@ -579,13 +579,27 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'))
         )
-        params.write(get_fn('charmm_conv_lj.xml', written=True),
+        params.write(get_fn('charmm.xml', written=True),
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrell'
                      ),
                      separate_ljforce=True
         )
+
+    def test_explicit_improper(self):
+        """Test writing out the improper explicitly"""
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                              get_fn('top_all36_prot.rtf'))
+        )
+        params.write(get_fn('charmm.xml', written=True),
+                     provenance=dict(
+                         OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
+                         Reference='MacKerrel'
+                     ),
+                     charmm_imp=True)
 
     def test_not_write_residues_with_same_templhash(self):
         """Test that no identical residues are written to XML, using the
