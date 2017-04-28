@@ -14,6 +14,7 @@ from parmed.utils.six.moves import StringIO
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
                    TestCaseRelative, EnergyTestCase)
+from parmed.exceptions import ParameterWarning
 
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
@@ -590,6 +591,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
     def test_explicit_improper(self):
         """Test writing out the improper explicitly"""
 
+        warnings.filterwarnings('ignore', category=ParameterWarning)
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'))
