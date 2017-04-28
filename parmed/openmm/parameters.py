@@ -255,6 +255,7 @@ class OpenMMParameterSet(ParameterSet):
 
                 else:
                     # Check for wildcards
+                    key_placeholder = None
                     for anchor in itertools.combinations([t1, t2, t3, t4], 2):
                         key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
                         if key in self.improper_types:
