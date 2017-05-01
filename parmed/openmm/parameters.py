@@ -261,7 +261,13 @@ class OpenMMParameterSet(ParameterSet):
                         if key in self.improper_types:
                             if MATCH and key != key_placeholder:
                                 flag = (altkeys1[0], altkeys1[-1])
-                                if flag[0] in key[0] and flag[1] in key[1]:
+                                if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                    # Match was already found.
+                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                  altkeys1, key_placeholder))
+                                    break
+
+                                if flag[0] == key[0] and flag[1] == key[1]:
                                     improper_harmonic[altkeys1] = self.improper_types[key]
                                     warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
                                                     altkeys1, key), ParameterWarning)
@@ -276,6 +282,12 @@ class OpenMMParameterSet(ParameterSet):
                                 if key in self.improper_periodic_types:
                                     if MATCH and key != key_placeholder:
                                         flag = (altkeys1[0], altkeys1[-1])
+                                        if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                            # Match already found.
+                                            warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                          key_placeholder, altkeys1, key_placeholder))
+                                            break
+
                                         if flag[0] in key[0] and flag[1] in key[1]:
                                             warnings.warn("More than one improper matches for {}. Using {}".format(
                                                     altkeys1, key), ParameterWarning)
