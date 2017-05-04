@@ -345,8 +345,8 @@ class OpenMMParameterSet(ParameterSet):
         # Structure has separate dihedral entries for each torsion
         if improper_dihedrals_ordering == 'default':
             dest.write(' <PeriodicTorsionForce>\n')
-        elif improper_dihedrals_ordering == 'amber':
-            dest.write(' <PeriodicTorsionForce ordering="amber">\n')
+        else:
+            dest.write(' <PeriodicTorsionForce ordering="%s">\n' % improper_dihedrals_ordering)
         diheds_done = set()
         pconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
