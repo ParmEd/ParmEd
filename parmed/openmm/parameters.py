@@ -285,10 +285,10 @@ class OpenMMParameterSet(ParameterSet):
                                         if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
                                             # Match already found.
                                             warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                          key_placeholder, altkeys1, key_placeholder))
+                                                          key_placeholder, altkeys1, key_placeholder), ParameterWarning)
                                             break
 
-                                        if flag[0] in key[0] and flag[1] in key[1]:
+                                        if flag[0] == key[0] and flag[1] == key[1]:
                                             warnings.warn("More than one improper matches for {}. Using {}".format(
                                                     altkeys1, key), ParameterWarning)
                                             improper_periodic[altkeys1] = self.improper_periodic_types[key]
