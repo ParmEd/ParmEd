@@ -118,7 +118,8 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
-    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False, charmm_imp=False):
+    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
+              improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -164,6 +165,9 @@ class OpenMMParameterSet(ParameterSet):
             ----
             When pair-specific L-J modifications are present (NBFIX in CHARMM), this
             behavior is always present and this flag is ignored.
+        improper_dihedrals_ordering : str
+            The ordering to use when assigning improper torsions in OpenMM.  Default is 'default',
+            other option is 'amber'
         charmm_imp: bool
             If True, will check for existence of IMPR in each residue and patch template,
             and write out the explicit improper definition without wildcards in the ffxml file.
@@ -206,7 +210,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
-            self._write_omm_dihedrals(dest, skip_types)
+            self._write_omm_dihedrals(dest, skip_types, improper_dihedrals_ordering)
             self._write_omm_impropers(dest, skip_types)
 #           self._write_omm_rb_torsions(dest, skip_types)
             self._write_omm_cmaps(dest, skip_types)
@@ -427,12 +431,15 @@ class OpenMMParameterSet(ParameterSet):
                        (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
         dest.write(' </HarmonicAngleForce>\n')
 
-    def _write_omm_dihedrals(self, dest, skip_types):
+    def _write_omm_dihedrals(self, dest, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
         # The from_structure method ensures that, even if the containing
         # Structure has separate dihedral entries for each torsion
-        dest.write(' <PeriodicTorsionForce>\n')
+        if improper_dihedrals_ordering == 'default':
+            dest.write(' <PeriodicTorsionForce>\n')
+        else:
+            dest.write(' <PeriodicTorsionForce ordering="%s">\n' % improper_dihedrals_ordering)
         diheds_done = set()
         pconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
