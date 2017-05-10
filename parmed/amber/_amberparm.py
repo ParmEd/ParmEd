@@ -2006,7 +2006,7 @@ class AmberParm(AmberFormat, Structure):
 
     def _label_alternates(self):
         atom_collection = self._get_atom_collection_for_alternate_labels()
-        possible_labels = list('ABCDEF')
+        possible_labels = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 
         for _, adict in enumerate(atom_collection):
             for atom_name, atom_list in iteritems(adict):
