@@ -1,0 +1,29 @@
+os: Windows Server 2012
+environment:
+  matrix:
+  - PRINTF_EXPONENT_DIGITS: "2"
+
+install:
+  - set HOME=.
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - "sh -lc \"pacman -S --noconfirm --needed
+      mingw-w64-x86_64-openblas
+      mingw-w64-x86_64-arpack
+      mingw-w64-x86_64-gcc
+      mingw-w64-x86_64-gcc-fortran
+      mingw-w64-x86_64-ncurses
+      mingw-w64-x86_64-readline
+      mingw-w64-x86_64-python2-numpy
+      wget
+      diffutils
+    \""
+build_script:
+  - where python
+  - python setup.py install
+# install pip after install ParmEd
+# (or will get distutils.errors.DistutilsPlatformError: VC 6.0 is not supported by this module
+  - wget https://bootstrap.pypa.io/get-pip.py
+  - python get-pip.py
+  - python -m pip install pytest
+  - py.test -v .
