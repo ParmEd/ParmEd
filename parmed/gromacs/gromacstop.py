@@ -10,7 +10,6 @@ import copy
 from datetime import datetime
 import math
 import os
-import pwd
 import re
 try:
     from string import letters
@@ -22,7 +21,7 @@ import warnings
 from parmed.constants import TINY, DEG_TO_RAD
 from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
 from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet
+from parmed.parameters import ParameterSet, _find_ureybrad_key
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed.structure import Structure
 from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
@@ -36,6 +35,18 @@ from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
+
+try:
+    import pwd
+    _username = pwd.getpwuid(os.getuid())[0]
+    _userid = os.getuid()
+    _uname = os.uname()[1]
+except ImportError:
+    import getpass
+    _username = getpass.getuser()   # pragma: no cover
+    _userid = 0                     # pragma: no cover
+    import platform                 # pragma: no cover
+    _uname = platform.node()        # pragma: no cover
 
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
@@ -237,7 +248,7 @@ class GromacsTopologyFile(Structure):
             # Fill in coordinates and unit cell information if appropriate
             if xyz is not None:
                 if isinstance(xyz, string_types):
-                    f = load_file(xyz)
+                    f = load_file(xyz, skip_bonds=True)
                     if not hasattr(f, 'coordinates') or f.coordinates is None:
                         raise TypeError('File %s does not have coordinates' %
                                         xyz)
@@ -258,7 +269,7 @@ class GromacsTopologyFile(Structure):
         """ Reads the topology file into the current instance """
         from parmed import gromacs as gmx
         params = self.parameterset = ParameterSet()
-        molecules = dict()
+        molecules = self.molecules = dict()
         bond_types = dict()
         angle_types = dict()
         ub_types = dict()
@@ -383,8 +394,8 @@ class GromacsTopologyFile(Structure):
                     params.angle_types[(a, b, c)] = t
                     params.angle_types[(c, b, a)] = t
                     if ut is not None:
-                        params.urey_bradley_types[(a, c)] = ut
-                        params.urey_bradley_types[(c, a)] = ut
+                        params.urey_bradley_types[(a, b, c)] = ut
+                        params.urey_bradley_types[(c, b, a)] = ut
                 elif current_section == 'dihedraltypes':
                     key, knd, t, replace = self._parse_dihedraltypes(line)
                     rkey = tuple(reversed(key))
@@ -1026,7 +1037,7 @@ class GromacsTopologyFile(Structure):
         update_typelist_from(params.angle_types, self.angle_types)
         for ub in self.urey_bradleys:
             if ub.type is not None: continue
-            key = (_gettype(ub.atom1), _gettype(ub.atom2))
+            key = _find_ureybrad_key(ub)
             if key in params.urey_bradley_types:
                 ub.type = params.urey_bradley_types[key]
                 if ub.type is not NoUreyBradley:
@@ -1216,6 +1227,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.cmap_types = struct.cmap_types
         gmxtop.rb_torsion_types = struct.rb_torsion_types
         gmxtop.urey_bradley_types = struct.urey_bradley_types
+        gmxtop.adjust_types = struct.adjust_types
         gmxtop.combining_rule = struct.combining_rule
         gmxtop.box = struct.box
         if (struct.trigonal_angles or
@@ -1233,29 +1245,41 @@ class GromacsTopologyFile(Structure):
         else:
             scee_values = set()
             scnb_values = set()
-            for dihedral in struct.dihedrals:
-                if dihedral.type is None: continue
-                if isinstance(dihedral.type, DihedralTypeList):
-                    for dt in dihedral.type:
-                        if dt.scee:
-                            scee_values.add(dt.scee)
-                        if dt.scnb:
-                            scnb_values.add(dt.scnb)
-                else:
-                    if dihedral.type.scee:
-                        scee_values.add(dihedral.type.scee)
-                    if dihedral.type.scnb:
-                        scnb_values.add(dihedral.type.scnb)
-            if len(scee_values) > 1:
+            if struct.adjusts:
+                for adjust in struct.adjusts:
+                    if adjust.type is None: continue
+                    scee_values.add(1/adjust.type.chgscale)
+                    # Do not add scnb_values, since we can just set explicit
+                    # exception pair parameters in GROMACS (which this structure
+                    # already has)
+                # In order to specify specific pair parameters, we need to set
+                # gen_pairs to 'no' so that the pair-specific L-J parameters are
+                # printed to the topology file (rather than being auto-created)
+                gmxtop.defaults.gen_pairs = 'no'
+            else:
+                for dihedral in struct.dihedrals:
+                    if dihedral.type is None or dihedral.ignore_end: continue
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        for dt in dihedral.type:
+                            if dt.scee:
+                                scee_values.add(dt.scee)
+                            if dt.scnb:
+                                scnb_values.add(dt.scnb)
+                    else:
+                        if dihedral.type.scee:
+                            scee_values.add(dihedral.type.scee)
+                        if dihedral.type.scnb:
+                            scnb_values.add(dihedral.type.scnb)
+            if len(set('%.5f' % x for x in scee_values)) > 1:
                 raise GromacsError('Structure has mixed 1-4 scaling which is '
                                    'not supported by Gromacs')
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
-            if len(scee_values) == 1:
+            if len(set('%.5f' % x for x in scee_values)) == 1:
                 gmxtop.defaults.fudgeQQ = 1/scee_values[0]
             else:
                 gmxtop.defaults.fudgeQQ = 1.0
-            if len(scnb_values) == 1:
+            if len(set('%.5f' % x for x in scnb_values)) == 1:
                 gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
             else:
                 gmxtop.defaults.fudgeLJ = 1.0
@@ -1342,7 +1366,7 @@ class GromacsTopologyFile(Structure):
             now = datetime.now()
             dest.write('''\
 ;
-;   File %swas generated
+;   File %s was generated
 ;   By user: %s (%d)
 ;   On host: %s
 ;   At date: %s
@@ -1356,10 +1380,10 @@ class GromacsTopologyFile(Structure):
 ;   Command line:
 ;     %s
 ;
-''' % (fname, pwd.getpwuid(os.getuid())[0], os.getuid(), os.uname()[1],
-       now.strftime('%a. %B  %w %X %Y'), os.path.split(sys.argv[0])[1],
-       __version__, os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
-       ' '.join(sys.argv)))
+''' % (fname, _username, _userid, _uname, now.strftime('%a. %B  %w %X %Y'),
+       os.path.split(sys.argv[0])[1], __version__,
+       os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
+       (' '.join(sys.argv)).encode('unicode_escape').decode('utf-8')))
             dest.write('\n[ defaults ]\n')
             dest.write('; nbfunc        comb-rule       gen-pairs       '
                         'fudgeLJ fudgeQQ\n')
@@ -1424,7 +1448,7 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.5f    %.5f\n' %
+                        parfile.write('%-5s %-5s  1  %.8f %.8f\n' %
                                       (key[0], key[1], param.sigma*lconv,
                                        param.epsilon*econv))
                     parfile.write('\n')
@@ -1444,8 +1468,8 @@ class GromacsTopologyFile(Structure):
                         part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
                                 key[0], key[1], key[2], param.theteq,
                                 param.k*conv)
-                        if (key[0], key[2]) in params.urey_bradley_types:
-                            ub = params.urey_bradley_types[(key[0], key[2])]
+                        if key in params.urey_bradley_types:
+                            ub = params.urey_bradley_types[key]
                             parfile.write(part % 5)
                             parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
                                           ub.k*bconv))
@@ -1750,8 +1774,8 @@ class GromacsTopologyFile(Structure):
                         key not in params.pair_types or
                         adjust.type != params.pair_types[key]) and \
                         adjust.type is not None:
-                    dest.write('  %.5f  %.5f' % (adjust.type.sigma*lconv,
-                                                 adjust.type.epsilon*econv))
+                    dest.write(' %.8f %.8f' % (adjust.type.sigma*lconv,
+                                               adjust.type.epsilon*econv))
                 dest.write('\n')
             dest.write('\n')
         elif struct.dihedrals:
@@ -1802,10 +1826,9 @@ class GromacsTopologyFile(Structure):
                             break
                     else:
                         ubtype = NoUreyBradley
-                    ubkey = (key[0], key[2])
                     param_equal = param_equal and (
-                            ubkey in params.urey_bradley_types and
-                            ubtype == params.urey_bradley_types[ubkey])
+                            key in params.urey_bradley_types and
+                            ubtype == params.urey_bradley_types[key])
                 if writeparams or not param_equal:
                     dest.write('   %.5f %f' % (angle.type.theteq,
                                                angle.type.k*conv))

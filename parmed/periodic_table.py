@@ -1,10 +1,10 @@
-""" 
+"""
 Contains all of the elements in the periodic table and dictionaries that
 store all of the data found in the periodic table for that element, indexed
 by the element's symbol. For consistency with AMBER, a fictitious element
 'EP' is added to all of the arrays that is just an Extra Point, with no mass
-or any other meaningful attribute. It's just a container to put an extra 
-charge 
+or any other meaningful attribute. It's just a container to put an extra
+charge
 """
 # Data descriptions:
 #
@@ -20,7 +20,7 @@ charge
 
 KNOWN_ELEMENTS = 118
 
-AtomicNum = { 'H'  :  1, 'He' :  2, 'Li' :  3, 'Be' :  4, 'B'  :  5, 'C'  :  6, 
+AtomicNum = { 'H'  :  1, 'He' :  2, 'Li' :  3, 'Be' :  4, 'B'  :  5, 'C'  :  6,
               'N'  :  7, 'O'  :  8, 'F'  :  9, 'Ne' : 10, 'Na' : 11, 'Mg' : 12,
               'Al' : 13, 'Si' : 14, 'P'  : 15, 'S'  : 16, 'Cl' : 17, 'Ar' : 18,
               'K'  : 19, 'Ca' : 20, 'Sc' : 21, 'Ti' : 22, 'V'  : 23, 'Cr' : 24,
@@ -54,45 +54,45 @@ Element = [ 'EP',
             'Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs',
             'Mt','Ds','Rg','Cn','Uut','Uuq','Uup','Uuh','Uus','Uuo' ]
 
-Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  , 
-         'Be' :   9.0122 , 'B'  :  10.811  , 'C'  :  12.0107 , 
-         'N'  :  14.0067 , 'O'  :  15.9994 , 'F'  :  18.9984 , 
+Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
+         'Be' :   9.0122 , 'B'  :  10.811  , 'C'  :  12.0107 ,
+         'N'  :  14.0067 , 'O'  :  15.9994 , 'F'  :  18.9984 ,
          'Ne' :  20.1797 , 'Na' :  22.9898 , 'Mg' :  24.3050 ,
-         'Al' :  26.9815 , 'Si' :  28.0855 , 'P'  :  30.9738 , 
+         'Al' :  26.9815 , 'Si' :  28.0855 , 'P'  :  30.9738 ,
          'S'  :  32.065  , 'Cl' :  35.453  , 'Ar' :  39.948  ,
-         'K'  :  39.0983 , 'Ca' :  40.078  , 'Sc' :  44.9559 , 
+         'K'  :  39.0983 , 'Ca' :  40.078  , 'Sc' :  44.9559 ,
          'Ti' :  47.867  , 'V'  :  50.9415 , 'Cr' :  51.9961 ,
-         'Mn' :  54.9380 , 'Fe' :  55.845  , 'Co' :  58.9331 , 
+         'Mn' :  54.9380 , 'Fe' :  55.845  , 'Co' :  58.9331 ,
          'Ni' :  58.6934 , 'Cu' :  63.546  , 'Zn' :  65.409  ,
-         'Ga' :  69.723  , 'Ge' :  72.64   , 'As' :  74.9216 , 
+         'Ga' :  69.723  , 'Ge' :  72.64   , 'As' :  74.9216 ,
          'Se' :  78.96   , 'Br' :  79.904  , 'Kr' :  83.798  ,
-         'Rb' :  85.4678 , 'Sr' :  87.62   , 'Y'  :  88.9059 , 
+         'Rb' :  85.4678 , 'Sr' :  87.62   , 'Y'  :  88.9059 ,
          'Zr' :  91.224  , 'Nb' :  92.9064 , 'Mo' :  95.94   ,
-         'Tc' :  98.     , 'Ru' : 101.07   , 'Rh' : 102.9055 , 
+         'Tc' :  98.     , 'Ru' : 101.07   , 'Rh' : 102.9055 ,
          'Pd' : 106.42   , 'Ag' : 107.8682 , 'Cd' : 112.411  ,
-         'In' : 114.818  , 'Sn' : 118.710  , 'Sb' : 121.760  , 
+         'In' : 114.818  , 'Sn' : 118.710  , 'Sb' : 121.760  ,
          'Te' : 127.60   , 'I'  : 126.9045 , 'Xe' : 131.293  ,
-         'Cs' : 132.9055 , 'Ba' : 137.327  , 'La' : 138.9055 , 
+         'Cs' : 132.9055 , 'Ba' : 137.327  , 'La' : 138.9055 ,
          'Ce' : 140.116  , 'Pr' : 140.9077 , 'Nd' : 144.242  ,
-         'Pm' : 145.     , 'Sm' : 150.36   , 'Eu' : 151.964  , 
+         'Pm' : 145.     , 'Sm' : 150.36   , 'Eu' : 151.964  ,
          'Gd' : 157.25   , 'Tb' : 158.9254 , 'Dy' : 162.500  ,
-         'Ho' : 164.9303 , 'Er' : 167.259  , 'Tm' : 168.9342 , 
+         'Ho' : 164.9303 , 'Er' : 167.259  , 'Tm' : 168.9342 ,
          'Yb' : 173.04   , 'Lu' : 174.967  , 'Hf' : 178.49   ,
-         'Ta' : 180.9479 , 'W'  : 183.84   , 'Re' : 186.207  , 
+         'Ta' : 180.9479 , 'W'  : 183.84   , 'Re' : 186.207  ,
          'Os' : 190.23   , 'Ir' : 192.217  , 'Pt' : 195.084  ,
-         'Au' : 196.9666 , 'Hg' : 200.59   , 'Tl' : 204.3833 , 
+         'Au' : 196.9666 , 'Hg' : 200.59   , 'Tl' : 204.3833 ,
          'Pb' : 207.2    , 'Bi' : 208.9804 , 'Po' : 209.     ,
-         'At' : 210.     , 'Rn' : 222.     , 'Fr' : 223.     , 
+         'At' : 210.     , 'Rn' : 222.     , 'Fr' : 223.     ,
          'Ra' : 226.     , 'Ac' : 227.     , 'Th' : 232.0381 ,
-         'Pa' : 231.0359 , 'U'  : 238.0289 , 'Np' : 237.     , 
+         'Pa' : 231.0359 , 'U'  : 238.0289 , 'Np' : 237.     ,
          'Pu' : 244.     , 'Am' : 243.     , 'Cm' : 247.     ,
-         'Bk' : 247.     , 'Cf' : 251.     , 'Es' : 252.     , 
+         'Bk' : 247.     , 'Cf' : 251.     , 'Es' : 252.     ,
          'Fm' : 257.     , 'Md' : 258.     , 'No' : 259.     ,
-         'Lr' : 262.     , 'Rf' : 261.     , 'Db' : 262.     , 
+         'Lr' : 262.     , 'Rf' : 261.     , 'Db' : 262.     ,
          'Sg' : 266.     , 'Bh' : 264.     , 'Hs' : 277.     ,
-         'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     , 
+         'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     ,
          'Cn' : 285.     , 'Uut': 284.     , 'Uuq': 289.     ,
-         'Uup': 288.     , 'Uuh': 292.     , 'Uus': 291.     , 
+         'Uup': 288.     , 'Uuh': 292.     , 'Uus': 291.     ,
          'Uuo': 294.     , 'EP' : 0.000000 }
 
 Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
@@ -285,10 +285,13 @@ def element_by_name(name):
     biomolecules, but you are better off using the mass or, even better, an
     appropriate representation of the atomic number to begin with
     """
+    name = name.strip()
+    if len(name) == 0:
+        return Element[0]
     try:
-        atomic_number = AtomicNum[name.strip()[0].upper()]
+        atomic_number = AtomicNum[name[0].upper()]
     except KeyError:
-        sym = name.strip()[:2]
+        sym = name[:2]
         try:
             sym = '%s%s' % (sym[0].upper(), sym[1].lower())
             atomic_number = AtomicNum[sym]

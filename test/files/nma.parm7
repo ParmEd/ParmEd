@@ -2904,7 +2904,7 @@ BLA BLA BLA BLA BLA BLA
        3       3       3       3       3       3       3       3       3
 %FLAG BOX_DIMENSIONS
 %FORMAT(5E16.8)
-  9.00000000E+01  1.00000000E+00  1.00000000E+00  1.00000000E+00
+  9.00000000E+01  3.07350000E+01  3.08760000E+01  2.84850000E+01
 %FLAG AMOEBA_FORCEFIELD
 %COMMENT This indicates that this parm file is specific to amoeba
 %COMMENT This must be present if do_amoeba(in mdin) is 1

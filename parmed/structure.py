@@ -21,30 +21,34 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function
 
+import math
+import os
 from collections import defaultdict
 from copy import copy
-import math
+
 import numpy as np
-import os
-from parmed.constants import DEG_TO_RAD, SMALL
-from parmed.exceptions import ParameterError
-from parmed.geometry import (box_lengths_and_angles_to_vectors,
-        box_vectors_to_lengths_and_angles)
-from parmed.residue import SOLVENT_NAMES
-from parmed.topologyobjects import (AtomList, ResidueList, TrackedList,
-        DihedralTypeList, Bond, Angle, Dihedral, UreyBradley, Improper, Cmap,
-        TrigonalAngle, OutOfPlaneBend, PiTorsion, StretchBend, TorsionTorsion,
-        NonbondedException, AcceptorDonor, Group, ExtraPoint, ChiralFrame,
-        TwoParticleExtraPointFrame, MultipoleFrame, NoUreyBradley, Atom,
-        ThreeParticleExtraPointFrame, OutOfPlaneExtraPointFrame, UnassignedAtomType)
-from parmed import unit as u
-from parmed.utils import tag_molecules, PYPY
-from parmed.utils.decorators import needs_openmm
-from parmed.utils.six import string_types, integer_types, iteritems
-from parmed.utils.six.moves import zip, range
-from parmed.vec3 import Vec3
+
+from . import unit as u
+from . import residue
+from .constants import DEG_TO_RAD, SMALL
+from .exceptions import ParameterError
+from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
+                       box_vectors_to_lengths_and_angles, distance2)
+from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
+                              Dihedral, DihedralType, DihedralTypeList, ExtraPoint, Group, Improper,
+                              MultipoleFrame, NonbondedException, NoUreyBradley, OutOfPlaneBend,
+                              OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
+                              ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
+                              TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
+                              UreyBradley)
+from .utils import PYPY, find_atom_pairs, tag_molecules
+from .utils.decorators import needs_openmm
+from .utils.six import integer_types, iteritems, string_types
+from .utils.six.moves import range, zip
+from .vec3 import Vec3
+
 # Try to import the OpenMM modules
 try:
     from simtk.openmm import app
@@ -216,6 +220,8 @@ class Structure(object):
     coordinates : np.ndarray of shape (nframes, natom, 3)
         If no coordinates are set, this is set to None. The first frame will
         match the coordinates present on the atoms.
+    symmetry : :class:`Symmetry`
+        if no symmetry is set, this is set to None.
 
     Notes
     -----
@@ -297,6 +303,7 @@ class Structure(object):
         self.nrexcl = 3
         self.title = ''
         self._combining_rule = 'lorentz'
+        self.symmetry = None
 
     #===================================================
 
@@ -420,7 +427,8 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy(atom)
-            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code,
+                       res.segid)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(copy(bt))
@@ -616,6 +624,9 @@ class Structure(object):
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
+        # Transfer TER cards
+        for r1, r2 in zip(c.residues, self.residues):
+            r1.ter = r2.ter
         return c
 
     #===================================================
@@ -763,6 +774,7 @@ class Structure(object):
         partners arrays
         """
         set14 = set()
+        deferred_dihedrals = [] # to work around pmemd tossing pn=0 dihedrals
         for dihedral in self.dihedrals:
             if dihedral.ignore_end : continue
             if (dihedral.atom1 in dihedral.atom4.bond_partners or
@@ -771,9 +783,19 @@ class Structure(object):
             elif (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
                 # Avoid double counting of 1-4 in a six-membered ring
                 dihedral.ignore_end = True
+            elif isinstance(dihedral.type, DihedralType) and dihedral.type.per == 0:
+                # This needs to be done to work around a "feature" in pmemd where periodicity=0
+                # torsions are thrown away. Since AmberParm never has any DihedralTypeList, we only
+                # need to defer periodicity=0 torsions for DihedralType torsions.
+                deferred_dihedrals.append(dihedral)
             else:
                 set14.add((dihedral.atom1.idx, dihedral.atom4.idx))
                 set14.add((dihedral.atom4.idx, dihedral.atom1.idx))
+        # Only keep ignore_end = False if we *must*; i.e., if the exclusion it would have
+        # added was not added by anybody else
+        for dihedral in deferred_dihedrals:
+            if (dihedral.atom1.idx, dihedral.atom4.idx) in set14:
+                dihedral.ignore_end = True
 
     #===================================================
 
@@ -822,6 +844,191 @@ class Structure(object):
             else:
                 # Pure numpy is faster in CPython, so do that when we can
                 self._coordinates = self._coordinates[:, np.array(sel)==0]
+
+    #===================================================
+
+    def assign_bonds(self, *reslibs):
+        """
+        Assigns bonds to all atoms based on the provided residue template
+        libraries. Atoms whose names are *not* in the templates, as well as
+        those residues for whom no template is found, is assigned to bonds based
+        on distances.
+
+        Parameters
+        ----------
+        reslibs : dict{str: ResidueTemplate}
+            Any number of residue template libraries. By default, assign_bonds
+            knows about the standard amino acid, RNA, and DNA residues.
+        """
+        # Import here to avoid circular references
+        from parmed.modeller import StandardBiomolecularResidues
+        # Build a composite dict of all residue templates
+        all_residues = copy(StandardBiomolecularResidues)
+        for lib in reslibs:
+            all_residues.update(lib)
+        # Walk through every residue and assign bonds from the templates
+        unassigned_residues = set()
+        unassigned_atoms = set()
+        cysteine_sg = set()
+        for res in self.residues:
+            templ = _res_in_templlib(res, all_residues)
+            if templ is None:
+                # Don't have a template for this residue. Keep a note and go on
+                unassigned_atoms.update(res.atoms)
+                unassigned_residues.add(res)
+                continue
+            resatoms = {a.name: a for a in res.atoms}
+            for a in res.atoms:
+                if a.name not in templ.map:
+                    unassigned_atoms.add(a)
+                    continue
+                # We matched our template atom. Transfer the element
+                # information, as it is more reliable
+                a.atomic_number = templ.map[a.name].atomic_number
+                for bp in templ.map[a.name].bond_partners:
+                    if (bp.name in resatoms and
+                            resatoms[bp.name] not in a.bond_partners):
+                        if a not in resatoms[bp.name].bond_partners:
+                            self.bonds.append(Bond(a, resatoms[bp.name]))
+        # Now go through each residue and assign heads and tails. This walks
+        # through the residues and bonds residue i's tail with residue j's head.
+        # So there is nothing to do for the last residue. Omit it from the loop
+        # so self.residues[i+1] never raises an IndexError
+        for i, res in enumerate(self.residues[:-1]):
+            templ = _res_in_templlib(res, all_residues)
+            # TER cards and changing chains prevents bonding to the next residue
+            if res.ter or (res.chain and
+                    (res.chain != self.residues[i+1].chain)):
+                continue
+            ntempl = _res_in_templlib(self.residues[i+1], all_residues)
+            if templ is None and ntempl is None:
+                # Any cross-link here picked up later
+                continue
+            if templ is None:
+                if ntempl.head is None:
+                    continue # Next residue doesn't bond to the previous one
+                # See if any atom in templ is close enough to bond to the head
+                # atom of the next residue's template
+                for head in self.residues[i+1].atoms:
+                    if head.name == ntempl.head:
+                        break
+                else:
+                    continue # head atom not found!
+                for a in res.atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             head.atomic_number)]
+                    if distance2(a, head) < maxdist:
+                        if a not in head.bond_partners:
+                            self.bonds.append(Bond(a, head))
+                        break
+                continue
+            if templ.tail is None:
+                continue # This residue does not bond with the next one
+            if ntempl is None:
+                # See if any atom in the next residue is bonding distance away
+                # from my tail
+                for tail in res.atoms:
+                    if tail.name == templ.tail.name:
+                        break
+                else:
+                    continue # tail not found
+                for a in self.residues[i+1].atoms:
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
+                                                             tail.atomic_number)]
+                    if distance2(a, tail) < maxdist:
+                        if a not in tail.bond_partners:
+                            self.bonds.append(Bond(a, tail))
+                        break
+                continue
+            if ntempl.head is None:
+                continue # Next residue does not bond with this one
+            # We have templates for both atoms, and both have a head and a tail
+            for tail in res.atoms:
+                if tail.name == templ.tail.name:
+                    break
+            else:
+                continue # head could not be found
+            for head in self.residues[i+1].atoms:
+                if head.name == ntempl.head.name:
+                    break
+            else:
+                continue # tail could not be found
+            if head not in tail.bond_partners:
+                self.bonds.append(Bond(head, tail))
+        # Now time to find bonds based on distance. First thing to do is to find
+        # all CYS residues and pull out those that have an SG atom with only 1
+        # bond partner, since those are *very* commonly bonded by
+        # post-translational modifications.
+        for res in self.residues:
+            if len(res.name) != 3 or not residue.AminoAcidResidue.has(res.name):
+                continue
+            if residue.AminoAcidResidue.get(res.name).abbr != 'CYS':
+                continue
+            # Cysteine! Find the SG and add it to unassigned atoms if it only
+            # has 1 atom bonded to it
+            for a in res.atoms:
+                if a.name == 'SG' and len(a.bond_partners) < 2:
+                    unassigned_atoms.add(a)
+                    cysteine_sg.add(a)
+                    break
+        # Can't do distance-based bond determination without coordinates
+        if self.coordinates is None:
+            return
+        # OK, now go through all atoms that have not been assigned. If an atom
+        # has not been assigned, but its residue HAS been assigned, then that
+        # means the name is wrong. A likely culprit is bad nomenclature for
+        # atoms. So in this case (and this case only), look for bond partners in
+        # an 'assigned' residue (but only the same residue we are part of). One
+        # thing this misses is when the head or tail atom is misnamed.
+        mindist = math.sqrt(max(STANDARD_BOND_LENGTHS_SQUARED.values()))
+        pairs = find_atom_pairs(self, mindist, unassigned_atoms)
+        for atom in unassigned_atoms:
+            for partner in pairs[atom.idx]:
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+            # Now look through all atoms in this template if it's a template
+            # that's already been assigned. If it's already in an unassigned
+            # residue, then all that residue's atoms were in unassigned_atoms,
+            # so there's no need to look through the residue again. Also, we
+            # added cysteine SG atoms to the unassigned atoms list to see if it
+            # is involved in post-translational bonds. But there *was* a
+            # template match for cysteine and SG was paired correctly. So don't
+            # try to assign it to bonds with other atoms in the cysteine here.
+            if atom.residue in unassigned_residues or atom in cysteine_sg:
+                continue
+            for partner in atom.residue.atoms:
+                if partner is atom:
+                    continue
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
+                                                         partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and
+                        atom not in partner.bond_partners):
+                    self.bonds.append(Bond(atom, partner))
+        # All reasonable bonds have now been added
+
+    #===================================================
+
+    def visualize(self, *args, **kwargs):
+        """Use nglview for visualization. This only works with Jupyter notebook
+        and require to install `nglview`
+
+        Examples
+        --------
+        >>> import parmed as pmd
+        >>> parm = pmd.download_PDB('1tsu')
+        >>> parm.visualize()
+
+        Parameters
+        ----------
+        args and kwargs : positional and keyword arguments given to nglview, optional
+        """
+        if self.coordinates is None:
+            raise ValueError('coordinates must not be None')
+        from nglview import show_parmed
+        return show_parmed(self, *args, **kwargs)
 
     #===================================================
 
@@ -902,7 +1109,7 @@ class Structure(object):
             else:
                 num = res.number
             struct.add_atom(copy(atom), res.name, num, res.chain,
-                            res.insertion_code)
+                            res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -931,7 +1138,8 @@ class Structure(object):
                     oval[-1].funct = val.funct
             # Now tack on the "new" types copied from `other`
             for used, typ in zip(used_types, otypcp):
-                if used: otyp.append(typ)
+                if used:
+                    otyp.append(typ)
             if hasattr(otyp, 'claim'):
                 otyp.claim()
         copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
@@ -940,52 +1148,42 @@ class Structure(object):
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.dihedrals, struct.dihedral_types,
                            self.dihedrals, self.dihedral_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
-                           'ignore_end'])
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper', 'ignore_end'])
         copy_valence_terms(struct.rb_torsions, struct.rb_torsion_types,
                            self.rb_torsions, self.rb_torsion_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper',
-                           'ignore_end'])
-        copy_valence_terms(struct.urey_bradleys, struct.urey_bradley_types,
-                           self.urey_bradleys, self.urey_bradley_types,
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.impropers, struct.improper_types,
-                           self.impropers, self.improper_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4'])
-        copy_valence_terms(struct.cmaps, struct.cmap_types,
-                           self.cmaps, self.cmap_types,
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'improper', 'ignore_end'])
+        copy_valence_terms(struct.urey_bradleys, struct.urey_bradley_types, self.urey_bradleys,
+                           self.urey_bradley_types, ['atom1', 'atom2'])
+        copy_valence_terms(struct.impropers, struct.improper_types, self.impropers,
+                           self.improper_types, ['atom1', 'atom2', 'atom3', 'atom4'])
+        copy_valence_terms(struct.cmaps, struct.cmap_types, self.cmaps, self.cmap_types,
                            ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
         copy_valence_terms(struct.trigonal_angles, struct.trigonal_angle_types,
                            self.trigonal_angles, self.trigonal_angle_types,
                            ['atom1', 'atom2', 'atom3', 'atom4'])
-        copy_valence_terms(struct.out_of_plane_bends,
-                           struct.out_of_plane_bend_types,
-                           self.out_of_plane_bends,
-                           self.out_of_plane_bend_types,
+        copy_valence_terms(struct.out_of_plane_bends, struct.out_of_plane_bend_types,
+                           self.out_of_plane_bends, self.out_of_plane_bend_types,
                            ['atom1', 'atom2', 'atom3', 'atom4'])
         copy_valence_terms(struct.pi_torsions, struct.pi_torsion_types,
                            self.pi_torsions, self.pi_torsion_types,
-                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5',
-                            'atom6'])
-        copy_valence_terms(struct.stretch_bends, struct.stretch_bend_types,
-                           self.stretch_bends, self.stretch_bend_types,
-                           ['atom1', 'atom2', 'atom3'])
+                           ['atom1', 'atom2', 'atom3', 'atom4', 'atom5', 'atom6'])
+        copy_valence_terms(struct.stretch_bends, struct.stretch_bend_types, self.stretch_bends,
+                           self.stretch_bend_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.torsion_torsions, struct.torsion_torsion_types,
                            self.torsion_torsions, self.torsion_torsion_types,
                            ['atom1', 'atom2', 'atom3', 'atom4', 'atom5'])
         copy_valence_terms(struct.chiral_frames, [], self.chiral_frames, [],
                            ['atom1', 'atom2', 'chirality'])
-        copy_valence_terms(struct.multipole_frames, [], self.multipole_frames,
-                           [], ['atom', 'frame_pt_num', 'vectail', 'vechead',
-                           'nvec'])
+        copy_valence_terms(struct.multipole_frames, [], self.multipole_frames, [],
+                           ['atom', 'frame_pt_num', 'vectail', 'vechead', 'nvec'])
         copy_valence_terms(struct.adjusts, struct.adjust_types, self.adjusts,
                            self.adjust_types, ['atom1', 'atom2'])
-        copy_valence_terms(struct.donors, [], self.donors, [],
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.acceptors, [], self.acceptors, [],
-                           ['atom1', 'atom2'])
-        copy_valence_terms(struct.groups, [], self.groups, [],
-                           ['atom', 'type', 'move'])
+        copy_valence_terms(struct.donors, [], self.donors, [], ['atom1', 'atom2'])
+        copy_valence_terms(struct.acceptors, [], self.acceptors, [], ['atom1', 'atom2'])
+        copy_valence_terms(struct.groups, [], self.groups, [], ['atom', 'type', 'move'])
+        struct._box = self._box
+        struct.symmetry = self.symmetry
+        struct.space_group = self.space_group
         return struct
 
     def _get_selection_array(self, selection):
@@ -1170,11 +1368,17 @@ class Structure(object):
             if len(involved_residues) == 1:
                 res = sel[0].residue
                 names = tuple(a.name for a in res)
-                if (res.name, len(res), names) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names)]].add(i)
+                charges = tuple('%.6f' % a.charge for a in res)
+                rmins = tuple('%.6f' % a.rmin for a in res)
+                epsilons = tuple('%.6f' % a.epsilon for a in res)
+                if (res.name, len(res), names, charges,
+                    rmins, epsilons) in res_molecules:
+                    counts[res_molecules[(res.name, len(res), names,
+                                          charges, rmins, epsilons)]].add(i)
                     continue
                 else:
-                    res_molecules[(res.name, len(res), names)] = len(structs)
+                    res_molecules[(res.name, len(res), names,
+                                   charges, rmins, epsilons)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
@@ -1183,6 +1387,9 @@ class Structure(object):
                                 'Residues must all be set'
                         if a1.residue.name != a2.residue.name: break
                         if a1.name != a2.name: break
+                        if '%.6f' % a1.charge != '%.6f' % a2.charge: break
+                        if '%.6f' % a1.rmin != '%.6f' % a2.rmin: break
+                        if '%.6f' % a1.epsilon != '%.6f' % a2.epsilon: break
                     else:
                         counts[j].add(i)
                         is_duplicate = True
@@ -1217,10 +1424,11 @@ class Structure(object):
 
         Parameters
         ----------
-        fname : str
-            Name of the file to save. If ``format`` is ``None`` (see below), the
-            file type will be determined based on the filename extension. If the
-            type cannot be determined, a ValueError is raised.
+        fname : str or file-like object
+            Name of the file or file-like object to save. If ``format`` is 
+            ``None`` (see below), the file type will be determined based on 
+            the filename extension. If ``fname`` is file-like object,  ``format`` 
+            must be  provided. If the type cannot be determined, a ValueError is raised.
         format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
             should be saved as. If ``None`` (default), the file type will be
@@ -1262,8 +1470,12 @@ class Structure(object):
         }
         # Basically everybody uses atom type names instead of type indexes. So
         # convert to atom type names and switch back if need be
-        if os.path.exists(fname) and not overwrite:
-            raise IOError('%s exists; not overwriting' % fname)
+        if not hasattr(fname, 'write'):
+            if os.path.exists(fname) and not overwrite:
+                raise IOError('%s exists; not overwriting' % fname)
+        else:
+            if format is None:
+                raise RuntimeError('Must provide supported format if using file-like object')
         all_ints = True
         for atom in self.atoms:
             if (isinstance(atom.type, integer_types) and
@@ -1605,15 +1817,15 @@ class Structure(object):
         Parameters
         ----------
         frame : int or 'all', optional
-            The frame number whose coordinates should be retrieved. Default is
+            The frame number whose unit cell should be retrieved. Default is
             'all'
 
         Returns
         -------
-        box : np.ndarray, shape([#,] natom, 3) or None
-            If frame is 'all', all coordinates are returned with shape
-            (#, natom, 3). Otherwise the requested frame is returned with shape
-            (natom, 3). If no coordinates exist and 'all' is requested, None is
+        box : np.ndarray, shape([#,] 6) or None
+            If frame is 'all', all unit cells are returned with shape
+            (#, 6). Otherwise the requested frame is returned with shape
+            (6,). If no unit cell exist and 'all' is requested, None is
             returned
 
         Raises
@@ -1918,12 +2130,12 @@ class Structure(object):
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
         # Rigid water only
         if constraints is None:
+            is_water = _settler(self)
             for bond in self.bonds:
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                if (bond.atom1.residue.name in SOLVENT_NAMES or
-                        bond.atom2.residue.name in SOLVENT_NAMES):
+                if is_water[bond.atom1.residue.idx]:
                     system.addConstraint(bond.atom1.idx, bond.atom2.idx,
                                          bond.type.req*length_conv)
             return
@@ -2037,9 +2249,18 @@ class Structure(object):
             force = mm.HarmonicBondForce()
         force.setForceGroup(self.BOND_FORCE_GROUP)
         # Add the bonds
+        if rigidWater:
+            is_water = _settler(self)
+        else:
+            is_water = [False for r in self.residues]
         for bond in self.bonds:
             if (bond.atom1.element == 1 or bond.atom2.element == 1) and (
                     not flexibleConstraints and constraints is app.HBonds):
+                continue
+            if not flexibleConstraints and is_water[bond.atom1.residue.idx]:
+                # is_water is False even for waters if rigidWater is False, so
+                # we can rely on is_water to be correct for our needs
+                # regardless
                 continue
             if bond.type is None:
                 raise ParameterError('Cannot find necessary parameters')
@@ -2211,7 +2432,11 @@ class Structure(object):
         """
         if not self.impropers: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.CustomTorsionForce("k*(theta-theta0)^2")
+        energy_function = 'k*dtheta_torus^2;'
+        energy_function += 'dtheta_torus = dtheta - floor(dtheta/(2*pi)+0.5)*(2*pi);'
+        energy_function += 'dtheta = theta - theta0;'
+        energy_function += 'pi = %f;' % math.pi
+        force = mm.CustomTorsionForce(energy_function)
         force.addPerTorsionParameter('k')
         force.addPerTorsionParameter('theta0')
         force.setForceGroup(self.IMPROPER_FORCE_GROUP)
@@ -2305,12 +2530,6 @@ class Structure(object):
 
         Notes
         -----
-        This method calls update_dihedral_exclusions, which might alter the
-        ``ignore_end`` attribute of some
-        :class:`parmed.topologyobjects.Dihedral` instances based on any
-        changes that might have been made to the bonds and angles since the last
-        time it was called.
-
         Subclasses of Structure for which this nonbonded treatment is inadequate
         should override this method to implement what is needed.
 
@@ -2758,6 +2977,11 @@ class Structure(object):
                                  'should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
             force.addParticle([atom.charge] + list(parms))
+        try:
+            force.finalize()
+        except AttributeError:
+            # only new versions of omm require calling finalize
+            pass
         # Set cutoff method
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomGBForce.NoCutoff)
@@ -3220,7 +3444,7 @@ class Structure(object):
         for atom in other.atoms:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                          res.insertion_code)
+                          res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3345,7 +3569,7 @@ class Structure(object):
             for atom in other.atoms:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                              res.insertion_code)
+                              res.insertion_code, res.segid)
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'])
             copy_valence_terms(other.angles, aoffset, self.angles,
@@ -3892,3 +4116,44 @@ class StructureView(object):
         return iter(self.atoms)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+def _settler(parm):
+    """ Identifies residues that can have SETTLE applied to it """
+    is_water = []
+    for r in parm.residues:
+        na = sum(1 for a in r if not isinstance(a, ExtraPoint))
+        if na != 3:
+            is_water.append(False)
+            continue
+        # Make sure we are not bonded to any other residues
+        for a in r:
+            for a2 in a.bond_partners:
+                if a2.residue is not r:
+                    is_water.append(False)
+                    break
+            else:
+                # this atom is OK
+                continue
+            # We only hit here if we hit the break above. So break here
+            break
+        else:
+            # Don't check elements, since they may not *always* be accurate.
+            # It's more likely that a 3-atom residue not bonded to any other
+            # residue is water.
+            is_water.append(True)
+    assert len(is_water) == len(parm.residues), 'Incorrect length'
+    return is_water
+
+def _res_in_templlib(res, lib):
+    """ Returns the residue template inside lib that matches res """
+    if res.name in lib:
+        return lib[res.name]
+    if len(res.name) == 3 and residue.AminoAcidResidue.has(res.name):
+        return lib[residue.AminoAcidResidue.get(res.name).abbr]
+    if residue.DNAResidue.has(res.name):
+        return lib[residue.DNAResidue.get(res.name).abbr]
+    if (residue.RNAResidue.has(res.name) and
+            residue.RNAResidue.get(res.name).abbr != 'T'):
+        return lib[residue.RNAResidue.get(res.name).abbr]
+    # Not present
+    return None

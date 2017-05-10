@@ -14,7 +14,7 @@ how ParmEd can enhance its utility for molecular modeling. It will also present
 a few examples using PyRosetta with the tools provided by ParmEd.
 
 What is PyRosetta
---------------
+-----------------
 
 Rosetta is a popular molecular modeling suite that allows scientists to model
 biomolecular systems, and has had a lot of `success in predicting experimental
@@ -31,7 +31,7 @@ Its features include:
 
 
 How does ParmEd enhance PyRosetta?
--------------------------------
+----------------------------------
 
 .. currentmodule:: parmed
 .. autosummary::
@@ -48,7 +48,6 @@ One can imagine that this functionality would be useful to easily seed
 simulations  for *ab initio* structure predictions or studies of a mutant
 protein using wildtype structures.
 
-
 Examples
 --------
 
@@ -59,3 +58,24 @@ PyRosetta :class:`Pose` please refer to the following:
     :maxdepth: 1
 
     Using PyRosetta and ParmEd to seed an OpenMM simulation <omm_rosetta>
+
+Warning
+~~~~~~~
+
+One minor complication with using PyRosetta to prepare a structure for
+simulating with OpenMM is that proline residues have virtual sites that prevent
+it from being recognized by OpenMM. If you get an error that looks like the
+following::
+
+    Traceback (most recent call last):
+      File "test.py", line 11, in <module>
+        positiveIon='Na+', negativeIon='Cl-', ionicStrength=0.1*molar)
+      File ".../python2.7/site-packages/simtk/openmm/app/modeller.py", line 372, in addSolvent
+        system = forcefield.createSystem(self.topology)
+      File ".../python2.7/site-packages/simtk/openmm/app/forcefield.py", line 785, in createSystem
+        raise ValueError('No template found for residue %d (%s).  %s' % (res.index+1, res.name, _findMatchErrors(self, res)))
+    ValueError: No template found for residue 2 (PRO).  This might mean your input topology is missing some atoms or bonds, or possibly that you are using the wrong force field.
+
+then you know that you have to strip all ``NV`` atoms (which are proline virtual
+sites) from the ``Structure``. You can do this by calling ``.strip('@NV')`` on
+your ``Structure`` prior to building the OpenMM ``System`` object.

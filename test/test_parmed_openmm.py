@@ -1,19 +1,23 @@
 """ Tests some OpenMM-specific functionality """
 from __future__ import print_function, division, absolute_import
 
+from collections import OrderedDict
 import math
-import numpy as np
-from parmed.utils.six.moves import StringIO
 import os
-import parmed as pmd
-from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 import unittest
-from utils import get_fn, mm, app, has_openmm, FileIOTestCase
-
 import warnings
 
+import numpy as np
+
+import parmed as pmd
+from parmed.utils.six.moves import StringIO
+from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
+from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
+                   TestCaseRelative, EnergyTestCase)
+
+
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
-class TestOpenMM(FileIOTestCase):
+class TestOpenMM(FileIOTestCase, EnergyTestCase):
 
     def setUp(self):
         super(TestOpenMM, self).setUp()
@@ -77,7 +81,6 @@ class TestOpenMM(FileIOTestCase):
 
     def test_load_topology(self):
         """ Tests loading an OpenMM Topology and System instance """
-        import warnings
         ommparm = app.AmberPrmtopFile(get_fn('complex.prmtop'))
         parm = load_file(get_fn('complex.prmtop'))
         system = ommparm.createSystem(implicitSolvent=app.OBC1)
@@ -85,6 +88,32 @@ class TestOpenMM(FileIOTestCase):
         self.assertEqual(len(parm.atoms), len(structure.atoms))
         self.assertEqual(len(parm.residues), len(structure.residues))
         self.assertEqual(len(parm.bonds), len(structure.bonds))
+
+    def test_load_topology_use_atom_id_as_typename(self):
+        """ Tests loading an OpenMM Topology and using Atom.id to name types """
+        ommparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        system = ommparm.createSystem(implicitSolvent=app.OBC1)
+
+        for pmd_atom, omm_atom in zip(parm.atoms, ommparm.topology.atoms()):
+            omm_atom.id = pmd_atom.type
+        structure = openmm.load_topology(ommparm.topology, system,
+                                         xyz=parm.positions)
+
+        self.assertEqual(len(parm.atoms), len(structure.atoms))
+        self.assertEqual([a.type for a in parm.atoms],
+                         [a.type for a in structure.atoms])
+        self.assertEqual(len(parm.residues), len(structure.residues))
+        self.assertEqual(len(parm.bonds), len(structure.bonds))
+
+        con1 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con2 = mm.Context(system, mm.VerletIntegrator(0.001), CPU)
+        con1.setPositions(parm.positions)
+        con2.setPositions(structure.positions)
+
+        self.check_energies(parm, con1, structure, con2)
+
+
 
     def test_load_topology_extra_bonds(self):
         """ Test loading extra bonds not in Topology """
@@ -515,11 +544,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 231)
+        self.assertEqual(len(ffxml.readlines()), 222)
         ffxml = StringIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 66)
+        self.assertEqual(len(ffxml.readlines()), 57)
 
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
@@ -533,7 +562,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                          get_fn('top_all36_prot.rtf'))
+                                              get_fn('top_all36_prot.rtf'),
+                                              get_fn('toppar_water_ions.str'))
         )
         params.write(get_fn('charmm_conv.xml', written=True),
                      provenance=dict(
@@ -541,3 +571,54 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                          Reference='MacKerrell'
                      )
         )
+
+    def test_ljforce_charmm(self):
+        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files"""
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                              get_fn('top_all36_prot.rtf'))
+        )
+        params.write(get_fn('charmm_conv_lj.xml', written=True),
+                     provenance=dict(
+                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                         Reference='MacKerrell'
+                     ),
+                     separate_ljforce=True
+        )
+
+    def test_not_write_residues_with_same_templhash(self):
+        """Test that no identical residues are written to XML, using the
+           templhasher function."""
+        # TODO add testing for multiatomic residues when support for those added
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
+            new_residues[name] = params.residues[name]
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 16)
+
+    def test_override_level(self):
+        """Test correct support for the override_level attribute of
+           ResidueTemplates and correct writing to XML tag"""
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        new_residues['K'] = params.residues['K']
+        new_residues['NA'] = params.residues['NA']
+        new_residues['K'].override_level = 1
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        output_lines = ffxml.readlines()
+        control_line1 = '  <Residue name="K" override="1">\n'
+        control_line2 = '  <Residue name="NA">\n'
+        self.assertEqual(output_lines[5], control_line1)
+        self.assertEqual(output_lines[8], control_line2)

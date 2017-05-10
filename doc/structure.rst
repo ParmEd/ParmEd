@@ -375,9 +375,10 @@ want to use the ``view`` descriptor of :class:`Structure
 
 **Let's look at the simplest form of the selection syntax -- by atom index**::
 
+    >>> from parmed import load_file
     >>> struct = load_file('4LZT.cif') # use the 4LZT.cif file in test/files/
     >>> struct
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC; NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC; NOT parametrized>
     >>> struct[0]
     <Atom N [0]; In LYS 0>
     >>> struct[10]
@@ -409,13 +410,13 @@ example below continues from the same ``struct`` we were using above::
     >>> struct['@CA']
     <Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized>
     >>> struct[':1-10']
-    <Structure 75 atoms; 10 residues; 0 bonds; NOT parametrized>
+    <Structure 75 atoms; 10 residues; 75 bonds; NOT parametrized>
     >>> struct[':1-10@CA,CB']
-    <Structure 19 atoms; 10 residues; 0 bonds; NOT parametrized>
+    <Structure 19 atoms; 10 residues; 9 bonds; NOT parametrized>
     >>> struct[':10<@5']
-    <Structure 49 atoms; 13 residues; 0 bonds; NOT parametrized>
+    <Structure 49 atoms; 13 residues; 43 bonds; NOT parametrized>
     >>> struct[':10<:5']
-    <Structure 88 atoms; 13 residues; 0 bonds; NOT parametrized>
+    <Structure 88 atoms; 13 residues; 84 bonds; NOT parametrized>
 
 **Now let's look at mask arrays**.
 
@@ -446,7 +447,7 @@ ParmEd will simply interpret that array as a selection array, which may lead to
 unexpected results, as seen below::
 
     >>> struct['A',:,df.name == 'CA']
-    <Structure 409 atoms; 274 residues; 0 bonds; NOT parametrized>
+    <Structure 409 atoms; 274 residues; 135 bonds; NOT parametrized>
 
 While you might expect this to select only the ``CA`` atoms (since all residues
 are in chain A), the key is that ``df.name == 'CA'`` is interpreted as a
@@ -491,14 +492,15 @@ we defined above::
     >>> struct[10:20:2]
     <Structure 5 atoms; 2 residues; 0 bonds; NOT parametrized>
     >>> struct[0,10:20:2] # note, this is the 10th to 20th atom of the 1st residue!
+    <Structure 0 atoms; 0 residues; 0 bonds; NOT parametrized>
     >>> struct[:,0] # First atom of every residue
     <Structure 274 atoms; 274 residues; 0 bonds; NOT parametrized>
     >>> struct['A',:,:] # All atoms in chain A
-    <Structure 1164 atoms; 274 residues; 0 bonds; NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; NOT parametrized>
     >>> struct[:,'CA'] # All atoms named CA in all residues
     <Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized>
 
-There is so much flexiblity in the Atom selection here that we can't possibly
+There is so much flexibility in the Atom selection here that we can't possibly
 cover everything. You are encouraged to try things out!
 
 Structure views
@@ -672,15 +674,20 @@ biphenyl examples from earlier::
 The :func:`load_file` function automatically determines the format of the file
 whose name is passed as an argument. The following formats are currently
 recognized and result in the instantiation of either a :class:`Structure
-<parmed.structure.Structure>`. or one of its subclasses:
+<parmed.structure.Structure>` or one of its subclasses:
 
 1. PDB
 2. PDBx/mmCIF
-3. Gromacs GRO
-4. Gromacs topology file
-5. Amber topology file
-6. CHARMM PSF file
-7. Mol2 file
+3. PQR
+4. Gromacs GRO
+5. Gromacs topology file
+6. Amber topology file
+7. CHARMM PSF file
+8. CHARMM coordinate file
+9. Mol2 file
+10. PyRosetta pose
+11. OpenMM Topology object
+12. Tinker XYZ file
 
 Here, we will focus on instantiating a :class:`Structure
 <parmed.structure.Structure>` instance from PDB and

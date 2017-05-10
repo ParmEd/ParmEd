@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set -ex
 
 do_coverage() {
     echo "Combining coverage data"
@@ -14,7 +14,8 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
 fi
-sh devtools/travis-ci/pyflakes_check.sh
+sh devtools/ci/pyflakes_check.sh
+echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"
 if [ "$PYTHON_VERSION" = "pypy" ]; then
@@ -32,9 +33,14 @@ else
              --timer-filter=warning,error .
 fi
 test -z `which coverage 2>/dev/null` || do_coverage
-echo "Running coveralls"
-if [ -z "$MINIMAL_PACKAGES" -a "$PYTHON_VERSION" != 'pypy' ]; then
-    # Only run coveralls on builds that test everything
-    coveralls
-fi
+#echo "Running coveralls"
+#if [ -z "$MINIMAL_PACKAGES" -a "$PYTHON_VERSION" != 'pypy' ]; then
+#    # Only run coveralls on builds that test everything
+#    coveralls
+#fi
 echo "Done!"
+
+# Workaround for annoying Travis failure on Macs
+shell_session_update() {
+  echo "Faking shell_session_update"
+}

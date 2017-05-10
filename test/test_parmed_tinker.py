@@ -11,8 +11,8 @@ from parmed.utils.six.moves import zip
 get_fn = utils.get_fn
 
 class TestTinkerFiles(unittest.TestCase):
-    
-    def testParameterFile(self):
+
+    def test_parameter_file(self):
         """ Tests parsing TINKER parameter files """
         param = parameterfile.AmoebaParameterSet(get_fn('amoeba09.prm'))
         attributes = {'angle-sextic': 2.2e-08, 'direct-13-scale': 1.0,
@@ -55,7 +55,7 @@ class TestTinkerFiles(unittest.TestCase):
 
         self.assertEqual(len(param.opbends), 35)
         self.assertAlmostEqual(param.opbends['60-62-0-0'].k, 107.9)
-        
+
         self.assertEqual(len(param.torsion_torsions), 0)
 
         self.assertEqual(len(param.urey_bradleys), 1)
@@ -65,7 +65,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(len(param.multipoles), 17)
         self.assertTrue(not any(param.multipoles['2-0-0'].potential_terms))
 
-    def testAnalout(self):
+    def test_analout(self):
         """ Tests parsing Amber-style Tinker analout files """
         analout = system.TinkerAnalout(get_fn('jac.analout'))
         self.assertEqual(len(analout.atom_list), 23558)
@@ -93,11 +93,11 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(analout.multipole_list[5].moment,
                          [0.2124, 0.0, 0.0, -0.1249, 0.03622, 0.0, -0.01437,
                           0.0, 0.0, -0.02185])
-        
+
         self.assertEqual(analout.pitors_list[5].atom1.type, 9)
         self.assertEqual(len(analout.pair12_list), 16569)
-    
-    def testXyz(self):
+
+    def test_xyz(self):
         """ Tests parsing Tinker XYZ files """
         self.assertTrue(tinkerfiles.XyzFile.id_format(get_fn('nma.xyz')))
         self.assertTrue(tinkerfiles.XyzFile.id_format(get_fn('2igd_924wat.xyz')))
@@ -112,6 +112,7 @@ class TestTinkerFiles(unittest.TestCase):
         self.assertEqual(xyz.atoms[-1].type, '248')
         xyz = pmd.load_file(get_fn('2igd_924wat.xyz'), get_fn('2igd_924wat.pdb'))
         pdb = pmd.load_file(get_fn('2igd_924wat.pdb'))
+        xyz2 = pmd.load_file(get_fn('2igd_924wat.xyz'))
         self.assertEqual(len(pdb.atoms), len(xyz.atoms))
         self.assertEqual(len(pdb.residues), len(xyz.residues))
         for r1, r2 in zip(pdb.residues, xyz.residues):
@@ -119,8 +120,15 @@ class TestTinkerFiles(unittest.TestCase):
             self.assertEqual(r1.chain, r2.chain)
             self.assertEqual(r1.name, r2.name)
             self.assertEqual(r1.insertion_code, r2.insertion_code)
+        # Make sure NA ions are atomic number of sodium
+        for atom in xyz.view['NA',:].atoms:
+            self.assertEqual(atom.atomic_number, pmd.periodic_table.AtomicNum['Na'])
+        # Now make sure that NA ions are atomic number of sodium even if we
+        # don't load a PDB file
+        for atom in xyz2.view[:,'Na+']:
+            self.assertEqual(atom.atomic_number, pmd.periodic_table.AtomicNum['Na'])
 
-    def testDyn(self):
+    def test_dyn(self):
         """ Tests parsing Tinker DYN files """
         dyn = tinkerfiles.DynFile(get_fn('nma.dyn'))
         self.assertEqual(dyn.natom, 2466)

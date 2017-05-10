@@ -117,7 +117,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
-    def write(self, dest, provenance=None, write_unused=True):
+    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False, improper_dihedrals_ordering='default'):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -151,6 +151,18 @@ class OpenMMParameterSet(ParameterSet):
             templates remaining and parameters including those atom types will
             not be written. A ParameterWarning is issued if any such residues are
             found in a).
+        separate_ljforce : bool
+            If True will use a separate LennardJonesForce to create a
+            CostumNonbondedForce to compute L-J interactions. It will set sigma
+            to 1 and epsilon to 0 in the NonbondedForce so that the
+            NonbondedForce  only calculates the electrostatic contribution. It
+            should be set to True when converting a CHARMM force field file that
+            doesn't have pair-specific  L-J modifications (NBFIX in CHARMM) so
+            that the ffxml conversion is compatible with the main charmm36.xml file.
+            Note:
+            ----
+            When pair-specific L-J modifications are present (NBFIX in CHARMM), this
+            behavior is always present and this flag is ignored.
 
         Notes
         -----
@@ -188,12 +200,13 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
-            self._write_omm_dihedrals(dest, skip_types)
+            self._write_omm_dihedrals(dest, skip_types, improper_dihedrals_ordering)
             self._write_omm_impropers(dest, skip_types)
 #           self._write_omm_rb_torsions(dest, skip_types)
             self._write_omm_cmaps(dest, skip_types)
             self._write_omm_scripts(dest, skip_types)
-            self._write_omm_nonbonded(dest, skip_types)
+            self._write_omm_nonbonded(dest, skip_types, separate_ljforce)
+            self._write_omm_LennardJonesForce(dest, skip_types, separate_ljforce)
         finally:
             dest.write('</ForceField>\n')
             if own_handle:
@@ -213,6 +226,14 @@ class OpenMMParameterSet(ParameterSet):
                 for atom in residue.atoms:
                     keep_types.add(atom.type)
         return {typ for typ in self.atom_types if typ not in keep_types}
+
+    @staticmethod
+    def _templhasher(residue):
+        if len(residue.atoms) == 1:
+            atom = residue.atoms[0]
+            return hash((atom.atomic_number, atom.type, atom.charge))
+        # TODO implement hash for polyatomic residues
+        return id(residue)
 
     def _write_omm_provenance(self, dest, provenance):
         dest.write(' <Info>\n')
@@ -247,21 +268,30 @@ class OpenMMParameterSet(ParameterSet):
             if name in skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             if atom_type.atomic_number == 0:
-                element = ""
+                dest.write('  <Type name="%s" class="%s" mass="%s"/>\n'
+                           % (name, name, atom_type.mass)
+                           )
             else:
                 element = Element[atom_type.atomic_number]
-            dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
-                       % (name, name, element, atom_type.mass)
-                       )
+                dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
+                           % (name, name, element, atom_type.mass)
+                          )
         dest.write(' </AtomTypes>\n')
 
     def _write_omm_residues(self, dest, skip_residues):
         if not self.residues: return
+        written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
-            if not isinstance(residue, ResidueTemplate) or name in skip_residues:
-                continue
-            dest.write('  <Residue name="%s">\n' % residue.name)
+            if name in skip_residues: continue
+            templhash = OpenMMParameterSet._templhasher(residue)
+            if templhash in written_residues: continue
+            written_residues.add(templhash)
+            if residue.override_level == 0:
+                dest.write('  <Residue name="%s">\n' % residue.name)
+            else:
+                dest.write('  <Residue name="%s" override="%d">\n' % (residue.name,
+                           residue.override_level))
             for atom in residue.atoms:
                 dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
@@ -308,12 +338,15 @@ class OpenMMParameterSet(ParameterSet):
                        (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
         dest.write(' </HarmonicAngleForce>\n')
 
-    def _write_omm_dihedrals(self, dest, skip_types):
+    def _write_omm_dihedrals(self, dest, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
         # The from_structure method ensures that, even if the containing
         # Structure has separate dihedral entries for each torsion
-        dest.write(' <PeriodicTorsionForce>\n')
+        if improper_dihedrals_ordering == 'default':
+            dest.write(' <PeriodicTorsionForce>\n')
+        else:
+            dest.write(' <PeriodicTorsionForce ordering="%s">\n' % improper_dihedrals_ordering)
         diheds_done = set()
         pconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -422,7 +455,7 @@ class OpenMMParameterSet(ParameterSet):
             )
         dest.write(' </CmapTorsionForce>\n')
 
-    def _write_omm_nonbonded(self, dest, skip_types):
+    def _write_omm_nonbonded(self, dest, skip_types, separate_ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -466,6 +499,10 @@ class OpenMMParameterSet(ParameterSet):
                 sigma = 1.0
                 epsilon = 0.0
 
+            if self.nbfix_types or separate_ljforce:
+                # turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions
+                sigma = 1.0
+                epsilon = 0.0
             # Ensure we don't have sigma = 0
             if (sigma == 0.0):
                 if (epsilon == 0.0):
@@ -478,15 +515,63 @@ class OpenMMParameterSet(ParameterSet):
                        (name, sigma, abs(epsilon)))
         dest.write(' </NonbondedForce>\n')
 
+    def _write_omm_LennardJonesForce(self, dest, skip_types, separate_ljforce):
+        if not self.nbfix_types and not separate_ljforce: return
+        # Convert Conversion factors for writing in natural OpenMM units
+        length_conv = u.angstrom.conversion_factor_to(u.nanometer)
+        ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+
+        scnb = set()
+        for key in self.dihedral_types:
+            dt = self.dihedral_types[key]
+            for t in dt:
+                if t.scnb: scnb.add(t.scnb)
+        if len(scnb) > 1:
+            raise NotImplementedError('Cannot currently handle mixed 1-4 '
+                    'scaling: L-J Scaling factors %s detected' %
+                    (', '.join([str(x) for x in scnb])))
+        if len(scnb) > 0:
+            lj14scale = 1.0 / scnb.pop()
+        else:
+            lj14scale = 1.0 / self.default_scnb
+
+        # write L-J records
+        dest.write(' <LennardJonesForce lj14scale="%s">\n' % lj14scale)
+        for name, atom_type in iteritems(self.atom_types):
+            if name in skip_types: continue
+            if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
+                sigma = atom_type.sigma * length_conv  # in md_unit_system
+                epsilon = atom_type.epsilon * ene_conv # in md_unit_system
+            else:
+                # Dummy atom
+                sigma = 1.0
+                epsilon = 0.0
+
+            # Ensure we don't have sigma = 0
+            if (sigma == 0.0):
+                if (epsilon == 0.0):
+                    sigma = 1.0 # reset sigma = 1
+                else:
+                    raise ValueError("For atom type '%s', sigma = 0 but "
+                                     "epsilon != 0." % name)
+
+            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
+                       (name, sigma, abs(epsilon)))
+
+        # write NBFIX records
+        for (atom_types, value) in iteritems(self.nbfix_types):
+            emin = value[0] * ene_conv
+            rmin = value[1] * length_conv
+            # convert to sigma
+            sigma = 2 * rmin/(2**(1.0/6))
+            dest.write('  <NBFixPair type1="%s" type2="%s" sigma="%s" epsilon="%s"/>\n' %
+                       (atom_types[0], atom_types[1], sigma, emin))
+        dest.write(' </LennardJonesForce>\n')
+
+
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported
         # options are specified
         if self.combining_rule == 'geometric':
             raise NotImplementedError('Geometric combining rule not currently '
                                       'supported.')
-        if len(self.nbfix_types) > 0:
-            for (a1, a2), nbfix in iteritems(self.nbfix_types):
-                if any((a in skip_types for a in (a1, a2))):
-                    continue
-                else:
-                    raise NotImplementedError('NBFIX not currently supported')

@@ -1,9 +1,10 @@
 """ Various utilities used by ParmEd that don't really fit elsewhere """
 from parmed.exceptions import MoleculeError as _MoleculeError
+from parmed.utils.pairlist import find_atom_pairs
 import sys
 
 __all__ = ['six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY',
-           'canonical_improper_order']
+           'canonical_improper_order', 'find_atom_pairs']
 
 PYPY = '__pypy__' in sys.builtin_module_names
 
@@ -76,12 +77,12 @@ def canonical_improper_order(atom1, atom2, atom3, atom4, center=1):
     """
     Controls how improper torsion keys are generated from Structures.
     Different programs have different conventions as far as where the
-    "central" atom is placed. This function should be overridden for each
-    subclass
+    "central" atom is placed.
 
-    The default is to *always* put the central atom first, and assume it
-    comes first already if no central atom is detected. A central atom is
-    defined as one that is bonded to the other 3
+    Note, different programs use different conventions for where the "central"
+    atom comes in the overall torsion ordering. CHARMM puts the central atom
+    first, whereas AMBER puts the central atom third. A central atom is defined
+    as the one that is bonded to the other 3.
 
     Parameters
     ----------
@@ -116,6 +117,7 @@ def canonical_improper_order(atom1, atom2, atom3, atom4, center=1):
             central = atom
             break
     else:
+        # TODO use "center" keyword to determine which atom is center
         # No atom identified as "central". Just assume that the third is
         central = atom3
         others = sorted([atom1, atom2, atom4])

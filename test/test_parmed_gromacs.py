@@ -3,8 +3,13 @@ Tests the functionality in the parmed.gromacs package
 """
 from contextlib import closing
 import copy
-import numpy as np
+import sys
 import os
+import unittest
+import warnings
+
+import numpy as np
+
 from parmed import (load_file, Structure, ExtraPoint, DihedralTypeList, Atom,
                     ParameterSet, Bond, NonbondedException, DihedralType,
                     RBTorsionType, Improper, Cmap, UreyBradley, BondType,
@@ -13,14 +18,12 @@ from parmed.charmm import CharmmParameterSet
 from parmed.exceptions import GromacsWarning, GromacsError, ParameterError
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
-from parmed import gromacs as gmx
+from parmed import gromacs as gmx, periodic_table
 from parmed.topologyobjects import UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
-import unittest
 from utils import (get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS,
                    create_random_structure)
 import utils
-import warnings
 
 @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
@@ -197,6 +200,28 @@ class TestGromacsTop(FileIOTestCase):
                 get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
         self._charmm27_checks(top)
+
+    def test_write_with_unicode_escape(self):
+        """ Tests writing a .top when sys.argv includes \n in a string"""
+        top = load_file(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
+        sys.argv.append('foo\nbar')
+        GromacsTopologyFile.write(top, get_fn('foobar.top'))
+        with open(get_fn('foobar.top')) as fh:
+            for _ in range(15):
+                assert fh.readline().startswith(';')
+        sys.argv.remove('foo\nbar')
+
+    def test_moleculetype_distinction(self):
+        """ Tests moleculetype distinction for different parameters """
+        parm = load_file(get_fn('different_molecules.parm7'))
+        parm.save(get_fn('different_molecules.top', written=True),
+                  format='gromacs', overwrite=True)
+        top = load_file(get_fn('different_molecules.top', written=True))
+        # Make sure all atoms have the same parameters
+        for a1, a2 in zip(parm.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertAlmostEqual(a1.charge, a2.charge, places=4)
 
     def _check_ff99sbildn(self, top):
         self.assertEqual(len(top.atoms), 4235)
@@ -1057,6 +1082,15 @@ class TestGromacsGro(FileIOTestCase):
         self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(fn))
         f = StringIO('Gromacs title line\n notanumber\nsome line\n')
         self.assertRaises(GromacsError, lambda: GromacsGroFile.parse(f))
+
+    def test_gro_elements_bonds(self):
+        """ Tests improved element and bond assignment in GRO files """
+        gro = GromacsGroFile.parse(
+                os.path.join(get_fn('07.DHFR-Liquid-NoPBC'), 'conf.gro')
+        )
+        self.assertGreater(len(gro.bonds), 0)
+        for atom in gro.view['NA', :].atoms:
+            self.assertEqual(atom.atomic_number, periodic_table.AtomicNum['Na'])
 
     def test_read_gro_file(self):
         """ Tests reading GRO file """

@@ -7,7 +7,7 @@ from contextlib import closing
 import numpy as np
 from parmed.exceptions import PDBError, PDBWarning
 from parmed.formats.registry import FileFormatType
-from parmed.formats.pdb import _standardize_resname, PDBFile
+from parmed.formats.pdb import _standardize_resname, PDBFile, _is_hetatm
 from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, ExtraPoint
@@ -89,7 +89,7 @@ class PQRFile(object):
     #===================================================
 
     @staticmethod
-    def parse(filename):
+    def parse(filename, skip_bonds=True):
         """ Read a PQR file and return a populated `Structure` class
 
         Parameters
@@ -99,6 +99,11 @@ class PQRFile(object):
             over the lines of a PQR. Compressed file names can be specified and
             are determined by file-name extension (e.g., file.pqr.gz,
             file.pqr.bz2)
+        skip_bonds : bool, optional
+            If True, skip trying to assign bonds. This can save substantial time
+            when parsing large files with non-standard residue names. However,
+            no bonds are assigned. This is OK if, for instance, the PQR file is
+            being parsed simply for its coordinates. Default is False.
 
         Returns
         -------
@@ -206,6 +211,8 @@ class PQRFile(object):
             if own_handle: fileobj.close()
 
         struct.unchange()
+        if not skip_bonds:
+            struct.assign_bonds()
         if coordinates:
             if len(coordinates) != 3*len(struct.atoms):
                 raise PDBError('bad number of atoms in some PQR models')
@@ -250,6 +257,7 @@ class PQRFile(object):
             own_handle = True
         atomrec = ('ATOM  %5d %-3s  %-3s %1s %3d    %7.3f %7.3f %7.3f %8.4f '
                    '%8.4f\n')
+        hetatomrec = atomrec.replace('ATOM  ', 'HETATM')
         if struct.box is not None:
             dest.write('CRYST1 %8.3f %8.3f %8.3f %6.2f %6.2f %6.2f\n' % (
                     struct.box[0], struct.box[1], struct.box[2], struct.box[3],
@@ -267,7 +275,7 @@ class PQRFile(object):
         if standard_resnames:
             standardize = lambda x: _standardize_resname(x)
         else:
-            standardize = lambda x: x
+            standardize = lambda x: (x, _is_hetatm(x))
         last_number = 0
         last_rnumber = 0
         for model, coord in enumerate(coords):
@@ -295,10 +303,14 @@ class PQRFile(object):
                     else:
                         aname = atom.name
                     xyz = coord[atom.idx]
-                    dest.write(atomrec % (anum, aname, standardize(res.name),
-                                          res.chain, rnum, xyz[0], xyz[1],
-                                          xyz[2], atom.charge,
-                                          atom.solvent_radius))
+                    resname, hetatm = standardize(res.name)
+                    if hetatm:
+                        rec = hetatomrec
+                    else:
+                        rec = atomrec
+                    dest.write(rec % (anum, aname, resname, res.chain, rnum,
+                                      xyz[0], xyz[1], xyz[2], atom.charge,
+                                      atom.solvent_radius))
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 

@@ -70,6 +70,11 @@ class ResidueTemplate(object):
         atom of this residue when this residue is the last in a chain
     groups : list of list(:class:`Atom`)
         If set, each group is a list of Atom instances making up each group
+    override_level : integer
+        For use with OpenMM ResidueTemplates. If OpenMM ForceField is given multiple
+        identically-matching residue templates with the same names it choses
+        (overrides with) the one with the highest override_level
+        (overrideLevel in OpenMM). Default is 0.
     """
 
     def __init__(self, name=''):
@@ -79,11 +84,12 @@ class ResidueTemplate(object):
         self.head = None
         self.tail = None
         self.connections = []
-        self._atomnames = set()
         self.type = UNKNOWN
         self.first_patch = None
         self.last_patch = None
         self.groups = []
+        self.override_level = 0
+        self._map = dict()
 
     def __repr__(self):
         if self.head is not None:
@@ -98,6 +104,10 @@ class ResidueTemplate(object):
                     type(self).__name__, self.name, len(self.atoms),
                     len(self.bonds), head, tail)
 
+    @property
+    def map(self):
+        return self._map
+
     def add_atom(self, atom):
         """ Adds an atom to this residue template
 
@@ -111,13 +121,13 @@ class ResidueTemplate(object):
         ValueError if ``atom`` has the same name as another atom in this
         residue already
         """
-        if atom.name in self._atomnames:
+        if atom.name in self._map:
             raise ValueError('Residue already has atom named %s' % atom.name)
         atom.residue = self
         self.atoms.append(atom)
-        self._atomnames.add(atom.name)
+        self._map[atom.name] = atom
 
-    def add_bond(self, atom1, atom2):
+    def add_bond(self, atom1, atom2, order=1.0):
         """ Adds a bond between the two provided atoms in the residue
 
         Parameters
@@ -130,6 +140,14 @@ class ResidueTemplate(object):
             The other atom in the bond. It must be in the ``atoms`` list of this
             ResidueTemplate. It can also be the atom index (index from 0) of the
             atom in the bond.
+        order : float
+            The bond order of this bond. Bonds are classified as follows:
+                1.0 -- single bond
+                2.0 -- double bond
+                3.0 -- triple bond
+                1.5 -- aromatic bond
+                1.25 -- amide bond
+            Default is 1.0
 
         Raises
         ------
@@ -153,7 +171,7 @@ class ResidueTemplate(object):
             raise RuntimeError('Both atoms must belong to template.atoms')
         # Do not add the same bond twice
         if atom1 not in atom2.bond_partners:
-            self.bonds.append(Bond(atom1, atom2))
+            self.bonds.append(Bond(atom1, atom2, order=order))
 
     @classmethod
     def from_residue(cls, residue):
@@ -217,10 +235,8 @@ class ResidueTemplate(object):
         if isinstance(atom, Atom):
             return atom in self.atoms
         if isinstance(atom, str):
-            for a in self.atoms:
-                if a.name == atom:
-                    return True
-        return False
+            return atom in self._map
+        raise AssertionError('Should not be here!')
 
     def __copy__(self):
         other = type(self)(name=self.name)
@@ -570,15 +586,20 @@ class ResidueTemplateContainer(list):
             # See if we need to decorate the termini names
             if rt.head is None and rt.tail is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
-                    rt.name = 'N%s' % rt.name
+                    if len(rt.name) != 4 or rt.name[0] != 'N':
+                        rt.name = 'N%s' % rt.name
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
-                    rt.name = '%s5' % rt.name
+                    if rt.name[-1] != '5':
+                        rt.name = '%s5' % rt.name
             elif rt.tail is None and rt.head is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
-                    rt.name = 'C%s' % rt.name
+                    if len(rt.name) != 4 or rt.name[0] != 'C':
+                        rt.name = 'C%s' % rt.name
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
-                    rt.name = '%s3' % rt.name
+                    if rt.name[-1] != '3':
+                        rt.name = '%s3' % rt.name
             inst.append(rt)
+        inst.box = struct.box
         return inst
 
     def __getitem__(self, value):
@@ -739,4 +760,3 @@ class ResidueTemplateContainer(list):
             AmberOFFLibrary.write(self.to_library(), fname, **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
-

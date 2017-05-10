@@ -222,7 +222,9 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Error processing boundbox table entries')
         else:
             if hasbox > 0:
-                angle *= RAD_TO_DEG
+                if angle < 3.15:
+                    # No box is this acute -- must be in radians
+                    angle *= RAD_TO_DEG
                 container.box = [a, b, c, angle, angle, angle]
         # Get the child sequence entry
         line = fileobj.readline()
@@ -367,7 +369,6 @@ class AmberOFFLibrary(object):
                 container[i].type = SOLVENT
             elif typ != '?':
                 warnings.warn('Unknown residue type "%s"' % typ, AmberWarning)
-# TODO delete
             if nres > 1:
                 container[i].name = resname
         # Get the residues sequence table
@@ -500,10 +501,12 @@ class AmberOFFLibrary(object):
         if any(len(r) > 1 for r in res):
             dest.write('!entry.%s.unit.connectivity table  int atom1x  '
                        'int atom2x  int flags\n' % res.name)
+            base = 1
             for r in res:
                 for bond in r.bonds:
-                    dest.write(' %d %d 1\n' % (bond.atom1.idx+1,
-                                               bond.atom2.idx+1))
+                    dest.write(' %d %d 1\n' % (bond.atom1.idx+base,
+                                               bond.atom2.idx+base))
+                base += len(r)
         dest.write('!entry.%s.unit.hierarchy table  str abovetype  int '
                    'abovex  str belowtype  int belowx\n' % res.name)
         c = 1
@@ -521,15 +524,17 @@ class AmberOFFLibrary(object):
                 dest.write(' %.6g %.6g %.6g\n' % (atom.xx, atom.xy, atom.xz))
         dest.write('!entry.%s.unit.residueconnect table  int c1x  int c2x  '
                    'int c3x  int c4x  int c5x  int c6x\n' % res.name)
+        c = 1
         for r in res:
-            # Make the CONECT1 and 0 default to 1 so that the TREE gets set
-            # correctly by tleap. Not used for anything else...
-            conn = [1, 1, 0, 0, 0, 0]
+            # Make the CONECT1 and 0 default to first and last atom so that the
+            # TREE gets set correctly by tleap. Not used for anything else...
+            conn = [c, c+len(r)-1, 0, 0, 0, 0]
             if r.head is not None: conn[0] = r.head.idx + 1
             if r.tail is not None: conn[1] = r.tail.idx + 1
-            for i, at in enumerate(r.connections):
+            for i, at in enumerate(r.connections[:4]):
                 conn[i+2] = at.idx + 1
             dest.write(' %d %d %d %d %d %d\n' % tuple(conn))
+            c += len(r)
         dest.write('!entry.%s.unit.residues table  str name  int seq  int '
                    'childseq  int startatomx  str restype  int imagingx\n' %
                    res.name)
@@ -548,7 +553,7 @@ class AmberOFFLibrary(object):
                               AmberWarning)
                 typ = '?'
             dest.write(' "%s" %d %d %d "%s" %d\n' % (r.name, i+1, 1+len(r), c,
-                       typ, _imaging_atom(r)))
+                       typ, _imaging_atom(r)+c))
             c += len(r)
         dest.write('!entry.%s.unit.residuesPdbSequenceNumber array int\n' %
                    res.name)
@@ -607,4 +612,4 @@ def _imaging_atom(res):
             masses[i] = atom.mass
     com = center_of_mass(coords, masses)
     diff = coords - com
-    return np.argmin((diff * diff).sum(axis=1)) + 1
+    return np.argmin((diff * diff).sum(axis=1))

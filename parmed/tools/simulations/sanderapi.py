@@ -23,6 +23,12 @@ def energy(parm, args, output=sys.stdout):
     """
     Compute a single-point energy using sander and print the result to the
     desired output
+
+    Parameters
+    ----------
+    parm : Structure
+    args : ArgumentList
+    output : file handler, default sys.stdout
     """
     global HAS_SANDER
     if not HAS_SANDER:
@@ -97,7 +103,7 @@ def energy(parm, args, output=sys.stdout):
             output.write('     EHbond   = %20.7f' % e.hbond)
         output.write('\nTOTAL    = %20.7f\n' % e.tot)
 
-def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
+def minimize(parm, igb, saltcon, cutoff, tol, maxcyc, disp=True, callback=None):
     """ Minimizes a snapshot. Use the existing System if it exists """
     if not HAS_SANDER:
         raise SimulationError('Could not import sander')
@@ -123,12 +129,16 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc):
         e, f = sander.energy_forces()
         return e.tot, -np.array(f)
     with sander.setup(parm, parm.coordinates, parm.box, inp):
-        options = dict(maxiter=maxcyc, disp=True, gtol=tol)
+        options = dict(maxiter=maxcyc, disp=disp, gtol=tol)
+        more_options = dict()
+        if callable(callback):
+            more_options['callback'] = callback
         results = optimize.minimize(energy_function, parm.coordinates,
                                     method='L-BFGS-B', jac=True,
-                                    options=options)
+                                    options=options,
+                                    **more_options)
         parm.coordinates = results.x
     if not results.success:
         print('Problem minimizing structure with scipy and sander:',
               file=sys.stderr)
-        print('\t' + results.message)
+        print('\t' + results.message.decode())

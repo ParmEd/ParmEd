@@ -2,14 +2,17 @@
 Useful functions for the test cases
 """
 import os
-import numpy as np
+from os.path import join, split, abspath
 import random
 import unittest
 import warnings
-from os.path import join, split, abspath
-from parmed import gromacs
+
+import numpy as np
+
+from parmed import gromacs, openmm
 from parmed.utils.six import string_types
 from parmed.utils.six.moves import zip
+
 warnings.filterwarnings('error', category=DeprecationWarning, module='parmed')
 
 try:
@@ -61,16 +64,29 @@ class TestCaseRelative(unittest.TestCase):
             if delta is None:
                 if abs(round(ratio - 1, places)) == 0:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, 10**-places, ratio)
-                )
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, 10**-places, ratio))
             else:
                 if abs(ratio - 1) < delta:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, delta, ratio))
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, delta, ratio))
+
+class EnergyTestCase(TestCaseRelative):
+
+    def check_energies(self, parm1, con1, parm2, con2):
+        ene1 = openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = openmm.utils.energy_decomposition(parm2, con2)
+
+        all_terms = set(ene1.keys()) | set(ene2.keys())
+
+        for term in all_terms:
+            if term not in ene1:
+                self.assertAlmostEqual(ene2[term], 0)
+            elif term not in ene2:
+                self.assertAlmostEqual(ene1[term], 0)
+            else:
+                self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
 class FileIOTestCase(unittest.TestCase):
 

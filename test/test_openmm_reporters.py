@@ -14,8 +14,7 @@ from parmed.openmm.reporters import (NetCDFReporter, MdcrdReporter,
 from parmed.utils.six.moves import range, zip, StringIO
 import sys
 import unittest
-from utils import (get_fn, mm, app, has_openmm, CPU, Reference, FileIOTestCase,
-                   HAS_GROMACS)
+from utils import get_fn, mm, app, has_openmm, CPU, FileIOTestCase, HAS_GROMACS
 
 amber_gas = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
 
@@ -264,7 +263,7 @@ class TestTrajRestartReporter(FileIOTestCase):
                                          nonbondedCutoff=8*u.angstroms)
         integrator = mm.LangevinIntegrator(300*u.kelvin, 5.0/u.picoseconds,
                                            1.0*u.femtoseconds)
-        sim = app.Simulation(systemsolv.topology, system, integrator, Reference)
+        sim = app.Simulation(systemsolv.topology, system, integrator, CPU)
         sim.context.setPositions(systemsolv.positions)
         sim.reporters.extend([
                 NetCDFReporter(get_fn('traj.nc', written=True), 1,

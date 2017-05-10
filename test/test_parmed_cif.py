@@ -19,6 +19,7 @@ from __future__ import print_function, division
 import sys, unittest, traceback, os
 from utils import get_fn, get_saved_fn, diff_files, FileIOTestCase
 
+import parmed as pmd
 from parmed.exceptions import PdbxSyntaxError
 from parmed.formats.pdbx import PdbxReader, PdbxWriter
 from parmed.formats.pdbx.PdbxContainers import *
@@ -116,6 +117,12 @@ class PdbxReaderTests(unittest.TestCase):
         self.assertAlmostEqual(maxR, 549.333333333)
         self.assertAlmostEqual(sumR/icount, 0.547058, delta=0.000002)
         self.assertEqual(icount, 18508)
+
+    def test_space_group(self):
+        parm_from_cif = pmd.download_CIF('2igd')
+        parm_from_pdb = pmd.download_PDB('2igd')
+        self.assertEqual(parm_from_cif.space_group, 'P 21 21 21')
+        self.assertEqual(parm_from_pdb.space_group, 'P 21 21 21')
 
 class PdbxWriterTests(FileIOTestCase):
     def setUp(self):

@@ -4,19 +4,23 @@ Tests parmed.formats package
 from __future__ import division
 import utils
 
+from copy import copy
 import numpy as np
+import parmed as pmd
 from parmed import amber, charmm, exceptions, formats, gromacs, residue
 from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
                     topologyobjects, Atom, write_PDB, write_CIF)
+from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
 from parmed.utils.six import iteritems, add_metaclass
-from parmed.utils.six.moves import zip, StringIO
+from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
+import sys
 import unittest
 from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
-                   HAS_GROMACS, FileIOTestCase)
+                   HAS_GROMACS, FileIOTestCase, create_random_structure)
 import warnings
 
 def reset_stringio(io):
@@ -24,6 +28,14 @@ def reset_stringio(io):
     io.seek(0)
     io.truncate()
     return io
+
+try:
+    import rdkit
+    has_rdkit = True
+except ImportError:
+    has_rdkit = False
+
+is_linux = sys.platform.startswith('linux')
 
 class TestFileLoader(FileIOTestCase):
     """ Tests the automatic file loader """
@@ -69,6 +81,17 @@ class TestFileLoader(FileIOTestCase):
         """ Tests automatic loading of Amber ASCII restart file """
         parm = formats.load_file(get_fn('trx.inpcrd'))
         self.assertIsInstance(parm, amber.AmberAsciiRestart)
+
+    def test_load_amber_restart_ascii_as_structure(self):
+        """ Tests automatic loading of Amber ASCII restart file to Structure """
+        parm = pmd.load_file(get_fn('ala3_solv.rst7'), structure=True)
+        inpcrd = pmd.load_file(get_fn('ala3_solv.rst7'))
+        self.assertIsInstance(parm, Structure)
+        np.testing.assert_almost_equal(parm.box, inpcrd.box)
+        np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
+        # dummy testing to assign box
+        # issue #778
+        parm.box = [0.]*6
 
     def test_load_amber_traj_ascii(self):
         """ Tests automatic loading of Amber mdcrd file """
@@ -124,6 +147,25 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 1)
         self.assertEqual(pdb.residues[0].name, 'SAM')
 
+    def test_load_pdb_with_negative_resnum(self):
+        """ Tests negative residue numbers in PDB writing """
+        # Make a random structure
+        struct = read_PDB(get_fn('4lzt.pdb'))
+        for i, residue in enumerate(struct.residues):
+            residue.number = i - 2
+        for i, atom in enumerate(struct.atoms):
+            atom.number = i - 2
+        mypdb = get_fn('negative_indexes.pdb', written=True)
+        struct.save(mypdb, renumber=False)
+        struct2 = read_PDB(mypdb)
+        self.assertEqual(len(struct.atoms), len(struct2.atoms))
+        self.assertEqual(len(struct.residues), len(struct2.residues))
+        # Now make sure the numbers are still negative
+        for i, atom in enumerate(struct2.atoms):
+            self.assertEqual(atom.number, i-2)
+        for i, residue in enumerate(struct2.residues):
+            self.assertEqual(residue.number, i-2)
+
     def test_load_cif(self):
         """ Tests automatic loading of PDBx/mmCIF files """
         cif = formats.load_file(get_fn('4LZT.cif'))
@@ -160,7 +202,7 @@ class TestFileLoader(FileIOTestCase):
                 formats.mol2.Mol2File.parse(get_fn('error.mol2'))
         )
 
-    @unittest.skipIf(not HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_load_gromacs_topology(self):
         """ Tests automatic loading of Gromacs topology file """
         top = formats.load_file(get_fn('1aki.charmm27.top'))
@@ -231,6 +273,26 @@ class TestFileLoader(FileIOTestCase):
                                 hasbox=True)
         self.assertIsInstance(crd, amber.AmberParm)
 
+    @unittest.skipUnless(has_rdkit and is_linux, "Only test load_rdkit module on Linux")
+    def test_load_sdf(self):
+        """ test load sdf format via rdkit """
+        sdffile = get_fn('test.sdf')
+        # structure = False
+        parmlist = pmd.load_file(sdffile)
+        self.assertIsInstance(parmlist, list)
+        self.assertEqual(len(parmlist[0].atoms), 34)
+        self.assertEqual(len(parmlist[1].atoms), 43)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[0].coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[0], [7.0468, -1.7307, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parmlist[1].coordinates[-1], [1.5269, 2.1331, 0.0000], decimal=3)
+        # structure = True
+        parm = pmd.load_file(sdffile, structure=True)
+        self.assertIsInstance(parm, Structure)
+        self.assertEqual(len(parm.atoms), 34)
+        np.testing.assert_almost_equal(parm.coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
+        np.testing.assert_almost_equal(parm.coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
+
 class TestPDBStructure(FileIOTestCase):
 
     def setUp(self):
@@ -252,6 +314,10 @@ class TestPDBStructure(FileIOTestCase):
     def tearDown(self):
         warnings.filterwarnings('always', category=exceptions.PDBWarning)
         FileIOTestCase.tearDown(self)
+
+    def test_pdb_anisou_inscode(self):
+        """ Tests that PDB files with ANISOU records on inscodes work """
+        download_PDB('1gdu')
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -798,6 +864,39 @@ class TestPDBStructure(FileIOTestCase):
                                    pdbfile.get_coordinates('all'))
         self._compareInputOutputPDBs(pdbfile, pdbfile2)
 
+    def test_ter_cards(self):
+        """ Tests that the addition of TER cards is correct in PDB writing """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb'))
+        pdbfile *= 5 # This should make us need 5 TER cards
+        fn = get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        with open(fn, 'r') as f:
+            self.assertEqual(sum([l.startswith('TER') for l in f]), 5)
+        # Make sure TER cards *don't* get added for water
+        pdbfile = download_PDB('4lzt')
+        pdbfile.write_pdb(fn)
+        with open(fn, 'r') as f:
+            for line in f:
+                if line.startswith('TER'):
+                    break
+            else:
+                assert False, 'No TER card found!'
+            # Make sure the rest of the atoms after this are HETATM
+            has_hetatms = False
+            for line in f:
+                self.assertFalse(line.startswith('ATOM'))
+                has_hetatms = has_hetatms or line.startswith('HETATM')
+            self.assertTrue(has_hetatms)
+
+    def test_ter_copy(self):
+        """ Test that copying a Structure preserves TER card presence """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb')) * 5
+        fn = get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        parsed = read_PDB(fn)
+        self.assertEqual(sum([r.ter for r in parsed.residues]), 5)
+        self.assertEqual(sum([r.ter for r in copy(parsed).residues]), 5)
+
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
         pdbfile = read_PDB(get_fn('bigz.pdb'))
@@ -873,6 +972,21 @@ class TestPDBStructure(FileIOTestCase):
                     residue.AminoAcidResidue.get(res.name).abbr, res.name
             )
 
+    def test_pdb_write_standard_names_water(self):
+        """ Test water residue name translation in PDB writing """
+        parm = formats.load_file(get_fn('nma.pdb'))
+        resname_set = set(res.name for res in parm.residues)
+        self.assertIn('WAT', resname_set)
+        self.assertNotIn('HOH', resname_set)
+        assert 'HOH' not in resname_set
+        output = StringIO()
+        parm.write_pdb(output, standard_resnames=True)
+        output.seek(0)
+        pdb = read_PDB(output)
+        resname_set = set(res.name for res in pdb.residues)
+        self.assertNotIn('WAT', resname_set)
+        self.assertIn('HOH', resname_set)
+
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
@@ -938,9 +1052,54 @@ class TestPDBStructure(FileIOTestCase):
         pdbfile.write_pdb(f, write_anisou=True)
         self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
 
+    def test_pdb_multimodel_parsing_bug_820(self):
+        """ Test model failing in parsing due to bug #820 in GitHub """
+        # Just make sure it does not raise an exception
+        self.assertEqual(len(download_PDB('1aaf').atoms), 893)
+
+    def test_pdb_write_symmetry_data(self):
+        """ Tests writing PDB file with symmetry data """
+        def assert_remark_290(parm, remark_290_lines):
+            output = StringIO()
+            parm.write_pdb(output)
+            output.seek(0)
+            buffer = output.read()
+            for line in remark_290_lines.split():
+                self.assertTrue(line in buffer)
+
+        # 4lzt
+        pdbfile = get_fn('4lzt.pdb')
+        parm = pmd.load_file(pdbfile)
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        # 2idg
+        parm = pmd.download_PDB('2igd')
+        remark_290_lines = """
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
+REMARK 290   SMTRY1   2 -1.000000  0.000000  0.000000       17.52500
+REMARK 290   SMTRY2   2  0.000000 -1.000000  0.000000        0.00000
+REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000       21.18500
+REMARK 290   SMTRY1   3 -1.000000  0.000000  0.000000        0.00000
+REMARK 290   SMTRY2   3  0.000000  1.000000  0.000000       20.25000
+REMARK 290   SMTRY3   3  0.000000  0.000000 -1.000000       21.18500
+REMARK 290   SMTRY1   4  1.000000  0.000000  0.000000       17.52500
+REMARK 290   SMTRY2   4  0.000000 -1.000000  0.000000       20.25000
+REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
+"""
+        assert_remark_290(parm, remark_290_lines)
+
+        self.assertRaises(ValueError, lambda: Symmetry(np.arange(100).reshape(10, 10)))
+
     def test_segid_handling(self):
         """ Test handling of CHARMM-specific SEGID identifier (r/w) """
-        pdbfile = read_PDB(self.overflow2)
+        pdbfile = read_PDB(self.overflow2, skip_bonds=True) # Big file... skip bond check
         allsegids = set(['PROA', 'PROB', 'CARA', 'CARE', 'CARC', 'CARD', 'CARB',
                          'MEMB', 'TIP3', 'POT', 'CLA'])
         foundsegids = set()
@@ -960,13 +1119,23 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_private_functions(self):
         """ Tests the private helper functions in parmed/formats/pdb.py """
-        self.assertEqual(formats.pdb._standardize_resname('ASH'), 'ASP')
-        self.assertEqual(formats.pdb._standardize_resname('CYX'), 'CYS')
-        self.assertEqual(formats.pdb._standardize_resname('RA'), 'A')
-        self.assertEqual(formats.pdb._standardize_resname('DG'), 'DG')
-        self.assertEqual(formats.pdb._standardize_resname('BLA'), 'BLA')
+        self.assertEqual(formats.pdb._standardize_resname('ASH'), ('ASP', False))
+        self.assertEqual(formats.pdb._standardize_resname('CYX'), ('CYS', False))
+        self.assertEqual(formats.pdb._standardize_resname('RA'), ('A', False))
+        self.assertEqual(formats.pdb._standardize_resname('DG'), ('DG', False))
+        self.assertEqual(formats.pdb._standardize_resname('BLA'), ('BLA', True))
+        self.assertEqual(formats.pdb._standardize_resname('WAT'), ('HOH', True))
+        self.assertEqual(formats.pdb._standardize_resname('TIP3'), ('HOH', True))
+        # Make sure standard residues return themselves
+        for res in residue.AminoAcidResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.DNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
+        for res in residue.RNAResidue.all_residues:
+            self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
     def test_deprecations(self):
+        """ Test functions that raise deprecation warnings """
         fn = get_fn('blah', written=True)
         parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
@@ -1448,6 +1617,19 @@ class TestCIFStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_CIF('illegal'))
         self.assertRaises(IOError, lambda: download_CIF('#@#%'))
 
+    def test_cif_symmetry(self):
+        """ Tests that symmetry is parsed from mmCIF files correctly """
+        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+
+    def test_cif_space_group_written_from_structure(self):
+        """ Tests CIF file writing with space groups """
+        parm = pmd.load_file(get_fn('SCM_A.pdb'))
+        self.assertEqual(parm.space_group, 'P 1 21 1')
+        written = get_fn('test.cif', written=True)
+        parm.write_cif(written)
+        parm2 = pmd.load_file(written)
+        self.assertEqual(parm2.space_group, 'P 1 21 1')
+
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
         cif = download_CIF('2koc')
@@ -1759,13 +1941,19 @@ class TestMol2File(FileIOTestCase):
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
         formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        formats.Mol2File.write(mol2, get_fn('test_multi_sep.mol2', written=True),
-                               split=True)
+        fn = get_fn('test_multi_sep.mol2', written=True)
+        formats.Mol2File.write(mol2, fn, split=True)
+        fnsq = get_fn('test_multi_sep_squashed.mol2', written=True)
+        formats.Mol2File.write(mol2, fnsq, split=True, compress_whitespace=True)
         self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
                                    get_fn('test_multi.mol2', written=True)))
-        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'),
-                                   get_fn('test_multi_sep.mol2', written=True)))
-        mol22 = formats.Mol2File.parse(get_fn('test_multi_sep.mol2', written=True))
+        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'), fn))
+        # Make sure the squashed lines all fall below 80 characters
+        with open(fnsq) as f, open(fn) as f2:
+            for line1, line2 in zip(f, f2):
+                self.assertLessEqual(len(line1), 80)
+                self.assertEqual(' '.join(line2.split()), line1.strip())
+        mol22 = formats.Mol2File.parse(fn)
         self.assertEqual(len(mol2), len(mol22))
         self.assertEqual([r.name for r in mol2], [r.name for r in mol22])
         for r1, r2 in zip(mol2, mol22):
@@ -1882,6 +2070,20 @@ class TestMol2File(FileIOTestCase):
         self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
                                    get_saved_fn('tripos9struct.mol3')))
 
+    def test_mol2_atomic_number_assignment(self):
+        """ Tests assignment of atomic numbers for mol2 files """
+        mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
+        templ = formats.Mol2File.parse(get_fn('tripos9.mol2'))
+        self.assertEqual(len(templ.atoms), len(mol2.atoms))
+        for a1, a2 in zip(mol2.atoms, templ.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+        # Now check that element assignment from GRO files (which has good
+        # element assignment routines) matches what the mol2 does
+        fn = get_fn('test.gro', written=True)
+        mol2.save(fn, overwrite=True)
+        for a1, a2 in zip(formats.load_file(fn).atoms, mol2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+
     def test_mol2_box(self):
         """ Tests parsing Mol2 file with CRYSIN section """
         mol2 = formats.load_file(get_fn('tripos3.mol2'), structure=True)
@@ -1894,6 +2096,32 @@ class TestMol2File(FileIOTestCase):
         mol2 = formats.Mol2File.parse(get_fn('duplicate_names.mol2'), structure=True)
         self.assertEqual(len(mol2.atoms), 89)
         self.assertEqual(len(mol2.bonds), 89)
+        # Make sure that atom types are used to guess element if atom name is
+        # ambiguous
+        for atom in mol2.atoms:
+            if atom.name == '****':
+                self.assertEqual(atom.atomic_number, 1)
+
+    def test_mol2_bond_order(self):
+        """ Tests that mol2 file parsing remembers bond order/type """
+        mol2 = formats.Mol2File.parse(get_fn('multimol.mol2'))[0]
+        fn = get_fn('test.mol2', written=True)
+        mol2.save(fn)
+        with open(fn, 'r') as f:
+            for line in f:
+                if line.startswith('@<TRIPOS>BOND'):
+                    break
+            # Collect all bond orders
+            bos = set()
+            for line in f:
+                if line.startswith('@<TRIPOS>'):
+                    break
+                bos.add(line.split()[3])
+        # This structure has bond orders 1, 2, am, and ar
+        self.assertEqual(bos, {'1', '2', 'am', 'ar'})
+        mol2_2 = formats.Mol2File.parse(fn)
+        for b1, b2 in zip(mol2.bonds, mol2_2.bonds):
+            self.assertEqual(b1.order, b2.order)
 
     @unittest.skipUnless(HAS_GROMACS, 'Cannot test without gromacs')
     def test_mol3_disulfide(self):

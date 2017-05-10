@@ -43,13 +43,13 @@ below (the filename argument is omitted):
 +--------------------------+--------------------------------+
 | Amber frcmod/parm.dat    | list of filenames              |
 +--------------------------+--------------------------------+
-| PDBx/mmCIF file          | None                           |
+| PDBx/mmCIF file          | ``skip_bonds``                 |
 +--------------------------+--------------------------------+
 | CHARMM coordinate file   | None                           |
 +--------------------------+--------------------------------+
 | CHARMM restart file      | None                           |
 +--------------------------+--------------------------------+
-| Gromacs GRO file         | None                           |
+| Gromacs GRO file         | ``skip_bonds``                 |
 +--------------------------+--------------------------------+
 | Gromacs topology file    | ``defines``, ``parametrize``   |
 |                          | ``xyz``, ``box``               |
@@ -60,9 +60,9 @@ below (the filename argument is omitted):
 +--------------------------+--------------------------------+
 | NetCDF trajectory file   | None                           |
 +--------------------------+--------------------------------+
-| PDB file                 | None                           |
+| PDB file                 | ``skip_bonds``                 |
 +--------------------------+--------------------------------+
-| PQR file                 | None                           |
+| PQR file                 | ``skip_bonds``                 |
 +--------------------------+--------------------------------+
 | PSF file                 | None                           |
 +--------------------------+--------------------------------+
@@ -92,6 +92,15 @@ The optional keyword arguments are described below:
   database.  If ``False``, they are not (default is ``True``).
 * ``structure`` -- If ``True``, return the Mol2/Mol3 file as a :class:`Structure
   <parmed.structure.Structure>` instance. Default is ``False``
+* ``skip_bonds`` -- If ``True``, no attempt is made to identify covalent bonds
+  between any atoms for these formats. If ``False`` (default), bonds are first
+  assigned by comparing to standard residue templates, then based on distance
+  criteria for any atom not specified within the templates. This has a
+  side-effect of improving element identification for PDB files that have no
+  element columns specified as well as substantially improving element
+  identification for ions in GRO files. You are suggested to keep the default
+  (``False``) unless you are *only* using the coordinates, in which case setting
+  ``skip_bonds`` to ``True`` will result in significantly improved performance.
 
 :func:`load_file` automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
@@ -110,8 +119,7 @@ Finally, to make it so that you can always retrieve a :class:`Structure
 <parmed.structure.Structure>` instance from file types that support returning
 one by passing the ``structure=True`` keyword to ``load_file``. If this argument
 is not supported by the resulting file type, it is simply ignored, as is the
-``natom`` and ``hasbox`` keywords (which are required arguments for the Amber
-ASCII trajectory file).
+``natom``, ``hasbox``, and ``skip_bonds`` keywords.
 
 Writing files with :meth:`Structure.save <parmed.structure.Structure.save>`
 ---------------------------------------------------------------------------
@@ -245,9 +253,9 @@ be found in the ``test/files/`` directory of the ParmEd source code::
     ... pdb = pmd.load_file('4lzt.pdb')
     >>> cif = pmd.load_file('4LZT.cif')
     >>> pdb
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized>
     >>> cif
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized>
     >>> # Load a Gromacs topology file -- only works with Gromacs installed
     ... top = pmd.load_file('1aki.ff99sbildn.top')
     >>> top
@@ -268,8 +276,8 @@ supported::
     ... pdb.save('test_pdb.cif')
     >>> # Check the resulting saved files
     ... pmd.load_file('test_parm.pdb')
-    <Structure 1654 atoms; 108 residues; 0 bonds; NOT parametrized>
+    <Structure 1654 atoms; 108 residues; 1670 bonds; NOT parametrized>
     >>> pmd.load_file('test_cif.pdb')
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized>
     >>> pmd.load_file('test_pdb.cif')
-    <Structure 1164 atoms; 274 residues; 0 bonds; PBC (triclinic); NOT parametrized>
+    <Structure 1164 atoms; 274 residues; 1043 bonds; PBC (triclinic); NOT parametrized>
