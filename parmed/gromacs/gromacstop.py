@@ -10,6 +10,10 @@ import copy
 from datetime import datetime
 import math
 import os
+try:
+    import pwd
+except ImportError:
+    pwd = None
 import re
 try:
     from string import letters
