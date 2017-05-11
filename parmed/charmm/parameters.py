@@ -779,8 +779,8 @@ class CharmmParameterSet(ParameterSet):
                     words = line.split()
                     resname = words[1].upper()
                     if resname in self.residues:
-                        warnings.warn('Replacing residue %r' %
-                                              resname, ParameterWarning)
+                        warnings.warn('Replacing residue {}'.format(resname)
+                                      , ParameterWarning)
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
@@ -811,6 +811,10 @@ class CharmmParameterSet(ParameterSet):
                             atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
+                        elif line[:6].upper() == 'DELETE':
+                            words = line.split()
+                            name = words[2].upper()
+                            res.delete.append(name)
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
@@ -854,10 +858,13 @@ class CharmmParameterSet(ParameterSet):
                                 elif tok.upper().startswith('LAST'):
                                     tpatches[resname] = val
                         elif line[:5].upper() == 'DELETE':
-                            pass
-                        elif line[:4].upper() == 'IMPR':
-                            it = iter([w.upper() for w in line.split()[1:]])
+                            words = line.split()
+                            name = words[2].upper()
+                            res.delete.append(name)
+                        elif line[:4].upper() in ('IMPR', 'IMPH'):
+                            it = iter(w.upper() for w in line.split()[1:])
                             for a1, a2, a3, a4 in zip(it, it, it, it):
+                                res._impr.append((a1, a2, a3, a4))
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):

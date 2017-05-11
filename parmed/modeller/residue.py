@@ -90,6 +90,7 @@ class ResidueTemplate(object):
         self.groups = []
         self.override_level = 0
         self._map = dict()
+        self._impr = []
 
     def __repr__(self):
         if self.head is not None:

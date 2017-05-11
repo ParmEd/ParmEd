@@ -537,6 +537,8 @@ class TestCharmmPsf(utils.FileIOTestCase):
     def test_copy_parameters(self):
         """ Tests copy_parameters option in load_parameters """
 
+        # ignore warning that two impropers match
+        warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         top.load_parameters(parmset=param22, copy_parameters=False)
         b = param22.bond_types[(top.atoms[0].type, top.atoms[1].type)]
