@@ -22,6 +22,7 @@ import parmed.unit as u
 from parmed.utils import PYPY
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
+import pickle
 import random
 import saved_outputs as saved
 import shutil
@@ -33,6 +34,10 @@ try:
     from string import letters
 except ImportError:
     from string import ascii_letters as letters
+
+def _picklecycle(obj):
+    return pickle.loads(pickle.dumps(obj))
+
 
 class TestReadParm(FileIOTestCase):
     """ Tests the various Parm file classes """
@@ -218,6 +223,16 @@ class TestReadParm(FileIOTestCase):
     def test_recalculate_lj(self):
         """ Test the AmberParm.recalculate_LJ() method """
         parm = readparm.AmberParm(get_fn('things.parm7'))
+        self._recalculate_lj_test(parm)
+
+    def test_recalculate_lj_after_pickling(self):
+        """ Test the AmberParm.recalculate_LJ() method with a pickled object """
+        parm = readparm.AmberParm(get_fn('things.parm7'))
+        parm_p = _picklecycle(parm)
+        self._recalculate_lj_test(parm_p)
+
+    def _recalculate_lj_test(self, parm):
+        """ run the tests for AmberParm.recalculate_LJ() """
         orig_LJ_A = np.array(parm.parm_data['LENNARD_JONES_ACOEF'])
         orig_LJ_B = np.array(parm.parm_data['LENNARD_JONES_BCOEF'])
         parm.recalculate_LJ()
@@ -229,6 +244,16 @@ class TestReadParm(FileIOTestCase):
     def test_detect_nbfix(self):
         """ Tests NBFIX detection for AmberParm """
         parm = readparm.AmberParm(get_fn('ash.parm7'))
+        self._detect_nbfix_test(parm)
+
+    def test_detect_nbfix_after_pickling(self):
+        """ Tests NBFIX detection for AmberParm with a pickled object """
+        parm = readparm.AmberParm(get_fn('ash.parm7'))
+        parm_p = _picklecycle(parm)
+        self._detect_nbfix_test(parm_p)
+
+    def _detect_nbfix_test(self, parm):
+        """ run the tests for NBFIX detection for AmberParm """
         self.assertFalse(parm.has_NBFIX())
         parm.parm_data['LENNARD_JONES_BCOEF'][0] = 0.0
         self.assertTrue(parm.has_NBFIX())
