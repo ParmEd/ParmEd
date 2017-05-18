@@ -2123,14 +2123,23 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
+    _AMBERPARM_ATTRS = 'LJ_types LJ_radius LJ_depth parm_data pointers'.split()
+
     def __getstate__(self):
         d = Structure.__getstate__(self)
         d.update(AmberFormat.__getstate__(self))
+        for attr in self._AMBERPARM_ATTRS:
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
         return d
 
     def __setstate__(self, d):
         AmberFormat.__setstate__(self, d)
         Structure.__setstate__(self, d)
+        for attr in self._AMBERPARM_ATTRS:
+            if attr in d:
+                setattr(self, attr, d[attr])
+
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
