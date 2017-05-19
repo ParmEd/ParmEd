@@ -159,6 +159,13 @@ class TestParmedSerialization(unittest.TestCase):
         self.assertEqual(structure.name, unpickled.name)
         self.assertIs(pmd.amber.AmberParm, type(unpickled))
 
+        for key in 'pointers LJ_types LJ_radius LJ_depth'.split():
+            self.assertEqual(hasattr(structure, key),
+                             hasattr(unpickled, key))
+            if hasattr(structure, key):
+                self.assertEqual(getattr(structure, key),
+                                 getattr(unpickled, key))
+
         # Now check that unknown_functional gets properly deserialized
         structure.unknown_functional = True
         self.assertTrue(pickle.loads(pickle.dumps(structure)).unknown_functional)
