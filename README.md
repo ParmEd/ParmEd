@@ -13,7 +13,7 @@ Badges
 Description
 ===========
 
-ParmEd is a package designed to facilitate creating and easily manipulating
+ParmEd is a great package designed to facilitate creating and easily manipulating
 molecular systems that are fully described by a common classical force field.
 Supported force fields include Amber, CHARMM, AMOEBA, and several others that
 share a similar functional form (e.g., GROMOS).
