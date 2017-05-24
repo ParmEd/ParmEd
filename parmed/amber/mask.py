@@ -361,8 +361,7 @@ class AmberMask(object):
         elif pmask1[0] == '>':
             cmp = lambda x, y: x > y
         else: # Should never execute this
-            raise MaskError('Unknown comparison criteria for distance mask: %s'
-                            % pmask1[0])
+            raise MaskError('Unknown comparison criteria for distance mask: %s' % pmask1[0])
         pmask1 = pmask1[1:]
         if pmask1[0] not in ':@': # Should never execute this
             raise MaskError('Bad distance criteria for mask: %s' % pmask1)

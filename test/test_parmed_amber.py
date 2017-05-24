@@ -1993,7 +1993,7 @@ class TestAmberMask(unittest.TestCase):
         parm = readparm.AmberParm(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
         # All atoms within 5 A of residue 8
         mask1 = mask.AmberMask(parm, ':8<@5')
-        # All atoms more than 10 A away from residue 1
+        # All atoms in any residue with at least one atom more than 10 A away from residue 1
         mask2 = mask.AmberMask(parm, ':1>:10')
 
         sel = mask1.Selection()
