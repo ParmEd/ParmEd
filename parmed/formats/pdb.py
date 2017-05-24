@@ -655,8 +655,7 @@ class PDBFile(object):
                         partner = _find_atom_index(struct, i)
                         if partner is None:
                             warnings.warn('CONECT record references non-'
-                                          'existent destination atom %d ' % i,
-                                          PDBWarning)
+                                          'existent destination atom %d ' % i, PDBWarning)
                         elif partner not in origin.bond_partners:
                             struct.bonds.append(Bond(origin, partner))
         finally:
@@ -668,8 +667,7 @@ class PDBFile(object):
             struct.assign_bonds()
 
         # Post-process some of the metadata to make it more reader-friendly
-        struct.keywords = [s.strip() for s in struct.keywords.split(',')
-                                            if s.strip()]
+        struct.keywords = [s.strip() for s in struct.keywords.split(',') if s.strip()]
         struct.journal = struct.journal.strip()
         struct.title = struct.title.strip()
 
@@ -678,8 +676,7 @@ class PDBFile(object):
             if len(coordinates) != 3*len(struct.atoms):
                 raise PDBError('bad number of atoms in some PDB models')
             all_coordinates.append(coordinates)
-        struct._coordinates = np.array(all_coordinates).reshape(
-                        (-1, len(struct.atoms), 3))
+        struct._coordinates = np.array(all_coordinates).reshape((-1, len(struct.atoms), 3))
         # process symmetry lines
         if _symmetry_lines:
             data = []
