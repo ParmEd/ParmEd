@@ -134,8 +134,7 @@ class AmberMask(object):
                     if flag > 0:
                         p = '*'
                     else:
-                        raise MaskError("AmberMask: '=' not in name "
-                                        "list syntax")
+                        raise MaskError("AmberMask: '=' not in name list syntax")
                 # If this is the end of an operand, terminate the buffer, flush
                 # it to infix, and reset flag to 0 and empty the buffer
                 if flag > 0:
@@ -210,7 +209,7 @@ class AmberMask(object):
                     n += 1
             i += 1
 
-        return infix + '_' # terminating _ for next step
+        return infix + '\n' # terminating \n for next step
 
     #======================================================
 
@@ -222,7 +221,7 @@ class AmberMask(object):
 
     def _isOperand(self, char):
         """ Determines if a character is an operand """
-        return len(char) == 1 and (char in "\\*/%-?,'.=+" or char.isalnum())
+        return len(char) == 1 and (char in "\\*/%-?,'.=+_" or char.isalnum())
 
     #======================================================
 
@@ -420,12 +419,11 @@ class AmberMask(object):
                 buffer += p
                 buffer_p += 1
                 if p == '*' and ptoken[pos-1] != '\\':
-                    if buffer_p == 1 and (pos == len(ptoken) - 1 or
-                                          ptoken[pos+1] == ','):
+                    if buffer_p == 1 and (pos == len(ptoken) - 1 or ptoken[pos+1] == ','):
                         reslist = ALL
                     elif reslist == NUMLIST:
                         reslist = NAMELIST
-                elif p.isalpha() or p in '?*':
+                elif p.isalpha() or p in '_?*':
                     reslist = NAMELIST
                 if pos == len(ptoken) - 1:
                     buffer_p = 0
@@ -448,7 +446,7 @@ class AmberMask(object):
                 if p == '*' and ptoken[pos-1] != "\\":
                     if atomlist == NUMLIST:
                         atomlist = NAMELIST
-                elif p.isalpha() or p in '?*':
+                elif p.isalpha() or p in '?*_':
                     if atomlist == NUMLIST:
                         atomlist = NAMELIST
                 elif p == '%':

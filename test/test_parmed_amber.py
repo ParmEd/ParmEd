@@ -397,6 +397,18 @@ class TestReadParm(FileIOTestCase):
         self.assertTrue(parm.has_cmap)
         self.assertEqual(parm.ptr('ifbox'), 1)
 
+    def test_chamber_eliminate_cmap(self):
+        """ Tests that CMAP flags are properly disposed of when they are deleted """
+        parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        for cmap in parm.cmaps:
+            cmap.delete()
+        del parm.cmaps[:]
+        del parm.cmap_types[:]
+        parm.remake_parm()
+        for flag in parm.parm_data:
+            self.assertFalse(flag.startswith('CHARMM_CMAP'))
+        self.assertFalse(parm.has_cmap)
+
     def test_amoeba_big(self):
         """ Test the AmoebaParm class with a large system """
         parm = readparm.AmoebaParm(get_fn('amoeba.parm7'))
@@ -2011,6 +2023,15 @@ class TestAmberMask(unittest.TestCase):
                 if within: break
             for atom in res.atoms:
                 self.assertEqual(sel[atom.idx], within)
+
+    def test_mask_underscore(self):
+        """ Test mask selection with atom name having an underscore """
+        parm = readparm.AmberParm(get_fn('ash.parm7'))
+        name = 'AT_A'
+        change(parm, 'ATOM_NAME', '@1', name).execute()
+        # Make sure a selection will grab this atom
+        mask1 = mask.AmberMask(parm, '@%s' % name)
+        self.assertEqual(list(mask1.Selected()), [0])
 
 class TestWriteFiles(FileIOTestCase):
 
