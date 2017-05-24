@@ -502,8 +502,10 @@ class ChamberParm(AmberParm):
             flags_to_delete = [flag for flag in self.flag_list if flag.startswith('CHARMM_CMAP')]
             for flag in flags_to_delete:
                 self.delete_flag(flag)
-            del self.pointers['CMAP']
-            del self.pointers['CMAP_TYPES']
+            if 'CMAP' in self.pointers:
+                del self.pointers['CMAP']
+            if 'CMAP_TYPES' in self.pointers:
+                del self.pointers['CMAP_TYPES']
             return
         # Time to transfer our CMAP types
         data = self.parm_data
