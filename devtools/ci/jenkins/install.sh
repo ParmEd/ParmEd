@@ -9,8 +9,11 @@ module load conda/jenkins || true
 # First remove the existing conda environment
 conda remove -yn ${CONDAENV} --all || true
 
-# Now create the conda environment
-conda create -yn ${CONDAENV} --no-default-packages python=${PYTHON_VERSION} --quiet
+# Now create the conda environment. Try it twice since a race condition might cause the first
+# attempt to fail
+conda create -yn ${CONDAENV} --no-default-packages python=${PYTHON_VERSION} --quiet ||
+    conda create -yn ${CONDAENV} --no-default-packages python=${PYTHON_VERSION} --quiet
+
 if [ "${label}" != "macos" ]; then
     conda config --add channels omnia
     conda config --add channels ambermd
