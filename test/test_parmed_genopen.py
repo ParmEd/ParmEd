@@ -25,8 +25,7 @@ class TestGenopen(FileIOTestCase):
         """ Tests genopen writing a normal text file """
         with closing(genopen(get_fn('tmp.txt', written=True), 'w')) as f:
             f.write(ALPHABET)
-        self.assertEqual(open(get_fn('tmp.txt', written=True), 'r').read(),
-                         ALPHABET)
+        self.assertEqual(open(get_fn('tmp.txt', written=True), 'r').read(), ALPHABET)
 
     def test_read_gzipped(self):
         """ Tests genopen reading a gzipped file """
@@ -84,8 +83,7 @@ class TestGenopen(FileIOTestCase):
             f.write(ALPHABET)
         with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
             f.write(ALPHABET)
-        self.assertEqual(open(get_fn('test.txt', written=True)).read(),
-                         ALPHABET*2)
+        self.assertEqual(open(get_fn('test.txt', written=True)).read(), ALPHABET*2)
 
     def test_append_gzip(self):
         """ Tests genopen appending a gzipped file """
