@@ -8,7 +8,7 @@ try:
 except:
     PDBFile = None
 try:
-    from rosetta import init, pose_from_sequence
+    from pyrosetta import init, pose_from_sequence
 except ImportError:
     init = pose_from_sequence = None
 
