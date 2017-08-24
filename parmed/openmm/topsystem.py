@@ -421,11 +421,24 @@ def _process_nonbonded(struct, force):
         except ZeroDivisionError:
             if q != 0:
                 raise ValueError("Can't scale charge product 0 to match %s" % q)
-            chgscale = 1
+            chgscale = None
         nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
         struct.adjust_types.append(nbtype)
     struct.adjust_types.claim()
+    # Go through all adjust_types and replace any chgscale values that are None with the first
+    # non-None value present. If all are None, set all to 1.0. This way we maximize the likelihood
+    # that all generated systems have 1 scaling factor which makes it easier to translate to other
+    # formats that may not support multiple scaling factors in electrostatic scaling (like GROMACS)
+    first_scaling_factor = 1.0
+    for adjust_type in struct.adjust_types:
+        if adjust_type.chgscale is not None:
+            first_scaling_factor = adjust_type.chgscale
+            break
+    # Now go through and set all Nones to first_scaling_factor
+    for adjust_type in struct.adjust_types:
+        if adjust_type.chgscale is None:
+            adjust_type.chgscale = first_scaling_factor
 
     # Check that all of our exceptions are accounted for
     for ai, exceptions in iteritems(bond_graph_exceptions):

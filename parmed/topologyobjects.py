@@ -4764,7 +4764,7 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
 
     def __repr__(self):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
-                type(self).__name__, self.rmin, self.epsilon, self.chgscale)
+            type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
     @_exception_to_notimplemented
     def __eq__(self, other):
