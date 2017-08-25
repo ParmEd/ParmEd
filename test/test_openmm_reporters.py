@@ -247,7 +247,7 @@ class TestTrajRestartReporter(FileIOTestCase):
         # Now test the ASCII restart file
         f = AmberAsciiRestart(get_fn('restart.rst7', written=True), 'r')
         # Compare to ncrst and make sure it's the same data
-        np.testing.assert_allclose(ncrst.coordinates, f.coordinates, rtol=1e-4)
+        np.testing.assert_allclose(ncrst.coordinates, f.coordinates, atol=1e-3)
         np.testing.assert_allclose(ncrst.velocities, f.velocities, rtol=1e-3)
         # Make sure the EnergyMinimizerReporter does not fail
         f = StringIO()
