@@ -193,6 +193,7 @@ class OpenMMParameterSet(ParameterSet):
                               'as write_unused is set to False', ParameterWarning)
         else:
             skip_residues = set()
+            skip_patches = set()
             skip_types = set()
         if self.atom_types:
             try:
@@ -200,6 +201,10 @@ class OpenMMParameterSet(ParameterSet):
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
+
+
+        self._determine_valid_patch_combinations(skip_residues)
+
         if charmm_imp:
             self._find_explicit_impropers()
         try:
@@ -207,6 +212,7 @@ class OpenMMParameterSet(ParameterSet):
             self._write_omm_provenance(dest, provenance)
             self._write_omm_atom_types(dest, skip_types)
             self._write_omm_residues(dest, skip_residues)
+            self._write_omm_patches(dest, valid_patches)
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
@@ -312,6 +318,16 @@ class OpenMMParameterSet(ParameterSet):
                 skip_residues.add(name)
         return skip_residues
 
+    def _find_unused_patches(self):
+        """
+        Set all patches as unused.
+        TODO: Fix this
+        """
+        skip_patches = set()
+        for name, residue in iteritems(self.residues):
+            skip_patches.add(name)
+        return skip_patches
+
     def _find_unused_types(self, skip_residues):
         keep_types = set()
         for name, residue in iteritems(self.residues):
@@ -397,6 +413,79 @@ class OpenMMParameterSet(ParameterSet):
             if residue.tail is not None and residue.tail is not residue.head:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
+            dest.write('  </Residue>\n')
+        dest.write(' </Residues>\n')
+
+    def _determine_valid_patch_combinations(self, skip_residues, precision=4):
+        """
+        Determine valid (permissible) combinations of patches with residues that
+        lead to integral net charges.
+
+        Populates the `valid_patches` attribute of residues,
+        `valid_residues` attribute of patches.
+
+        skip_residues : set of ResidueTemplate
+            List of residues to skip
+
+        precision : int, optional
+            Each valid patch should be produce a net charge that is integral to
+            this many decimal places.
+            Default is 4
+
+        TODO:
+        * residues and patches will need data structures to hold valid patches;
+        may be best if these are temporary since they may need to be rebuilt for each system
+
+        """
+        # Attempt to patch every residue, recording only valid combinations.
+        for residue in self.residues:
+            if name in skip_residues: continue
+            for patch in self.patches:
+                # Attempt to patch the residue.
+                patched_residue = self._apply_patch_to_residue(patch, residue)
+                # Check that the net charge is integral.
+                net_charge = patched_residue.net_charge
+                is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
+                if is_integral:
+                    residue.valid_patches.append(patch)
+                    patch.valid_residues.append(residue)
+
+    def _write_omm_patches(self, dest, skip_patches):
+        if not self.patches: return
+        written_patches = set()
+        dest.write(' <Patches>\n')
+        for name, patch in iteritems(self.patches):
+            if name in skip_patches: continue
+            templhash = OpenMMParameterSet._templhasher(patch)
+            if templhash in written_patches: continue
+            written_patches.add(templhash)
+            if patch.override_level == 0:
+                dest.write('  <Patch name="%s">\n' % residue.name)
+            else:
+                dest.write('  <Patch name="%s" override="%d">\n' % (residue.name,
+                           residue.override_level))
+            for atom in residue.atoms:
+                if atom.patch_action == 'add':
+                    dest.write('   <AddAtom name="%s" type="%s" charge="%s"/>\n' %
+                           (atom.name, atom.type, atom.charge))
+                elif atom.patch_action == 'change':
+                    dest.write('   <ChangeAtom name="%s" type="%s" charge="%s"/>\n' %
+                           (atom.name, atom.type, atom.charge))
+            for atom_name in residue.delete_atoms:
+                dest.write('   <DeleteAtom name="%s"/>\n' % atom_name)
+            for bond in residue.bonds:
+                if bond.patch_action == 'add':
+                    dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
+                            (bond.atom1.name, bond.atom2.name))
+                elif bond.patch_action == 'delete':
+                    dest.write('   <DeleteBond atomName1="%s" atomName2="%s"/>\n' %
+                            (bond.atom1.name, bond.atom2.name))
+            for atom in residue.add_external_bonds:
+                dest.write('   <AddExternalBond atomName="%s"/>\n' %
+                           atom.name)
+            for atom in residue.remove_external_bonds:
+                dest.write('   <RemoveExternalBond atomName="%s"/>\n' %
+                           atom.head.name)
             dest.write('  </Residue>\n')
         dest.write(' </Residues>\n')
 
