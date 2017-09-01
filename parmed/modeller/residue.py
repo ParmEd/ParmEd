@@ -333,6 +333,16 @@ class ResidueTemplate(object):
 
         return self
 
+    def apply_patch(self, patch):
+        """
+        Apply the specified PatchTemplate to the ResidueTemplate.
+
+        TODO:
+        * How do we handle patches that involve more than one residue?
+        """
+        # TODO
+        raise Exception('Not implemented.')
+
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
 
