@@ -857,10 +857,6 @@ class CharmmParameterSet(ParameterSet):
                                     hpatches[resname] = val
                                 elif tok.upper().startswith('LAST'):
                                     tpatches[resname] = val
-                        elif line[:5].upper() == 'DELETE':
-                            words = line.split()
-                            name = words[2].upper()
-                            res.delete.append(name)
                         elif line[:4].upper() in ('IMPR', 'IMPH'):
                             it = iter(w.upper() for w in line.split()[1:])
                             for a1, a2, a3, a4 in zip(it, it, it, it):
