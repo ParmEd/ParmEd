@@ -540,7 +540,8 @@ class PatchTemplate(ResidueTemplate):
     """
     def __init__(self, name=''):
         super(PatchTemplate, self).__init__(name)
-        self.delete = []
+        self.delete_atoms = []
+        self.delete_impropers = []
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

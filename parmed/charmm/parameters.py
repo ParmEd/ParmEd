@@ -812,9 +812,16 @@ class CharmmParameterSet(ParameterSet):
                             group.append(atom)
                             res.add_atom(atom)
                         elif line[:6].upper() == 'DELETE':
-                            words = line.split()
                             name = words[2].upper()
-                            res.delete.append(name)
+                            entity_type = words[1].upper()
+                            if entity_type == 'ATOM':
+                                res.delete_atoms.append(name)
+                            elif entity_type == 'IMPR':
+                                res.delete_impropers.append(words[2:5])
+                            else:
+                                msg = 'ParmEd cannot handle DELETE BOND, ANGL, DIHE, IMPR, DONO, or ACCE\n'
+                                msg += 'line was: %s' % line                                
+                                raise Exception(msg)
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
