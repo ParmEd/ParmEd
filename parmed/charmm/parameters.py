@@ -729,6 +729,7 @@ class CharmmParameterSet(ParameterSet):
             f = tfile
         hpatch = tpatch = None # default Head and Tail patches
         residues = dict()
+        patches = dict()
         hpatches = dict()
         tpatches = dict()
         line = next(f)
@@ -820,7 +821,7 @@ class CharmmParameterSet(ParameterSet):
                                 res.delete_impropers.append(words[2:5])
                             else:
                                 msg = 'ParmEd cannot handle DELETE BOND, ANGL, DIHE, IMPR, DONO, or ACCE\n'
-                                msg += 'line was: %s' % line                                
+                                msg += 'line was: %s' % line
                                 raise Exception(msg)
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
@@ -879,7 +880,7 @@ class CharmmParameterSet(ParameterSet):
                     if restype == 'RESI':
                         residues[resname] = res
                     elif restype == 'PRES':
-                        self.patches[resname] = res
+                        patches[resname] = res
                     else:
                         assert False, 'restype != RESI or PRES'
                     # We parsed a line we need to look at. So don't update the
@@ -904,6 +905,7 @@ class CharmmParameterSet(ParameterSet):
                     warnings.warn('Patch %s not found' % tpatches[resname])
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
+        self.patches.update(patches)
 
         if own_handle: f.close()
 
