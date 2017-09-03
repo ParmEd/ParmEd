@@ -447,9 +447,9 @@ class OpenMMParameterSet(ParameterSet):
         """
         # Attempt to patch every residue, recording only valid combinations.
         valid_patch_combinations = defaultdict(list)
-        for residue in self.residues.values():
-            if residue in skip_residues: continue
-            for patch in self.patches.values():
+        for patch in self.patches.values():
+            for residue in self.residues.values():
+                if residue in skip_residues: continue
                 # Attempt to patch the residue.
                 try:
                     patched_residue = residue.apply_patch(patch)
