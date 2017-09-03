@@ -197,7 +197,6 @@ class OpenMMParameterSet(ParameterSet):
                               'as write_unused is set to False', ParameterWarning)
         else:
             skip_residues = set()
-            skip_patches = set()
             skip_types = set()
         if self.atom_types:
             try:
@@ -326,16 +325,6 @@ class OpenMMParameterSet(ParameterSet):
                 skip_residues.add(name)
         return skip_residues
 
-    def _find_unused_patches(self):
-        """
-        Set all patches as unused.
-        TODO: Fix this
-        """
-        skip_patches = set()
-        for name, residue in iteritems(self.residues):
-            skip_patches.add(name)
-        return skip_patches
-
     def _find_unused_types(self, skip_residues):
         keep_types = set()
         for name, residue in iteritems(self.residues):
@@ -452,7 +441,7 @@ class OpenMMParameterSet(ParameterSet):
                 if residue in skip_residues: continue
                 # Attempt to patch the residue.
                 try:
-                    patched_residue = residue.apply_patch(patch)
+                    residue.apply_patch(patch)
                 except Exception as e:
                     # Patching failed; continue to next patch
                     print('%8s x %8s : %s' % (patch.name, residue.name, str(e)))
@@ -460,7 +449,7 @@ class OpenMMParameterSet(ParameterSet):
 
                 valid_patch_combinations[residue.name].append(patch.name)
                 valid_patch_combinations[patch.name].append(residue.name)
-                                
+
         return valid_patch_combinations
 
     def _write_omm_patches(self, dest, valid_patch_combinations):
@@ -479,7 +468,7 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('  <Patch name="%s">\n' % patch.name)
             else:
                 dest.write('  <Patch name="%s" override="%d">\n' % (patch.name,
-                           residue.override_level))
+                           patch.override_level))
 
             # Construct an example patched residue
             residue_name = valid_patch_combinations[name][0]

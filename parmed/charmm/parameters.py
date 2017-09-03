@@ -816,11 +816,7 @@ class CharmmParameterSet(ParameterSet):
                             name = words[2].upper()
                             entity_type = words[1].upper()
                             if entity_type == 'ATOM':
-                                try:
-                                    res.delete_atoms.append(name)
-                                except exception as e:
-                                    print(dir(res))
-                                    raise(e)
+                                res.delete_atoms.append(name)
                             elif entity_type == 'IMPR':
                                 res.delete_impropers.append(words[2:5])
                             else:
