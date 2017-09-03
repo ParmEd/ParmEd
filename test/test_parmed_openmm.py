@@ -583,7 +583,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         openmm_params = openmm.OpenMMParameterSet.from_parameterset(charmm_params)
         print('openmm_params has %d residues and %d patches' % (len(openmm_params.residues), len(openmm_params.patches)))
 
-        openmm_params.write(get_fn('charmm.xml', written=True),
+        #openmm_params.write(get_fn('charmm.xml', written=True),
+        openmm_params.write(get_fn('charmm36.xml'),
                             provenance=dict(
                                 OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                                 Reference='MacKerrell'

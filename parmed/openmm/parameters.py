@@ -476,7 +476,8 @@ class OpenMMParameterSet(ParameterSet):
         dest.write(' <Patches>\n')
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
-            if name not in valid_patch_combinations: continue
+            if (name not in valid_patch_combinations) or (len(valid_patch_combinations[name])==0):
+                continue
 
             templhash = OpenMMParameterSet._templhasher(patch)
             if templhash in written_patches: continue
@@ -487,28 +488,41 @@ class OpenMMParameterSet(ParameterSet):
                 dest.write('  <Patch name="%s" override="%d">\n' % (patch.name,
                            residue.override_level))
 
+            # Construct an example patched residue
+            residue_name = valid_patch_combinations[name][0]
+            residue = self.residues[residue_name]
+            patched_residue = residue.apply_patch(patch)
+
             for atom in patch.atoms:
-                if atom.patch_action == 'add':
+                if atom.name not in patched_residue:
                     dest.write('   <AddAtom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
-                elif atom.patch_action == 'change':
+                else:
                     dest.write('   <ChangeAtom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
-            for atom_name in residue.delete_atoms:
+
+            for atom_name in patch.delete_atoms:
                 dest.write('   <DeleteAtom name="%s"/>\n' % atom_name)
+
+            for bond in patch.bonds:
+                dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
+                           (bond.atom1.name, bond.atom2.name))
+
             for bond in residue.bonds:
-                if bond.patch_action == 'add':
-                    dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
-                            (bond.atom1.name, bond.atom2.name))
-                elif bond.patch_action == 'delete':
+                if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
                     dest.write('   <DeleteBond atomName1="%s" atomName2="%s"/>\n' %
-                            (bond.atom1.name, bond.atom2.name))
-            for atom in residue.add_external_bonds:
-                dest.write('   <AddExternalBond atomName="%s"/>\n' %
-                           atom.name)
-            for atom in residue.remove_external_bonds:
-                dest.write('   <RemoveExternalBond atomName="%s"/>\n' %
-                           atom.head.name)
+                        (bond.atom1.name, bond.atom2.name))
+
+            if (residue.head is not None) and (patched_residue.head is None):
+                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.head.name)
+            if (residue.tail is not None) and (patched_residue.tail is None):
+                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.tail.name)
+
+            if (residue.head is None) and (patched_residue.head is not None):
+                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.head.name)
+            if (residue.tail is None) and (patched_residue.tail is not None):
+                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.tail.name)
+
             if patch.name in valid_patch_combinations:
                 for residue_name in valid_patch_combinations[patch.name]:
                     dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
