@@ -429,7 +429,7 @@ class OpenMMParameterSet(ParameterSet):
             dest.write('  </Residue>\n')
         dest.write(' </Residues>\n')
 
-    def _determine_valid_patch_combinations(self, skip_residues, precision=4):
+    def _determine_valid_patch_combinations(self, skip_residues):
         """
         Determine valid (permissible) combinations of patches with residues that
         lead to integral net charges.
@@ -439,11 +439,6 @@ class OpenMMParameterSet(ParameterSet):
 
         skip_residues : set of ResidueTemplate
             List of residues to skip
-
-        precision : int, optional
-            Each valid patch should be produce a net charge that is integral to
-            this many decimal places.
-            Default is 4
 
         TODO:
         * residues and patches will need data structures to hold valid patches;
@@ -462,12 +457,9 @@ class OpenMMParameterSet(ParameterSet):
                     # Patching failed; continue to next patch
                     print('%8s x %8s : %s' % (patch.name, residue.name, str(e)))
                     continue
-                # Check that the net charge is integral.
-                net_charge = patched_residue.net_charge
-                is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
-                if is_integral:
-                    valid_patch_combinations[residue.name].append(patch.name)
-                    valid_patch_combinations[patch.name].append(residue.name)
+
+                valid_patch_combinations[residue.name].append(patch.name)
+                valid_patch_combinations[patch.name].append(residue.name)
         return valid_patch_combinations
 
     def _write_omm_patches(self, dest, valid_patch_combinations):

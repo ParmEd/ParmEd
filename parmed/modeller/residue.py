@@ -378,11 +378,34 @@ class ResidueTemplate(object):
 
         return self
 
-    def apply_patch(self, patch):
+    def apply_patch(self, patch, precision=4):
         """
         Apply the specified PatchTemplate to the ResidueTemplate.
 
         This only handles patches that affect a single residue.
+
+        An exception is thrown if patch is incompatible because
+        * The patch specifies that an atom is to be deleted that doesn't exist in the residue
+        * A bond specified as being added in the patch does not have both atom names present after adding/deleting atoms from the patch
+        * The new net charge is not integral to the specified precision
+
+        Parameters
+        ----------
+
+        patch : PatchTemplate
+            The patch to apply to this residue
+
+        precision : int, optional
+            Each valid patch should be produce a net charge that is integral to
+            this many decimal places.
+            Default is 4
+
+        Returns
+        -------
+
+        residue : ResidueTemplate
+            A new ResidueTemplate corresponding to the patched residue is returned.
+            The original remains unmodified.
 
         """
         # Create a copy
@@ -391,7 +414,7 @@ class ResidueTemplate(object):
         # Delete atoms
         for atom_name in patch.delete_atoms:
             residue.delete_atom(atom_name)
-        # Replace atoms
+        # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
                 # Overwrite type and charge
@@ -401,10 +424,21 @@ class ResidueTemplate(object):
                 residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
         # Add bonds
         for bond in patch.bonds:
-            residue.add_bond(bond.atom1.name, bond.atom2.name)
+            try:
+                residue.add_bond(bond.atom1.name, bond.atom2.name)
+            except:
+                raise Exception('Bond %s was not found in residue to be patched.' % bond)
         # Delete impropers
         for impr in patch.delete_impropers:
-            residue.remove(impr)
+            try:
+                residue.remove(impr)
+            except:
+                raise Exception('Improper %s was not found in residue to be patched.' % impr)
+        # Check that the net charge is integral.
+        net_charge = residue.net_charge
+        is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
+        if not is_integral:
+            raise Exception('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
 
         return residue
 
