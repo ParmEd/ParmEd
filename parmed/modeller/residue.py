@@ -397,6 +397,9 @@ class ResidueTemplate(object):
                 # Overwrite type and charge
                 residue[atom.name].type = atom.type
                 residue[atom.name].charge = atom.charge
+        # Add bonds
+        for bond in patch.bonds:
+            residue.add_bond(bond.atom1.name, bond.atom2.name)
         # Delete impropers
         for impr in patch.delete_impropers:
             residue.remove(impr)

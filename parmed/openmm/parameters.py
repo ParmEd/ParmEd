@@ -460,6 +460,7 @@ class OpenMMParameterSet(ParameterSet):
                     patched_residue = residue.apply_patch(patch)
                 except Exception as e:
                     # Patching failed; continue to next patch
+                    print('%8s x %8s : %s' % (patch.name, residue.name, str(e)))
                     continue
                 # Check that the net charge is integral.
                 net_charge = patched_residue.net_charge
