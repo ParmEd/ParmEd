@@ -388,9 +388,15 @@ class ResidueTemplate(object):
         # Create a copy
         # TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?
         residue = _copy.copy(self)
-        # Process patch
+        # Delete atoms
         for atom_name in patch.delete_atoms:
             residue.delete_atom(atom_name)
+        # Replace atoms
+        for atom in patch.atoms:
+            if atom.name in residue:
+                # Overwrite type and charge
+                residue[atom.name].type = atom.type
+                residue[atom.name].charge = atom.charge
         # Delete impropers
         for impr in patch.delete_impropers:
             residue.remove(impr)
