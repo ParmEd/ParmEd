@@ -442,6 +442,23 @@ class ResidueTemplate(object):
 
         return residue
 
+    def to_networkx(self):
+        """ Create a NetworkX graph of atoms and bonds
+
+        Returns
+        -------
+        G : :class:`networkx.Graph`
+            A NetworkX Graph representing the molecule
+
+        """
+        import networkx
+        G = networkx.Graph()
+        for atom in self.atoms:
+            G.add_node(atom.name, charge=atom.charge, type=atom.type)
+        for bond in self.bonds:
+            G.add_edge(bond.atom1.name, bond.atom2.name)
+        return G
+
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
 

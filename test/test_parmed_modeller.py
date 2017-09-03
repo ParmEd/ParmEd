@@ -9,6 +9,10 @@ try:
     import pandas as pd
 except ImportError:
     pd = None
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
 import os
 import parmed as pmd
 from parmed import Atom, read_PDB, Structure
@@ -54,6 +58,20 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertEqual(df.shape, (6, 20))
         self.assertAlmostEqual(df.charge.sum(), 0)
         self.assertEqual(df.atomic_number.sum(), 23)
+
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
+    def test_to_networkx(self):
+        """ Test converting ResidueTemplate to NetworkX graph """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a5, a6)
+        G1 = self.templ.to_networkx()
+        assert not nx.is_connected(G1)
+        self.templ.add_bond(a2, a5)
+        G2 = self.templ.to_networkx()
+        assert nx.is_connected(G2)
 
     def test_add_atom(self):
         """ Tests the ResidueTemplate.add_atom function """
