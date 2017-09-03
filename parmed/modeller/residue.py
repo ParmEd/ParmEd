@@ -143,7 +143,7 @@ class ResidueTemplate(object):
             atom_name = atom.name
 
         if atom_name not in self._map:
-            raise RuntimeError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, self._map.keys()))
+            raise RuntimeError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, list(self._map.keys())))
 
         atom = self._map[atom_name]
 
@@ -257,7 +257,6 @@ class ResidueTemplate(object):
                         inst.connections.append(inst.atoms[idx])
                 else:
                     inst.add_bond(i1, i2)
-        # TODO: Does this method neglect to copy other information, like head, tail, patches, and impropers?
         return inst
 
     @property
@@ -434,7 +433,7 @@ class ResidueTemplate(object):
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)
             except:
-                raise Exception('Bond %s-%s could not be added to patched residue: %s' % (atom1_name, atom2_name))
+                raise Exception('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
