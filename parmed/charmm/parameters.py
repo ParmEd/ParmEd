@@ -813,16 +813,19 @@ class CharmmParameterSet(ParameterSet):
                             group.append(atom)
                             res.add_atom(atom)
                         elif line[:6].upper() == 'DELETE':
+                            words = line.split()
                             name = words[2].upper()
                             entity_type = words[1].upper()
                             if entity_type == 'ATOM':
-                                res.delete_atoms.append(name)
+                                try:
+                                    res.delete_atoms.append(name)
+                                except exception as e:
+                                    print(dir(res))
+                                    raise(e)
                             elif entity_type == 'IMPR':
                                 res.delete_impropers.append(words[2:5])
                             else:
-                                msg = 'ParmEd cannot handle DELETE BOND, ANGL, DIHE, IMPR, DONO, or ACCE\n'
-                                msg += 'line was: %s' % line
-                                raise Exception(msg)
+                                warnings.warn('WARNING: Ignoring "%s" because entity type %s not used.' % (line.strip(), entity_type))
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
@@ -892,20 +895,27 @@ class CharmmParameterSet(ParameterSet):
             pass
 
         # Go through the patches and add the appropriate one
+        self.patches.update(patches)
         for resname, res in iteritems(residues):
-            if hpatches[resname] is not None:
+            patch_name = hpatches[resname]
+            if patch_name is not None:
                 try:
-                    res.first_patch = self.patches[hpatches[resname]]
+                    res.first_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn('Patch %s not found' % hpatches[resname])
-            if tpatches[resname] is not None:
+                    warnings.warn('Patch %s not found' % patch_name)
+                    # DEBUG
+                    print('patches.keys()')
+                    print(patches.keys())
+                    print(patch_name in patches.keys())
+
+            patch_name = tpatches[resname]
+            if patch_name is not None:
                 try:
-                    res.last_patch = self.patches[tpatches[resname]]
+                    res.last_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn('Patch %s not found' % tpatches[resname])
+                    warnings.warn('Patch %s not found' % patch_name)
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
-        self.patches.update(patches)
 
         if own_handle: f.close()
 
