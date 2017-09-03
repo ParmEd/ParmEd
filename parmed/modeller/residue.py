@@ -423,11 +423,18 @@ class ResidueTemplate(object):
             else:
                 residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
         # Add bonds
-        for bond in patch.bonds:
+        for (atom1_name, atom2_name, order) in patch.add_bonds:
             try:
-                residue.add_bond(bond.atom1.name, bond.atom2.name)
+                # Remove dangling bonds
+                for name in [atom1_name, atom2_name]:
+                    if name == residue.head:
+                        residue.head = None
+                    if name == residue.tail:
+                        residue.tail = None
+                # Add bond
+                residue.add_bond(atom1_name, atom2_name, order)
             except:
-                raise Exception('Bond %s was not found in residue to be patched.' % bond)
+                raise Exception('Bond %s-%s could not be added to patched residue: %s' % (atom1_name, atom2_name))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
@@ -443,6 +450,7 @@ class ResidueTemplate(object):
         import networkx as nx
         G = residue.to_networkx()
         if not nx.is_connected(G):
+            print([ c for c in nx.connected_components(G) ])
             raise Exception('Patched residue bond graph is not a connected graph.')
 
         return residue
@@ -660,8 +668,12 @@ class PatchTemplate(ResidueTemplate):
 
     Attributes
     ----------
-    delete : list of str
-        List of atoms that need to be deleted in applying the patch
+    add_bonds : list of (str, str, order)
+        List of bonds that need to be added in applying the patch
+    delete_atoms : list of str
+        List of atom names that need to be deleted in applying the patch
+    delete_impropers : list of tuple of str
+        List of impropers (tuple of atom names) that need to be deleted in applying the patch
 
     See Also
     --------
@@ -675,6 +687,7 @@ class PatchTemplate(ResidueTemplate):
     """
     def __init__(self, name=''):
         super(PatchTemplate, self).__init__(name)
+        self.add_bonds = []
         self.delete_atoms = []
         self.delete_impropers = []
 

@@ -828,6 +828,14 @@ class CharmmParameterSet(ParameterSet):
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
+                                if restype == 'PRES':
+                                    # Patches can have bonds that refer to atoms not in the patch, so store these in a list of tuples
+                                    order = 1
+                                    if line.split()[0].upper() == 'DOUBLE':
+                                        order = 2
+                                    res.add_bonds.append( (a1, a2, order) )
+                                    continue
+
                                 if a1.startswith('-'):
                                     res.head = res[a2]
                                     continue
@@ -839,12 +847,6 @@ class CharmmParameterSet(ParameterSet):
                                     continue
                                 if a2.startswith('+'):
                                     res.tail = res[a1]
-                                    continue
-                                # Apparently PRES objects do not need to put +
-                                # or - in front of atoms that belong to adjacent
-                                # residues
-                                if restype == 'PRES' and (a1 not in res or
-                                                          a2 not in res):
                                     continue
                                 res.add_bond(a1, a2)
                         elif line[:4].upper() == 'CMAP':

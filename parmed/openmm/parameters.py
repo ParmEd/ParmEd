@@ -460,6 +460,7 @@ class OpenMMParameterSet(ParameterSet):
 
                 valid_patch_combinations[residue.name].append(patch.name)
                 valid_patch_combinations[patch.name].append(residue.name)
+                                
         return valid_patch_combinations
 
     def _write_omm_patches(self, dest, valid_patch_combinations):
