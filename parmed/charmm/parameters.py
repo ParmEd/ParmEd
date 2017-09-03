@@ -89,7 +89,6 @@ class CharmmParameterSet(ParameterSet):
         # Instantiate the list types
         super(CharmmParameterSet, self).__init__()
         self.parametersets = []
-        self.patches = dict()
         self._declared_nbrules = False
 
         # Load all of the files
@@ -903,10 +902,6 @@ class CharmmParameterSet(ParameterSet):
                     res.first_patch = self.patches[patch_name]
                 except KeyError:
                     warnings.warn('Patch %s not found' % patch_name)
-                    # DEBUG
-                    print('patches.keys()')
-                    print(patches.keys())
-                    print(patch_name in patches.keys())
 
             patch_name = tpatches[resname]
             if patch_name is not None:

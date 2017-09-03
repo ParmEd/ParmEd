@@ -90,6 +90,7 @@ class ParameterSet(object):
         self.parametersets = []
         self._combining_rule = 'lorentz'
         self.residues = OrderedDict()
+        self.patches = OrderedDict()
         self.default_scee = self.default_scnb = 1.0
 
     def __copy__(self):
@@ -145,6 +146,8 @@ class ParameterSet(object):
             other.cmap_types[tuple(reversed(key))] = typ
         for key, item in iteritems(self.residues):
             other.residues[key] = copy(item)
+        for key, item in iteritems(self.patches):
+            other.patches[key] = copy(item)
         other.combining_rule = self.combining_rule
 
         return other
