@@ -439,6 +439,11 @@ class ResidueTemplate(object):
         is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
         if not is_integral:
             raise Exception('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
+        # Ensure residue is connected
+        import networkx as nx
+        G = residue.to_networkx()
+        if not nx.is_connected(G):
+            raise Exception('Patched residue bond graph is not a connected graph.')
 
         return residue
 
