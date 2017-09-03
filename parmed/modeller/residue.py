@@ -128,6 +128,51 @@ class ResidueTemplate(object):
         self.atoms.append(atom)
         self._map[atom.name] = atom
 
+    def delete_atom(self, atom):
+        """ Delete an atom from this residue template, along with corresponding bonds.
+
+        Parameters
+        ----------
+        atom : :class:`Atom` or str
+            The atom or atom name to be deleted
+
+        """
+        if type(atom) is str:
+            atom_name = atom
+        else:
+            atom_name = atom.name
+
+        if atom_name not in self._map:
+            raise RuntimeError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, self._map.keys()))
+
+        atom = self._map[atom_name]
+
+        # Adjust head and tail if needed
+        if self.head == atom:
+            self.head = None
+        if self.tail == atom:
+            self.tail = None
+
+        # Remove all bonds involving this atom
+        for bond in list(self.bonds):
+            if (bond.atom1 == atom) or (bond.atom2 == atom):
+                # Remove this bond from all atoms it spans
+                bond.delete()
+                # Delete the bond from the residue
+                self.bonds.remove(bond)
+
+        # Remove all impropers involving this atom
+        for impr in list(self._impr):
+            if atom in impr:
+                self._impr.remove(impr)
+
+        # Disconnect the atom from the residue so that it does not trigger atom.residue.delete_atom(atom)
+        atom.residue = None
+
+        # Remove the atom from the ResidueTemplate
+        del self._map[atom_name]
+        self.atoms.remove(atom)
+
     def add_bond(self, atom1, atom2, order=1.0):
         """ Adds a bond between the two provided atoms in the residue
 
@@ -179,7 +224,6 @@ class ResidueTemplate(object):
         """
         This constructor creates a ResidueTemplate from a particular Residue
         object
-
         Parameters
         ----------
         residue : :class:`Residue`
@@ -213,6 +257,7 @@ class ResidueTemplate(object):
                         inst.connections.append(inst.atoms[idx])
                 else:
                     inst.add_bond(i1, i2)
+        # TODO: Does this method neglect to copy other information, like head, tail, patches, and impropers?
         return inst
 
     @property
@@ -337,11 +382,20 @@ class ResidueTemplate(object):
         """
         Apply the specified PatchTemplate to the ResidueTemplate.
 
-        TODO:
-        * How do we handle patches that involve more than one residue?
+        This only handles patches that affect a single residue.
+
         """
-        # TODO
-        raise Exception('Not implemented.')
+        # Create a copy
+        # TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?
+        residue = _copy.copy(self)
+        # Process patch
+        for atom_name in patch.delete_atoms:
+            residue.delete_atom(atom_name)
+        # Delete impropers
+        for impr in patch.delete_impropers:
+            residue.remove(impr)
+
+        return residue
 
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
