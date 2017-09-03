@@ -277,6 +277,7 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertNotIn(a6, a5.bond_partners)
         self.assertEqual(len(templ.bonds), 4)
 
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
     def test_patch_residue(self):
         """ Tests ResidueTemplate.patch_residue function """
         templ = self.templ
