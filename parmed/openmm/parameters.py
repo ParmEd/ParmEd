@@ -209,7 +209,8 @@ class OpenMMParameterSet(ParameterSet):
         # DEBUG
         print('Determining valid patch combinations...')
         valid_patch_combinations = self._determine_valid_patch_combinations(skip_residues)
-        print(valid_patch_combinations)
+        for patch_name in self.patches:
+            print('%8s : %s' % (patch_name, valid_patch_combinations[patch_name]))
         print('')
 
         if charmm_imp:
