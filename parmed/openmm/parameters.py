@@ -211,7 +211,7 @@ class OpenMMParameterSet(ParameterSet):
         valid_patch_combinations = self._determine_valid_patch_combinations(skip_residues)
         LOGGER.debug('Valid patch combinations:')
         for patch_name in self.patches:
-            LOGGER.debug('%8s : %s', patch_name, str(valid_patch_combinations[patch_name]))
+            LOGGER.debug('%8s : %s', patch_name, valid_patch_combinations[patch_name])
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -445,7 +445,7 @@ class OpenMMParameterSet(ParameterSet):
                     residue.apply_patch(patch)
                 except IncompatiblePatchError as e:
                     # Patching failed; continue to next patch
-                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, str(e))
+                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
                     continue
 
                 valid_patch_combinations[residue.name].append(patch.name)
