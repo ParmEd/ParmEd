@@ -108,9 +108,6 @@ class PreProcessorWarning(ParmedWarning):
 class OpenMMWarning(ParmedWarning):
     """ If there is something we should warn when processing OpenMM objects """
 
-class IncompatiblePatchWarning(ParmedWarning):
-    """ If there is some warning information about why a patch is compatible """
-
 # Control flow exceptions
 
 class CharmmPsfEOF(ParmedError):
