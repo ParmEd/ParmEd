@@ -9,6 +9,11 @@ import warnings
 
 import numpy as np
 
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
+
 import parmed as pmd
 from parmed.utils.six.moves import StringIO
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
@@ -558,6 +563,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         params.write(get_fn('test.xml', written=True))
 
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
     def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files"""
 
@@ -573,6 +579,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      )
         )
 
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
     def test_ljforce_charmm(self):
         """ Test writing LennardJonesForce without NBFIX from Charmm parameter files"""
 
@@ -592,6 +599,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                             separate_ljforce=True
                             )
 
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
     def test_explicit_improper(self):
         """Test writing out the improper explicitly"""
 
