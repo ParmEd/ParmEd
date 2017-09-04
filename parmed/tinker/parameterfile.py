@@ -2,12 +2,14 @@
 This module contains classes regarding the Amoeba potential and loading in a
 TINKER-based parameter file.
 """
-from __future__ import print_function
-from parmed.utils.six.moves import range
-from parmed.exceptions import TinkerError, TinkerWarning
+import logging
+from ..utils.six.moves import range
+from ..exceptions import TinkerError, TinkerWarning
 from collections import OrderedDict
 import re
 import warnings
+
+LOGGER = logging.getLogger(__name__)
 
 class BookmarkedFile(object):
     """ Allows setting a bookmark and rewinding to that bookmark """
@@ -468,9 +470,9 @@ class AmoebaParameterSet(object):
         while rematch:
             try:
                 get_angle_type(rematch.groups()[0], *line.split()[1:])
-            except TypeError as err:
-                print(repr(rematch.groups()[0]), line.split()[1:])
-                raise err
+            except TypeError:
+                LOGGER.debug('%s, %s', repr(rematch.groups()[0]), line.split()[1:])
+                raise
             line = f.readline().replace('\t', ' ')
             rematch = self.anglere.match(line)
         # Now parse out the stretch-bend parameters
