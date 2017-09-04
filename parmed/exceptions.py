@@ -36,6 +36,9 @@ class CharmmError(ParsingError):
 class ResidueError(ParmedError):
     """ For when there are problems defining a residue """
 
+class IncompatiblePatchError(ParmedError):
+    """ For when applying a PatchTemplate to a ResidueTemplate fails """
+
 class ParameterError(ParmedError):
     """ If a parameter is missing from a database """
 
@@ -104,6 +107,9 @@ class PreProcessorWarning(ParmedWarning):
 
 class OpenMMWarning(ParmedWarning):
     """ If there is something we should warn when processing OpenMM objects """
+
+class IncompatiblePatchWarning(ParmedWarning):
+    """ If there is some warning information about why a patch is compatible """
 
 # Control flow exceptions
 

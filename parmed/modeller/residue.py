@@ -11,6 +11,7 @@ from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
+from parmed.exceptions import IncompatiblePatchError
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -143,7 +144,7 @@ class ResidueTemplate(object):
             atom_name = atom.name
 
         if atom_name not in self._map:
-            raise RuntimeError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, list(self._map.keys())))
+            raise KeyError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, list(self._map.keys())))
 
         atom = self._map[atom_name]
 
@@ -412,7 +413,10 @@ class ResidueTemplate(object):
         residue = _copy.copy(self)
         # Delete atoms
         for atom_name in patch.delete_atoms:
-            residue.delete_atom(atom_name)
+            try:
+                residue.delete_atom(atom_name)
+            except KeyError as e:
+                raise IncompatiblePatchError(str(e))
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
@@ -432,25 +436,25 @@ class ResidueTemplate(object):
                         residue.tail = None
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)
-            except:
-                raise Exception('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
+            except IndexError as e:
+                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
                 residue.remove(impr)
-            except:
-                raise Exception('Improper %s was not found in residue to be patched.' % impr)
+            except ValueError as e:
+                raise IncompatiblePatchError('Improper %s was not found in residue to be patched.' % impr)
         # Check that the net charge is integral.
         net_charge = residue.net_charge
         is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
         if not is_integral:
-            raise Exception('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
+            raise IncompatiblePatchError('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
         # Ensure residue is connected
         import networkx as nx
         G = residue.to_networkx()
         if not nx.is_connected(G):
-            print([ c for c in nx.connected_components(G) ])
-            raise Exception('Patched residue bond graph is not a connected graph.')
+            components = [ c for c in nx.connected_components(G) ]
+            raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
 
         return residue
 

@@ -18,7 +18,7 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
-from parmed.exceptions import ParameterWarning
+from parmed.exceptions import ParameterWarning, IncompatiblePatchError, IncompatiblePatchWarning
 import itertools
 from collections import defaultdict
 
@@ -205,12 +205,7 @@ class OpenMMParameterSet(ParameterSet):
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
 
-        # DEBUG
-        print('Determining valid patch combinations...')
         valid_patch_combinations = self._determine_valid_patch_combinations(skip_residues)
-        for patch_name in self.patches:
-            print('%8s : %s' % (patch_name, valid_patch_combinations[patch_name]))
-        print('')
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -442,9 +437,9 @@ class OpenMMParameterSet(ParameterSet):
                 # Attempt to patch the residue.
                 try:
                     residue.apply_patch(patch)
-                except Exception as e:
+                except IncompatiblePatchError as e:
                     # Patching failed; continue to next patch
-                    print('%8s x %8s : %s' % (patch.name, residue.name, str(e)))
+                    warnings.warn('%8s x %8s : %s' % (patch.name, residue.name, str(e)), IncompatiblePatchWarning)
                     continue
 
                 valid_patch_combinations[residue.name].append(patch.name)
