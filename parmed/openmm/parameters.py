@@ -33,6 +33,7 @@ XML_ESCAPES = {
 
 import logging
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG) # DEBUG
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -219,8 +220,10 @@ class OpenMMParameterSet(ParameterSet):
 
         valid_patch_combinations = self._determine_valid_patch_combinations(skip_residues)
         LOGGER.debug('Valid patch combinations:')
+        print('Valid patch combinations:') # DEBUG
         for patch_name in self.patches:
             LOGGER.debug('%8s : %s', patch_name, valid_patch_combinations[patch_name])
+            print('%8s : %s' % (patch_name, valid_patch_combinations[patch_name])) # DEBUG
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -373,7 +376,8 @@ class OpenMMParameterSet(ParameterSet):
                     dest.write('  <%s' % tag)
                     for attribute in attributes:
                         dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
-                    escaped_element_content = escape(element_content, XML_ESCAPES)
+                    # TODO: Is this the right way to handle element content that contains lists, etc
+                    escaped_element_content = escape(str(element_content), XML_ESCAPES)
                     dest.write('>%s</%s>\n' % (escaped_element_content, tag))
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
@@ -457,6 +461,7 @@ class OpenMMParameterSet(ParameterSet):
                 except IncompatiblePatchError as e:
                     # Patching failed; continue to next patch
                     LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
+                    print('%8s x %8s : %s' % (patch.name, residue.name, e)) # DEBUG
                     continue
 
                 valid_patch_combinations[residue.name].append(patch.name)
@@ -520,6 +525,7 @@ class OpenMMParameterSet(ParameterSet):
             if patch.name in valid_patch_combinations:
                 for residue_name in valid_patch_combinations[patch.name]:
                     dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
+
             dest.write('  </Patch>\n')
         dest.write(' </Patches>\n')
 

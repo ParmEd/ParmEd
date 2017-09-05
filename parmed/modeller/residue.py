@@ -441,7 +441,7 @@ class ResidueTemplate(object):
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
-                residue.remove(impr)
+                residue._impr.remove(impr)
             except ValueError as e:
                 raise IncompatiblePatchError('Improper %s was not found in residue to be patched.' % impr)
         # Check that the net charge is integral.
