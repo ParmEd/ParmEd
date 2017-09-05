@@ -22,6 +22,15 @@ from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
 from collections import defaultdict
 
+from xml.sax.saxutils import escape
+XML_ESCAPES = {
+    '&' : '&amp;',
+    '<' : '&lt;',
+    '>' : '&gt;',
+    "'" : '&#39;',
+    '"' : '&quot;'
+    }
+
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -353,7 +362,8 @@ class OpenMMParameterSet(ParameterSet):
                 content = [content]
             for sub_content in content:
                 if isinstance(sub_content, string_types):
-                    dest.write('  <%s>%s</%s>\n' % (tag, sub_content, tag))
+                    escaped_sub_content = escape(sub_content, XML_ESCAPES)
+                    dest.write('  <%s>%s</%s>\n' % (tag, escaped_sub_content, tag))
                 elif isinstance(sub_content, dict):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
@@ -363,6 +373,7 @@ class OpenMMParameterSet(ParameterSet):
                     dest.write('  <%s' % tag)
                     for attribute in attributes:
                         dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
+                    escaped_element_content = escape(element_content, XML_ESCAPES)
                     dest.write('>%s</%s>\n' % (element_content, tag))
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)

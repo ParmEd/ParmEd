@@ -606,7 +606,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml_filename = get_fn('charmm36.xml')
         openmm_params.write(ffxml_filename,
                             provenance=dict(
-                                OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
+                                OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
                                 Reference='MacKerrell'
                                 ),
                             separate_ljforce=True
@@ -625,7 +625,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml_filename = get_fn('charmm.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
-                         OriginalFiles='par_all36_prot.prm, top_all36_prot.rtf',
+                         OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrel'
                      ),
                      charmm_imp=True)
