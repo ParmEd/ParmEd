@@ -613,7 +613,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                             )
         forcefield = app.ForceField(ffxml_filename)
 
-    @unittest.skipIf((nx is None) and has_openmm, "Cannot test without networkx and openmm")
+    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without networkx and openmm")
     def test_explicit_improper(self):
         """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
 
