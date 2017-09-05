@@ -646,8 +646,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 16)
-        ffxml.seek(0)
-        forcefield = app.ForceField(ffxml)
 
     def test_override_level(self):
         """Test correct support for the override_level attribute of
@@ -668,5 +666,3 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         control_line2 = '  <Residue name="NA">\n'
         self.assertEqual(output_lines[5], control_line1)
         self.assertEqual(output_lines[8], control_line2)
-        ffxml.seek(0)
-        forcefield = app.ForceField(ffxml)
