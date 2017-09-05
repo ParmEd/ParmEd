@@ -374,7 +374,7 @@ class OpenMMParameterSet(ParameterSet):
                     for attribute in attributes:
                         dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
                     escaped_element_content = escape(element_content, XML_ESCAPES)
-                    dest.write('>%s</%s>\n' % (element_content, tag))
+                    dest.write('>%s</%s>\n' % (escaped_element_content, tag))
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
         dest.write(' </Info>\n')
