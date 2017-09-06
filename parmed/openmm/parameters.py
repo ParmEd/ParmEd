@@ -487,6 +487,8 @@ class OpenMMParameterSet(ParameterSet):
                            patch.override_level))
 
             # Construct an example patched residue
+            # TODO: We should also ensure that *all* compatible residues have the
+            # same added/changed atoms and deleted bonds, just to be safe.
             residue_name = valid_residues_for_patch[name][0]
             try:
                 residue = self.residues[residue_name]
