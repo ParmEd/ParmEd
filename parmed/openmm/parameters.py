@@ -218,12 +218,12 @@ class OpenMMParameterSet(ParameterSet):
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
 
-        valid_patch_combinations = self._determine_valid_patch_combinations(skip_residues)
+        [valid_residues_for_patch, valid_patches_for_residue] = self._determine_valid_patch_combinations(skip_residues)
         LOGGER.debug('Valid patch combinations:')
         print('Valid patch combinations:') # DEBUG
         for patch_name in self.patches:
-            LOGGER.debug('%8s : %s', patch_name, valid_patch_combinations[patch_name])
-            print('%8s : %s' % (patch_name, valid_patch_combinations[patch_name])) # DEBUG
+            LOGGER.debug('%8s : %s', patch_name, valid_residues_for_patch[patch_name])
+            print('%8s : %s' % (patch_name, valid_residues_for_patch[patch_name])) # DEBUG
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -231,8 +231,8 @@ class OpenMMParameterSet(ParameterSet):
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
             self._write_omm_atom_types(dest, skip_types)
-            self._write_omm_residues(dest, skip_residues, valid_patch_combinations)
-            self._write_omm_patches(dest, valid_patch_combinations)
+            self._write_omm_residues(dest, skip_residues, valid_patches_for_residue)
+            self._write_omm_patches(dest, valid_residues_for_patch)
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
@@ -376,7 +376,7 @@ class OpenMMParameterSet(ParameterSet):
                     dest.write('  <%s' % tag)
                     for attribute in attributes:
                         dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
-                    # TODO: Is this the right way to handle element content that contains lists, etc
+                    # TODO: Is this the right way to handle element content that contains lists, etc?
                     escaped_element_content = escape(str(element_content), XML_ESCAPES)
                     dest.write('>%s</%s>\n' % (escaped_element_content, tag))
                 else:
@@ -400,10 +400,10 @@ class OpenMMParameterSet(ParameterSet):
                           )
         dest.write(' </AtomTypes>\n')
 
-    def _write_omm_residues(self, dest, skip_residues, valid_patch_combinations=None):
+    def _write_omm_residues(self, dest, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
-        if valid_patch_combinations is None:
-            valid_patch_combinations = dict()
+        if valid_patches_for_residue is None:
+            valid_patches_for_residue = dict()
         written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
@@ -428,8 +428,8 @@ class OpenMMParameterSet(ParameterSet):
             if residue.tail is not None and residue.tail is not residue.head:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
-            if residue.name in valid_patch_combinations:
-                for patch_name in valid_patch_combinations[residue.name]:
+            if residue.name in valid_patches_for_residue:
+                for patch_name in valid_patches_for_residue[residue.name]:
                     dest.write('   <AllowPatch name="%s"/>\n' % patch_name)
             dest.write('  </Residue>\n')
         dest.write(' </Residues>\n')
@@ -439,19 +439,22 @@ class OpenMMParameterSet(ParameterSet):
         Determine valid (permissible) combinations of patches with residues that
         lead to integral net charges.
 
-        Populates the `valid_patches` attribute of residues,
-        `valid_residues` attribute of patches.
-
+        Parameters
+        ----------
         skip_residues : set of ResidueTemplate
             List of residues to skip
 
-        TODO:
-        * residues and patches will need data structures to hold valid patches;
-        may be best if these are temporary since they may need to be rebuilt for each system
+        Returns
+        -------
+        valid_residues_for_patch : dict
+            valid_residues_for_patch[patch] is a list of residues compatible with that patch
+        valid_patches_for_residue : dict
+            valid_patches_for_residue[residue] is a list of patches compatible with that residue
 
         """
         # Attempt to patch every residue, recording only valid combinations.
-        valid_patch_combinations = defaultdict(list)
+        valid_residues_for_patch = defaultdict(list)
+        valid_patches_for_residue = defaultdict(list)
         for patch in self.patches.values():
             for residue in self.residues.values():
                 if residue in skip_residues: continue
@@ -464,18 +467,18 @@ class OpenMMParameterSet(ParameterSet):
                     print('%8s x %8s : %s' % (patch.name, residue.name, e)) # DEBUG
                     continue
 
-                valid_patch_combinations[residue.name].append(patch.name)
-                valid_patch_combinations[patch.name].append(residue.name)
+                valid_residues_for_patch[patch.name].append(residue.name)
+                valid_patches_for_residue[residue.name].append(patch.name)
 
-        return valid_patch_combinations
+        return [valid_residues_for_patch, valid_patches_for_residue]
 
-    def _write_omm_patches(self, dest, valid_patch_combinations):
+    def _write_omm_patches(self, dest, valid_residues_for_patch):
         if not self.patches: return
         written_patches = set()
         dest.write(' <Patches>\n')
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
-            if (name not in valid_patch_combinations) or (len(valid_patch_combinations[name])==0):
+            if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
                 continue
 
             templhash = OpenMMParameterSet._templhasher(patch)
@@ -488,8 +491,15 @@ class OpenMMParameterSet(ParameterSet):
                            patch.override_level))
 
             # Construct an example patched residue
-            residue_name = valid_patch_combinations[name][0]
-            residue = self.residues[residue_name]
+            residue_name = valid_residues_for_patch[name][0]
+            try:
+                residue = self.residues[residue_name]
+            except KeyError as e:
+                print('Compatible residue not found in self.residues')
+                print('   patch name: %s' % name)
+                print('   valid patch combinations: %s' % valid_residues_for_patch[name])
+                print('   residue name: %s' % residue_name)
+                raise(e)
             patched_residue = residue.apply_patch(patch)
 
             for atom in patch.atoms:
