@@ -33,7 +33,6 @@ XML_ESCAPES = {
 
 import logging
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG) # DEBUG
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -220,10 +219,8 @@ class OpenMMParameterSet(ParameterSet):
 
         [valid_residues_for_patch, valid_patches_for_residue] = self._determine_valid_patch_combinations(skip_residues)
         LOGGER.debug('Valid patch combinations:')
-        print('Valid patch combinations:') # DEBUG
         for patch_name in self.patches:
             LOGGER.debug('%8s : %s', patch_name, valid_residues_for_patch[patch_name])
-            print('%8s : %s' % (patch_name, valid_residues_for_patch[patch_name])) # DEBUG
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -464,7 +461,6 @@ class OpenMMParameterSet(ParameterSet):
                 except IncompatiblePatchError as e:
                     # Patching failed; continue to next patch
                     LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
-                    print('%8s x %8s : %s' % (patch.name, residue.name, e)) # DEBUG
                     continue
 
                 valid_residues_for_patch[patch.name].append(residue.name)
@@ -495,11 +491,12 @@ class OpenMMParameterSet(ParameterSet):
             try:
                 residue = self.residues[residue_name]
             except KeyError as e:
-                print('Compatible residue not found in self.residues')
-                print('   patch name: %s' % name)
-                print('   valid patch combinations: %s' % valid_residues_for_patch[name])
-                print('   residue name: %s' % residue_name)
-                raise(e)
+                msg =  'Compatible residue not found in self.residues\n'
+                msg += '   patch name: %s\n' % name
+                msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
+                msg += '   residue name: %s\n' % residue_name
+                msg += str(e)
+                raise(msg)
             patched_residue = residue.apply_patch(patch)
 
             for atom in patch.atoms:
@@ -532,9 +529,8 @@ class OpenMMParameterSet(ParameterSet):
             if (residue.tail is None) and (patched_residue.tail is not None):
                 dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.tail.name)
 
-            if patch.name in valid_patch_combinations:
-                for residue_name in valid_patch_combinations[patch.name]:
-                    dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
+            for residue_name in valid_residues_for_patch[patch.name]:
+                dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
 
             dest.write('  </Patch>\n')
         dest.write(' </Patches>\n')

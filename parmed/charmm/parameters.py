@@ -891,14 +891,6 @@ class CharmmParameterSet(ParameterSet):
         except StopIteration:
             pass
 
-        # Sanity check time: Make sure no patch names have already been defined as residues, and vice versa
-        new_patches_that_are_existing_residues = set(patches.keys()).intersection(self.residues.keys())
-        if len(new_patches_that_are_existing_residues) > 0:
-            raise ValueError('CHARMM tried to define these patches that are already defined as residues: %s' % new_patches_that_are_existing_residues)
-        new_residues_that_are_existing_patches = set(residues.keys()).intersection(self.patches.keys())
-        if len(new_residues_that_are_existing_patches) > 0:
-            raise ValueError('CHARMM tried to define these residues that are already defined as patches: %s' % new_residues_that_are_existing_patches)
-
         # Go through the patches and add the appropriate one
         self.patches.update(patches)
         for resname, res in iteritems(residues):
