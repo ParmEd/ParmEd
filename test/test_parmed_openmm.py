@@ -9,6 +9,11 @@ import warnings
 
 import numpy as np
 
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
+
 import parmed as pmd
 from parmed.utils.six.moves import StringIO
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
@@ -279,7 +284,7 @@ class TestSystemCreation(unittest.TestCase):
 
 class TestWriteParameters(FileIOTestCase):
 
-    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    @unittest.skipIf((not has_openmm) or (os.getenv('AMBERHOME') is None), 'Cannot test w/out Amber and OpenMM')
     def test_write_xml_parameters(self):
         """ Test writing XML parameters loaded from Amber files """
         leaprc = StringIO("""\
@@ -495,15 +500,17 @@ CHIS = CHIE
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet.from_leaprc(leaprc)
         )
-        params.write(get_fn('amber_conv.xml', written=True),
+        ffxml_filename = get_fn('amber_conv.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(OriginalFile='leaprc.ff14SB',
-                     Reference=['Maier & Simmerling', 'Simmerling & Maier'],
+                     Reference=['Maier and Simmerling', 'Simmerling and Maier'],
                      Source=dict(Source='leaprc.ff14SB',
                      sourcePackage='AmberTools', sourcePackageVersion='15'))
         )
+        forcefield = app.ForceField(ffxml_filename)
 
 
-    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
+    @unittest.skipIf((not has_openmm) or (os.getenv('AMBERHOME') is None), 'Cannot test w/out Amber and OpenMM')
     def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
         leaprc = StringIO("""\
@@ -516,11 +523,14 @@ parm10 = loadamberparams gaff.dat
 Wang, J., Wang, W., Kollman P. A.; Case, D. A. "Automatic atom type and bond type perception in molecular mechanical calculations". Journal of Molecular Graphics and Modelling , 25, 2006, 247260.
 Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development and testing of a general AMBER force field". Journal of Computational Chemistry, 25, 2004, 1157-1174.
 """
-        params.write(get_fn('gaff.xml', written=True),
+        ffxml_filename = get_fn('gaff.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(OriginalFile='gaff.dat',
                      Reference=citations)
         )
+        forcefield = app.ForceField(ffxml_filename)
 
+    @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -536,6 +546,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
+        ffxml.seek(0)
+        forcefield = app.ForceField(ffxml)
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                   pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
@@ -550,58 +562,74 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
+        ffxml.seek(0)
+        forcefield = app.ForceField(ffxml)
 
+    @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
                 load_file(os.path.join(get_fn('parm'), 'frcmod.constph'))
         )
-        params.write(get_fn('test.xml', written=True))
+        ffxml_filename = get_fn('test.xml', written=True)
+        params.write(ffxml_filename)
+        forcefield = app.ForceField(ffxml_filename)
 
+    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without NetworkX and OpenMM")
     def test_write_xml_parameters_charmm(self):
-        """ Test writing XML parameter files from Charmm parameter files"""
+        """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'),
                                               get_fn('toppar_water_ions.str'))
         )
-        params.write(get_fn('charmm_conv.xml', written=True),
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(
-                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                         OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
                          Reference='MacKerrell'
                      )
         )
+        forcefield = app.ForceField(ffxml_filename)
 
+    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without NetworkX and OpenMM")
     def test_ljforce_charmm(self):
-        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files"""
+        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
 
-        params = openmm.OpenMMParameterSet.from_parameterset(
-                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                              get_fn('top_all36_prot.rtf'))
-        )
-        params.write(get_fn('charmm.xml', written=True),
-                     provenance=dict(
-                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                         Reference='MacKerrell'
-                     ),
-                     separate_ljforce=True
-        )
+        charmm_params = pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                                      get_fn('top_all36_prot.rtf'))
 
+        openmm_params = openmm.OpenMMParameterSet.from_parameterset(charmm_params)
+
+        #openmm_params.write(get_fn('charmm.xml', written=True),
+        ffxml_filename = get_fn('charmm36.xml')
+        openmm_params.write(ffxml_filename,
+                            provenance=dict(
+                                OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                                Reference='MacKerrell'
+                                ),
+                            separate_ljforce=True
+                            )
+        forcefield = app.ForceField(ffxml_filename)
+
+    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without networkx and openmm")
     def test_explicit_improper(self):
-        """Test writing out the improper explicitly"""
+        """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
 
         warnings.filterwarnings('ignore', category=ParameterWarning)
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'))
         )
-        params.write(get_fn('charmm.xml', written=True),
+        ffxml_filename = get_fn('charmm.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrel'
                      ),
                      charmm_imp=True)
+        forcefield = app.ForceField(ffxml_filename)
 
     def test_not_write_residues_with_same_templhash(self):
         """Test that no identical residues are written to XML, using the

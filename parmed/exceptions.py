@@ -36,6 +36,9 @@ class CharmmError(ParsingError):
 class ResidueError(ParmedError):
     """ For when there are problems defining a residue """
 
+class IncompatiblePatchError(ParmedError):
+    """ For when applying a PatchTemplate to a ResidueTemplate fails """
+
 class ParameterError(ParmedError):
     """ If a parameter is missing from a database """
 
