@@ -594,7 +594,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         forcefield = app.ForceField(ffxml_filename)
         # Parameterize alanine tripeptide in vacuum
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
-        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)        
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
         # Parameterize ACE-NME in water
         pdbfile = app.PDBFile(get_fn('nma.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
@@ -618,6 +618,9 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                             separate_ljforce=True
                             )
         forcefield = app.ForceField(ffxml_filename)
+        # Parameterize alanine tripeptide in vacuum
+        pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
 
     @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without networkx and openmm")
     def test_explicit_improper(self):

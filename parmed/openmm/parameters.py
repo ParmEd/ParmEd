@@ -502,7 +502,7 @@ class OpenMMParameterSet(ParameterSet):
             patched_residue = residue.apply_patch(patch)
 
             for atom in patch.atoms:
-                if atom.name not in patched_residue:
+                if atom.name not in residue:
                     dest.write('   <AddAtom name="%s" type="%s" charge="%s"/>\n' %
                            (atom.name, atom.type, atom.charge))
                 else:
