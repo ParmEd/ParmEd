@@ -468,7 +468,20 @@ class OpenMMParameterSet(ParameterSet):
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 
-    def _write_omm_patches(self, dest, valid_residues_for_patch):
+    def _write_omm_patches(self, dest, valid_residues_for_patch, write_apply_to_residue=False):
+        """
+        Write patch definitions for OpenMM ForceField
+
+        Parameters
+        ----------
+        dest : file-like object
+            The file-like object to write the <Patches> section to.
+        valid_residues_for_patch : dict of str : str
+            valid_residues_for_patch[patch_name] lists the residue names valid for this patch
+        write_apply_to_residue : bool, optional, default=False
+            If True, will write <ApplyToResidue> tags.        
+
+        """
         if not self.patches: return
         written_patches = set()
         dest.write(' <Patches>\n')
@@ -535,8 +548,9 @@ class OpenMMParameterSet(ParameterSet):
             if (residue.tail is None) and (patched_residue.tail is not None):
                 dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.tail.name)
 
-            for residue_name in valid_residues_for_patch[patch.name]:
-                dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
+            if write_apply_to_residue:
+                for residue_name in valid_residues_for_patch[patch.name]:
+                    dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
 
             dest.write('  </Patch>\n')
         dest.write(' </Patches>\n')
