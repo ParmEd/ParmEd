@@ -430,9 +430,9 @@ class ResidueTemplate(object):
             try:
                 # Remove dangling bonds
                 for name in [atom1_name, atom2_name]:
-                    if name == residue.head:
+                    if residue.head and (name == residue.head.name):
                         residue.head = None
-                    if name == residue.tail:
+                    if residue.tail and (name == residue.tail.name):
                         residue.tail = None
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)

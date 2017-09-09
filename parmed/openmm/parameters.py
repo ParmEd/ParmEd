@@ -510,15 +510,19 @@ class OpenMMParameterSet(ParameterSet):
                            (atom.name, atom.type, atom.charge))
 
             for atom_name in patch.delete_atoms:
-                dest.write('   <DeleteAtom name="%s"/>\n' % atom_name)
+                dest.write('   <RemoveAtom name="%s"/>\n' % atom_name)
 
             for bond in patch.bonds:
-                dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
+                dest.write('   <RemoveBond atomName1="%s" atomName2="%s"/>\n' %
                            (bond.atom1.name, bond.atom2.name))
 
+            for bond in patched_residue.bonds:
+                if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
+                    dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
+                        (bond.atom1.name, bond.atom2.name))
             for bond in residue.bonds:
                 if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
-                    dest.write('   <DeleteBond atomName1="%s" atomName2="%s"/>\n' %
+                    dest.write('   <RemoveBond atomName1="%s" atomName2="%s"/>\n' %
                         (bond.atom1.name, bond.atom2.name))
 
             if (residue.head is not None) and (patched_residue.head is None):
