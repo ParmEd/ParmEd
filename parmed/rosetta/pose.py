@@ -12,7 +12,7 @@ from parmed.topologyobjects import Atom, ExtraPoint, Bond
 from parmed.utils.six.moves import range
 
 try:
-    from rosetta import Pose, AtomID
+    from pyrosetta import Pose, AtomID
 except ImportError:
     Pose = AtomID = None
 
