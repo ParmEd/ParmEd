@@ -22,6 +22,8 @@ from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
 from collections import defaultdict
 
+from lxml.etree import Element, Comment, SubElement, ElementTree
+
 from xml.sax.saxutils import escape
 XML_ESCAPES = {
     '&' : '&amp;',
@@ -225,23 +227,24 @@ class OpenMMParameterSet(ParameterSet):
         if charmm_imp:
             self._find_explicit_impropers()
         try:
-            dest.write('<ForceField>\n')
-            self._write_omm_provenance(dest, provenance)
-            self._write_omm_atom_types(dest, skip_types)
-            self._write_omm_residues(dest, skip_residues, valid_patches_for_residue)
-            self._write_omm_patches(dest, valid_residues_for_patch)
-            self._write_omm_bonds(dest, skip_types)
-            self._write_omm_angles(dest, skip_types)
-            self._write_omm_urey_bradley(dest, skip_types)
-            self._write_omm_dihedrals(dest, skip_types, improper_dihedrals_ordering)
-            self._write_omm_impropers(dest, skip_types)
-#           self._write_omm_rb_torsions(dest, skip_types)
-            self._write_omm_cmaps(dest, skip_types)
-            self._write_omm_scripts(dest, skip_types)
-            self._write_omm_nonbonded(dest, skip_types, separate_ljforce)
-            self._write_omm_LennardJonesForce(dest, skip_types, separate_ljforce)
+            root = Element('ForceField')
+            self._write_omm_provenance(root, provenance)
+            self._write_omm_atom_types(root, skip_types)
+            self._write_omm_residues(root, skip_residues, valid_patches_for_residue)
+            self._write_omm_patches(root, valid_residues_for_patch)
+            self._write_omm_bonds(root, skip_types)
+            self._write_omm_angles(root, skip_types)
+            self._write_omm_urey_bradley(root, skip_types)
+            self._write_omm_dihedrals(root, skip_types, improper_dihedrals_ordering)
+            self._write_omm_impropers(root, skip_types)
+#           self._write_omm_rb_torsions(root, skip_types)
+            self._write_omm_cmaps(root, skip_types)
+            self._write_omm_scripts(root, skip_types)
+            self._write_omm_nonbonded(root, skip_types, separate_ljforce)
+            self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
         finally:
-            dest.write('</ForceField>\n')
+            tree = ElementTree(root)
+            tree.write(dest)
             if own_handle:
                 dest.close()
 
@@ -351,85 +354,74 @@ class OpenMMParameterSet(ParameterSet):
         # TODO implement hash for polyatomic residues
         return id(residue)
 
-    def _write_omm_provenance(self, dest, provenance):
-        dest.write(' <Info>\n')
-        dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
-                   datetime.datetime.now().timetuple()[:3])
-        provenance = provenance if provenance is not None else {}
+    def _write_omm_provenance(self, root, provenance):
+        info = SubElement(root, 'Info')
+
+        date_generated = SubElement(info, "DateGenerated")
+        date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3])
+
+        provenance = provenance or dict()
         for tag, content in iteritems(provenance):
             if tag == 'DateGenerated': continue
             if not isinstance(content, list):
                 content = [content]
             for sub_content in content:
                 if isinstance(sub_content, string_types):
-                    escaped_sub_content = escape(sub_content, XML_ESCAPES)
-                    dest.write('  <%s>%s</%s>\n' % (tag, escaped_sub_content, tag))
+                    item = Element(tag)
+                    item.text = sub_content
+                    info.append(item)
                 elif isinstance(sub_content, dict):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
                                        'specified incorrectly.')
                     attributes = [key for key in sub_content if key != tag]
                     element_content = sub_content[tag]
-                    dest.write('  <%s' % tag)
-                    for attribute in attributes:
-                        dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
-                    # TODO: Is this the right way to handle element content that contains lists, etc?
-                    escaped_element_content = escape(str(element_content), XML_ESCAPES)
-                    dest.write('>%s</%s>\n' % (escaped_element_content, tag))
+
+                    item = SubElement(info, tag, **sub_content)
+                    item.text = str(element_content)
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
-        dest.write(' </Info>\n')
 
-    def _write_omm_atom_types(self, dest, skip_types):
+    def _write_omm_atom_types(self, xml_root, skip_types):
         if not self.atom_types: return
-        dest.write(' <AtomTypes>\n')
+        xml_section = SubElement(xml_root, "AtomTypes")
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
             if atom_type.atomic_number == 0:
-                dest.write('  <Type name="%s" class="%s" mass="%s"/>\n'
-                           % (name, name, atom_type.mass)
-                           )
+                SubElement(xml_section, 'Type', name=name, class=name, mass=str(atom_type.mass))
             else:
                 element = Element[atom_type.atomic_number]
-                dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
-                           % (name, name, element, atom_type.mass)
-                          )
-        dest.write(' </AtomTypes>\n')
+                SubElement(xml_section, 'Type', name=name, class=class, element=str(element), mass=str(atom_type.mass))
 
-    def _write_omm_residues(self, dest, skip_residues, valid_patches_for_residue=None):
+    def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
             valid_patches_for_residue = dict()
         written_residues = set()
-        dest.write(' <Residues>\n')
+        xml_section = SubElement(xml_root, 'Residues')
         for name, residue in iteritems(self.residues):
             if name in skip_residues: continue
             templhash = OpenMMParameterSet._templhasher(residue)
             if templhash in written_residues: continue
             written_residues.add(templhash)
+            # Write residue
             if residue.override_level == 0:
-                dest.write('  <Residue name="%s">\n' % residue.name)
+                xml_residue = SubElement(xml_section, 'Residue', name=residue.name)
             else:
-                dest.write('  <Residue name="%s" override="%d">\n' % (residue.name,
-                           residue.override_level))
+                xml_residue = SubElement(xml_section, 'Residue', name=residue.name, override=residue.override_level)
+            # Write residue contents
             for atom in residue.atoms:
-                dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
-                           (atom.name, atom.type, atom.charge))
+                SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
             for bond in residue.bonds:
-                dest.write('   <Bond atomName1="%s" atomName2="%s"/>\n' %
-                           (bond.atom1.name, bond.atom2.name))
+                SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
             if residue.head is not None:
-                dest.write('   <ExternalBond atomName="%s"/>\n' %
-                           residue.head.name)
+                SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
-                dest.write('   <ExternalBond atomName="%s"/>\n' %
-                           residue.tail.name)
+                SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
             if residue.name in valid_patches_for_residue:
                 for patch_name in valid_patches_for_residue[residue.name]:
-                    dest.write('   <AllowPatch name="%s"/>\n' % patch_name)
-            dest.write('  </Residue>\n')
-        dest.write(' </Residues>\n')
+                    SubElement(xml_residue, 'AllowPatch', name=patch_name)
 
     def _determine_valid_patch_combinations(self, skip_residues):
         """
@@ -468,23 +460,23 @@ class OpenMMParameterSet(ParameterSet):
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 
-    def _write_omm_patches(self, dest, valid_residues_for_patch, write_apply_to_residue=False):
+    def _write_omm_patches(self, xml_root, valid_residues_for_patch, write_apply_to_residue=False):
         """
         Write patch definitions for OpenMM ForceField
 
         Parameters
         ----------
-        dest : file-like object
-            The file-like object to write the <Patches> section to.
+        xml_root : lxml.etree.Element
+            The XML Element write the <Patches> section to.
         valid_residues_for_patch : dict of str : str
             valid_residues_for_patch[patch_name] lists the residue names valid for this patch
         write_apply_to_residue : bool, optional, default=False
-            If True, will write <ApplyToResidue> tags.        
+            If True, will write <ApplyToResidue> tags.
 
         """
         if not self.patches: return
         written_patches = set()
-        dest.write(' <Patches>\n')
+        xml_patches = SubElement(xml_root, 'Patches')\
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
             if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
@@ -494,10 +486,9 @@ class OpenMMParameterSet(ParameterSet):
             if templhash in written_patches: continue
             written_patches.add(templhash)
             if patch.override_level == 0:
-                dest.write('  <Patch name="%s">\n' % patch.name)
+                patch_xml = SubElement(xml_patches, 'Patch', name=patch.name)
             else:
-                dest.write('  <Patch name="%s" override="%d">\n' % (patch.name,
-                           patch.override_level))
+                patch_xml = SubElement(xml_patches, 'Patch', name=patch.name, override=patch.override_level)
 
             # Construct an example patched residue
             # TODO: We should also ensure that *all* compatible residues have the
@@ -516,48 +507,40 @@ class OpenMMParameterSet(ParameterSet):
 
             for atom in patch.atoms:
                 if atom.name not in residue:
-                    dest.write('   <AddAtom name="%s" type="%s" charge="%s"/>\n' %
-                           (atom.name, atom.type, atom.charge))
+                    SubElement(patch_xml, 'AddAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
                 else:
-                    dest.write('   <ChangeAtom name="%s" type="%s" charge="%s"/>\n' %
-                           (atom.name, atom.type, atom.charge))
+                    SubElement(patch_xml, 'ChangeAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
 
             for atom_name in patch.delete_atoms:
-                dest.write('   <RemoveAtom name="%s"/>\n' % atom_name)
+                SubElement(patch_xml, 'RemoveAtom', name=atom.name)
 
             for bond in patch.bonds:
-                dest.write('   <RemoveBond atomName1="%s" atomName2="%s"/>\n' %
-                           (bond.atom1.name, bond.atom2.name))
+                SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
 
             for bond in patched_residue.bonds:
                 if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
-                    dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
-                        (bond.atom1.name, bond.atom2.name))
+                    SubElement(patch_xml, 'AddBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
             for bond in residue.bonds:
                 if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
-                    dest.write('   <RemoveBond atomName1="%s" atomName2="%s"/>\n' %
-                        (bond.atom1.name, bond.atom2.name))
+                    SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
 
             if (residue.head is not None) and (patched_residue.head is None):
-                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.head.name)
+                SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.head.name)
             if (residue.tail is not None) and (patched_residue.tail is None):
-                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.tail.name)
+                SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.tail.name)
 
             if (residue.head is None) and (patched_residue.head is not None):
-                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.head.name)
+                SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.head.name)
             if (residue.tail is None) and (patched_residue.tail is not None):
-                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.tail.name)
+                SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.tail.name)
 
             if write_apply_to_residue:
                 for residue_name in valid_residues_for_patch[patch.name]:
-                    dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
+                    SubElement(patch_xml, 'ApplyToResidue', name=residue_name)
 
-            dest.write('  </Patch>\n')
-        dest.write(' </Patches>\n')
-
-    def _write_omm_bonds(self, dest, skip_types):
+    def _write_omm_bonds(self, xml_root, skip_types):
         if not self.bond_types: return
-        dest.write(' <HarmonicBondForce>\n')
+        xml_force = SubElement(xml_root, 'HarmonicBondForce')
         bonds_done = set()
         lconv = u.angstroms.conversion_factor_to(u.nanometers)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
@@ -566,13 +549,11 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond type1="%s" type2="%s" length="%s" k="%s"/>\n'
-                       % (a1, a2, bond.req*lconv, bond.k*kconv))
-        dest.write(' </HarmonicBondForce>\n')
+            SubElement(xml_force, 'Bond', type1=a1, type2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
 
-    def _write_omm_angles(self, dest, skip_types):
+    def _write_omm_angles(self, xml_root, skip_types):
         if not self.angle_types: return
-        dest.write(' <HarmonicAngleForce>\n')
+        xml_force = SubElement(xml_root, 'HarmonicAngleForce')
         angles_done = set()
         tconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) * 2
@@ -581,10 +562,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            dest.write('  <Angle type1="%s" type2="%s" type3="%s" '
-                       'angle="%s" k="%s"/>\n' %
-                       (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
-        dest.write(' </HarmonicAngleForce>\n')
+            SubElement(xml_force, 'Angle', type1=a1, type2=a2, type3=a3, angle=str(angle.thetaeq*tconv), k=str(angle.k*kconv))
 
     def _write_omm_dihedrals(self, dest, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
@@ -592,9 +570,9 @@ class OpenMMParameterSet(ParameterSet):
         # The from_structure method ensures that, even if the containing
         # Structure has separate dihedral entries for each torsion
         if improper_dihedrals_ordering == 'default':
-            dest.write(' <PeriodicTorsionForce>\n')
+            xml_force = SubElement(xml_root, 'PeriodicTorsionForce')
         else:
-            dest.write(' <PeriodicTorsionForce ordering="%s">\n' % improper_dihedrals_ordering)
+            xml_force = SubElement(xml_root, 'PeriodicTorsionForce', ordering=improper_dihedrals_ordering)
         diheds_done = set()
         pconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -605,14 +583,13 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
             diheds_done.add((a4, a3, a2, a1))
-            dest.write('  <Proper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
+            terms = dict()
             for i, term in enumerate(dihed):
                 i += 1
-                dest.write(' periodicity%d="%d" phase%d="%s" k%d="%s"' %
-                           (i, term.per, i, term.phase*pconv, i,
-                            term.phi_k*kconv))
-            dest.write('/>\n')
+                terms['periodicity%d' % i] = str(term.per)
+                terms['phase%d' % i] = str(term.phase*pconv)
+                terms['k%d' % i] = str(term.phi_k*kconv)
+            SubElement(xml_force, 'Proper', type1=nowild(a1), type2=a2, type3=a3, type4=nowild(a4), **terms)
         # Now do the periodic impropers. OpenMM expects the central atom to be
         # listed first. ParameterSet goes out of its way to list it third
         # (consistent with Amber) except in instances where order is random (as
@@ -629,34 +606,28 @@ class OpenMMParameterSet(ParameterSet):
             if a2 != 'X' and a3 == 'X':
                 # Single wild-card entries put the wild-card in position 2
                 a2, a3 = a3, a2
-            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" periodicity1="%d" phase1="%s" k1="%s"/>\n' %
-                       (a1, nowild(a2), nowild(a3), nowild(a4), improp.per,
-                        improp.phase*pconv, improp.phi_k*kconv)
-            )
-        dest.write(' </PeriodicTorsionForce>\n')
+            SubElement(xml_force, 'Improper', type1=a1, type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+                       periodicity1=str(improp.per), phase1=str(improp.phase*pconv), k1=str(improp.phi_k*kconv))
 
-    def _write_omm_impropers(self, dest, skip_types):
+    def _write_omm_impropers(self, xml_root, skip_types):
         if not self.improper_types: return
-        dest.write(' <CustomTorsionForce energy="k*(theta-theta0)^2">\n')
-        dest.write('  <PerTorsionParameter name="k"/>\n')
-        dest.write('  <PerTorsionParameter name="theta0"/>\n')
+        xml_force = SubElement(xml_root, 'CustomTorsionForce', energy="k*(theta-theta0)^2")
+        SubElement(xml_force, 'PerTorsionParameter', name="k")
+        SubElement(xml_force, 'PerTorsionParameter', name="theta0")
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
         tconv = u.degree.conversion_factor_to(u.radian)
         def nowild(name):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
-            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" k="%s" theta0="%s"/>\n' %
-                       (nowild(a1), nowild(a2), nowild(a3), nowild(a4),
-                       improp.psi_k*kconv, improp.psi_eq*tconv)
-            )
-        dest.write(' </CustomTorsionForce>\n')
+            SubElement(xml_force, 'Improper', type1=nowild(a1), type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+                       k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
 
-    def _write_omm_urey_bradley(self, dest, skip_types):
+    def _write_omm_urey_bradley(self, xml_root, skip_types):
         if not self.urey_bradley_types: return None
-        dest.write(' <!-- Urey-Bradley terms -->\n')
+        xml_root.append( Comment("Urey-Bradley terms") )
+
+
         dest.write(' <AmoebaUreyBradleyForce>\n')
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
