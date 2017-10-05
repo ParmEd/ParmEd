@@ -358,7 +358,7 @@ class OpenMMParameterSet(ParameterSet):
         info = SubElement(root, 'Info')
 
         date_generated = SubElement(info, "DateGenerated")
-        date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3])
+        date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3]
 
         provenance = provenance or dict()
         for tag, content in iteritems(provenance):
@@ -388,11 +388,12 @@ class OpenMMParameterSet(ParameterSet):
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
+            properties = { 'name' : name, 'class' : name, 'mass' : str(atom_type.mass) }
             if atom_type.atomic_number == 0:
-                SubElement(xml_section, 'Type', name=name, class=name, mass=str(atom_type.mass))
+                SubElement(xml_section, 'Type', **properties)
             else:
                 element = Element[atom_type.atomic_number]
-                SubElement(xml_section, 'Type', name=name, class=class, element=str(element), mass=str(atom_type.mass))
+                SubElement(xml_section, 'Type', element=str(element), **properties)
 
     def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
@@ -476,7 +477,7 @@ class OpenMMParameterSet(ParameterSet):
         """
         if not self.patches: return
         written_patches = set()
-        xml_patches = SubElement(xml_root, 'Patches')\
+        xml_patches = SubElement(xml_root, 'Patches')
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
             if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
@@ -626,9 +627,7 @@ class OpenMMParameterSet(ParameterSet):
     def _write_omm_urey_bradley(self, xml_root, skip_types):
         if not self.urey_bradley_types: return None
         xml_root.append( Comment("Urey-Bradley terms") )
-
-
-        dest.write(' <AmoebaUreyBradleyForce>\n')
+        xml_force = SubElement(xml_root, 'AmoebaUreyBradleyForce')
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
         _ommfrc = u.kilojoule_per_mole/u.nanometer**2
@@ -638,14 +637,11 @@ class OpenMMParameterSet(ParameterSet):
             if any((a in skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
-            dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%s" k="%s"/>\n'
-                       % (a1, a2, a3, urey.req*length_conv, urey.k*frc_conv))
+            SubElement(xml_force, 'UreyBradley', type1=a1, type2=a2, type3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
 
-        dest.write(' </AmoebaUreyBradleyForce>\n')
-
-    def _write_omm_cmaps(self, dest, skip_types):
+    def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        dest.write(' <CmapTorsionForce>\n')
+        xml_force = SubElement(xml_root, CmapTorsionForce)
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -653,28 +649,26 @@ class OpenMMParameterSet(ParameterSet):
             if id(cmap) in maps: continue
             maps[id(cmap)] = counter
             counter += 1
-            dest.write('  <Map>\n')
+            xml_map = SubElement(xml_force, 'Map')
             grid = cmap.grid.switch_range().T
+            map_string = ''
             for i in range(cmap.resolution):
                 dest.write('  ')
                 base = i * cmap.resolution
                 for j in range(cmap.resolution):
-                    dest.write(' %s' % (grid[base+j]*econv))
-                dest.write('\n')
-            dest.write('  </Map>\n')
+                    map_string += ' %s' % (grid[base+j]*econv)
+                map_string += '\n'
+            xml_map.text = map_string
         used_torsions = set()
         for (a1, a2, a3, a4, _, _, _, a5), cmap in iteritems(self.cmap_types):
             if any((a in skip_types for a in (a1, a2, a3, a4, a5))): continue
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
-            dest.write('   <Torsion map="%d" type1="%s" type2="%s" '
-                       'type3="%s" type4="%s" type5="%s"/>\n' %
-                       (maps[id(cmap)], a1, a2, a3, a4, a5)
-            )
-        dest.write(' </CmapTorsionForce>\n')
+            SubElement(xml_force, 'Torsion', map=str(maps[id(cmap)]),
+                       type1=a1, type2=a2, type3=a3, type4=a4, type5=a5)
 
-    def _write_omm_nonbonded(self, dest, skip_types, separate_ljforce):
+    def _write_omm_nonbonded(self, xml_root, skip_types, separate_ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -705,9 +699,8 @@ class OpenMMParameterSet(ParameterSet):
             lj14scale = 1.0 / self.default_scnb
 
         # Write NonbondedForce records.
-        dest.write(' <NonbondedForce coulomb14scale="%s" lj14scale="%s">\n' %
-                   (coulomb14scale, lj14scale))
-        dest.write('  <UseAttributeFromResidue name="charge"/>\n')
+        xml_force = SubElement(xml_root, 'NonbondedForce', coulomb14scale=str(coulomb14scale), lj14scale=str(lj14scale))
+        SubElement(xml_force, 'UseAttributeFromResidue', name="charge")
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
@@ -730,11 +723,9 @@ class OpenMMParameterSet(ParameterSet):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, abs(epsilon)))
-        dest.write(' </NonbondedForce>\n')
+            SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
-    def _write_omm_LennardJonesForce(self, dest, skip_types, separate_ljforce):
+    def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
         if not self.nbfix_types and not separate_ljforce: return
         # Convert Conversion factors for writing in natural OpenMM units
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -755,7 +746,7 @@ class OpenMMParameterSet(ParameterSet):
             lj14scale = 1.0 / self.default_scnb
 
         # write L-J records
-        dest.write(' <LennardJonesForce lj14scale="%s">\n' % lj14scale)
+        xml_force = SubElement(xml_root, 'LennardJonesForce', lj14scale=str(lj14scale))
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
@@ -774,8 +765,7 @@ class OpenMMParameterSet(ParameterSet):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, abs(epsilon)))
+            SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
         # write NBFIX records
         for (atom_types, value) in iteritems(self.nbfix_types):
@@ -783,10 +773,7 @@ class OpenMMParameterSet(ParameterSet):
             rmin = value[1] * length_conv
             # convert to sigma
             sigma = 2 * rmin/(2**(1.0/6))
-            dest.write('  <NBFixPair type1="%s" type2="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (atom_types[0], atom_types[1], sigma, emin))
-        dest.write(' </LennardJonesForce>\n')
-
+            SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(epsilon))
 
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported

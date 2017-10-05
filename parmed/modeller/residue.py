@@ -388,6 +388,7 @@ class ResidueTemplate(object):
         * The patch specifies that an atom is to be deleted that doesn't exist in the residue
         * A bond specified as being added in the patch does not have both atom names present after adding/deleting atoms from the patch
         * The new net charge is not integral to the specified precision
+        * The residue is not modified in any way (no atoms or bonds added/changed/deleted)
 
         Parameters
         ----------
@@ -411,10 +412,13 @@ class ResidueTemplate(object):
         # Create a copy
         # TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?
         residue = _copy.copy(self)
+        # Record whether we've actually modified the residue.
+        topology_changed = False
         # Delete atoms
         for atom_name in patch.delete_atoms:
             try:
                 residue.delete_atom(atom_name)
+                modifications_made = True
             except KeyError as e:
                 raise IncompatiblePatchError(str(e))
         # Add or replace atoms
@@ -425,6 +429,7 @@ class ResidueTemplate(object):
                 residue[atom.name].charge = atom.charge
             else:
                 residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
+                modifications_made = True
         # Add bonds
         for (atom1_name, atom2_name, order) in patch.add_bonds:
             try:
