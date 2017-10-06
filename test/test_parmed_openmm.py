@@ -20,7 +20,7 @@ except ImportError:
     lxml = None
 
 import parmed as pmd
-from parmed.utils.six import StringIO, BytesIO
+from parmed.utils.six import StringIO
 from io import TextIOWrapper
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
@@ -287,7 +287,7 @@ class TestSystemCreation(unittest.TestCase):
 
 class TestWriteParameters(FileIOTestCase):
 
-    @unittest.skipIf((not has_openmm) or (os.getenv('AMBERHOME') is None), 'Cannot test w/out Amber and OpenMM')
+    @unittest.skipIf(not has_openmm or os.getenv('AMBERHOME') is None or lxml is None, 'Cannot test w/out Amber, OpenMM, or lxml')
     def test_write_xml_parameters(self):
         """ Test writing XML parameters loaded from Amber files """
         leaprc = StringIO("""\
@@ -513,7 +513,7 @@ CHIS = CHIE
         forcefield = app.ForceField(ffxml_filename)
 
 
-    @unittest.skipIf((not has_openmm) or (os.getenv('AMBERHOME') is None), 'Cannot test w/out Amber and OpenMM')
+    @unittest.skipIf(not has_openmm or os.getenv('AMBERHOME') is None or lxml is None, 'Cannot test w/out Amber, OpenMM, or lxml')
     def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
         leaprc = StringIO("""\
@@ -533,7 +533,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         forcefield = app.ForceField(ffxml_filename)
 
-    @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+    @unittest.skipUnless(has_openmm and lxml is not None, "Cannot test without OpenMM or lxml")
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -541,11 +541,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                 os.path.join(get_fn('parm'), 'parm10.dat'),
                 os.path.join(get_fn('parm'), 'frcmod.ff14SB'))
         )
-        ffxml = BytesIO()
+        ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 2178)
-        ffxml = BytesIO()
+        ffxml = StringIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
@@ -556,19 +556,19 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                   pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
                   os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
         )
-        ffxml = BytesIO()
+        ffxml = StringIO()
         warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 222)
-        ffxml = BytesIO()
+        ffxml = StringIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
         ffxml.seek(0)
         forcefield = app.ForceField(ffxml)
 
-    @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+    @unittest.skipUnless(has_openmm and lxml is not None, "Cannot test without OpenMM or lxml")
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -655,7 +655,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
             new_residues[name] = params.residues[name]
         params.residues = new_residues
-        ffxml = BytesIO()
+        ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 16)
@@ -672,7 +672,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         new_residues['NA'] = params.residues['NA']
         new_residues['K'].override_level = 1
         params.residues = new_residues
-        ffxml = BytesIO()
+        ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
         output_lines = ffxml.readlines()

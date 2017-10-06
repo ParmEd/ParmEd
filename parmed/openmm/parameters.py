@@ -8,7 +8,9 @@ from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
 from functools import wraps
+from contextlib import closing
 import datetime
+from parmed.constants import DEFAULT_ENCODING
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
@@ -145,7 +147,7 @@ class OpenMMParameterSet(ParameterSet):
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False, encoding='utf-8'):
+              improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -197,8 +199,6 @@ class OpenMMParameterSet(ParameterSet):
         charmm_imp: bool
             If True, will check for existence of IMPR in each residue and patch template,
             and write out the explicit improper definition without wildcards in the ffxml file.
-        encoding : str, optional, default='utf-8'
-            Encoding for XML file.
 
         Notes
         -----
@@ -249,7 +249,14 @@ class OpenMMParameterSet(ParameterSet):
         self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
 
         tree = etree.ElementTree(root)
-        tree.write(dest, encoding=encoding)
+
+        xml = etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
+
+        if isinstance(dest, string_types):
+            with closing(genopen(dest, 'w')) as f:
+                f.write(xml)
+        else:
+            dest.write(xml)
 
     def _find_explicit_impropers(self):
         improper_harmonic = {}
