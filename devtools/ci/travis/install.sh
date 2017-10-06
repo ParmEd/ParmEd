@@ -27,7 +27,7 @@ else # Otherwise, CPython... go through conda
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
             numpy scipy pandas nose openmm coverage nose-timer \
-            python-coveralls netCDF4
+            python-coveralls netCDF4 lxml
         conda update -y -n myenv --all
         conda install -y -n myenv pyflakes=1.0.0
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
@@ -35,7 +35,6 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv nglview -c bioconda
         conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
         conda install -y -n myenv -c conda-forge networkx
-        conda install -y -n myenv -c conda-forge lxml        
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes=1.0.0 \
