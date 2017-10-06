@@ -13,6 +13,10 @@ try:
     import networkx as nx
 except ImportError:
     nx = None
+try:
+    import lxml
+except ImportError:
+    lxml = None
 
 import parmed as pmd
 from parmed.utils.six.moves import StringIO
@@ -118,8 +122,6 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         con2.setPositions(structure.positions)
 
         self.check_energies(parm, con1, structure, con2)
-
-
 
     def test_load_topology_extra_bonds(self):
         """ Test loading extra bonds not in Topology """
@@ -640,6 +642,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      charmm_imp=True)
         forcefield = app.ForceField(ffxml_filename)
 
+    @skipIf(lxml is None, 'Cannot test without lxml')
     def test_not_write_residues_with_same_templhash(self):
         """Test that no identical residues are written to XML, using the
            templhasher function."""
@@ -656,6 +659,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 16)
 
+    @skipIf(lxml is None, 'Cannot test without lxml')
     def test_override_level(self):
         """Test correct support for the override_level attribute of
            ResidueTemplates and correct writing to XML tag"""
