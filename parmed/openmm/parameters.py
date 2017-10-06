@@ -188,11 +188,6 @@ class OpenMMParameterSet(ParameterSet):
         should not provide this information in ``provenance`` (it will be
         removed if it is provided).
         """
-        if isinstance(dest, string_types):
-            dest = genopen(dest, 'w')
-            own_handle = True
-        else:
-            own_handle = False
         if not write_unused:
             skip_residues = self._find_unused_residues()
             skip_types = self._find_unused_types(skip_residues)
@@ -217,27 +212,25 @@ class OpenMMParameterSet(ParameterSet):
 
         if charmm_imp:
             self._find_explicit_impropers()
-        try:
-            root = etree.Element('ForceField')
-            self._write_omm_provenance(root, provenance)
-            self._write_omm_atom_types(root, skip_types)
-            self._write_omm_residues(root, skip_residues, valid_patches_for_residue)
-            self._write_omm_patches(root, valid_residues_for_patch)
-            self._write_omm_bonds(root, skip_types)
-            self._write_omm_angles(root, skip_types)
-            self._write_omm_urey_bradley(root, skip_types)
-            self._write_omm_dihedrals(root, skip_types, improper_dihedrals_ordering)
-            self._write_omm_impropers(root, skip_types)
-#           self._write_omm_rb_torsions(root, skip_types)
-            self._write_omm_cmaps(root, skip_types)
-            self._write_omm_scripts(root, skip_types)
-            self._write_omm_nonbonded(root, skip_types, separate_ljforce)
-            self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
-        finally:
-            string = etree.tostring(root, encoding='utf-8').decode('utf-8')
-            dest.write(string)
-            if own_handle:
-                dest.close()
+
+        root = etree.Element('ForceField')
+        self._write_omm_provenance(root, provenance)
+        self._write_omm_atom_types(root, skip_types)
+        self._write_omm_residues(root, skip_residues, valid_patches_for_residue)
+        self._write_omm_patches(root, valid_residues_for_patch)
+        self._write_omm_bonds(root, skip_types)
+        self._write_omm_angles(root, skip_types)
+        self._write_omm_urey_bradley(root, skip_types)
+        self._write_omm_dihedrals(root, skip_types, improper_dihedrals_ordering)
+        self._write_omm_impropers(root, skip_types)
+        #self._write_omm_rb_torsions(root, skip_types)
+        self._write_omm_cmaps(root, skip_types)
+        self._write_omm_scripts(root, skip_types)
+        self._write_omm_nonbonded(root, skip_types, separate_ljforce)
+        self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
+
+        tree = ElementTree(root)
+        tree.write(dest)
 
     def _find_explicit_impropers(self):
         improper_harmonic = {}
