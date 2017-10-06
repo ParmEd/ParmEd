@@ -7,6 +7,7 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+from functools import wraps
 import datetime
 from parmed.formats.registry import FileFormatType
 from parmed.modeller.residue import ResidueTemplate, PatchTemplate
@@ -22,10 +23,25 @@ from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
 from collections import defaultdict
 
-from lxml import etree
+try:
+    from lxml import etree
+except ImportError:
+    etree = None
 
 import logging
 LOGGER = logging.getLogger(__name__)
+
+def needs_lxml(func):
+    """
+    Decorator to raise an ImportError if a function requires lxml but it is not
+    present
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if etree is None:
+            raise ImportError('required package lxml could not be found')
+        return func(*args, **kwargs)
+    return wrapper
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -127,6 +143,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return new_params
 
+    @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
               improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
@@ -338,6 +355,7 @@ class OpenMMParameterSet(ParameterSet):
         # TODO implement hash for polyatomic residues
         return id(residue)
 
+    @needs_lxml
     def _write_omm_provenance(self, root, provenance):
         info = etree.SubElement(root, 'Info')
 
@@ -366,6 +384,7 @@ class OpenMMParameterSet(ParameterSet):
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
 
+    @needs_lxml
     def _write_omm_atom_types(self, xml_root, skip_types):
         if not self.atom_types: return
         xml_section = etree.SubElement(xml_root, "AtomTypes")
@@ -379,6 +398,7 @@ class OpenMMParameterSet(ParameterSet):
                 element = Element[atom_type.atomic_number]
                 etree.SubElement(xml_section, 'Type', element=str(element), **properties)
 
+    @needs_lxml
     def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
@@ -445,6 +465,7 @@ class OpenMMParameterSet(ParameterSet):
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 
+    @needs_lxml
     def _write_omm_patches(self, xml_root, valid_residues_for_patch, write_apply_to_residue=False):
         """
         Write patch definitions for OpenMM ForceField
@@ -523,6 +544,7 @@ class OpenMMParameterSet(ParameterSet):
                 for residue_name in valid_residues_for_patch[patch.name]:
                     etree.SubElement(patch_xml, 'ApplyToResidue', name=residue_name)
 
+    @needs_lxml
     def _write_omm_bonds(self, xml_root, skip_types):
         if not self.bond_types: return
         xml_force = etree.SubElement(xml_root, 'HarmonicBondForce')
@@ -536,6 +558,7 @@ class OpenMMParameterSet(ParameterSet):
             bonds_done.add((a2, a1))
             etree.SubElement(xml_force, 'Bond', type1=a1, type2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
 
+    @needs_lxml
     def _write_omm_angles(self, xml_root, skip_types):
         if not self.angle_types: return
         xml_force = etree.SubElement(xml_root, 'HarmonicAngleForce')
@@ -549,6 +572,7 @@ class OpenMMParameterSet(ParameterSet):
             angles_done.add((a3, a2, a1))
             etree.SubElement(xml_force, 'Angle', type1=a1, type2=a2, type3=a3, angle=str(angle.theteq*tconv), k=str(angle.k*kconv))
 
+    @needs_lxml
     def _write_omm_dihedrals(self, xml_root, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
@@ -594,6 +618,7 @@ class OpenMMParameterSet(ParameterSet):
             etree.SubElement(xml_force, 'Improper', type1=a1, type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
                        periodicity1=str(improp.per), phase1=str(improp.phase*pconv), k1=str(improp.phi_k*kconv))
 
+    @needs_lxml
     def _write_omm_impropers(self, xml_root, skip_types):
         if not self.improper_types: return
         xml_force = etree.SubElement(xml_root, 'CustomTorsionForce', energy="k*(theta-theta0)^2")
@@ -608,6 +633,7 @@ class OpenMMParameterSet(ParameterSet):
             etree.SubElement(xml_force, 'Improper', type1=nowild(a1), type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
                        k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
 
+    @needs_lxml
     def _write_omm_urey_bradley(self, xml_root, skip_types):
         if not self.urey_bradley_types: return None
         xml_root.append( etree.Comment("Urey-Bradley terms") )
@@ -623,6 +649,7 @@ class OpenMMParameterSet(ParameterSet):
             if urey == NoUreyBradley: continue
             etree.SubElement(xml_force, 'UreyBradley', type1=a1, type2=a2, type3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
 
+    @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
         xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
@@ -651,6 +678,7 @@ class OpenMMParameterSet(ParameterSet):
             etree.SubElement(xml_force, 'Torsion', map=str(maps[id(cmap)]),
                        type1=a1, type2=a2, type3=a3, type4=a4, type5=a5)
 
+    @needs_lxml
     def _write_omm_nonbonded(self, xml_root, skip_types, separate_ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
@@ -708,6 +736,7 @@ class OpenMMParameterSet(ParameterSet):
 
             etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
+    @needs_lxml
     def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
         if not self.nbfix_types and not separate_ljforce: return
         # Convert Conversion factors for writing in natural OpenMM units
@@ -762,5 +791,4 @@ class OpenMMParameterSet(ParameterSet):
         # Not currently implemented, so throw an exception if any unsupported
         # options are specified
         if self.combining_rule == 'geometric':
-            raise NotImplementedError('Geometric combining rule not currently '
-                                      'supported.')
+            raise NotImplementedError('Geometric combining rule not currently supported.')
