@@ -519,6 +519,7 @@ class OpenMMParameterSet(ParameterSet):
                 msg += str(e)
                 raise(msg)
             patched_residue = residue.apply_patch(patch)
+            #patch_xml.append( etree.Comment('Using residue %s as reference template' % residue.name) )
 
             for atom in patch.atoms:
                 if atom.name not in residue:
@@ -527,7 +528,7 @@ class OpenMMParameterSet(ParameterSet):
                     etree.SubElement(patch_xml, 'ChangeAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
 
             for atom_name in patch.delete_atoms:
-                etree.SubElement(patch_xml, 'RemoveAtom', name=atom.name)
+                etree.SubElement(patch_xml, 'RemoveAtom', name=atom_name)
 
             for bond in patch.bonds:
                 etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
@@ -785,7 +786,6 @@ class OpenMMParameterSet(ParameterSet):
                 else:
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
-
             etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
         # write NBFIX records
@@ -794,7 +794,7 @@ class OpenMMParameterSet(ParameterSet):
             rmin = value[1] * length_conv
             # convert to sigma
             sigma = 2 * rmin/(2**(1.0/6))
-            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), emin=str(emin))
+            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
 
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported

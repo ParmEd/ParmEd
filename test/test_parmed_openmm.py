@@ -587,7 +587,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                                               get_fn('top_all36_prot.rtf'),
                                               get_fn('toppar_water_ions.str'))
         )
-        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        #ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        ffxml_filename = get_fn('charmm_conv.xml') # DEBUG
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
@@ -678,5 +679,5 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         output_lines = ffxml.readlines()
         control_line1 = '  <Residue name="K" override="1">\n'
         control_line2 = '  <Residue name="NA">\n'
-        self.assertEqual(output_lines[5], control_line1)
-        self.assertEqual(output_lines[8], control_line2)
+        self.assertEqual(output_lines[5].strip(), control_line1.strip())
+        self.assertEqual(output_lines[8].strip(), control_line2.strip())
