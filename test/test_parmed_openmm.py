@@ -6,6 +6,7 @@ import math
 import os
 import unittest
 import warnings
+from unittest import skipIf
 
 import numpy as np
 
@@ -19,12 +20,12 @@ except ImportError:
     lxml = None
 
 import parmed as pmd
-from parmed.utils.six.moves import StringIO
+from parmed.utils.six import StringIO, BytesIO
+from io import TextIOWrapper
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
                    TestCaseRelative, EnergyTestCase)
 from parmed.exceptions import ParameterWarning
-
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestOpenMM(FileIOTestCase, EnergyTestCase):
@@ -540,11 +541,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                 os.path.join(get_fn('parm'), 'parm10.dat'),
                 os.path.join(get_fn('parm'), 'frcmod.ff14SB'))
         )
-        ffxml = StringIO()
+        ffxml = BytesIO()
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 2178)
-        ffxml = StringIO()
+        ffxml = BytesIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
@@ -555,12 +556,12 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                   pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
                   os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
         )
-        ffxml = StringIO()
+        ffxml = BytesIO()
         warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 222)
-        ffxml = StringIO()
+        ffxml = BytesIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
@@ -654,7 +655,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
             new_residues[name] = params.residues[name]
         params.residues = new_residues
-        ffxml = StringIO()
+        ffxml = BytesIO()
         params.write(ffxml)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 16)
@@ -671,7 +672,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         new_residues['NA'] = params.residues['NA']
         new_residues['K'].override_level = 1
         params.residues = new_residues
-        ffxml = StringIO()
+        ffxml = BytesIO()
         params.write(ffxml)
         ffxml.seek(0)
         output_lines = ffxml.readlines()

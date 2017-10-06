@@ -145,7 +145,7 @@ class OpenMMParameterSet(ParameterSet):
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False):
+              improper_dihedrals_ordering='default', charmm_imp=False, encoding='utf-8'):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -197,6 +197,8 @@ class OpenMMParameterSet(ParameterSet):
         charmm_imp: bool
             If True, will check for existence of IMPR in each residue and patch template,
             and write out the explicit improper definition without wildcards in the ffxml file.
+        encoding : str, optional, default='utf-8'
+            Encoding for XML file.
 
         Notes
         -----
@@ -246,8 +248,8 @@ class OpenMMParameterSet(ParameterSet):
         self._write_omm_nonbonded(root, skip_types, separate_ljforce)
         self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
 
-        tree = ElementTree(root)
-        tree.write(dest)
+        tree = etree.ElementTree(root)
+        tree.write(dest, encoding=encoding)
 
     def _find_explicit_impropers(self):
         improper_harmonic = {}
@@ -414,7 +416,7 @@ class OpenMMParameterSet(ParameterSet):
             if residue.override_level == 0:
                 xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name)
             else:
-                xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name, override=residue.override_level)
+                xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name, override=str(residue.override_level))
             # Write residue contents
             for atom in residue.atoms:
                 etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
