@@ -24,15 +24,6 @@ from collections import defaultdict
 
 from lxml import etree
 
-from xml.sax.saxutils import escape
-XML_ESCAPES = {
-    '&' : '&amp;',
-    '<' : '&lt;',
-    '>' : '&gt;',
-    "'" : '&#39;',
-    '"' : '&quot;'
-    }
-
 import logging
 LOGGER = logging.getLogger(__name__)
 
@@ -641,7 +632,7 @@ class OpenMMParameterSet(ParameterSet):
 
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        xml_force = etree.SubElement(xml_root, CmapTorsionForce)
+        xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -772,7 +763,7 @@ class OpenMMParameterSet(ParameterSet):
             rmin = value[1] * length_conv
             # convert to sigma
             sigma = 2 * rmin/(2**(1.0/6))
-            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(epsilon))
+            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), emin=str(emin))
 
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported
