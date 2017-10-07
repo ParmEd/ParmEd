@@ -587,8 +587,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                                               get_fn('top_all36_prot.rtf'),
                                               get_fn('toppar_water_ions.str'))
         )
-        #ffxml_filename = get_fn('charmm_conv.xml', written=True)
-        ffxml_filename = get_fn('charmm_conv.xml') # DEBUG
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
