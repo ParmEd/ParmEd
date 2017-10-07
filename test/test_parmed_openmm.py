@@ -599,7 +599,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
         # Parameterize ACE-NME in water
-        pdbfile = app.PDBFile(get_fn('nma.pdb'))
+        pdbfile = app.PDBFile(get_fn('2igd_924wat.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
 
     @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without NetworkX and OpenMM")
