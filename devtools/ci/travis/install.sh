@@ -22,7 +22,11 @@ else # Otherwise, CPython... go through conda
     export PATH=$HOME/miniconda/bin:$PATH
     conda update conda -y
     conda install --yes conda-build jinja2 binstar pip
-    conda config --add channels omnia
+    # Omnia requires conda-forge
+    conda config --add channels omnia --add channels conda-forge
+    # Use of conda-forge requires update
+    conda update --yes conda
+    # Add OpenMM dev channel
     conda config --add channels omnia/label/dev
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
@@ -35,7 +39,7 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv boost==1.59.0 -c omnia
         conda install -y -n myenv nglview -c bioconda
         conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
-        conda install -y -n myenv -c conda-forge networkx
+        conda install -y -n myenv networkx
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose pyflakes=1.0.0 \
