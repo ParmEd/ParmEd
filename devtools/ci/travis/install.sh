@@ -23,6 +23,7 @@ else # Otherwise, CPython... go through conda
     conda update conda -y
     conda install --yes conda-build jinja2 binstar pip
     conda config --add channels omnia
+    conda config --add channels omnia/label/dev
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
