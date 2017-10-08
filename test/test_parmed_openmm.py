@@ -568,7 +568,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         forcefield = app.ForceField(ffxml)
 
-    @unittest.skipUnless(has_openmm and lxml is not None, "Cannot test without OpenMM or lxml")
+    @unittest.skipIf((not has_openmm) or (lxml is None), "Cannot test without OpenMM or lxml")
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -602,7 +602,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         pdbfile = app.PDBFile(get_fn('2igd_924wat.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
 
-    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without NetworkX and OpenMM")
+    @unittest.skipIf((nx is None) or (not has_openmm) or (lxml is None), "Cannot test without NetworkX and OpenMM")
     def test_ljforce_charmm(self):
         """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
 
@@ -625,7 +625,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
 
-    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without networkx and openmm")
+    @unittest.skipIf((nx is None) or (not has_openmm) or (lxml is None), "Cannot test without networkx and openmm")
     def test_explicit_improper(self):
         """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
 
@@ -645,8 +645,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 
     @skipIf(lxml is None, 'Cannot test without lxml')
     def test_not_write_residues_with_same_templhash(self):
-        """Test that no identical residues are written to XML, using the
-           templhasher function."""
+        """Test that no identical residues are written to XML, using the templhasher function."""
         # TODO add testing for multiatomic residues when support for those added
         params = openmm.OpenMMParameterSet.from_parameterset(
                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
@@ -662,8 +661,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 
     @skipIf(lxml is None, 'Cannot test without lxml')
     def test_override_level(self):
-        """Test correct support for the override_level attribute of
-           ResidueTemplates and correct writing to XML tag"""
+        """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
                  )
