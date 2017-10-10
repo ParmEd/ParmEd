@@ -15,7 +15,7 @@ try:
 except ImportError:
     nx = None
 try:
-    import lxml
+    from lxml import etree
 except ImportError:
     lxml = None
 
