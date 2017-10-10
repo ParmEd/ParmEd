@@ -15,9 +15,10 @@ try:
 except ImportError:
     nx = None
 try:
-    from lxml import etree
+    import lxml
 except ImportError:
     lxml = None
+print('lxml = %s' % lxml)
 
 import parmed as pmd
 from parmed.utils.six import StringIO
