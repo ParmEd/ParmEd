@@ -69,11 +69,7 @@ class Argument(object):
 
     def __eq__(self, other):
         """ String comparison """
-        marked = self.marked, other.marked
-        try:
-            return str(self) == str(other)
-        finally:
-            self.marked, other.marked = marked
+        return self.string == str(other)
 
     def mark(self):
         """ Provide a way of forcibly marking an argument """
