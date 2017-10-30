@@ -11,9 +11,8 @@ import warnings
 from collections import Counter, OrderedDict
 
 import numpy as np
-import parmed.gromacs as gromacs
 
-from .. import unit as u
+from .. import gromacs, unit as u
 from ..amber import (AmberAsciiRestart, AmberMask, AmberMdcrd, AmberParm,
                      AmoebaParm, ChamberParm, NetCDFRestart, NetCDFTraj)
 from ..amber._chamberparm import ConvertFromPSF
@@ -155,7 +154,7 @@ class Action(lawsuit):
                 arg_list = '%s ' % arg_list
             arg_list += ' '.join([str(a) for a in args])
             for kw, item in iteritems(kwargs):
-                arg_list += ' %s %s ' % (kw, item)
+                arg_list += ' %s %s ' % (kw, self._format_arg(item))
         elif arg_list is None:
             arg_list = ArgumentList('')
         # If our arg_list is a string, convert it to an ArgumentList
@@ -230,6 +229,17 @@ class Action(lawsuit):
 
     def __str__(self):
         return ''
+
+    @staticmethod
+    def _format_arg(arg):
+        """
+        Formats an argument so that if it's a string with a space in it, the argument will be
+        encapsulated with quotes
+        """
+        arg = str(arg)
+        if ' ' in arg or '\t' in arg:
+            return '"%s"' % arg
+        return arg
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
