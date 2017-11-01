@@ -126,9 +126,8 @@ class TestNonParmActions(FileIOTestCase):
         # To keep stderr clean
         warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                       '-top %s' % get_fn('top_all22_prot.inp'),
-                       '-param %s' % get_fn('par_all22_prot.inp'))
+        a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                       get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'))
         str(a)
         a.execute()
         parm = a.parm
@@ -139,111 +138,94 @@ class TestNonParmActions(FileIOTestCase):
         self.assertEqual(parm.ptr('ifbox'), 0)
         # Error checking
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % 'foo',
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', 'foo', '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'), '-crd',
+                           get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % 'foo',
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', 'foo', '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'), '-crd',
+                           get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % 'foo',
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'),
+                           '-param', 'foo', '-crd', get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % 'foo').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', 'foo').execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-str foo').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'), '-str', 'foo').execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-toppar foo').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'), '-toppar', 'foo').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'),
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'),
                            '-toppar', get_fn('trx.prmtop')).execute()
         )
         fn = get_fn('test.inp', written=True)
         with open(fn, 'w') as f:
             pass
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'),
-                           '-toppar', fn).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'), '-toppar', fn).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('*.pdb')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'), '-param',
+                           get_fn('par_all22_prot.inp'), '-crd', get_fn('*.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('*.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('*.psf'), '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'), '-crd',
+                           get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-box',
-                           'a,b,c,d,e,f').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'), '-box', 'a,b,c,d,e,f').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-box',
-                           '1,2,3,4').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb'), '-box', '1,2,3,4').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'),
+                           '-crd', get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'), '-radii',
-                           'foobar').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'), '-radii', 'foobar').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'), '-radii',
-                           'foobar').execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
+                           '-top', get_fn('top_all22_prot.inp'),
+                           '-param', get_fn('par_all22_prot.inp'), '-radii', 'foobar').execute()
         )
         self.assertRaises(exc.ChamberError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('trx.prmtop')).execute()
+                PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
+                           get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'),
+                           '-crd', get_fn('trx.prmtop')).execute()
         )
 
     def test_chamber_model(self):
@@ -251,12 +233,10 @@ class TestNonParmActions(FileIOTestCase):
         # To keep stderr clean
         warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('propane.psf'),
-                       '-top %s' % get_fn('top_all36_prot.rtf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_all36_prot_model.str'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('propane.pdb'))
+        a = PT.chamber(self.parm, '-psf', get_fn('propane.psf'), '-top',
+                       get_fn('top_all36_prot.rtf'), '-param', get_fn('par_all36_prot.prm'),
+                       '-str', get_fn('toppar_all36_prot_model.str'), '-str',
+                       get_fn('toppar_water_ions.str'), '-crd', get_fn('propane.pdb'))
         str(a)
         a.execute()
         parm = a.parm
@@ -285,10 +265,9 @@ class TestNonParmActions(FileIOTestCase):
         """ Test the chamber action with a complex system using NBFIX """
         warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-toppar %s' % get_fn('???_all36_prot.???'),
-                       '-toppar %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box bounding')
+        a = PT.chamber(self.parm, '-psf', get_fn('ala3_solv.psf'), '-toppar',
+                       get_fn('???_all36_prot.???'), '-toppar', get_fn('toppar_water_ions.str'),
+                       '-crd', get_fn('ala3_solv.crd'), '-box', 'bounding')
         a.execute()
         str(a)
         parm = a.parm
@@ -323,10 +302,10 @@ class TestNonParmActions(FileIOTestCase):
         """ Test that chamber sets the box angles for triclinics correctly """
         warnings.filterwarnings('ignore', category=CharmmWarning,
                                 module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box',
+        a = PT.chamber(self.parm, '-psf', get_fn('ala3_solv.psf'),
+                       '-param', get_fn('par_all36_prot.prm'),
+                       '-str', get_fn('toppar_water_ions.str'),
+                       '-crd', get_fn('ala3_solv.crd'), '-box',
                        '33,33,33,109.475,109.475,109.475')
         a.execute()
         str(a)
@@ -338,11 +317,9 @@ class TestNonParmActions(FileIOTestCase):
         for x, y in zip(parm.box, [33]*3 + [109.475]*3):
             self.assertAlmostEqual(x, y)
         # Now check implied orthorhombic UC
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box',
-                       '33,33,33')
+        a = PT.chamber(self.parm, '-psf', get_fn('ala3_solv.psf'), '-param',
+                       get_fn('par_all36_prot.prm'), '-str', get_fn('toppar_water_ions.str'),
+                       '-crd', get_fn('ala3_solv.crd'), '-box', '33,33,33')
         a.execute()
         str(a)
         parm = a.parm
@@ -391,7 +368,7 @@ class TestNonParmActions(FileIOTestCase):
         """ Test the gromber action passing various defines """
         a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
                        os.path.join(get_fn('03.AlaGlu'), 'conf.gro'),
-                       'define SOMEDEF=this define SOMEDEF2=that')
+                       'define', 'SOMEDEF=this', 'define', 'SOMEDEF2=that')
         stra = str(a)
         self.assertIn('SOMEDEF', stra)
         self.assertIn('SOMEDEF2', stra)
@@ -3026,7 +3003,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB actions for ChamberParm """
         parm = copy(gascham)
-        PT.addPDB(parm, get_fn('ala_ala_ala.pdb'), 'elem allicodes').execute()
+        PT.addPDB(parm, get_fn('ala_ala_ala.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3483,7 +3460,7 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB for AmoebaParm """
         parm = copy(amoebaparm)
-        PT.addPDB(parm, get_fn('nma.pdb'), 'elem allicodes').execute()
+        PT.addPDB(parm, get_fn('nma.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)

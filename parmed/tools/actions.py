@@ -152,7 +152,7 @@ class Action(lawsuit):
                 arg_list = ''
             else:
                 arg_list = '%s ' % arg_list
-            arg_list += ' '.join([str(a) for a in args])
+            arg_list += ' '.join([self._format_arg(a) for a in args])
             for kw, item in iteritems(kwargs):
                 arg_list += ' %s %s ' % (kw, self._format_arg(item))
         elif arg_list is None:
