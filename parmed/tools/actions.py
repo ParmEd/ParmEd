@@ -150,6 +150,9 @@ class Action(lawsuit):
         if args or kwargs:
             if arg_list is None:
                 arg_list = ''
+            elif isinstance(arg_list, string_types) and ' ' in arg_list.strip():
+                # arg_list has a space, so enclose it in quotes
+                arg_list = '"%s"  ' % arg_list
             else:
                 arg_list = '%s ' % arg_list
             arg_list += ' '.join([self._format_arg(a) for a in args])
@@ -157,6 +160,8 @@ class Action(lawsuit):
                 arg_list += ' %s %s ' % (kw, self._format_arg(item))
         elif arg_list is None:
             arg_list = ArgumentList('')
+        elif isinstance(arg_list, string_types):
+            arg_list = self._format_arg(arg_list)
         # If our arg_list is a string, convert it to an ArgumentList
         if isinstance(arg_list, string_types):
             arg_list = ArgumentList(arg_list)
@@ -202,6 +207,7 @@ class Action(lawsuit):
                 else:
                     raise ParmError('%s objects are not supported by this action' %
                                     type(self.parm).__name__)
+        self._arg_list = arg_list
         try:
             self.init(arg_list)
         except NoArgument:
@@ -238,7 +244,7 @@ class Action(lawsuit):
         """
         arg = str(arg)
         if ' ' in arg or '\t' in arg:
-            return '"%s"' % arg
+            return ' "%s" ' % arg
         return arg
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

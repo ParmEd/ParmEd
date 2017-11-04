@@ -1045,9 +1045,9 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
         act = PT.printAngles(gasparm, '*', '@5', '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
-        act = PT.printAngles(gasparm, '@1 @5 @7')
+        act = PT.printAngles(gasparm, *'@1 @5 @7'.split())
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
-        act = PT.printAngles(gasparm, '@7 @5 @1')
+        act = PT.printAngles(gasparm, *'@7 @5 @1'.split())
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
 
     def test_print_angles_with_measurements(self):
@@ -1194,7 +1194,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_dihedral(self):
         """ Test addDihedral and deleteDihedral on AmberParm """
         parm = copy(gasparm)
-        act = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1')
+        act = PT.deleteDihedral(parm, *':ALA@N :ALA@CA :ALA@CB :ALA@HB1'.split())
         n = act.execute()
         str(act)
         str(PT.deleteDihedral(parm, '@NONE', '@NONE', '@NONE', '@NONE'))
@@ -1243,26 +1243,22 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         else:
             assert False, 'No natural impropers found'
         PT.addDihedral(parm, '@1', '@20', '@30', '@40', dt.phi_k,
-                dt.per, dt.phase, dt.scee, dt.scnb, type='improper').execute()
+            dt.per, dt.phase, dt.scee, dt.scnb, type='improper').execute()
         self.assertEqual(len(parm.dihedral_types), ntyp)
         self.assertIs(parm.dihedrals[-1].type, dt)
         # Error checking
         self.assertRaises(exc.SetParamError,
-                PT.addDihedral(parm, '@1-2', '@3', '@4', '@5', 1, 1, 10).execute)
+            PT.addDihedral(parm, '@1-2', '@3', '@4', '@5', 1, 1, 10).execute)
         self.assertRaises(exc.InputError, lambda:
-                PT.addDihedral(parm, '@1', '@2', '@3', '@4', 1, 1, 10,
-                               type='badtype').execute()
+            PT.addDihedral(parm, '@1', '@2', '@3', '@4', 1, 1, 10, type='badtype').execute()
         )
         self.assertRaises(exc.SetParamError, lambda:
-                PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1,
-                    10).execute())
+            PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1, 10).execute())
         self.assertRaises(exc.DeleteDihedralError, lambda:
-                PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
+            PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
         self.assertRaises(exc.SeriousParmWarning,
-                PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5',
-                    '@6-7').execute)
-        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35',
-            '@45').execute(), 0)
+            PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5', '@6-7').execute)
+        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35', '@45').execute(), 0)
 
     def test_set_bond(self):
         """ Test setBond on AmberParm """
@@ -1752,7 +1748,7 @@ Basic MD simulation
         self.assertTrue((np.abs(diff) > 1e-3).any())
 
         # Now run the python script and make sure it does the same thing
-        os.system('cd %s && %s %s' % (get_fn('writes'), sys.executable, script))
+        os.system('cd "%s" && "%s" "%s"' % (get_fn('writes'), sys.executable, script))
         if pd is not None:
             df = pd.read_csv(mdout)
             self.assertEqual(df.shape, (5, 6))
@@ -2764,7 +2760,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_dihedral(self):
         """ Test the addDihedral and deleteDihedral actions for ChamberParm """
         parm = copy(gascham)
-        n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        n = PT.deleteDihedral(parm, *':ALA@N :ALA@CA :ALA@CB :ALA@HB1'.split()).execute()
         parm.remake_parm()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
@@ -3362,23 +3358,22 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         """ Check that addDihedral and deleteDihedral fail for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.deleteDihedral(parm, '@1 @2 @3 @4').execute())
+            PT.deleteDihedral(parm, *'@1 @2 @3 @4'.split()).execute())
         self.assertRaises(exc.ParmError, lambda:
-                PT.addDihedral(parm, '@1 @2 @3 @4 0.1556 3 0 1.2 2.0',
-                               type='normal').execute()
+            PT.addDihedral(parm, '@1 @2 @3 @4 0.1556 3 0 1.2 2.0', type='normal').execute()
         )
 
     def test_set_bond(self):
         """ Check that setBond fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute())
+            PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute())
 
     def test_set_angle(self):
         """ Check that setAngle fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.setAngle(parm, ':ALA@CA :ALA@CB :ALA@HB1 40 100').execute())
+            PT.setAngle(parm, ':ALA@CA :ALA@CB :ALA@HB1 40 100').execute())
 
     def test_add_atomic_number(self):
         """ Test addAtomicNumber for AmoebaParm """

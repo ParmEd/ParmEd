@@ -118,7 +118,7 @@ class ArgumentList(object):
         including whitespace
         """
         import re
-        tokenre = re.compile(r'''((?:\s+".*"\s+)|(?:\s+'.*'\s+)|(?:\S+))''')
+        tokenre = re.compile(r'''((?:\s+".*?"\s+?)|(?:\s+'.*?'\s+?)|(?:\S+))''')
         tokenlist = tokenre.findall(instring)
         # Make sure every non-whitespace character is consumed
         if len(tokenre.sub('', instring).strip()) > 0:
