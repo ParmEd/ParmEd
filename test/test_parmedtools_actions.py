@@ -1785,10 +1785,10 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 23.01), 0.05)
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'igb 100').execute())
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'saltcon -0.2').execute())
-        PT.energy(parm, 'igb 0').execute()
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, igb=100).execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, cutoff=-2.0).execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, saltcon=-0.2).execute())
+        PT.energy(parm, igb=0).execute()
         parm.coordinates = None
         self.assertRaises(exc.SimulationError, lambda: PT.energy(parm).execute())
 
@@ -1803,49 +1803,7 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 12785.68), 0.05)
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
-#   def test_energy_HAS_SANDER_is_False(self):
-#       """ Tests energy action with HAS_SANDER = False """
-#       parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
-#       sanderapi.HAS_SANDER = False
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-#           saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
-#       sanderapi.HAS_SANDER = True
-#       sanderapi.HAS_SCIPY = False
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-#           saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
-#       # make sure we can compute energy if restore sander and scipy
-#       sanderapi.HAS_SCIPY = True
-#       sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   def test_minimize_sanderapi_implicit_solvent_minimization(self):
-#       """ Tests the minimize action with pysander and scipy """
-#       # just want to make sure those minimizations runnable
-#       parm7 = get_fn('ala_ala_ala.parm7')
-#       rst7 = get_fn('ala_ala_ala.rst7')
-#       parm = pmd.load_file(parm7, rst7)
-#       original_coordinates = parm.coordinates
-#       for igb in (0, 1, 2, 5, 7, 8):
-#           parm.coordinates = original_coordinates
-#           sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-#       def test_wrong_igb():
-#           sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-#       self.assertRaises(exc.SimulationError, test_wrong_igb)
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   def test_minimize_sanderapi_explicit_solvent_minimization(self):
-#       """ Tests the minimize action with pysander and scipy """
-#       # just want to make sure those minimizations runnable
-#       parm7 = get_fn('ala3_solv.parm7')
-#       rst7 = get_fn('ala3_solv.rst7')
-#       parm = pmd.load_file(parm7, rst7)
-#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=None, tol=1E-2, maxcyc=10)
-#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=9., tol=1E-2, maxcyc=10)
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, cutoff=-2.0).execute())
 
     @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
     def test_minimize_from_action_tools(self):
@@ -1857,13 +1815,13 @@ Basic MD simulation
         original_coordinates = parm.coordinates
 
         for igb in (0, 1, 2, 5, 6, 7, 8):
-            arg_list = 'igb {} maxcyc 10'.format(igb)
+            arg_list = dict(igb=igb, maxcyc=10)
             parm.coordinates = original_coordinates
-            pmd.tools.minimize(parm, arg_list).execute()
+            pmd.tools.minimize(parm, **arg_list).execute()
 
         def test_coordinates_is_None():
             parm.coordinates = None
-            pmd.tools.minimize(parm, 'igb 8 maxcyc 10').execute()
+            pmd.tools.minimize(parm, igb=8, maxcyc=10).execute()
         self.assertRaises(exc.SimulationError, test_coordinates_is_None)
 
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
@@ -1893,14 +1851,12 @@ Basic MD simulation
             IS = app.GBn2
         else:
             assert False, 'illegal input'
-        system = parm.createSystem(implicitSolvent=IS,
-                                   implicitSolventSaltConc=0.1*u.molar)
+        system = parm.createSystem(implicitSolvent=IS, implicitSolventSaltConc=0.1*u.molar)
         starting_e = 0
         for _, e in pmd.openmm.energy_decomposition_system(parm, system):
             starting_e += e
         script = get_fn('minimize.py', written=True)
-        act = PT.minimize(parm, 'omm', script=script, maxcyc=10, igb=igb,
-                          saltcon=0.1)
+        act = PT.minimize(parm, 'omm', script=script, maxcyc=10, igb=igb, saltcon=0.1)
         str(act)
         act.execute()
         end_e = 0
