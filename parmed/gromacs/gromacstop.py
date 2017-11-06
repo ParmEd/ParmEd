@@ -1312,10 +1312,23 @@ class GromacsTopologyFile(Structure):
             top of `dest`. If it is a file-like object, parameters will be
             written there.  If parameters is the same as ``dest``, then the
             parameter types will be written to the same topologyfile.
+        molfile : None or str of file-like object, optional
+            If specified as other than None, the molecules will be written to a
+            separate file that is included in the main topology file. The
+            name of this file will be the provided srting. If None or
+            the same as the ``dest'', the molecules will be written into the
+            body of the topology file. If it is a file-like object,
+            the molecules will be written there. Using this option can make
+            it easier to combine multiple molecules into the same topology.
+            This will change where the following topology sections are
+            written: moleculetype, atoms, bonds, pairs, angles, dihedrals,
+            cmap, settles, virtual_sites2, virtual_sites3 and exclusions.
 
         Raises
         ------
         ValueError if the same molecule number appears in multiple combine lists
+        TypeError if the dest input cannot be parsed
+        ValueError if the combine, parameters, or molfile input cannot be parsed
         """
         import parmed.gromacs as gmx
         from parmed import __version__
