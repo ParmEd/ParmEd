@@ -29,6 +29,7 @@ else # Otherwise, CPython... go through conda
             numpy scipy pandas nose openmm coverage nose-timer \
             python-coveralls netCDF4
         conda update -y -n myenv --all
+        conda install -y -n libgfortran==1
         conda install -y -n myenv pyflakes=1.0.0
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
