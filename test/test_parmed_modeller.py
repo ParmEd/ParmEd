@@ -1094,7 +1094,7 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
         AmberOFFLibrary.write(offlib, 'testinternal.lib')
         f = open('tleap_orig.in', 'w')
         f.write("""\
-source %s
+source "%s"
 l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
               HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
 set default PBRadii mbondi2
@@ -1142,7 +1142,7 @@ quit
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\
-source %s
+source "%s"
 l = sequence {%s %s}
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7
