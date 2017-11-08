@@ -2,19 +2,19 @@
 This module contains functionality for running simulations with OpenMM using
 parameters defined in an input file for sander and pmemd.
 """
-from __future__ import division, print_function
+from __future__ import division
 
-from parmed.amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7
-from parmed.amber.mdin import Mdin
-from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
-        RestartReporter, ProgressReporter, EnergyMinimizerReporter)
-from parmed.utils.timer import Timer
-from parmed import unit as u
-from parmed.utils.six.moves import range
+import logging
+from ...amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7
+from ...amber.mdin import Mdin
+from ...openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter, RestartReporter,
+                           ProgressReporter, EnergyMinimizerReporter)
+from ...utils.timer import Timer
+from ... import unit as u
+from ...utils.six.moves import range
 from math import sqrt
 import os
-from parmed.tools.exceptions import (SimulationError, SimulationWarning,
-        UnhandledArgumentWarning)
+from ..exceptions import SimulationError, SimulationWarning, UnhandledArgumentWarning
 import sys
 import warnings
 try:
@@ -25,6 +25,8 @@ try:
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False
+
+LOGGER = logging.getLogger(__name__)
 
 _SCRIPT_HEADER = """\
 #!/usr/bin/env python
@@ -54,8 +56,7 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
     """
     parm = mask.parm # store the parm object
     if not refc.valid or refc.natom != parm.ptr('natom'):
-        raise SimulationError('Invalid (or incompatible) reference coordinate '
-                              'file')
+        raise SimulationError('Invalid (or incompatible) reference coordinate file')
 
     # Make the (very simple) force term
     if scriptfile is not None:
@@ -114,12 +115,12 @@ def simulate(parm, args):
     dcd = args.has_key('dcd')
     scriptfile = args.get_key_string('script', None)
     runsim = not args.has_key('norun')
-    printprogress = args.has_key('progress')
+    if args.has_key('progress'):
+        LOGGER.warning('progress keyword is deprecated - set log level to INFO for progress')
     # Get any unmarked arguments
     unmarked_cmds = args.unmarked()
     if len(unmarked_cmds) > 0:
-        warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds),
-                      UnhandledArgumentWarning)
+        warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds), UnhandledArgumentWarning)
 
     # Open up the script file and write the header if requested
     if scriptfile is not None:
@@ -144,8 +145,7 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ifqnt']:
         raise SimulationError('QM/MM simulations are not supported.')
     if mdin.cntrl_nml['ievb']:
-        raise SimulationError('Empirical Valence Bond simulations '
-                              'not supported.')
+        raise SimulationError('Empirical Valence Bond simulations not supported.')
     if mdin.cntrl_nml['ipb']:
         raise SimulationError('PB simulations not supported')
     if mdin.cntrl_nml['irism']:
@@ -167,21 +167,19 @@ def simulate(parm, args):
     if mdin.cntrl_nml['ipimd']:
         raise SimulationError('Path-integral MD is not supported.')
     if mdin.cntrl_nml['ilscivr']:
-        raise SimulationError('Linearized semi-classical simulations are not '
-                              'supported.')
+        raise SimulationError('Linearized semi-classical simulations are not supported.')
     if parm.ptr('ifbox') > 0 and mdin.cntrl_nml['igb'] > 0:
         raise SimulationError('Cannot treat periodic system with GB')
     if mdin.cntrl_nml['nmropt']:
         raise SimulationError('NMR restraints are not supported.')
     if runmd and mdin.cntrl_nml['gamma_ln'] == 0 and mdin.cntrl_nml['ntt'] == 3:
-        raise SimulationError('Langevin integrator needs a non-zero friction '
-                              'coefficient')
+        raise SimulationError('Langevin integrator needs a non-zero friction coefficient')
     if mdin.cntrl_nml['ioutfm'] not in (0, 1):
         raise SimulationError('ioutfm must be 0 or 1')
     # Catch some illegal trajectory printing options
     if mdin.cntrl_nml['ioutfm'] == 0 and dcd:
-        warnings.warn('Forcefully setting ioutfm=1 to print DCD-formatted '
-                      'trajectories.', SimulationWarning)
+        warnings.warn('Forcefully setting ioutfm=1 to print DCD-formatted trajectories.',
+                      SimulationWarning)
         mdin.change('cntrl', 'ioutfm', 1)
     if mdin.cntrl_nml['ntwv'] < 0 or mdin.cntrl_nml['ntwf'] < 0:
         if mdin.cntrl_nml['ioutfm'] != 1 or dcd:
@@ -289,7 +287,7 @@ def simulate(parm, args):
 
     # Create the OpenMM System object from our current options
     timer.start_timer('system')
-    if printprogress: print('\tSetting up the OpenMM system...')
+    LOGGER.info('Setting up the OpenMM system...')
     system = parm.createSystem(nonbondedMethod=nbmeth,
                      nonbondedCutoff=mdin.cntrl_nml['cut']*u.angstrom,
                      constraints=constraints, rigidWater=rw,
@@ -328,40 +326,35 @@ def simulate(parm, args):
                 frc.setUseDispersionCorrection(False)
                 if scriptfile is not None:
                     scriptfile.write('# Disable long-range vdW correction\n')
-                    scriptfile.write('system.getForces()[%d].' % i +
-                                     'setUseDispersionCorrection(False)\n')
+                    scriptfile.write('system.getForces()[%d].setUseDispersionCorrection(False)\n'%i)
             if isinstance(frc, mm.CustomNonbondedForce):
                 frc.setUseLongRangeCorrection(False)
                 if scriptfile is not None:
                     scriptfile.write('# Disable long-range vdW correction\n')
-                    scriptfile.write('system.getForces()[%d].' % i +
-                                     'setUseLongRangeCorrection(False)\n')
+                    scriptfile.write('system.getForces()[%d].setUseLongRangeCorrection(False)\n'%i)
         if scriptfile is not None:
             scriptfile.write('\n')
 
     timer.stop_timer('system')
-   
+
     # See if we need to add positional restraints
     if mdin.cntrl_nml['ntr'] != 0:
         timer.add_timer('restraints', 'Setting up positional restraints')
         timer.start_timer('restraints')
-        if printprogress: print('\tSetting up the restraints...')
+        LOGGER.debug('Setting up the restraints...')
         if mdin.cntrl_nml['restraint_wt'] <= 0:
-            raise SimulationError('Restraint weight must be > 0 for restrained '
-                                  'dynamics')
+            raise SimulationError('Restraint weight must be > 0 for restrained dynamics')
         if not mdin.cntrl_nml['restraintmask'].strip():
-            raise SimulationError('Restrained atom selection must be made via '
-                                  'restraintmask')
+            raise SimulationError('Restrained atom selection must be made via restraintmask')
         if scriptfile is not None:
             scriptfile.write("# Set up the restrained atom selection mask\n")
-            scriptfile.write("mask = AmberMask(parm, '%s')\n" %
-                             mdin.cntrl_nml['restraintmask'])
+            scriptfile.write("mask = AmberMask(parm, '%s')\n" % mdin.cntrl_nml['restraintmask'])
             scriptfile.write('refc = Rst7.open("%s")\n' % refc)
         mask = AmberMask(parm, mdin.cntrl_nml['restraintmask'])
-        system.addForce(positional_restraints(mask,
-                        mdin.cntrl_nml['restraint_wt'] * 
-                        u.kilocalorie_per_mole/u.angstrom/u.angstrom,
-                        Rst7.open(refc), scriptfile=scriptfile,)
+        system.addForce(
+            positional_restraints(mask, mdin.cntrl_nml['restraint_wt'] *
+                                  u.kilocalorie_per_mole/u.angstrom/u.angstrom,
+                                  Rst7.open(refc), scriptfile=scriptfile)
         )
         if scriptfile is not None:
             scriptfile.write('system.addForce(frc)\n\n')
@@ -372,35 +365,31 @@ def simulate(parm, args):
         if mdin.cntrl_nml['ntt'] == 0:
             raise SimulationError('constant pressure requires a thermostat')
         if mdin.cntrl_nml['barostat'] == 1:
-            raise SimulationError('Berendsen barostat is not implemented in '
-                                  'OpenMM. Use the MC barostat instead '
-                                  '(barostat=2)')
+            raise SimulationError('Berendsen barostat is not implemented in OpenMM. Use the MC '
+                                  'barostat instead (barostat=2)')
         if mdin.cntrl_nml['ntp'] == 1:
             # Isotropic scaling
             barostat = mm.MonteCarloBarostat(mdin.cntrl_nml['pres0']*u.bar,
-                                mdin.cntrl_nml['temp0']*u.kelvin,
-                                mdin.cntrl_nml['mcbarint'],
-            )
+                                             mdin.cntrl_nml['temp0']*u.kelvin,
+                                             mdin.cntrl_nml['mcbarint'],
+                                            )
             if scriptfile is not None:
-                scriptfile.write('barostat = MonteCarloBarostat(%s*u.bar,\n'
-                                 '                    %s*u.kelvin, %s\n)\n' %
-                                 (mdin.cntrl_nml['pres0'],
-                                 mdin.cntrl_nml['temp0'],
-                                 mdin.cntrl_nml['mcbarint'])
-                )
+                scriptfile.write('barostat = MonteCarloBarostat(%s*u.bar,\n                    '
+                                 '%s*u.kelvin, %s\n)\n' % (mdin.cntrl_nml['pres0'],
+                                 mdin.cntrl_nml['temp0'], mdin.cntrl_nml['mcbarint'])
+                                )
         elif mdin.cntrl_nml['ntp'] == 2:
             # Anisotropic scaling
-            barostat = mm.MonteCarloAnisotropicBarostat(
-                            mdin.cntrl_nml['pres0']*u.bar,
-                            mdin.cntrl_nml['temp0']*u.kelvin,
-                            True, True, True, mdin.cntrl_nml['mcbarint'],
-            )
+            barostat = mm.MonteCarloAnisotropicBarostat(mdin.cntrl_nml['pres0']*u.bar,
+                                                        mdin.cntrl_nml['temp0']*u.kelvin, True,
+                                                        True, True, mdin.cntrl_nml['mcbarint'],
+                                                       )
             if scriptfile is not None:
-                scriptfile.write(
-                        'barostat = MonteCarloAnisotropicBarostat(%s*u.bar,\n  '
-                        '               %s*u.kelvin, True, True, True, %s\n)\n'
-                    % (mdin.cntrl_nml['pres0'], mdin.cntrl_nml['temp0'],
-                       mdin.cntrl_nml['mcbarint']))
+                scriptfile.write('barostat = MonteCarloAnisotropicBarostat(%s*u.bar,\n  '
+                                 '               %s*u.kelvin, True, True, True, %s\n)\n' %
+                                 (mdin.cntrl_nml['pres0'], mdin.cntrl_nml['temp0'],
+                                  mdin.cntrl_nml['mcbarint'])
+                                )
         else:
             raise SimulationError('ntp must be 1 or 2 for constant pressure')
         if scriptfile is not None:
@@ -412,28 +401,25 @@ def simulate(parm, args):
     # tolerance and get the simulation platform
     if mdin.cntrl_nml['ntt'] == 3:
         integrator = mm.LangevinIntegrator(mdin.cntrl_nml['temp0']*u.kelvin,
-                            mdin.cntrl_nml['gamma_ln']/u.picosecond,
-                            mdin.cntrl_nml['dt']*u.picosecond
-        )
+                                           mdin.cntrl_nml['gamma_ln']/u.picosecond,
+                                           mdin.cntrl_nml['dt']*u.picosecond
+                                          )
         if scriptfile is not None:
-            scriptfile.write(
-                    'integrator = LangevinIntegrator(%s*u.kelvin, '
-                    '%s/u.picosecond,\n'
-                    '                    %s*u.picosecond\n)\n' %
-                    (mdin.cntrl_nml['temp0'], mdin.cntrl_nml['gamma_ln'],
-                     mdin.cntrl_nml['dt'])
-            )
+            scriptfile.write('integrator = LangevinIntegrator(%s*u.kelvin, '
+                             '%s/u.picosecond,\n                    %s*u.picosecond\n)\n' %
+                             (mdin.cntrl_nml['temp0'], mdin.cntrl_nml['gamma_ln'],
+                              mdin.cntrl_nml['dt'])
+                            )
     else:
         if mdin.cntrl_nml['ntt'] == 1:
             raise SimulationError('ntt must be 2 or 3 for OpenMM (Andersen '
                                   'thermostat or Langevin dynamics')
         elif mdin.cntrl_nml['ntt'] == 2:
             if scriptfile is not None:
-                scriptfile.write('system.addForce(AndersenThermostat(%s*'
-                                 'u.kelvin, %s\n)\n' %
-                             (mdin.cntrl_nml['temp0'], mdin.cntrl_nml['vrand']))
-            system.addForce(mm.AndersenThermostat(
-                    mdin.cntrl_nml['temp0']*u.kelvin, mdin.cntrl_nml['vrand'])
+                scriptfile.write('system.addForce(AndersenThermostat(%s*u.kelvin, %s\n)\n' %
+                                 (mdin.cntrl_nml['temp0'], mdin.cntrl_nml['vrand']))
+            system.addForce(
+                mm.AndersenThermostat(mdin.cntrl_nml['temp0']*u.kelvin, mdin.cntrl_nml['vrand'])
             )
         if scriptfile is not None:
             scriptfile.write('integrator = VerletIntegrator(%s*u.picosecond)\n'
@@ -444,18 +430,15 @@ def simulate(parm, args):
     if constraints is not None:
         integrator.setConstraintTolerance(mdin.cntrl_nml['tol'])
         if scriptfile is not None:
-            scriptfile.write('integrator.setConstraintTolerance(%s)\n' %
-                                mdin.cntrl_nml['tol'])
+            scriptfile.write('integrator.setConstraintTolerance(%s)\n' % mdin.cntrl_nml['tol'])
 
     # Define the platform if it was requested, or just take the default
     if plat is not None:
         if plat not in ('CUDA', 'Reference', 'CPU', 'OpenCL'):
-            raise SimulationError('Platform must be one of CUDA, Reference, '
-                                'CPU, or OpenCL')
+            raise SimulationError('Platform must be one of CUDA, Reference, CPU, or OpenCL')
         platform = mm.Platform.getPlatformByName(plat)
         if scriptfile is not None:
-            scriptfile.write('platform = Platform.getPlatformByName("%s")\n' %
-                             plat)
+            scriptfile.write('platform = Platform.getPlatformByName("%s")\n' % plat)
     else:
         if scriptfile is not None:
             scriptfile.write('platform = None\n')
@@ -468,10 +451,9 @@ def simulate(parm, args):
     # Create the Simulation object
     timer.add_timer('simulation', 'Creating the Simulation object')
     timer.start_timer('simulation')
-    if printprogress: print('\tSetting up the simulation...')
+    LOGGER.info('Setting up the simulation...')
     if scriptfile is not None:
-        scriptfile.write('simulation = Simulation(parm.topology, system, '
-                         'integrator, platform)\n\n')
+        scriptfile.write('simulation = Simulation(parm.topology, system, integrator, platform)\n\n')
     simulation = Simulation(parm.topology, system, integrator, platform)
 
     # Now set the default precision model. This needs to be done based on the
@@ -492,22 +474,18 @@ def simulate(parm, args):
                              "'OpenCLPrecision', '%s')\n\n" % prec)
         platform.setPropertyValue(simulation.context, 'OpenCLPrecision', prec)
     elif platform.getName() == 'Reference' and prec != 'double':
-        warnings.warn('The Reference platform only uses double precision',
-                      SimulationWarning)
+        warnings.warn('The Reference platform only uses double precision', SimulationWarning)
     elif platform.getName() == 'CPU' and prec != 'single':
-        warnings.warn('The CPU platform only uses single precision',
-                      SimulationWarning)
+        warnings.warn('The CPU platform only uses single precision', SimulationWarning)
 
     # Set the particle positions and box vectors (if applicable) from either the
     # given restart file or from the topology file object. Also use particle
     # velocities if requested via irest=1
-    if printprogress:
-        print('\tSetting up initial coordinates and velocities...')
+    LOGGER.info('Setting up initial coordinates and velocities...')
     if inpcrd is not None:
         position_container = Rst7.open(inpcrd)
         if position_container.natom != parm.ptr('natom'):
-            raise SimulationError('inpcrd [%s] and prmtop mismatch in number '
-                                  'of atoms' % inpcrd)
+            raise SimulationError('inpcrd [%s] and prmtop mismatch in number of atoms' % inpcrd)
     else:
         position_container = parm
     if scriptfile is not None:
@@ -517,48 +495,41 @@ def simulate(parm, args):
     if parm.ptr('ifbox') > 0:
         # Only set box vectors if box is present
         if scriptfile is not None:
-            scriptfile.write('simulation.context.'
-                             'setPeriodicBoxVectors(*parm.box_vectors)\n\n')
-        simulation.context.setPeriodicBoxVectors(
-                    *position_container.box_vectors)
+            scriptfile.write('simulation.context.setPeriodicBoxVectors(*parm.box_vectors)\n\n')
+        simulation.context.setPeriodicBoxVectors(*position_container.box_vectors)
 
     # Velocities
     if runmd and mdin.cntrl_nml['irest'] == 1 and position_container.hasvels:
         if scriptfile is not None:
             scriptfile.write('# Set velocities\n')
-            scriptfile.write('simulation.context.setVelocities'
-                             '(parm.velocities)\n')
+            scriptfile.write('simulation.context.setVelocities(parm.velocities)\n')
         simulation.context.setVelocities(position_container.velocities)
     elif runmd:
         if scriptfile is not None:
             scriptfile.write('# Set velocities\n')
             scriptfile.write('simulation.context.setVelocitiesToTemperature(\n'
-                          '           %s*u.kelvin)\n' % mdin.cntrl_nml['tempi'])
-        simulation.context.setVelocitiesToTemperature(
-                                        mdin.cntrl_nml['tempi']*u.kelvin)
+                             '           %s*u.kelvin)\n' % mdin.cntrl_nml['tempi'])
+        simulation.context.setVelocitiesToTemperature(mdin.cntrl_nml['tempi']*u.kelvin)
     # Add the energy reporter
     if scriptfile is not None:
         scriptfile.write('# Add the state data reporters\n')
-        scriptfile.write('rep = StateDataReporter("%s", %s, volume=%s,'
-                'density=%s)\n' % (outputfile, mdin.cntrl_nml['ntpr'],
-                parm.ptr('ifbox') > 0, runmd and mdin.cntrl_nml['ntp'] > 0)
-        )
+        density = runmd and mdin.cntrl_nml['ntp'] > 0
+        scriptfile.write('rep = StateDataReporter("%s", %s, volume=%s, density=%s)\n' %
+                         (outputfile, mdin.cntrl_nml['ntpr'], parm.ptr('ifbox') > 0, density)
+                        )
         scriptfile.write('simulation.reporters.append(rep)\n')
-        scriptfile.write('rep = ProgressReporter("%s", %s, %s, volume=%s, '
-                'density=%s)\n' % (mdinfo, mdin.cntrl_nml['ntpr'],
-                mdin.cntrl_nml['nstlim'], parm.ptr('ifbox') > 0,
-                runmd and mdin.cntrl_nml['ntp'] > 0)
-        )
+        scriptfile.write('rep = ProgressReporter("%s", %s, %s, volume=%s, density=%s)\n' %
+                         (mdinfo, mdin.cntrl_nml['ntpr'], mdin.cntrl_nml['nstlim'],
+                          parm.ptr('ifbox') > 0, density)
+                        )
         scriptfile.write('simulation.reporters.append(rep)\n')
-    rep = StateDataReporter(outputfile, mdin.cntrl_nml['ntpr'],
-                    volume=parm.ptr('ifbox') > 0,
-                    density=runmd and mdin.cntrl_nml['ntp'] > 0)
+    rep = StateDataReporter(outputfile, mdin.cntrl_nml['ntpr'], volume=parm.ptr('ifbox') > 0,
+                            density=density)
     simulation.reporters.append(rep)
-    rep = ProgressReporter(mdinfo, mdin.cntrl_nml['ntpr'],
-                mdin.cntrl_nml['nstlim'], volume=mdin.cntrl_nml['ntb'] > 0,
-                density=mdin.cntrl_nml['ntb'] == 2)
+    rep = ProgressReporter(mdinfo, mdin.cntrl_nml['ntpr'], mdin.cntrl_nml['nstlim'],
+                           volume=mdin.cntrl_nml['ntb'] > 0, density=density)
     simulation.reporters.append(rep)
-      
+
     timer.stop_timer('simulation')
 
     # Now see if we wanted minimization or not
@@ -567,94 +538,76 @@ def simulate(parm, args):
         if mdin.cntrl_nml['imin'] == 1:
             timer.add_timer('minimization', 'Structure minimization')
             timer.start_timer('minimization')
-            if printprogress: print('\tMinimizing...')
+            LOGGER.info('Minimizing...')
             if scriptfile is not None:
-                scriptfile.write('rep = EnergyMinimizerReporter("%s", '
-                                 'volume=%s)\n' %
+                scriptfile.write('rep = EnergyMinimizerReporter("%s", volume=%s)\n' %
                                  (outputfile, parm.ptr('ifbox') > 0))
                 scriptfile.write('rep.report(simulation)\n')
                 scriptfile.write('# Minimize the energy\n')
                 scriptfile.write('simulation.minimizeEnergy(\n'
-                                '      tolerance=%s*u.kilocalories_per_mole,\n'
-                                '      maxIterations=%s\n)\n' %
-                    (mdin.cntrl_nml['drms'], mdin.cntrl_nml['maxcyc'])
-                )
+                                 '    tolerance=%s*u.kilocalories_per_mole,\n'
+                                 '    maxIterations=%s\n)\n' %
+                                 (mdin.cntrl_nml['drms'], mdin.cntrl_nml['maxcyc']))
                 scriptfile.write('rep.report(simulation)\n\n')
                 scriptfile.write('# Write the restart file\n')
-                scriptfile.write(
-                    'restrt_reporter = RestartReporter("%s", 1,\n'
-                    '                       False, %s, write_velocities=False\n'
-                    ')\n' % (restart, mdin.cntrl_nml['ntxo']==2)
-                )
+                scriptfile.write('restrt_reporter = RestartReporter("%s", 1,\n'
+                                 '    False, %s, write_velocities=False\n)\n' %
+                                 (restart, mdin.cntrl_nml['ntxo']==2))
                 scriptfile.write('restrt_reporter.report(simulation,\n'
-                    '      simulation.context.getState(getPositions=True,\n'
-                    '         enforcePeriodicBox=%s)\n)\n' %
-                    bool(mdin.cntrl_nml['ntb']))
-            rep = EnergyMinimizerReporter(outputfile,
-                                          volume=parm.ptr('ifbox') > 0)
+                                 '    simulation.context.getState(getPositions=True, '
+                                 'enforcePeriodicBox=%s)\n)\n' % bool(mdin.cntrl_nml['ntb']))
+            rep = EnergyMinimizerReporter(outputfile, volume=parm.ptr('ifbox') > 0)
             rep.report(simulation)
-            simulation.minimizeEnergy(
-                    tolerance=mdin.cntrl_nml['drms']*u.kilocalories_per_mole,
-                    maxIterations=mdin.cntrl_nml['maxcyc']
-            )
+            simulation.minimizeEnergy(tolerance=mdin.cntrl_nml['drms']*u.kilocalories_per_mole,
+                                      maxIterations=mdin.cntrl_nml['maxcyc'])
             rep.report(simulation)
             # Write a restart file with the new coordinates
-            restrt_reporter = RestartReporter(restart, 1, parm.ptr('natom'),
-                    False, mdin.cntrl_nml['ntxo'] == 2, write_velocities=False)
-            restrt_reporter.report(simulation,
-                simulation.context.getState(getPositions=True,
-                        enforcePeriodicBox=bool(mdin.cntrl_nml['ntb']))
-            )
+            restrt_reporter = RestartReporter(restart, 1, parm.ptr('natom'), False,
+                                              mdin.cntrl_nml['ntxo'] == 2, write_velocities=False)
+            restrt_reporter.report(simulation, simulation.context.getState(getPositions=True,
+                                   enforcePeriodicBox=bool(mdin.cntrl_nml['ntb'])))
             timer.stop_timer('minimization')
         elif mdin.cntrl_nml['imin'] == 5:
             timer.add_timer('minimization', 'Structure minimization')
             timer.start_timer('minimization')
-            if printprogress: print('\tMinimizing...')
+            LOGGER.info('Minimizing...')
             try:
                 inptraj = NetCDFTraj.open_old(inptrajname)
                 nframes = inptraj.frame
                 if scriptfile is not None:
-                    scriptfile.write('inptraj = NetCDFTraj.open_old("%s")\n' %
-                                     inptrajname)
+                    scriptfile.write('inptraj = NetCDFTraj.open_old("%s")\n' % inptrajname)
                     scriptfile.write('nframes = inptraj.frame\n')
             except RuntimeError:
-                inptraj = AmberMdcrd(inptrajname, parm.ptr('natom'),
-                                     mdin.cntrl_nml['ntb'] > 0, mode='r')
+                inptraj = AmberMdcrd(inptrajname, parm.ptr('natom'), mdin.cntrl_nml['ntb'] > 0,
+                                     mode='r')
                 nframes = len(inptraj.coordinates())
                 if scriptfile is not None:
-                    scriptfile.write('inptraj = AmberMdcrd("%s", %s, %s, '
-                                     'mode="r")\n' % (inptrajname, 
-                                     "parm.ptr('natom')",
-                                     mdin.cntrl_nml['ntb']>0))
+                    scriptfile.write('inptraj = AmberMdcrd("%s", %s, %s, mode="r")\n' %
+                                     (inptrajname, "parm.ptr('natom')", mdin.cntrl_nml['ntb']>0))
                     scriptfile.write('nframes = inptraj.frame\n')
             # Create a reporter to handle the minimized coordinates
             if mdin.cntrl_nml['ioutfm'] == 0:
                 crd_reporter = MdcrdReporter(trajectory, 1)
                 if scriptfile is not None:
-                    scriptfile.write('crd_reporter = MdcrdReporter("%s", 1)\n'
-                                     % trajectory)
+                    scriptfile.write('crd_reporter = MdcrdReporter("%s", 1)\n' % trajectory)
             elif dcd:
                 crd_reporter = DCDReporter(trajectory, 1)
                 if scriptfile is not None:
-                    scriptfile.write('crd_reporter = DCDReporter("%s", 1)\n' %
-                                     trajectory)
+                    scriptfile.write('crd_reporter = DCDReporter("%s", 1)\n' % trajectory)
             else:
                 crd_reporter = NetCDFReporter(trajectory, 1)
                 if scriptfile is not None:
-                    scriptfile.write('crd_reporter = NetCDFReporter("%s", 1)\n'
-                                     % trajectory)
+                    scriptfile.write('crd_reporter = NetCDFReporter("%s", 1)\n' % trajectory)
             if scriptfile is not None:
                 scriptfile.write('f = open("%s", "w", 0)\n'
-                        'rep = EnergyMinimizerReporter(f, volume=%s)\n'
-                        'for frame in range(nframes)\n'
-                        '    crds = inptraj.coordinates(frame)\n'
-                        '    simulation.context.setPositions(\n'
-                        '         tuple([Vec3(crds[3*i], crds[3*i+1], '
-                        'crds[3*i+2])\n'
-                        '           for i in range(parm.ptr("natom"))]) * '
-                        'u.angstroms\n'
-                        '    )\n' % outputfile
-                )
+                                 'rep = EnergyMinimizerReporter(f, volume=%s)\n'
+                                 'for frame in range(nframes)\n'
+                                 '    crds = inptraj.coordinates(frame)\n'
+                                 '    simulation.context.setPositions(\n'
+                                 '         tuple([Vec3(crds[3*i], crds[3*i+1], '
+                                 'crds[3*i+2])\n'
+                                 '           for i in range(parm.ptr("natom"))]) * '
+                                 'u.angstroms\n    )\n' % outputfile)
             f = open(outputfile, 'w', 0)
             rep = EnergyMinimizerReporter(f, volume=parm.ptr('ifbox') > 0)
             for frame in range(nframes):
@@ -667,23 +620,19 @@ def simulate(parm, args):
                 if mdin.cntrl_nml['maxcyc'] > 1:
                     if scriptfile is not None:
                         scriptfile.write('    simulation.minimizeEnergy(\n'
-                            '          tolerance=%s*u.kilocalories_per_mole,\n'
-                            '          maxIterations=%s,\n'
-                            '    )\n'
-                            '    crd_reporter.report(simulation,\n'
-                            '        simulation.context.getState('
-                            'getPositions=True),\n    )\n'
-                            '    rep.report(simulation)\n' %
-                            (mdin.cntrl_nml['drms'], mdin.cntrl_nml['maxcyc'])
-                        )
+                                         '          tolerance=%s*u.kilocalories_per_mole,\n'
+                                         '          maxIterations=%s,\n'
+                                         '    )\n'
+                                         '    crd_reporter.report(simulation,\n'
+                                         '        simulation.context.getState('
+                                         'getPositions=True),\n    )\n'
+                                         '    rep.report(simulation)\n' %
+                                         (mdin.cntrl_nml['drms'], mdin.cntrl_nml['maxcyc']))
                     simulation.minimizeEnergy(
-                            tolerance=mdin.cntrl_nml['drms']*
-                                      u.kilocalories_per_mole,
-                            maxIterations=mdin.cntrl_nml['maxcyc']
+                        tolerance=mdin.cntrl_nml['drms']* u.kilocalories_per_mole,
+                        maxIterations=mdin.cntrl_nml['maxcyc']
                     )
-                    crd_reporter.report(simulation,
-                            simulation.context.getState(getPositions=True),
-                    )
+                    crd_reporter.report(simulation, simulation.context.getState(getPositions=True))
                     rep.report(simulation)
                 f.write('=' * 80 + '\n')
             f.close()
@@ -703,46 +652,36 @@ def simulate(parm, args):
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s)\n'
-                        ')\n' % (trajectory, mdin.cntrl_nml['ntwx'])
-                    )
+                                     '      MdcrdReporter("%s", %s)\n)\n' %
+                                     (trajectory, mdin.cntrl_nml['ntwx']))
             elif dcd:
-                simulation.reporters.append(
-                        DCDReporter(trajectory, mdin.cntrl_nml['ntwx'])
-                )
+                simulation.reporters.append(DCDReporter(trajectory, mdin.cntrl_nml['ntwx']))
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                            '      DCDReporter("%s", %s)\n)\n' %
-                            (trajectory, mdin.cntrl_nml['ntwx'])
-                    )
+                                     '      DCDReporter("%s", %s)\n)\n' %
+                                     (trajectory, mdin.cntrl_nml['ntwx']))
             else:
                 simulation.reporters.append(
-                        NetCDFReporter(trajectory, mdin.cntrl_nml['ntwx'],
-                                crds=True, vels=mdin.cntrl_nml['ntwv'] < 0,
-                                frcs=mdin.cntrl_nml['ntwf'] < 0
-                        )
+                   NetCDFReporter(trajectory, mdin.cntrl_nml['ntwx'], crds=True,
+                                  vels=mdin.cntrl_nml['ntwv'] < 0, frcs=mdin.cntrl_nml['ntwf'] < 0)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s,\n'
-                        '          crds=True, vels=%s, frcs=%s\n'
-                        '      )\n)\n' %
-                        (trajectory, mdin.cntrl_nml['ntwx'],
-                        mdin.cntrl_nml['ntwv'] < 0, mdin.cntrl_nml['ntwf'] < 0)
-                    )
+                                     '      NetCDFReporter("%s", %s,\n'
+                                     '          crds=True, vels=%s, frcs=%s\n'
+                                     '      )\n)\n' % (trajectory, mdin.cntrl_nml['ntwx'],
+                                     mdin.cntrl_nml['ntwv'] < 0, mdin.cntrl_nml['ntwf'] < 0))
         # Velocity trajectory reporters
         if mdin.cntrl_nml['ntwv'] > 0:
             if mdin.cntrl_nml['ioutfm'] == 0:
                 simulation.reporters.append(
-                        MdcrdReporter(mdvel, mdin.cntrl_nml['ntwv'],
-                                crds=False, vels=True, frcs=False)
+                   MdcrdReporter(mdvel, mdin.cntrl_nml['ntwv'], crds=False, vels=True, frcs=False)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s, crds=False,\n'
-                        '         vels=True, frcs=False)\n'
-                        ')\n' % (trajectory, mdin.cntrl_nml['ntwv'])
-                    )
+                                     '      MdcrdReporter("%s", %s, crds=False,\n'
+                                     '         vels=True, frcs=False)\n'
+                                     ')\n' % (trajectory, mdin.cntrl_nml['ntwv']))
             elif dcd:
                 # Should never make it here due to earlier checks; catch anyway
                 raise SimulationError('Cannot write velocities to DCD files.')
@@ -750,91 +689,79 @@ def simulate(parm, args):
                 # Add forces too only if ntwf < 0 AND no coordinate traj is
                 # being printed (otherwise forces will be printed to the
                 # coordinate file
-                _frcs = mdin.cntrl_nml['ntwf']<0 and mdin.cntrl_nml['ntwx']==0
+                _frcs = mdin.cntrl_nml['ntwf'] < 0 and mdin.cntrl_nml['ntwx'] == 0
                 simulation.reporters.append(
-                        NetCDFReporter(mdvel, mdin.cntrl_nml['ntwv'],
-                                crds=False, vels=True, frcs=_frcs)
+                    NetCDFReporter(mdvel, mdin.cntrl_nml['ntwv'], crds=False, vels=True, frcs=_frcs)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s,\n'
-                        '          crds=False, vels=True, frcs=%s\n'
-                        '      )\n)\n' %
-                        (mdvel, mdin.cntrl_nml['ntwv'],
-                         mdin.cntrl_nml['ntwf']<0 and mdin.cntrl_nml['ntwx']==0)
-                    )
+                                     '      NetCDFReporter("%s", %s,\n'
+                                     '          crds=False, vels=True, frcs=%s\n'
+                                     '      )\n)\n' % (mdvel, mdin.cntrl_nml['ntwv'],
+                                      mdin.cntrl_nml['ntwf'] < 0 and mdin.cntrl_nml['ntwx'] == 0))
         # Force trajectory reporters
         if mdin.cntrl_nml['ntwf'] > 0:
             if mdin.cntrl_nml['ioutfm'] == 0:
                 simulation.reporters.append(
-                        MdcrdReporter(mdfrc, mdin.cntrl_nml['ntwf'],
-                                      crds=False, vels=False, frcs=True)
+                    MdcrdReporter(mdfrc, mdin.cntrl_nml['ntwf'], crds=False, vels=False, frcs=True)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      MdcrdReporter("%s", %s, crds=False,\n'
-                        '         vels=False, frcs=True)\n'
-                        ')\n' % (trajectory, mdin.cntrl_nml['ntwf'])
-                    )
+                                     '      MdcrdReporter("%s", %s, crds=False,\n'
+                                     '         vels=False, frcs=True)\n'
+                                     ')\n' % (trajectory, mdin.cntrl_nml['ntwf']))
             elif dcd:
                 # Should never make it here due to earlier checks; catch anyway
                 raise SimulationError('Cannot write forces to DCD files.')
             else:
                 simulation.reporters.append(
-                        NetCDFReporter(mdfrc, mdin.cntrl_nml['ntwf'],
-                                crds=False, vels=False, frcs=True)
+                    NetCDFReporter(mdfrc, mdin.cntrl_nml['ntwf'], crds=False, vels=False, frcs=True)
                 )
                 if scriptfile is not None:
                     scriptfile.write('simulation.reporters.append(\n'
-                        '      NetCDFReporter("%s", %s,\n'
-                        '          crds=False, vels=False, frcs=True\n'
-                        '      )\n)\n' % (mdfrc, mdin.cntrl_nml['ntwv'])
-                    )
+                                     '      NetCDFReporter("%s", %s,\n'
+                                     '          crds=False, vels=False, frcs=True\n'
+                                     '      )\n)\n' % (mdfrc, mdin.cntrl_nml['ntwv']))
         # Restart file reporter
         restrt_reporter = RestartReporter(restart, abs(mdin.cntrl_nml['ntwr']),
-                    mdin.cntrl_nml['ntwr'] < 0, mdin.cntrl_nml['ntxo'] == 2)
+                                          mdin.cntrl_nml['ntwr'] < 0, mdin.cntrl_nml['ntxo'] == 2)
         if scriptfile is not None:
-            scriptfile.write('restrt_reporter = RestartReporter("%s", %s,\n'
-                    '      %s, %s)\n' %
-                    (restart, abs(mdin.cntrl_nml['ntwr']),
-                     mdin.cntrl_nml['ntwr'] < 0, mdin.cntrl_nml['ntxo'] == 2)
-            )
+            scriptfile.write('restrt_reporter = RestartReporter("%s", %s,\n      %s, %s)\n' %
+                             (restart, abs(mdin.cntrl_nml['ntwr']), mdin.cntrl_nml['ntwr'] < 0,
+                              mdin.cntrl_nml['ntxo'] == 2))
         if mdin.cntrl_nml['ntwr'] != 0:
             simulation.reporters.append(restrt_reporter)
             if scriptfile is not None:
-                scriptfile.write('simulation.reporters.'
-                                 'append(restrt_reporter)\n')
+                scriptfile.write('simulation.reporters.append(restrt_reporter)\n')
 
-        if printprogress: print('\tRunning MD...')
+        LOGGER.info('Running MD...')
         if scriptfile is not None:
             scriptfile.write('simulation.step(%s)\n'
-                'final_state = simulation.context.getState(getPositions=True,\n'
-                '     getVelocities=True, enforcePeriodicBox=%s)\n'
-                'restrt_reporter.report(simulation, final_state)\n' %
-                (mdin.cntrl_nml['nstlim'], mdin.cntrl_nml['ntb'] > 0)
-            )
+                             'final_state = simulation.context.getState(getPositions=True,\n'
+                             '     getVelocities=True, enforcePeriodicBox=%s)\n'
+                             'restrt_reporter.report(simulation, final_state)\n' %
+                             (mdin.cntrl_nml['nstlim'], mdin.cntrl_nml['ntb'] > 0))
         if runsim:
             simulation.step(mdin.cntrl_nml['nstlim'])
             # Now write the final restart file, hijacking the restart file
             # reporter
-            final_state = simulation.context.getState(getPositions=True,
-                                    getVelocities=True,
-                                    enforcePeriodicBox=mdin.cntrl_nml['ntb']>0
-            )
+            final_state = simulation.context.getState(getPositions=True, getVelocities=True,
+                                                      enforcePeriodicBox=mdin.cntrl_nml['ntb'] > 0)
             restrt_reporter.report(simulation, final_state)
             timer.stop_timer('md')
             nsperday = (mdin.cntrl_nml['nstlim'] * mdin.cntrl_nml['dt'] /
                         1000.0 / (timer.timers['md'] / 3600 / 24))
 
     timer.done()
-    print('Done')
+    LOGGER.info('Done')
     for t in timer.timer_names:
         timer.print_(t, sys.stdout)
    
     if mdin.cntrl_nml['imin'] == 0 and runsim:
-        print('MD timing: %.3f ns/day' % nsperday)
+        LOGGER.info('MD timing: %.3f ns/day' % nsperday)
 
-    if scriptfile is not None: scriptfile.close()
+    if scriptfile is not None:
+        scriptfile.close()
 
 def energy(parm, args, output=sys.stdout):
     """
@@ -858,8 +785,7 @@ def energy(parm, args, output=sys.stdout):
     # Get any unmarked arguments
     unmarked_cmds = args.unmarked()
     if len(unmarked_cmds) > 0:
-        warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds),
-                      UnhandledArgumentWarning)
+        warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds), UnhandledArgumentWarning)
    
     gbmeth = None
     if parm.ptr('ifbox') == 0:
@@ -869,8 +795,7 @@ def energy(parm, args, output=sys.stdout):
         else:
             nbmeth = ff.CutoffNonPeriodic
         if not igb in (0, 1, 2, 5, 6, 7, 8):
-            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, '
-                                  '6, 7, or 8')
+            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, 6, 7, or 8')
         if igb == 1:
             gbmeth = HCT
         elif igb == 2:
@@ -882,7 +807,7 @@ def energy(parm, args, output=sys.stdout):
         elif igb == 8:
             gbmeth = GBn2
     else:
-        if cutoff is None: cutoff = 8.0
+        cutoff = cutoff if cutoff is not None else 8.0
         if do_ewald:
             nbmeth = ff.Ewald
         else:
@@ -900,19 +825,13 @@ def energy(parm, args, output=sys.stdout):
         except IOError:
             raise SimulationError('Could not create temporary file for app ' # pragma: no cover
                                   'layer energy calculation.')
-#       except Exception as exc: TODO delete
-#TODO deleteraise SimulationError('Error creating parm object from app layer. '
-#TODO delete                      '[ %s: %s ]' % (type(exc).__name__, exc))
 
     # Time to create the OpenMM system
-    system = parm_.createSystem(nonbondedMethod=nbmeth,
-                                nonbondedCutoff=cutoff*u.angstrom,
-                                constraints=None, rigidWater=True,
-                                removeCMMotion=False, implicitSolvent=gbmeth,
-                                implicitSolventSaltConc=saltcon*u.molar,
+    system = parm_.createSystem(nonbondedMethod=nbmeth, nonbondedCutoff=cutoff*u.angstrom,
+                                constraints=None, rigidWater=True, removeCMMotion=False,
+                                implicitSolvent=gbmeth, implicitSolventSaltConc=saltcon*u.molar,
                                 soluteDielectric=1.0, solventDielectric=78.5,
-                                ewaldErrorTolerance=5e-5,
-    )
+                                ewaldErrorTolerance=5e-5)
 
     # If we used the app layer, we need to assign force groups to enable energy
     # decomposition
@@ -944,8 +863,7 @@ def energy(parm, args, output=sys.stdout):
     # Define the platform if it was requested, or just take the default
     if plat is not None:
         if plat not in ('CUDA', 'Reference', 'CPU', 'OpenCL'):
-            raise SimulationError('Platform must be one of CUDA, Reference, '
-                                  'CPU, or OpenCL')
+            raise SimulationError('Platform must be one of CUDA, Reference, CPU, or OpenCL')
         platform = mm.Platform.getPlatformByName(plat)
     else:
         platform = None
@@ -973,18 +891,15 @@ def energy(parm, args, output=sys.stdout):
     elif platform.getName() == 'OpenCL':
         platform.setPropertyValue(context, 'OpenCLPrecision', prec)
     elif platform.getName() == 'Reference' and prec != 'double':
-        warnings.warn('The Reference platform only uses double precision',
-                      SimulationWarning)
+        warnings.warn('The Reference platform only uses double precision', SimulationWarning)
     elif platform.getName() == 'CPU' and prec != 'single':
-        warnings.warn('The CPU platform only uses single precision',
-                      SimulationWarning)
+        warnings.warn('The CPU platform only uses single precision', SimulationWarning)
 
     # Now get the energy
     has_pbc = parm.ptr('ifbox') > 0
     nrg = u.kilocalories/u.mole
     if decomp:
-        # Now we have to loop through every force group and compute them
-        # individually
+        # Now we have to loop through every force group and compute them individually
       
         # Bonds first
         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
@@ -1010,8 +925,7 @@ def energy(parm, args, output=sys.stdout):
             imp = state.getPotentialEnergy().value_in_unit(nrg)
             # Now cmap
             if parm.has_cmap:
-                state = context.getState(getEnergy=True,
-                                         enforcePeriodicBox=has_pbc,
+                state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
                                          groups=2**parm.CMAP_FORCE_GROUP)
                 cmap = state.getPotentialEnergy().value_in_unit(nrg)
             else:
@@ -1019,28 +933,24 @@ def energy(parm, args, output=sys.stdout):
 
         # Now non-bonded. No real way to decompose this.
         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
-                                groups=2**parm.NONBONDED_FORCE_GROUP)
+                                 groups=2**parm.NONBONDED_FORCE_GROUP)
         nonbond = state.getPotentialEnergy().value_in_unit(nrg)
 
         if parm.chamber:
             output.write('Bond         = %20.7f     Angle        = %20.7f\n'
                          'Dihedral     = %20.7f     Urey-Bradley = %20.7f\n'
-                         'Improper     = %20.7f     ' % (bond, angle, dihedral,
-                         ub, imp))
+                         'Improper     = %20.7f     ' % (bond, angle, dihedral, ub, imp))
             if parm.has_cmap:
                 output.write('CMAP         = %20.7f\n' % cmap)
-            output.write('Nonbond      = %20.7f\n'
-                         'TOTAL        = %20.7f\n' % (nonbond,
+            output.write('Nonbond      = %20.7f\nTOTAL        = %20.7f\n' % (nonbond,
                          bond+angle+dihedral+ub+imp+cmap+nonbond))
         else:
             output.write('Bond     = %20.7f     Angle    = %20.7f\n'
                          'Dihedral = %20.7f     Nonbond  = %20.7f\n'
-                         'TOTAL    = %20.7f\n' % (bond, angle, dihedral,
-                          nonbond, (bond+angle+dihedral+nonbond)))
-
+                         'TOTAL    = %20.7f\n' % (bond, angle, dihedral, nonbond,
+                         (bond+angle+dihedral+nonbond)))
     else:
-        state = context.getState(getEnergy=True,
-                                 enforcePeriodicBox=parm.ptr('ifbox') > 0)
+        state = context.getState(getEnergy=True, enforcePeriodicBox=parm.ptr('ifbox') > 0)
 
         output.write('Potential Energy = %.7f kcal/mol\n' %
                      state.getPotentialEnergy().value_in_unit(nrg))
@@ -1067,8 +977,7 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
         else:
             nbmeth = ff.CutoffNonPeriodic
         if not igb in (0, 1, 2, 5, 6, 7, 8):
-            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, '
-                                  '6, 7, or 8')
+            raise SimulationError('Bad igb value. Must be 0, 1, 2, 5, 6, 7, or 8')
         if igb == 1:
             gbmeth = HCT
         elif igb == 2:
@@ -1086,37 +995,33 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
         nbmeth = ff.PME
 
     # Time to create the OpenMM system
-    system = parm.createSystem(nonbondedMethod=nbmeth,
-                               nonbondedCutoff=cutoff*u.angstrom,
-                               constraints=None, rigidWater=True,
-                               removeCMMotion=False, implicitSolvent=gbmeth,
-                               implicitSolventKappa=kappa*(1.0/u.angstrom),
+    system = parm.createSystem(nonbondedMethod=nbmeth, nonbondedCutoff=cutoff*u.angstrom,
+                               constraints=None, rigidWater=True, removeCMMotion=False,
+                               implicitSolvent=gbmeth, implicitSolventKappa=kappa*(1.0/u.angstrom),
                                soluteDielectric=1.0, solventDielectric=78.5,
-                               ewaldErrorTolerance=5e-5,
-    )
+                               ewaldErrorTolerance=5e-5)
 
     if script is not None:
         scriptfile.write('# Create the system\n'
-                'system = parm.createSystem(nonbondedMethod=%s,\n'
-                '                   nonbondedCutoff=%s*u.angstrom,\n'
-                '                   constraints=None, rigidWater=True,\n'
-                '                   removeCMMotion=False, implicitSolvent=%s,\n'
-                '                   implicitSolventKappa=%s*(1.0/u.angstrom),\n'
-                '                   soluteDielectric=1.0,\n'
-                '                   solventDielectric=78.5,\n'
-                '                   ewaldErrorTolerance=5e-5\n'
-                ')\n\n'
-                '# Create a dummy integrator\n'
-                'integrator = VerletIntegrator(2.0*u.femtoseconds)\n\n' %
-                (nbmeth, cutoff, gbmeth, kappa)
-        )
+                         'system = parm.createSystem(nonbondedMethod=%s,\n'
+                         '                   nonbondedCutoff=%s*u.angstrom,\n'
+                         '                   constraints=None, rigidWater=True,\n'
+                         '                   removeCMMotion=False, implicitSolvent=%s,\n'
+                         '                   implicitSolventKappa=%s*(1.0/u.angstrom),\n'
+                         '                   soluteDielectric=1.0,\n'
+                         '                   solventDielectric=78.5,\n'
+                         '                   ewaldErrorTolerance=5e-5\n'
+                         ')\n\n'
+                         '# Create a dummy integrator\n'
+                         'integrator = VerletIntegrator(2.0*u.femtoseconds)\n\n' %
+                         (nbmeth, cutoff, gbmeth, kappa))
 
     # See if we need to add restraints
     if restraintmask is not None:
         mask = AmberMask(parm, restraintmask)
-        system.addForce(positional_restraints(mask,
-                            u.kilocalorie_per_mole/u.angstrom/u.angstrom,
-                            parm.rst7, scriptfile=scriptfile,)
+        system.addForce(
+            positional_restraints(mask, u.kilocalorie_per_mole/u.angstrom/u.angstrom,
+                                  parm.rst7, scriptfile=scriptfile,)
         )
 
     if script is not None:
@@ -1129,32 +1034,28 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
         simulation = Simulation(parm.topology, system, integrator, plat)
         if script is not None:
             scriptfile.write('# Create the platform\n'
-                    'plat = Platform.getPlatformByName(%s)\n\n'
-                    '# Create the simulation\n'
-                    'simulation = Simulation(parm.topology, system, '
-                    'integrator, plat)\n\n'
-                    % (platform)
-            )
+                             'plat = Platform.getPlatformByName(%s)\n\n'
+                             '# Create the simulation\n'
+                             'simulation = Simulation(parm.topology, system, '
+                             'integrator, plat)\n\n' % (platform))
     else:
         simulation = Simulation(parm.topology, system, integrator)
         if script is not None:
             scriptfile.write('# Create the simulation\n'
-                    'simulation = Simulation(parm.topology, system, '
-                    'integrator)\n\n')
+                             'simulation = Simulation(parm.topology, system, integrator)\n\n')
 
     # Now assign the coordinates
     simulation.context.setPositions(parm.positions)
     if script is not None:
         scriptfile.write('# Setting the positions\n'
-                'simulation.context.setPositions(parm.positions)\n\n'
-                '# Minimize the energy\n'
-                'simulation.minimizeEnergy(tolerance=%s, maxIterations=%s)\n'
-                '# Store the positions back in the parmtop\n'
-                'state = simulation.context.getState(getPositions=True\n'
-                '                                    enforcePeriodicBox=%s)\n'
-                'parm.positions = state.getPositions()\n' %
-                (bool(parm.ptr('ifbox') > 0), tol, maxcyc or 0)
-        )
+                         'simulation.context.setPositions(parm.positions)\n\n'
+                         '# Minimize the energy\n'
+                         'simulation.minimizeEnergy(tolerance=%s, maxIterations=%s)\n'
+                         '# Store the positions back in the parmtop\n'
+                         'state = simulation.context.getState(getPositions=True\n'
+                         '                                    enforcePeriodicBox=%s)\n'
+                         'parm.positions = state.getPositions()\n' %
+                         (bool(parm.ptr('ifbox') > 0), tol, maxcyc or 0))
         scriptfile.close()
 
     # Go ahead and minimize now and set the coordinates from the results of this
@@ -1163,5 +1064,5 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
         simulation.minimizeEnergy(tolerance=tol, maxIterations=maxcyc or 0)
         # Now get the coordinates
         state = simulation.context.getState(getPositions=True,
-                                enforcePeriodicBox=parm.ptr('ifbox')>0)
+                                            enforcePeriodicBox=parm.ptr('ifbox') > 0)
         parm.positions = state.getPositions()

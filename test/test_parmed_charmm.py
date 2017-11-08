@@ -1042,6 +1042,13 @@ class TestCharmmParameters(utils.FileIOTestCase):
         else:
             self.assertEqual(a1, a2)
 
+    def test_charmm36_rtf(self):
+        """Test parsing of CHARMM36 RTF files."""
+        # Make sure there are no failures loading CHARMM36 RTF files.
+        param36 = parameters.CharmmParameterSet(get_fn('top_all36_prot.rtf'),
+                                                get_fn('top_all36_carb.rtf'),
+                                                get_fn('top_all36_cgenff.rtf'))
+
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 

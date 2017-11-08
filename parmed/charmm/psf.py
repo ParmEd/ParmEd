@@ -9,15 +9,15 @@ Date: April 20, 2014
 from __future__ import division
 
 from copy import copy as _copy
-from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
-                    AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
-                    Atom, DihedralType, ImproperType, UnassignedAtomType)
-from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError, ParameterWarning)
-from parmed.structure import needs_openmm, Structure
-from parmed.utils.io import genopen
-from parmed.utils.six import wraps
-from parmed.utils.six.moves import zip, range
-from parmed.utils.six import string_types
+from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
+                               UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
+                               UnassignedAtomType)
+from ..exceptions import CharmmError, CharmmWarning, ParameterError, ParameterWarning
+from ..structure import needs_openmm, Structure
+from ..utils.io import genopen
+from ..utils.six import wraps
+from ..utils.six.moves import zip, range
+from ..utils.six import string_types
 import re
 import warnings
 import itertools
@@ -525,13 +525,13 @@ class CharmmPsfFile(Structure):
                 if isinstance(atom.type, int):
                     atype = parmset.atom_types_int[atom.type]
                 else:
-                    atype = parmset.atom_types_str[atom.type]
+                    atype = parmset.atom_types_str[atom.type.upper()]
             except KeyError:
-                raise ParameterError('Could not find atom type for %s' %
-                                     atom.type)
+                raise ParameterError('Could not find atom type for %s' % atom.type)
             atom.atom_type = atype
-            # Change to string type to look up the rest of the parameters
-            atom.type = str(atom.atom_type)
+            # Change to string type to look up the rest of the parameters. Use
+            # upper-case since all parameter sets were read in as upper-case
+            atom.type = str(atom.atom_type).upper()
             atom.atomic_number = atype.atomic_number
 
         # Next load all of the bonds

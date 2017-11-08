@@ -502,7 +502,7 @@ class AmberFormat(object):
             own_handle = True
         elif hasattr(fname, 'read'):
             prm = fname
-            own_handle = True
+            own_handle = False
         else:
             raise TypeError('%s must be a file name or file-like object' % fname)
 

@@ -9,7 +9,7 @@ from __future__ import absolute_import, print_function, division
 from copy import copy as _copy
 import datetime
 from parmed.formats.registry import FileFormatType
-from parmed.modeller.residue import ResidueTemplate
+from parmed.modeller.residue import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Element
 from parmed.topologyobjects import NoUreyBradley
@@ -18,8 +18,21 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
-from parmed.exceptions import ParameterWarning
+from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
+from collections import defaultdict
+
+from xml.sax.saxutils import escape
+XML_ESCAPES = {
+    '&' : '&amp;',
+    '<' : '&lt;',
+    '>' : '&gt;',
+    "'" : '&#39;',
+    '"' : '&quot;'
+    }
+
+import logging
+LOGGER = logging.getLogger(__name__)
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -115,6 +128,9 @@ class OpenMMParameterSet(ParameterSet):
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
                 new_params.residues[name] = residue
+        for name, patch in iteritems(params.patches):
+            if isinstance(patch, PatchTemplate):
+                new_params.patches[name] = patch
 
         return new_params
 
@@ -200,13 +216,20 @@ class OpenMMParameterSet(ParameterSet):
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
+
+        [valid_residues_for_patch, valid_patches_for_residue] = self._determine_valid_patch_combinations(skip_residues)
+        LOGGER.debug('Valid patch combinations:')
+        for patch_name in self.patches:
+            LOGGER.debug('%8s : %s', patch_name, valid_residues_for_patch[patch_name])
+
         if charmm_imp:
             self._find_explicit_impropers()
         try:
             dest.write('<ForceField>\n')
             self._write_omm_provenance(dest, provenance)
             self._write_omm_atom_types(dest, skip_types)
-            self._write_omm_residues(dest, skip_residues)
+            self._write_omm_residues(dest, skip_residues, valid_patches_for_residue)
+            self._write_omm_patches(dest, valid_residues_for_patch)
             self._write_omm_bonds(dest, skip_types)
             self._write_omm_angles(dest, skip_types)
             self._write_omm_urey_bradley(dest, skip_types)
@@ -339,7 +362,8 @@ class OpenMMParameterSet(ParameterSet):
                 content = [content]
             for sub_content in content:
                 if isinstance(sub_content, string_types):
-                    dest.write('  <%s>%s</%s>\n' % (tag, sub_content, tag))
+                    escaped_sub_content = escape(sub_content, XML_ESCAPES)
+                    dest.write('  <%s>%s</%s>\n' % (tag, escaped_sub_content, tag))
                 elif isinstance(sub_content, dict):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
@@ -349,7 +373,9 @@ class OpenMMParameterSet(ParameterSet):
                     dest.write('  <%s' % tag)
                     for attribute in attributes:
                         dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
-                    dest.write('>%s</%s>\n' % (element_content, tag))
+                    # TODO: Is this the right way to handle element content that contains lists, etc?
+                    escaped_element_content = escape(str(element_content), XML_ESCAPES)
+                    dest.write('>%s</%s>\n' % (escaped_element_content, tag))
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
         dest.write(' </Info>\n')
@@ -371,8 +397,10 @@ class OpenMMParameterSet(ParameterSet):
                           )
         dest.write(' </AtomTypes>\n')
 
-    def _write_omm_residues(self, dest, skip_residues):
+    def _write_omm_residues(self, dest, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
+        if valid_patches_for_residue is None:
+            valid_patches_for_residue = dict()
         written_residues = set()
         dest.write(' <Residues>\n')
         for name, residue in iteritems(self.residues):
@@ -397,8 +425,117 @@ class OpenMMParameterSet(ParameterSet):
             if residue.tail is not None and residue.tail is not residue.head:
                 dest.write('   <ExternalBond atomName="%s"/>\n' %
                            residue.tail.name)
+            if residue.name in valid_patches_for_residue:
+                for patch_name in valid_patches_for_residue[residue.name]:
+                    dest.write('   <AllowPatch name="%s"/>\n' % patch_name)
             dest.write('  </Residue>\n')
         dest.write(' </Residues>\n')
+
+    def _determine_valid_patch_combinations(self, skip_residues):
+        """
+        Determine valid (permissible) combinations of patches with residues that
+        lead to integral net charges.
+
+        Parameters
+        ----------
+        skip_residues : set of ResidueTemplate
+            List of residues to skip
+
+        Returns
+        -------
+        valid_residues_for_patch : dict
+            valid_residues_for_patch[patch] is a list of residues compatible with that patch
+        valid_patches_for_residue : dict
+            valid_patches_for_residue[residue] is a list of patches compatible with that residue
+
+        """
+        # Attempt to patch every residue, recording only valid combinations.
+        valid_residues_for_patch = defaultdict(list)
+        valid_patches_for_residue = defaultdict(list)
+        for patch in self.patches.values():
+            for residue in self.residues.values():
+                if residue in skip_residues: continue
+                # Attempt to patch the residue.
+                try:
+                    residue.apply_patch(patch)
+                except IncompatiblePatchError as e:
+                    # Patching failed; continue to next patch
+                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
+                    continue
+
+                valid_residues_for_patch[patch.name].append(residue.name)
+                valid_patches_for_residue[residue.name].append(patch.name)
+
+        return [valid_residues_for_patch, valid_patches_for_residue]
+
+    def _write_omm_patches(self, dest, valid_residues_for_patch):
+        if not self.patches: return
+        written_patches = set()
+        dest.write(' <Patches>\n')
+        for name, patch in iteritems(self.patches):
+            # Require that at least one valid patch combination exists for this patch
+            if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
+                continue
+
+            templhash = OpenMMParameterSet._templhasher(patch)
+            if templhash in written_patches: continue
+            written_patches.add(templhash)
+            if patch.override_level == 0:
+                dest.write('  <Patch name="%s">\n' % patch.name)
+            else:
+                dest.write('  <Patch name="%s" override="%d">\n' % (patch.name,
+                           patch.override_level))
+
+            # Construct an example patched residue
+            # TODO: We should also ensure that *all* compatible residues have the
+            # same added/changed atoms and deleted bonds, just to be safe.
+            residue_name = valid_residues_for_patch[name][0]
+            try:
+                residue = self.residues[residue_name]
+            except KeyError as e:
+                msg =  'Compatible residue not found in self.residues\n'
+                msg += '   patch name: %s\n' % name
+                msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
+                msg += '   residue name: %s\n' % residue_name
+                msg += str(e)
+                raise(msg)
+            patched_residue = residue.apply_patch(patch)
+
+            for atom in patch.atoms:
+                if atom.name not in patched_residue:
+                    dest.write('   <AddAtom name="%s" type="%s" charge="%s"/>\n' %
+                           (atom.name, atom.type, atom.charge))
+                else:
+                    dest.write('   <ChangeAtom name="%s" type="%s" charge="%s"/>\n' %
+                           (atom.name, atom.type, atom.charge))
+
+            for atom_name in patch.delete_atoms:
+                dest.write('   <DeleteAtom name="%s"/>\n' % atom_name)
+
+            for bond in patch.bonds:
+                dest.write('   <AddBond atomName1="%s" atomName2="%s"/>\n' %
+                           (bond.atom1.name, bond.atom2.name))
+
+            for bond in residue.bonds:
+                if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
+                    dest.write('   <DeleteBond atomName1="%s" atomName2="%s"/>\n' %
+                        (bond.atom1.name, bond.atom2.name))
+
+            if (residue.head is not None) and (patched_residue.head is None):
+                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.head.name)
+            if (residue.tail is not None) and (patched_residue.tail is None):
+                dest.write('   <RemoveExternalBond atomName="%s"/>\n' % residue.tail.name)
+
+            if (residue.head is None) and (patched_residue.head is not None):
+                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.head.name)
+            if (residue.tail is None) and (patched_residue.tail is not None):
+                dest.write('   <AddExternalBond atomName="%s"/>\n' % patched_residue.tail.name)
+
+            for residue_name in valid_residues_for_patch[patch.name]:
+                dest.write('   <ApplyToResidue name="%s"/>\n' % residue_name)
+
+            dest.write('  </Patch>\n')
+        dest.write(' </Patches>\n')
 
     def _write_omm_bonds(self, dest, skip_types):
         if not self.bond_types: return
