@@ -51,7 +51,7 @@ class CharmmFile(object):
         for line in self._handle:
             try:
                 idx = line.index('!')
-            except IndexError:
+            except ValueError:
                 # There is no comment...
                 idx = None
                 end = ''
