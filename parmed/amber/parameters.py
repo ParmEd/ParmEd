@@ -57,6 +57,9 @@ def _find_amber_file(fname, search_oldff):
     - $AMBERHOME/dat/leap/parm
     """
     from parmed.amber import AMBERHOME
+    if len(fname) > 1 and {fname[0], fname[-1]} in ({'"'}, {"'"}):
+        # Strip quotes
+        fname = fname[1:-1]
     if os.path.exists(fname):
         return fname
     leapdir = os.path.join(AMBERHOME, 'dat', 'leap')
@@ -67,8 +70,6 @@ def _find_amber_file(fname, search_oldff):
     if search_oldff:
         if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
             return os.path.join(leapdir, 'lib', 'oldff', fname)
-#       if os.path.exists(os.path.join(leapdir, 'parm', 'oldff', fname)):
-#           return os.path.join(leapdir, 'parm', 'oldff', fname)
     raise ValueError('Cannot find Amber file [%s]' % fname)
 
 @add_metaclass(FileFormatType)

@@ -4,20 +4,22 @@ This sets up the command interpreter for textual ParmEd (parmed).
 
 # Load some system modules that may be useful for various users in shell mode
 import cmd
-from glob import glob
 import os
-from parmed.exceptions import ParmedError, ParmedWarning
-from parmed.utils.six import iteritems
-from parmed.utils.six.moves import range
-from parmed.tools.actions import COMMANDMAP, Usages
-from parmed.tools.argumentlist import ArgumentList
-from parmed.tools.exceptions import InterpreterError
+import sys
+import traceback
+from glob import glob
+
+from ..exceptions import ParmedError, ParmedWarning
+from ..utils.six import iteritems
+from ..utils.six.moves import range  # pylint: disable=W0622,E0401
+from .actions import COMMANDMAP, Usages
+from .argumentlist import ArgumentList
+from .exceptions import InterpreterError
+
 try:
     import readline
 except ImportError:
     readline = None
-import sys
-import traceback
 
 _COMMANDLOGS = []
 
