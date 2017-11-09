@@ -1292,7 +1292,7 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def write(self, dest, combine=None, parameters='inline'):
+    def write(self, dest, combine=None, parameters='inline', molfile=None):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -1312,10 +1312,23 @@ class GromacsTopologyFile(Structure):
             top of `dest`. If it is a file-like object, parameters will be
             written there.  If parameters is the same as ``dest``, then the
             parameter types will be written to the same topologyfile.
+        molfile : None or str of file-like object, optional
+            If specified as other than None, the molecules will be written to a
+            separate file that is included in the main topology file. The
+            name of this file will be the provided srting. If None or
+            the same as the ``dest'', the molecules will be written into the
+            body of the topology file. If it is a file-like object,
+            the molecules will be written there. Using this option can make
+            it easier to combine multiple molecules into the same topology.
+            This will change where the following topology sections are
+            written: moleculetype, atoms, bonds, pairs, angles, dihedrals,
+            cmap, settles, virtual_sites2, virtual_sites3 and exclusions.
 
         Raises
         ------
         ValueError if the same molecule number appears in multiple combine lists
+        TypeError if the dest input cannot be parsed
+        ValueError if the combine, parameters, or molfile input cannot be parsed
         """
         import parmed.gromacs as gmx
         from parmed import __version__
@@ -1345,6 +1358,28 @@ class GromacsTopologyFile(Structure):
             parfile = parameters
         else:
             raise ValueError('parameters must be "inline", a file name, or '
+                             'a file-like object')
+
+        # Determine where to write the molecules
+        own_molfile_handle = False
+        include_molfile = None
+        if molfile is None:
+            _molfile = dest
+        elif isinstance(molfile, string_types):
+            if molfile == fname.strip():
+                _molfile = dest
+            else:
+                own_molfile_handle = True
+                _molfile = genopen(molfile, 'w')
+                include_molfile = molfile
+        elif hasattr(molfile, 'write'):
+            _molfile = molfile
+            include_molfile = _molfile.name
+            # I assume the file should still be included even if it's not passed
+            # in as a file name. I'm not sure if all `write`-able objects have a
+            # `name` property, though.
+        else:
+            raise ValueError('molfile must be "top", a file name, or '
                              'a file-like object')
 
         # Error-checking for combine
@@ -1542,6 +1577,8 @@ class GromacsTopologyFile(Structure):
                             parfile.write(' '.join(str(param.grid[j]*conv)
                                           for j in range(i, end)))
                         parfile.write('\n\n')
+            if include_molfile is not None:
+                dest.write('#include "%s"\n\n' % include_molfile)
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -1561,8 +1598,9 @@ class GromacsTopologyFile(Structure):
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title,
-                                        params, parameters == 'inline')
+                    GromacsTopologyFile._write_molecule(molecule, _molfile,
+                                                        title, params,
+                                                        parameters == 'inline')
                 # System
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
@@ -1587,8 +1625,9 @@ class GromacsTopologyFile(Structure):
                     dest.write('%-15s %6d\n' % (names[j], ii-i))
                     i = ii
             elif isinstance(combine, string_types) and combine.lower() == 'all':
-                GromacsTopologyFile._write_molecule(self, dest, 'system',
-                                    params, parameters == 'inline')
+                GromacsTopologyFile._write_molecule(self, _molfile, 'system',
+                                                    params,
+                                                    parameters == 'inline')
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
                     dest.write(self.title)
@@ -1673,8 +1712,9 @@ class GromacsTopologyFile(Structure):
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title,
-                                        params, parameters == 'inline')
+                    GromacsTopologyFile._write_molecule(molecule, _molfile,
+                                                        title, params,
+                                                        parameters == 'inline')
                 # System
                 dest.write('[ system ]\n; Name\n')
                 if self.title:
@@ -1703,6 +1743,8 @@ class GromacsTopologyFile(Structure):
                 dest.close()
             if own_parfile_handle:
                 parfile.close()
+            if own_molfile_handle:
+                _molfile.close()
 
     #===================================================
 
