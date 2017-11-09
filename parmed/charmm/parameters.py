@@ -553,7 +553,7 @@ class CharmmParameterSet(ParameterSet):
                 # defined in the first place, so just have the key a fully
                 # sorted list. We still depend on the PSF having properly
                 # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
+                key = tuple([type1, type2, type3, type4])
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
