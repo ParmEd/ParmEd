@@ -1,8 +1,11 @@
 """
 This stores a list of arguments, tokenizing a string into a list of arguments.
 """
+import logging
 import warnings
-from parmed.tools.exceptions import NoArgument, InputError
+from .exceptions import NoArgument, InputError
+
+LOGGER = logging.getLogger(__name__)
 
 class Argument(object):
     """ Is an argument """
@@ -12,9 +15,10 @@ class Argument(object):
         self.marked = False
         self.keep_quotes = False
         if len(string) == 0 or (len(string) == 1 and string in ("'", '"')):
-            warnings.warn("Unclosed quotation detected! Ignoring lone quote")
+            LOGGER.warning("Unclosed quotation detected! Ignoring lone quote")
 
     def lower(self):
+        """ Make the argument lower-case """
         return self.string.lower()
 
     def isfloat(self):
@@ -56,9 +60,9 @@ class Argument(object):
             return self.string
 
         # Strip leading and trailing quotes (only if they both exist)
-        if self.string[0] == "'" and self.string[len(self.string)-1] == "'":
-            return self.string[1:len(self.string)-1]
-        elif self.string[0] == '"' and self.string[len(self.string)-1] == '"':
+        if self.string[0] == "'" and self.string[-1] == "'":
+            return self.string[1:-1]
+        elif self.string[0] == '"' and self.string[-1] == '"':
             return self.string[1:len(self.string)-1]
 
         return self.string
@@ -114,7 +118,7 @@ class ArgumentList(object):
         including whitespace
         """
         import re
-        tokenre = re.compile(r'''((?:\s+".*"\s+)|(?:\s+'.*'\s+)|(?:\S+))''')
+        tokenre = re.compile(r'''((?:\s+".*?"\s+?)|(?:\s+'.*?'\s+?)|(?:\S+))''')
         tokenlist = tokenre.findall(instring)
         # Make sure every non-whitespace character is consumed
         if len(tokenre.sub('', instring).strip()) > 0:

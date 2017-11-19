@@ -930,18 +930,13 @@ class TestParameterFiles(FileIOTestCase):
         # Check looking in oldff
         self.assertRaises(ValueError, lambda: finder('rna.amberua.lib', False))
         self.assertEqual(finder('rna.amberua.lib', True),
-                os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
-                             'oldff', 'rna.amberua.lib')
+            os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib', 'oldff', 'rna.amberua.lib')
         )
 
     def test_file_detection_frcmod(self):
         """ Tests the detection of Amber frcmod files """
         for fname in glob.glob(os.path.join(get_fn('parm'), 'frcmod.*')):
-            try:
-                self.assertTrue(parameters.AmberParameterSet.id_format(fname))
-            except Exception as e:
-                print('Unexpected failure with %s' % fname)
-                raise
+            self.assertTrue(parameters.AmberParameterSet.id_format(fname))
         # Now try creating a bunch of non-frcmod files to test the file ID
         # discrimination
         fn = get_fn('test.frcmod', written=True)
@@ -1258,15 +1253,15 @@ class TestParameterFiles(FileIOTestCase):
         """ Tests loading a leaprc file with loadMol2 files """
         fn1 = get_fn('leaprc', written=True)
         with open(fn1, 'w') as f:
-            f.write('DAN = loadMol2 %s\n' % get_fn('tripos1.mol2'))
-            f.write('GPN = loadMol3 %s\n' % get_fn('tripos9.mol2'))
+            f.write('DAN = loadMol2 "%s"\n' % get_fn('tripos1.mol2'))
+            f.write('GPN = loadMol3 "%s"\n' % get_fn('tripos9.mol2'))
         params = parameters.AmberParameterSet.from_leaprc(fn1)
         self.assertEqual(len(params.residues), 2)
         self.assertIn('DAN', params.residues)
         self.assertIn('GPN', params.residues)
         # Now make sure we warn about mult-residue mol2 files
         with open(fn1, 'w') as f:
-            f.write('SOME = loadMol2 %s\n' % get_fn('multimol.mol2'))
+            f.write('SOME = loadMol2 "%s"\n' % get_fn('multimol.mol2'))
         warnings.filterwarnings('error', category=AmberWarning)
         self.assertRaises(AmberWarning, lambda:
                 parameters.AmberParameterSet.from_leaprc(fn1))
@@ -2685,17 +2680,15 @@ class TestAmberTitratableResidues(FileIOTestCase):
     def test_cpin_creation(self):
         """ Test TitratableResidueList and cpin creation """
         import cpinutil
-        repl = dict(parm=get_fn('trx.prmtop'),
-                    output=get_fn('test.cpin', written=True))
+        parm = get_fn('trx.prmtop')
+        output = get_fn('test.cpin', written=True)
         opt = cpinutil.parser.parse_args(
-                    ('-igb 2 -p %(parm)s -states 0,0,1,0,1,1,0,1,0,1,1,1 -o '
-                     '%(output)s' % (repl)).split()
+            ['-igb', '2', '-p', parm, '-states', '0,0,1,0,1,1,0,1,0,1,1,1', '-o', output]
         )
         cpinutil.main(opt)
         self.assertTrue(
-                diff_files(get_saved_fn('test.cpin'),
-                           get_fn('test.cpin', written=True),
-                           absolute_error=1e-6, spacechar='=,')
+            diff_files(get_saved_fn('test.cpin'), get_fn('test.cpin', written=True),
+                       absolute_error=1e-6, spacechar='=,')
         )
 
     def test_titratable_residue(self):
