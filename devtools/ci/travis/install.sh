@@ -28,6 +28,8 @@ else # Otherwise, CPython... go through conda
     conda update --yes conda
     # Add OpenMM dev channel
     conda config --add channels omnia/label/dev
+    # Install lxml at base level
+    conda install --yes lxml
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
