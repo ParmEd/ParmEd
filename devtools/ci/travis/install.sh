@@ -28,8 +28,6 @@ else # Otherwise, CPython... go through conda
     conda update --yes conda
     # Add OpenMM dev channel
     conda config --add channels omnia/label/dev
-    # Install lxml at base level
-    conda install --yes lxml
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         conda create -y -n myenv python=$PYTHON_VERSION \
@@ -44,7 +42,7 @@ else # Otherwise, CPython... go through conda
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose coverage \
-            nose-timer python-coveralls lxml
+            nose-timer python-coveralls
     fi
     source activate myenv
     pip install pyflakes==1.0.0
