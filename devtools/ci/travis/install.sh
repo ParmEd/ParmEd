@@ -42,7 +42,7 @@ else # Otherwise, CPython... go through conda
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose coverage \
-            nose-timer python-coveralls
+            nose-timer python-coveralls lxml
     fi
     source activate myenv
     pip install pyflakes==1.0.0
