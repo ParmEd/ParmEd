@@ -47,21 +47,42 @@ class CharmmFile(object):
 
     def __iter__(self):
         # Iterate over the file
+        parts = []
         for line in self._handle:
             try:
                 idx = line.index('!')
-                end = '\n'
-                self.comment = line[idx:].rstrip()
             except ValueError:
                 # There is no comment...
                 idx = None
                 end = ''
                 self.comment = ''
-            yield line[:idx] + end
+                if line.rstrip('\r\n').endswith('-'):
+                    # Continuation
+                    parts.append(line.rstrip('\r\n')[:-1]) # Skip the continuation character
+                    continue
+            else:
+                # Lines with no comment cannot continue
+                end = '\n'
+                self.comment = line[idx:].rstrip()
+            parts.append(line[:idx] + end)
+            yield ' '.join(parts)
+            # Reset parts
+            parts = []
 
     def readline(self):
         self.line_number += 1
         line = self._handle.readline()
+        parts = []
+        while line:
+            if line.rstrip('\r\n').endswith('-'):
+                # Continuation
+                parts.append(line.rstrip('\r\n')[:-1]) # Skip the continuation character
+                line = self._handle.readline()
+                self.line_number += 1
+            else:
+                parts.append(line)
+                break # done with this line
+        line = ' '.join(parts)
         try:
             idx = line.index('!')
             self.comment = line[idx:].rstrip()
