@@ -739,7 +739,7 @@ class PDBFile(object):
             will be converted into the PDB-standard values.
         increase_tercount : bool, optional, default True
             If True, the TER atom number field increased by one compared to
-            atom card preceding it.
+            atom card preceding it; this conforms to PDB standard.
 
         Notes
         -----
