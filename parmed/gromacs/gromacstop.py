@@ -1230,6 +1230,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.adjust_types = struct.adjust_types
         gmxtop.combining_rule = struct.combining_rule
         gmxtop.box = struct.box
+        gmxtop.nrexcl = struct.nrexcl
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
