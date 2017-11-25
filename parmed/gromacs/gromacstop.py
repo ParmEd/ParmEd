@@ -1427,12 +1427,13 @@ class GromacsTopologyFile(Structure):
             if self.has_NBFIX():
                 typemap = dict(self.parameterset.nbfix_types)
                 dest.write('[ nonbond_params ]\n')
+                eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
                 for key, val in typemap.items():
                     a1 = key[0]
                     a2 = key[1]
                     eps = val[0] # kcal
                     sig = val[1] # Angstrom
-                    eps *= u.kilocalorie.conversion_factor_to(u.kilojoule)
+                    eps *= eps_conversion
                     sig *= 0.1
                     dest.write('{0} {1} 1 {2} {3}\n'.format(
                         key[0], key[1], sig/2**(1/6), eps))
