@@ -21,7 +21,7 @@ else # Otherwise, CPython... go through conda
 
     export PATH=$HOME/miniconda/bin:$PATH
     conda update conda -y
-    conda install --yes conda-build jinja2 binstar pip
+    conda install --yes conda-build jinja2 anaconda-client pip
     # Omnia requires conda-forge
     conda config --add channels omnia --add channels conda-forge
     # Use of conda-forge requires update
@@ -30,15 +30,17 @@ else # Otherwise, CPython... go through conda
     conda config --add channels omnia/label/dev
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
+        # Install all prerequisites
         conda create -y -n myenv python=$PYTHON_VERSION \
             numpy scipy pandas nose openmm coverage nose-timer \
-            python-coveralls netCDF4 lxml
+            python-coveralls netCDF4
         conda update -y -n myenv --all
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
         conda install -y -n myenv nglview -c bioconda
         conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
         conda install -y -n myenv networkx
+        conda install -y -n myenv lxml
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose coverage \
@@ -49,4 +51,7 @@ else # Otherwise, CPython... go through conda
     if [ -z "$MINIMAL_PACKAGES" ]; then
         pip uninstall parmed -y # from ambertools
     fi
+
+    # DEBUG
+    conda list
 fi # CPython

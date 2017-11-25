@@ -10,21 +10,12 @@ from unittest import skipIf
 
 import numpy as np
 
-try:
-    import networkx as nx
-except ImportError:
-    nx = None
-try:
-    import lxml
-except ImportError:
-    lxml = None
-
 import parmed as pmd
 from parmed.utils.six import StringIO
 from io import TextIOWrapper
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
-from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
-                   TestCaseRelative, EnergyTestCase)
+from utils import (get_fn, mm, app, has_openmm, has_networkx, has_lxml,
+                   FileIOTestCase, CPU, TestCaseRelative, EnergyTestCase)
 from parmed.exceptions import ParameterWarning
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
@@ -285,9 +276,12 @@ class TestSystemCreation(unittest.TestCase):
         a1.exclude(a5)
         system = struct.createSystem()
 
-class TestWriteParameters(FileIOTestCase):
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_lxml, 'Cannot test without lxml')
+@unittest.skipUnless(has_networkx, 'Cannot test without networkx')
+@unittest.skipUnless(os.getenv('AMBERHOME'), 'Cannot test without AMBERHOME')
+class TestWriteAmberParameters(FileIOTestCase):
 
-    @unittest.skipIf(not has_openmm or os.getenv('AMBERHOME') is None or lxml is None, 'Cannot test w/out Amber, OpenMM, or lxml')
     def test_write_xml_parameters(self):
         """ Test writing XML parameters loaded from Amber files """
         leaprc = StringIO("""\
@@ -512,8 +506,6 @@ CHIS = CHIE
         )
         forcefield = app.ForceField(ffxml_filename)
 
-
-    @unittest.skipIf(not has_openmm or os.getenv('AMBERHOME') is None or lxml is None, 'Cannot test w/out Amber, OpenMM, or lxml')
     def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
         leaprc = StringIO("""\
@@ -533,7 +525,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         forcefield = app.ForceField(ffxml_filename)
 
-    @unittest.skipUnless(has_openmm and lxml is not None, "Cannot test without OpenMM or lxml")
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -568,7 +559,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         forcefield = app.ForceField(ffxml)
 
-    @unittest.skipIf((not has_openmm) or (lxml is None), "Cannot test without OpenMM or lxml")
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -578,7 +568,45 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml_filename)
         forcefield = app.ForceField(ffxml_filename)
 
-    @unittest.skipIf((nx is None) or (not has_openmm), "Cannot test without NetworkX and OpenMM")
+    def test_not_write_residues_with_same_templhash(self):
+        """Test that no identical residues are written to XML, using the templhasher function."""
+        # TODO add testing for multiatomic residues when support for those added
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
+            new_residues[name] = params.residues[name]
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        self.assertEqual(len(ffxml.readlines()), 16)
+
+    def test_override_level(self):
+        """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
+                 )
+        new_residues = OrderedDict()
+        new_residues['K'] = params.residues['K']
+        new_residues['NA'] = params.residues['NA']
+        new_residues['K'].override_level = 1
+        params.residues = new_residues
+        ffxml = StringIO()
+        params.write(ffxml)
+        ffxml.seek(0)
+        output_lines = ffxml.readlines()
+        control_line1 = '  <Residue name="K" override="1">\n'
+        control_line2 = '  <Residue name="NA">\n'
+        self.assertEqual(output_lines[5].strip(), control_line1.strip())
+        self.assertEqual(output_lines[8].strip(), control_line2.strip())
+
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_lxml, 'Cannot test without lxml')
+@unittest.skipUnless(has_networkx, 'Cannot test without networkx')
+class TestWriteCHARMMParameters(FileIOTestCase):
+
     def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
 
@@ -602,7 +630,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         pdbfile = app.PDBFile(get_fn('2igd_924wat.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
 
-    @unittest.skipIf((nx is None) or (not has_openmm) or (lxml is None), "Cannot test without NetworkX and OpenMM")
     def test_ljforce_charmm(self):
         """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
 
@@ -625,7 +652,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
 
-    @unittest.skipIf((nx is None) or (not has_openmm) or (lxml is None), "Cannot test without networkx and openmm")
     def test_explicit_improper(self):
         """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
 
@@ -642,39 +668,3 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                      ),
                      charmm_imp=True)
         forcefield = app.ForceField(ffxml_filename)
-
-    @skipIf(lxml is None, 'Cannot test without lxml')
-    def test_not_write_residues_with_same_templhash(self):
-        """Test that no identical residues are written to XML, using the templhasher function."""
-        # TODO add testing for multiatomic residues when support for those added
-        params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
-        new_residues = OrderedDict()
-        for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
-            new_residues[name] = params.residues[name]
-        params.residues = new_residues
-        ffxml = StringIO()
-        params.write(ffxml)
-        ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 16)
-
-    @skipIf(lxml is None, 'Cannot test without lxml')
-    def test_override_level(self):
-        """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
-        params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
-        new_residues = OrderedDict()
-        new_residues['K'] = params.residues['K']
-        new_residues['NA'] = params.residues['NA']
-        new_residues['K'].override_level = 1
-        params.residues = new_residues
-        ffxml = StringIO()
-        params.write(ffxml)
-        ffxml.seek(0)
-        output_lines = ffxml.readlines()
-        control_line1 = '  <Residue name="K" override="1">\n'
-        control_line2 = '  <Residue name="NA">\n'
-        self.assertEqual(output_lines[5].strip(), control_line1.strip())
-        self.assertEqual(output_lines[8].strip(), control_line2.strip())
