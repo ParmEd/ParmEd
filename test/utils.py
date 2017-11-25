@@ -30,7 +30,7 @@ try:
     import networkx as nx
     has_networkx = True
 except ImportError:
-    has_networkx = false
+    has_networkx = False
 
 try:
     from lxml import etree
