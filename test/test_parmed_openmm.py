@@ -13,6 +13,8 @@ import numpy as np
 import parmed as pmd
 from parmed.utils.six import StringIO
 from io import TextIOWrapper
+from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+                           CharmmParameterSet)
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
 from utils import (get_fn, mm, app, has_openmm, has_networkx, has_lxml,
                    FileIOTestCase, CPU, TestCaseRelative, EnergyTestCase)
@@ -629,6 +631,41 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         # Parameterize ACE-NME in water
         pdbfile = app.PDBFile(get_fn('2igd_924wat.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
+
+    def test_write_xml_parameters_methanol_ions_energy(self):
+        """ Test writing XML parameter files from Charmm parameter files, reading them back into OpenMM ForceField, and computing energy of methanol and NaCl """
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_cgenff.prm'),
+                                              get_fn('top_all36_cgenff.rtf'),
+                                              get_fn('toppar_water_ions.str'))
+        )
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFile='par_all36_cgenff.prm, top_all36_cgenff.rtf, toppar_water_ions.str',
+                         Reference='MacKerrell'
+                     )
+        )
+        forcefield = app.ForceField(ffxml_filename)
+        # Parameterize methanol and ions in vacuum
+        pdbfile = app.PDBFile(get_fn('methanol_ions.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        context = mm.Context(system, integrator, CPU)
+        context.setPositions(pdbfile.positions)
+        ffxml_potential = context.getState(getEnergy=True).getPotentialEnergy() / u.kilocalories_per_mole
+        del context, integrator
+        # Compute energy via ParmEd reader
+        psf = CharmmPsfFile(get_fn('methanol_ions.psf'))
+        system = psf.createSystem(params)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        context = mm.Context(system, integrator, CPU)
+        context.setPositions(pdbfile.positions)
+        parmed_potential = context.getState(getEnergy=True).getPotentialEnergy() / u.kilocalories_per_mole
+        del context, integrator
+        # Ensure potentials are almost equal
+        self.assertAlmostEqual(ffxml_potential, parmed_potential)
 
     def test_ljforce_charmm(self):
         """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
