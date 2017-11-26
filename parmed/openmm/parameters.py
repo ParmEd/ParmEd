@@ -503,7 +503,7 @@ class OpenMMParameterSet(ParameterSet):
             if patch.override_level == 0:
                 patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name)
             else:
-                patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name, override=patch.override_level)
+                patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name, override=str(patch.override_level))
 
             # Construct an example patched residue
             # TODO: We should also ensure that *all* compatible residues have the
