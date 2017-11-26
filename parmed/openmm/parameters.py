@@ -792,8 +792,8 @@ class OpenMMParameterSet(ParameterSet):
         for (atom_types, value) in iteritems(self.nbfix_types):
             emin = value[0] * ene_conv
             rmin = value[1] * length_conv
-            # convert to sigma
-            sigma = 2 * rmin/(2**(1.0/6))
+            # convert to sigma; note that NBFIX types are not rmin/2 but rmin
+            sigma = rmin/(2**(1.0/6))
             etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
 
     def _write_omm_scripts(self, dest, skip_types):
