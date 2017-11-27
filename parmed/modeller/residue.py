@@ -11,6 +11,7 @@ from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
+from parmed.exceptions import IncompatiblePatchError
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -90,6 +91,7 @@ class ResidueTemplate(object):
         self.groups = []
         self.override_level = 0
         self._map = dict()
+        self._impr = []
 
     def __repr__(self):
         if self.head is not None:
@@ -126,6 +128,51 @@ class ResidueTemplate(object):
         atom.residue = self
         self.atoms.append(atom)
         self._map[atom.name] = atom
+
+    def delete_atom(self, atom):
+        """ Delete an atom from this residue template, along with corresponding bonds.
+
+        Parameters
+        ----------
+        atom : :class:`Atom` or str
+            The atom or atom name to be deleted
+
+        """
+        if type(atom) is str:
+            atom_name = atom
+        else:
+            atom_name = atom.name
+
+        if atom_name not in self._map:
+            raise KeyError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, list(self._map.keys())))
+
+        atom = self._map[atom_name]
+
+        # Adjust head and tail if needed
+        if self.head == atom:
+            self.head = None
+        if self.tail == atom:
+            self.tail = None
+
+        # Remove all bonds involving this atom
+        for bond in list(self.bonds):
+            if (bond.atom1 == atom) or (bond.atom2 == atom):
+                # Remove this bond from all atoms it spans
+                bond.delete()
+                # Delete the bond from the residue
+                self.bonds.remove(bond)
+
+        # Remove all impropers involving this atom
+        for impr in list(self._impr):
+            if atom in impr:
+                self._impr.remove(impr)
+
+        # Disconnect the atom from the residue so that it does not trigger atom.residue.delete_atom(atom)
+        atom.residue = None
+
+        # Remove the atom from the ResidueTemplate
+        del self._map[atom_name]
+        self.atoms.remove(atom)
 
     def add_bond(self, atom1, atom2, order=1.0):
         """ Adds a bond between the two provided atoms in the residue
@@ -178,7 +225,6 @@ class ResidueTemplate(object):
         """
         This constructor creates a ResidueTemplate from a particular Residue
         object
-
         Parameters
         ----------
         residue : :class:`Residue`
@@ -222,6 +268,10 @@ class ResidueTemplate(object):
         except AttributeError:
             self._crd = np.array([[a.xx, a.xy, a.xz] for a in self])
         return self._crd
+
+    @property
+    def net_charge(self):
+        return sum([a.charge for a in self])
 
     # Make ResidueTemplate look like a container of atoms, also indexable by the
     # atom name
@@ -310,7 +360,7 @@ class ResidueTemplate(object):
         """
         if not self.atoms:
             raise ValueError('Cannot fix charges on an empty residue')
-        net_charge = sum(a.charge for a in self.atoms)
+        net_charge = self.net_charge
         if to is None:
             to = round(net_charge)
         else:
@@ -327,6 +377,113 @@ class ResidueTemplate(object):
         self.atoms[0].charge += to - sum(atom.charge for atom in self.atoms)
 
         return self
+
+    def apply_patch(self, patch, precision=4):
+        """
+        Apply the specified PatchTemplate to the ResidueTemplate.
+
+        This only handles patches that affect a single residue.
+
+        An exception is thrown if patch is incompatible because
+        * The patch specifies that an atom is to be deleted that doesn't exist in the residue
+        * A bond specified as being added in the patch does not have both atom names present after adding/deleting atoms from the patch
+        * The new net charge is not integral to the specified precision
+        * The residue is not modified in any way (no atoms or bonds added/changed/deleted)
+
+        Parameters
+        ----------
+
+        patch : PatchTemplate
+            The patch to apply to this residue
+
+        precision : int, optional
+            Each valid patch should be produce a net charge that is integral to
+            this many decimal places.
+            Default is 4
+
+        Returns
+        -------
+
+        residue : ResidueTemplate
+            A new ResidueTemplate corresponding to the patched residue is returned.
+            The original remains unmodified.
+
+        """
+        # Create a copy
+        # TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?
+        residue = _copy.copy(self)
+        # Record whether we've actually modified the residue.
+        modifications_made = False
+        # Delete atoms
+        for atom_name in patch.delete_atoms:
+            try:
+                residue.delete_atom(atom_name)
+                modifications_made = True
+            except KeyError as e:
+                raise IncompatiblePatchError(str(e))
+        # Add or replace atoms
+        for atom in patch.atoms:
+            if atom.name in residue:
+                # Overwrite type and charge
+                residue[atom.name].type = atom.type
+                residue[atom.name].charge = atom.charge
+            else:
+                residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
+            modifications_made = True
+        # Add bonds
+        for (atom1_name, atom2_name, order) in patch.add_bonds:
+            try:
+                # Remove dangling bonds
+                for name in [atom1_name, atom2_name]:
+                    if residue.head and (name == residue.head.name):
+                        residue.head = None
+                    if residue.tail and (name == residue.tail.name):
+                        residue.tail = None
+                # Add bond
+                residue.add_bond(atom1_name, atom2_name, order)
+                modifications_made = True
+            except IndexError as e:
+                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
+        # Delete impropers
+        for impr in patch.delete_impropers:
+            try:
+                residue._impr.remove(impr)
+                # removal of impropers doesn't do anything as far as OpenMM is concerned, so don't note this as a modification having been made
+            except ValueError as e:
+                raise IncompatiblePatchError('Improper %s was not found in residue to be patched.' % impr)
+        # Check that the net charge is integral.
+        net_charge = residue.net_charge
+        is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
+        if not is_integral:
+            raise IncompatiblePatchError('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
+        # Ensure residue is connected
+        import networkx as nx
+        G = residue.to_networkx()
+        if not nx.is_connected(G):
+            components = [ c for c in nx.connected_components(G) ]
+            raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
+        # Make sure the patch has actually modified the residue
+        if not modifications_made:
+            raise IncompatiblePatchError('Patch did not modify residue.')
+
+        return residue
+
+    def to_networkx(self):
+        """ Create a NetworkX graph of atoms and bonds
+
+        Returns
+        -------
+        G : :class:`networkx.Graph`
+            A NetworkX Graph representing the molecule
+
+        """
+        import networkx
+        G = networkx.Graph()
+        for atom in self.atoms:
+            G.add_node(atom.name, charge=atom.charge, type=atom.type)
+        for bond in self.bonds:
+            G.add_edge(bond.atom1.name, bond.atom2.name)
+        return G
 
     def to_dataframe(self):
         """ Create a pandas dataframe from the atom information
@@ -524,8 +681,12 @@ class PatchTemplate(ResidueTemplate):
 
     Attributes
     ----------
-    delete : list of str
-        List of atoms that need to be deleted in applying the patch
+    add_bonds : list of (str, str, order)
+        List of bonds that need to be added in applying the patch
+    delete_atoms : list of str
+        List of atom names that need to be deleted in applying the patch
+    delete_impropers : list of tuple of str
+        List of impropers (tuple of atom names) that need to be deleted in applying the patch
 
     See Also
     --------
@@ -539,7 +700,9 @@ class PatchTemplate(ResidueTemplate):
     """
     def __init__(self, name=''):
         super(PatchTemplate, self).__init__(name)
-        self.delete = []
+        self.add_bonds = []
+        self.delete_atoms = []
+        self.delete_impropers = []
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

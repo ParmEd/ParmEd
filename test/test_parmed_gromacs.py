@@ -3,8 +3,13 @@ Tests the functionality in the parmed.gromacs package
 """
 from contextlib import closing
 import copy
-import numpy as np
+import sys
 import os
+import unittest
+import warnings
+
+import numpy as np
+
 from parmed import (load_file, Structure, ExtraPoint, DihedralTypeList, Atom,
                     ParameterSet, Bond, NonbondedException, DihedralType,
                     RBTorsionType, Improper, Cmap, UreyBradley, BondType,
@@ -16,11 +21,9 @@ from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx, periodic_table
 from parmed.topologyobjects import UnassignedAtomType
 from parmed.utils.six.moves import range, zip, StringIO
-import unittest
 from utils import (get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS,
                    create_random_structure)
 import utils
-import warnings
 
 @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
 class TestGromacsTop(FileIOTestCase):
@@ -197,6 +200,17 @@ class TestGromacsTop(FileIOTestCase):
                 get_fn('1aki.charmm27.top', written=True))
         top2 = load_file(get_fn('1aki.charmm27.top', written=True))
         self._charmm27_checks(top)
+
+    def test_write_with_unicode_escape(self):
+        """ Tests writing a .top when sys.argv includes \n in a string"""
+        top = load_file(get_fn('1aki.charmm27.top'))
+        self.assertEqual(top.combining_rule, 'lorentz')
+        sys.argv.append('foo\nbar')
+        GromacsTopologyFile.write(top, get_fn('foobar.top'))
+        with open(get_fn('foobar.top')) as fh:
+            for _ in range(15):
+                assert fh.readline().startswith(';')
+        sys.argv.remove('foo\nbar')
 
     def test_moleculetype_distinction(self):
         """ Tests moleculetype distinction for different parameters """
@@ -599,6 +613,22 @@ class TestGromacsTop(FileIOTestCase):
         # Now try separate parameter/topology file
         fn2 = get_fn('test.itp', written=True)
         top.write(fn, parameters=fn2)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology/molfile files
+        fn3 = get_fn('test_mol.itp', written=True)
+        top.write(fn, parameters=fn2, molfile=fn3)
         top2 = load_file(fn)
         self.assertEqual(len(top2.atoms), len(top.atoms))
         self.assertEqual(len(top2.bonds), len(top.bonds))

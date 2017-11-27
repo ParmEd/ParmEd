@@ -8,6 +8,7 @@ import copy
 import numpy as np
 import os
 import parmed as pmd
+from parmed.utils.io import genopen
 from parmed.utils.six import iteritems, string_types
 from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
@@ -536,6 +537,8 @@ class TestCharmmPsf(utils.FileIOTestCase):
     def test_copy_parameters(self):
         """ Tests copy_parameters option in load_parameters """
 
+        # ignore warning that two impropers match
+        warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         top.load_parameters(parmset=param22, copy_parameters=False)
         b = param22.bond_types[(top.atoms[0].type, top.atoms[1].type)]
@@ -1039,6 +1042,13 @@ class TestCharmmParameters(utils.FileIOTestCase):
         else:
             self.assertEqual(a1, a2)
 
+    def test_charmm36_rtf(self):
+        """Test parsing of CHARMM36 RTF files."""
+        # Make sure there are no failures loading CHARMM36 RTF files.
+        param36 = parameters.CharmmParameterSet(get_fn('top_all36_prot.rtf'),
+                                                get_fn('top_all36_carb.rtf'),
+                                                get_fn('top_all36_cgenff.rtf'))
+
 class TestFileWriting(utils.FileIOTestCase):
     """ Tests the various file writing capabilities """
 
@@ -1088,7 +1098,7 @@ class TestFileWriting(utils.FileIOTestCase):
     def test_charmm_stream_file(self):
         """ Test the CharmmStreamFile API """
         stream = CharmmStreamFile(get_fn('toppar_spin_label_dummy.str'))
-        lines = open(get_fn('toppar_spin_label_dummy.str'), 'r').readlines()
+        lines = genopen(get_fn('toppar_spin_label_dummy.str'), 'r').readlines()
         for l1, l2, c in zip(stream, lines, stream.comments):
             if '!' in l2:
                 self.assertEqual(l1, l2[:l2.index('!')] + '\n')

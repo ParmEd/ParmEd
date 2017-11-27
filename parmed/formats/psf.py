@@ -287,6 +287,7 @@ class PSFFile(object):
                                      cmap.atom4.idx+1, cmap.atom5.idx+1)
             )
             dest.write('\n')
+        dest.write('\n')
         # Done!
         # If we opened our own handle, close it
         if own_handle:

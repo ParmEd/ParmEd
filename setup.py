@@ -1,6 +1,7 @@
 import os
 import sys
 import versioneer
+import struct
 
 if sys.version_info < (2, 7):
     sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
@@ -73,10 +74,18 @@ depends = [os.path.join('src', 'CompatabilityMacros.h'),
            os.path.join('src', 'readparm.h')]
 include_dirs = [os.path.join(os.path.abspath('.'), 'src')]
 
+definitions = []
+
+#if using 64 bit python interpreter on Windows, add the MS_WIN64 flag for 64 bit pointers
+if sys.platform == 'win32' and (struct.calcsize("P") == 8):
+    definitions.append(('MS_WIN64', None))
+    definitions.append(('_hypot', 'hypot')) #fix MinGW build -- see http://stackoverflow.com/questions/10660524/error-building-boost-1-49-0-with-gcc-4-7-0/12124708#12124708
+
 extensions = [Extension('parmed.amber._rdparm',
                         sources=sources,
                         include_dirs=include_dirs,
-                        depends=depends)
+                        depends=depends,
+                        define_macros=definitions)
 ]
 
 if __name__ == '__main__':

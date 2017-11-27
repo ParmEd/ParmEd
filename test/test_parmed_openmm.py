@@ -6,18 +6,22 @@ import math
 import os
 import unittest
 import warnings
+from unittest import skipIf
 
 import numpy as np
 
 import parmed as pmd
-from parmed.utils.six.moves import StringIO
+from parmed.utils.six import StringIO
+from io import TextIOWrapper
+from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
+                           CharmmParameterSet)
 from parmed import openmm, load_file, exceptions, ExtraPoint, unit as u
-from utils import (get_fn, mm, app, has_openmm, FileIOTestCase, CPU,
-                   TestCaseRelative, EnergyTestCase)
-
+from utils import (get_fn, mm, app, has_openmm, has_networkx, has_lxml,
+                   FileIOTestCase, CPU, TestCaseRelative, EnergyTestCase)
+from parmed.exceptions import ParameterWarning
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
-class TestOpenMM(FileIOTestCase, TestCaseRelative, EnergyTestCase):
+class TestOpenMM(FileIOTestCase, EnergyTestCase):
 
     def setUp(self):
         super(TestOpenMM, self).setUp()
@@ -112,8 +116,6 @@ class TestOpenMM(FileIOTestCase, TestCaseRelative, EnergyTestCase):
         con2.setPositions(structure.positions)
 
         self.check_energies(parm, con1, structure, con2)
-
-
 
     def test_load_topology_extra_bonds(self):
         """ Test loading extra bonds not in Topology """
@@ -276,9 +278,12 @@ class TestSystemCreation(unittest.TestCase):
         a1.exclude(a5)
         system = struct.createSystem()
 
-class TestWriteParameters(FileIOTestCase):
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_lxml, 'Cannot test without lxml')
+@unittest.skipUnless(has_networkx, 'Cannot test without networkx')
+@unittest.skipUnless(os.getenv('AMBERHOME'), 'Cannot test without AMBERHOME')
+class TestWriteAmberParameters(FileIOTestCase):
 
-    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_write_xml_parameters(self):
         """ Test writing XML parameters loaded from Amber files """
         leaprc = StringIO("""\
@@ -494,15 +499,15 @@ CHIS = CHIE
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet.from_leaprc(leaprc)
         )
-        params.write(get_fn('amber_conv.xml', written=True),
+        ffxml_filename = get_fn('amber_conv.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(OriginalFile='leaprc.ff14SB',
-                     Reference=['Maier & Simmerling', 'Simmerling & Maier'],
+                     Reference=['Maier and Simmerling', 'Simmerling and Maier'],
                      Source=dict(Source='leaprc.ff14SB',
                      sourcePackage='AmberTools', sourcePackageVersion='15'))
         )
+        forcefield = app.ForceField(ffxml_filename)
 
-
-    @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
         leaprc = StringIO("""\
@@ -515,10 +520,12 @@ parm10 = loadamberparams gaff.dat
 Wang, J., Wang, W., Kollman P. A.; Case, D. A. "Automatic atom type and bond type perception in molecular mechanical calculations". Journal of Molecular Graphics and Modelling , 25, 2006, 247260.
 Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development and testing of a general AMBER force field". Journal of Computational Chemistry, 25, 2004, 1157-1174.
 """
-        params.write(get_fn('gaff.xml', written=True),
+        ffxml_filename = get_fn('gaff.xml', written=True)
+        params.write(ffxml_filename,
                      provenance=dict(OriginalFile='gaff.dat',
                      Reference=citations)
         )
+        forcefield = app.ForceField(ffxml_filename)
 
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
@@ -535,6 +542,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 1646)
+        ffxml.seek(0)
+        forcefield = app.ForceField(ffxml)
 
         params = openmm.OpenMMParameterSet.from_parameterset(
                   pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
@@ -549,47 +558,20 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
+        ffxml.seek(0)
+        forcefield = app.ForceField(ffxml)
 
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(
                 load_file(os.path.join(get_fn('parm'), 'frcmod.constph'))
         )
-        params.write(get_fn('test.xml', written=True))
-
-    def test_write_xml_parameters_charmm(self):
-        """ Test writing XML parameter files from Charmm parameter files"""
-
-        params = openmm.OpenMMParameterSet.from_parameterset(
-                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                              get_fn('top_all36_prot.rtf'),
-                                              get_fn('toppar_water_ions.str'))
-        )
-        params.write(get_fn('charmm_conv.xml', written=True),
-                     provenance=dict(
-                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                         Reference='MacKerrell'
-                     )
-        )
-
-    def test_ljforce_charmm(self):
-        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files"""
-
-        params = openmm.OpenMMParameterSet.from_parameterset(
-                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                                              get_fn('top_all36_prot.rtf'))
-        )
-        params.write(get_fn('charmm_conv_lj.xml', written=True),
-                     provenance=dict(
-                         OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
-                         Reference='MacKerrell'
-                     ),
-                     separate_ljforce=True
-        )
+        ffxml_filename = get_fn('test.xml', written=True)
+        params.write(ffxml_filename)
+        forcefield = app.ForceField(ffxml_filename)
 
     def test_not_write_residues_with_same_templhash(self):
-        """Test that no identical residues are written to XML, using the
-           templhasher function."""
+        """Test that no identical residues are written to XML, using the templhasher function."""
         # TODO add testing for multiatomic residues when support for those added
         params = openmm.OpenMMParameterSet.from_parameterset(
                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
@@ -604,8 +586,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         self.assertEqual(len(ffxml.readlines()), 16)
 
     def test_override_level(self):
-        """Test correct support for the override_level attribute of
-           ResidueTemplates and correct writing to XML tag"""
+        """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
         params = openmm.OpenMMParameterSet.from_parameterset(
                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
                  )
@@ -620,5 +601,107 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         output_lines = ffxml.readlines()
         control_line1 = '  <Residue name="K" override="1">\n'
         control_line2 = '  <Residue name="NA">\n'
-        self.assertEqual(output_lines[5], control_line1)
-        self.assertEqual(output_lines[8], control_line2)
+        self.assertEqual(output_lines[5].strip(), control_line1.strip())
+        self.assertEqual(output_lines[8].strip(), control_line2.strip())
+
+@unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+@unittest.skipUnless(has_lxml, 'Cannot test without lxml')
+@unittest.skipUnless(has_networkx, 'Cannot test without networkx')
+class TestWriteCHARMMParameters(FileIOTestCase):
+
+    def test_write_xml_parameters_charmm(self):
+        """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                              get_fn('top_all36_prot.rtf'),
+                                              get_fn('toppar_water_ions.str'))
+        )
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
+                         Reference='MacKerrell'
+                     )
+        )
+        forcefield = app.ForceField(ffxml_filename)
+        # Parameterize alanine tripeptide in vacuum
+        pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
+        # Parameterize ACE-NME in water
+        pdbfile = app.PDBFile(get_fn('2igd_924wat.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.PME)
+
+    def test_write_xml_parameters_methanol_ions_energy(self):
+        """ Test writing XML parameter files from Charmm parameter files, reading them back into OpenMM ForceField, and computing energy of methanol and NaCl """
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_cgenff.prm'),
+                                              get_fn('top_all36_cgenff.rtf'),
+                                              get_fn('toppar_water_ions.str'))
+        )
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFile='par_all36_cgenff.prm, top_all36_cgenff.rtf, toppar_water_ions.str',
+                         Reference='MacKerrell'
+                     )
+        )
+        forcefield = app.ForceField(ffxml_filename)
+        # Parameterize methanol and ions in vacuum
+        pdbfile = app.PDBFile(get_fn('methanol_ions.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        context = mm.Context(system, integrator, CPU)
+        context.setPositions(pdbfile.positions)
+        ffxml_potential = context.getState(getEnergy=True).getPotentialEnergy() / u.kilocalories_per_mole
+        del context, integrator
+        # Compute energy via ParmEd reader
+        psf = CharmmPsfFile(get_fn('methanol_ions.psf'))
+        system = psf.createSystem(params)
+        integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
+        context = mm.Context(system, integrator, CPU)
+        context.setPositions(pdbfile.positions)
+        parmed_potential = context.getState(getEnergy=True).getPotentialEnergy() / u.kilocalories_per_mole
+        del context, integrator
+        # Ensure potentials are almost equal
+        self.assertAlmostEqual(ffxml_potential, parmed_potential)
+
+    def test_ljforce_charmm(self):
+        """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
+
+        charmm_params = pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                                      get_fn('top_all36_prot.rtf'))
+
+        openmm_params = openmm.OpenMMParameterSet.from_parameterset(charmm_params)
+
+        #openmm_params.write(get_fn('charmm.xml', written=True),
+        ffxml_filename = get_fn('charmm36.xml')
+        openmm_params.write(ffxml_filename,
+                            provenance=dict(
+                                OriginalFile='par_all36_prot.prm & top_all36_prot.rtf',
+                                Reference='MacKerrell'
+                                ),
+                            separate_ljforce=True
+                            )
+        forcefield = app.ForceField(ffxml_filename)
+        # Parameterize alanine tripeptide in vacuum
+        pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
+        system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
+
+    def test_explicit_improper(self):
+        """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
+
+        warnings.filterwarnings('ignore', category=ParameterWarning)
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                              get_fn('top_all36_prot.rtf'))
+        )
+        ffxml_filename = get_fn('charmm.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
+                         Reference='MacKerrel'
+                     ),
+                     charmm_imp=True)
+        forcefield = app.ForceField(ffxml_filename)

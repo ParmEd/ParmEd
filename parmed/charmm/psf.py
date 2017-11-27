@@ -9,17 +9,18 @@ Date: April 20, 2014
 from __future__ import division
 
 from copy import copy as _copy
-from parmed.topologyobjects import (Bond, Angle, Dihedral, Improper,
-                    AcceptorDonor, Group, Cmap, UreyBradley, NoUreyBradley,
-                    Atom, DihedralType, ImproperType, UnassignedAtomType)
-from parmed.exceptions import (CharmmError, CharmmWarning, ParameterError)
-from parmed.structure import needs_openmm, Structure
-from parmed.utils.io import genopen
-from parmed.utils.six import wraps
-from parmed.utils.six.moves import zip, range
-from parmed.utils.six import string_types
+from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
+                               UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
+                               UnassignedAtomType)
+from ..exceptions import CharmmError, CharmmWarning, ParameterError, ParameterWarning
+from ..structure import needs_openmm, Structure
+from ..utils.io import genopen
+from ..utils.six import wraps
+from ..utils.six.moves import zip, range
+from ..utils.six import string_types
 import re
 import warnings
+import itertools
 
 def _catchindexerror(func):
     """
@@ -524,13 +525,13 @@ class CharmmPsfFile(Structure):
                 if isinstance(atom.type, int):
                     atype = parmset.atom_types_int[atom.type]
                 else:
-                    atype = parmset.atom_types_str[atom.type]
+                    atype = parmset.atom_types_str[atom.type.upper()]
             except KeyError:
-                raise ParameterError('Could not find atom type for %s' %
-                                     atom.type)
+                raise ParameterError('Could not find atom type for %s' % atom.type)
             atom.atom_type = atype
-            # Change to string type to look up the rest of the parameters
-            atom.type = str(atom.atom_type)
+            # Change to string type to look up the rest of the parameters. Use
+            # upper-case since all parameter sets were read in as upper-case
+            atom.type = str(atom.atom_type).upper()
             atom.atomic_number = atype.atomic_number
 
         # Next load all of the bonds
@@ -611,6 +612,7 @@ class CharmmPsfFile(Structure):
             dihedral.type.list = self.dihedral_types
         # Now do the impropers
         for imp in self.impropers:
+            MATCH = False
             # Store the atoms
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
@@ -620,30 +622,58 @@ class CharmmPsfFile(Structure):
             # Check for exact harmonic or exact periodic
             if key in parmset.improper_types:
                 imp.type = parmset.improper_types[key]
+                MATCH = True
             elif key in parmset.improper_periodic_types:
                 imp.type = parmset.improper_periodic_types[key]
+                MATCH = True
             elif altkey1 in parmset.improper_periodic_types:
                 imp.type = parmset.improper_periodic_types[altkey1]
+                MATCH = True
             elif altkey2 in parmset.improper_periodic_types:
                 imp.type = parmset.improper_periodic_types[altkey2]
+                MATCH = True
             else:
                 # Check for wild-card harmonic
-                for anchor in (at2, at3, at4):
-                    key = tuple(sorted([at1, anchor, 'X', 'X']))
+                key_placeholder = None
+                for anchor in itertools.combinations([at1, at2, at3, at4], 2):
+                    key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
                     if key in parmset.improper_types:
+                        if MATCH and key != key_placeholder:
+                            flag = (altkey1[0], altkey1[-1])
+                            if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                # Match was already found
+                                warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                              altkey1, key_placeholder), ParameterWarning)
+                                break
+                            if flag[0] == key[0] and flag[1] == key[1]:
+                                imp.type = parmset.improper_types[key]
+                                warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                              altkey1, key), ParameterWarning)
+                        key_placeholder = key
                         imp.type = parmset.improper_types[key]
-                        break
-                # Check for wild-card periodic
-                if key not in parmset.improper_types:
-                    for anchor in (at2, at3, at4):
-                        key = tuple(sorted([at1, anchor, 'X', 'X']))
-                        if key in parmset.improper_periodic_types:
-                            imp.type = parmset.improper_periodic_types[key]
-                            break
-                    # Not found anywhere
-                    if key not in parmset.improper_periodic_types:
-                        raise ParameterError('No improper parameters found for '
-                                             '%r' % imp)
+                        MATCH = True
+
+                    # Check for wild-card in periodic
+                    if key not in parmset.improper_types:
+                        for anchor in itertools.combinations([at1, at2, at3, at4], 2):
+                            key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                            if key in parmset.improper_periodic_types:
+                                if MATCH and key != key_placeholder:
+                                    flag = (altkey1[0], altkey1[-1])
+                                    if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                        # Match was already found
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                      key_placeholder, altkey1, key_placeholder), ParameterWarning)
+                                        break
+                                    if flag[0] == key[0] and flag[1] == key[1]:
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                      key_placeholder, altkey1, key), ParameterWarning)
+                                        imp.type = parmset.improper_periodic_types[key]
+                                MATCH = True
+                                key_placeholder = key
+                                imp.type = parmset.improper_periodic_types[key]
+                    elif not MATCH:
+                        warnings.warn("No improper parameter found for {}".format(altkey1), ParameterWarning)
             imp.type.used = False
         # prepare list of harmonic impropers present in system
         del self.improper_types[:]

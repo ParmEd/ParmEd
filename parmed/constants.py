@@ -5,14 +5,13 @@ Can be used like:
    from parmed.constants import *
 """
 from __future__ import division
-from math import pi as _pi, sqrt as _sqrt, log10 as _log10
+from math import pi as _pi, sqrt as _sqrt, log10 as _log10, acos as _acos
 
-__all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH',
-           'MBONA', 'NTHETH', 'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM',
-           'NEXT', 'NRES', 'NBONA', 'NTHETA', 'NPHIA', 'NUMBND', 'NUMANG',
-           'NPTRA', 'NATYP', 'NPHB', 'IFPERT', 'NBPER', 'NGPER', 'NDPER',
-           'MBPER', 'MGPER', 'MDPER', 'IFBOX', 'NMXRS', 'IFCAP', 'NUMEXTRA',
-           'NCOPY', 'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD']
+__all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH', 'MBONA', 'NTHETH',
+           'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM', 'NEXT', 'NRES', 'NBONA', 'NTHETA',
+           'NPHIA', 'NUMBND', 'NUMANG', 'NPTRA', 'NATYP', 'NPHB', 'IFPERT', 'NBPER', 'NGPER',
+           'NDPER', 'MBPER', 'MGPER', 'MDPER', 'IFBOX', 'NMXRS', 'IFCAP', 'NUMEXTRA', 'NCOPY',
+           'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD', 'TRUNCATED_OCTAHEDRON_ANGLE']
 
 AMBER_ELECTROSTATIC = 18.2223
 CHARMM_ELECTROSTATIC = _sqrt(332.0716)
@@ -67,9 +66,13 @@ NNB = NEXT
 
 RAD_TO_DEG = 180.0 / _pi
 DEG_TO_RAD = _pi / 180.0
+TRUNCATED_OCTAHEDRON_ANGLE = _acos(-1/3) * 180 / _pi
 
 # For use in floating point comparisons
 TINY = 1.0e-8
 SMALL = 1.0e-4
 TINY_DIGITS = int(_log10(TINY) + 0.5)
 SMALL_DIGITS = int(_log10(SMALL) + 0.5)
+
+# For I/O
+DEFAULT_ENCODING = 'UTF-8'

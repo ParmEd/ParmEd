@@ -7,9 +7,12 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+from functools import wraps
+from contextlib import closing
 import datetime
+from parmed.constants import DEFAULT_ENCODING
 from parmed.formats.registry import FileFormatType
-from parmed.modeller.residue import ResidueTemplate
+from parmed.modeller.residue import ResidueTemplate, PatchTemplate
 from parmed.parameters import ParameterSet
 from parmed.periodic_table import Element
 from parmed.topologyobjects import NoUreyBradley
@@ -18,7 +21,29 @@ from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
-from parmed.exceptions import ParameterWarning
+from parmed.exceptions import ParameterWarning, IncompatiblePatchError
+import itertools
+from collections import defaultdict
+
+try:
+    from lxml import etree
+except ImportError:
+    etree = None
+
+import logging
+LOGGER = logging.getLogger(__name__)
+
+def needs_lxml(func):
+    """
+    Decorator to raise an ImportError if a function requires lxml but it is not
+    present
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if etree is None:
+            raise ImportError('required package lxml could not be found')
+        return func(*args, **kwargs)
+    return wrapper
 
 @add_metaclass(FileFormatType)
 class OpenMMParameterSet(ParameterSet):
@@ -114,10 +139,15 @@ class OpenMMParameterSet(ParameterSet):
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
                 new_params.residues[name] = residue
+        for name, patch in iteritems(params.patches):
+            if isinstance(patch, PatchTemplate):
+                new_params.patches[name] = patch
 
         return new_params
 
-    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False):
+    @needs_lxml
+    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
+              improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -127,7 +157,7 @@ class OpenMMParameterSet(ParameterSet):
             attribute) to which the XML file will be written
         provenance : dict, optional
             If present, the XML file will be tagged with the available fields.
-            Keys of the dictionary become XML element tags, the values of the
+            Keys of the dictionary become XML etree.Element tags, the values of the
             dictionary must be instances of any of:
             - str / unicode (Py2) or str (Py3) - one XML element with this
             content is written
@@ -163,6 +193,12 @@ class OpenMMParameterSet(ParameterSet):
             ----
             When pair-specific L-J modifications are present (NBFIX in CHARMM), this
             behavior is always present and this flag is ignored.
+        improper_dihedrals_ordering : str
+            The ordering to use when assigning improper torsions in OpenMM.  Default is 'default',
+            other option is 'amber'
+        charmm_imp: bool
+            If True, will check for existence of IMPR in each residue and patch template,
+            and write out the explicit improper definition without wildcards in the ffxml file.
 
         Notes
         -----
@@ -171,11 +207,6 @@ class OpenMMParameterSet(ParameterSet):
         should not provide this information in ``provenance`` (it will be
         removed if it is provided).
         """
-        if isinstance(dest, string_types):
-            dest = genopen(dest, 'w')
-            own_handle = True
-        else:
-            own_handle = False
         if not write_unused:
             skip_residues = self._find_unused_residues()
             skip_types = self._find_unused_types(skip_residues)
@@ -192,25 +223,123 @@ class OpenMMParameterSet(ParameterSet):
             except KeyError:
                 warnings.warn('Some residue templates are using unavailable '
                               'AtomTypes', ParameterWarning)
-        try:
-            dest.write('<ForceField>\n')
-            self._write_omm_provenance(dest, provenance)
-            self._write_omm_atom_types(dest, skip_types)
-            self._write_omm_residues(dest, skip_residues)
-            self._write_omm_bonds(dest, skip_types)
-            self._write_omm_angles(dest, skip_types)
-            self._write_omm_urey_bradley(dest, skip_types)
-            self._write_omm_dihedrals(dest, skip_types)
-            self._write_omm_impropers(dest, skip_types)
-#           self._write_omm_rb_torsions(dest, skip_types)
-            self._write_omm_cmaps(dest, skip_types)
-            self._write_omm_scripts(dest, skip_types)
-            self._write_omm_nonbonded(dest, skip_types, separate_ljforce)
-            self._write_omm_LennardJonesForce(dest, skip_types, separate_ljforce)
-        finally:
-            dest.write('</ForceField>\n')
-            if own_handle:
-                dest.close()
+
+        [valid_residues_for_patch, valid_patches_for_residue] = self._determine_valid_patch_combinations(skip_residues)
+        LOGGER.debug('Valid patch combinations:')
+        for patch_name in self.patches:
+            LOGGER.debug('%8s : %s', patch_name, valid_residues_for_patch[patch_name])
+
+        if charmm_imp:
+            self._find_explicit_impropers()
+
+        root = etree.Element('ForceField')
+        self._write_omm_provenance(root, provenance)
+        self._write_omm_atom_types(root, skip_types)
+        self._write_omm_residues(root, skip_residues, valid_patches_for_residue)
+        self._write_omm_patches(root, valid_residues_for_patch)
+        self._write_omm_bonds(root, skip_types)
+        self._write_omm_angles(root, skip_types)
+        self._write_omm_urey_bradley(root, skip_types)
+        self._write_omm_dihedrals(root, skip_types, improper_dihedrals_ordering)
+        self._write_omm_impropers(root, skip_types)
+        #self._write_omm_rb_torsions(root, skip_types)
+        self._write_omm_cmaps(root, skip_types)
+        self._write_omm_scripts(root, skip_types)
+        self._write_omm_nonbonded(root, skip_types, separate_ljforce)
+        self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
+
+        tree = etree.ElementTree(root)
+
+        xml = etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
+
+        if isinstance(dest, string_types):
+            with closing(genopen(dest, 'w')) as f:
+                f.write(xml)
+        else:
+            dest.write(xml)
+
+    def _find_explicit_impropers(self):
+        improper_harmonic = {}
+        improper_periodic = {}
+        for name, residue in iteritems(self.residues):
+            a_names = [a.name for a in residue.atoms]
+            a_types = [a.type for a in residue.atoms]
+            for impr in residue._impr:
+                MATCH = False
+                a1, a2,a3, a4 = impr
+                if a2[0] == '-' or a2[0] == '+':
+                    a2 = a2[1:]
+                if a3[0] == '-' or a3[0] == '+':
+                    a3 = a3[1:]
+                if a4[0] == '-' or a4[0] == '+':
+                    a4 = a4[1:]
+                t1 = a_types[a_names.index(a1)]
+                t2 = a_types[a_names.index(a2)]
+                t3 = a_types[a_names.index(a3)]
+                t4 = a_types[a_names.index(a4)]
+                key = tuple(sorted((t1, t2, t3, t4)))
+                altkeys1 = (t1, t2, t3, t4)
+                altkeys2 = (t4, t3, t2, t1)
+                if key in self.improper_types:
+                    improper_harmonic[altkeys1] = self.improper_types[key]
+                    MATCH = True
+                elif key in self.improper_periodic_types:
+                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                    MATCH = True
+                elif altkeys1 in self.improper_periodic_types:
+                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
+                    MATCH = True
+                elif altkeys2 in self.improper_periodic_types:
+                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
+                    MATCH = True
+
+                else:
+                    # Check for wildcards
+                    key_placeholder = None
+                    for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                        key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                        if key in self.improper_types:
+                            if MATCH and key != key_placeholder:
+                                flag = (altkeys1[0], altkeys1[-1])
+                                if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                    # Match was already found.
+                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                  altkeys1, key_placeholder))
+                                    break
+
+                                if flag[0] == key[0] and flag[1] == key[1]:
+                                    improper_harmonic[altkeys1] = self.improper_types[key]
+                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                    altkeys1, key), ParameterWarning)
+
+
+                            MATCH = True
+                            key_placeholder = key
+                            improper_harmonic[altkeys1] = self.improper_types[key]
+                        if key not in self.improper_types:
+                            for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                                key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                                if key in self.improper_periodic_types:
+                                    if MATCH and key != key_placeholder:
+                                        flag = (altkeys1[0], altkeys1[-1])
+                                        if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                            # Match already found.
+                                            warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                          key_placeholder, altkeys1, key_placeholder), ParameterWarning)
+                                            break
+
+                                        if flag[0] == key[0] and flag[1] == key[1]:
+                                            warnings.warn("More than one improper matches for {}. Using {}".format(
+                                                    altkeys1, key), ParameterWarning)
+                                            improper_periodic[altkeys1] = self.improper_periodic_types[key]
+
+                                    MATCH = True
+                                    key_placeholder = key
+                                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                        elif not MATCH:
+                            warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
+        self.improper_periodic_types = improper_periodic
+        self.improper_types = improper_harmonic
 
     def _find_unused_residues(self):
         skip_residues = set()
@@ -235,81 +364,200 @@ class OpenMMParameterSet(ParameterSet):
         # TODO implement hash for polyatomic residues
         return id(residue)
 
-    def _write_omm_provenance(self, dest, provenance):
-        dest.write(' <Info>\n')
-        dest.write('  <DateGenerated>%02d-%02d-%02d</DateGenerated>\n' %
-                   datetime.datetime.now().timetuple()[:3])
-        provenance = provenance if provenance is not None else {}
+    @needs_lxml
+    def _write_omm_provenance(self, root, provenance):
+        info = etree.SubElement(root, 'Info')
+
+        date_generated = etree.SubElement(info, "DateGenerated")
+        date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3]
+
+        provenance = provenance or dict()
         for tag, content in iteritems(provenance):
             if tag == 'DateGenerated': continue
             if not isinstance(content, list):
                 content = [content]
             for sub_content in content:
                 if isinstance(sub_content, string_types):
-                    dest.write('  <%s>%s</%s>\n' % (tag, sub_content, tag))
+                    item = etree.Element(tag)
+                    item.text = sub_content
+                    info.append(item)
                 elif isinstance(sub_content, dict):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
                                        'specified incorrectly.')
                     attributes = [key for key in sub_content if key != tag]
                     element_content = sub_content[tag]
-                    dest.write('  <%s' % tag)
-                    for attribute in attributes:
-                        dest.write(' %s="%s"' % (attribute, sub_content[attribute]))
-                    dest.write('>%s</%s>\n' % (element_content, tag))
+                    attributes = { k : str(v) for (k,v) in sub_content.items() }
+                    item = etree.SubElement(info, tag, **attributes)
+                    item.text = str(element_content)
                 else:
                     raise TypeError('Incorrect type of the %s element content' % tag)
-        dest.write(' </Info>\n')
 
-    def _write_omm_atom_types(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_atom_types(self, xml_root, skip_types):
         if not self.atom_types: return
-        dest.write(' <AtomTypes>\n')
+        xml_section = etree.SubElement(xml_root, "AtomTypes")
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             assert atom_type.atomic_number >= 0, 'Atomic number not set!'
+            properties = { 'name' : name, 'class' : name, 'mass' : str(atom_type.mass) }
             if atom_type.atomic_number == 0:
-                dest.write('  <Type name="%s" class="%s" mass="%s"/>\n'
-                           % (name, name, atom_type.mass)
-                           )
+                etree.SubElement(xml_section, 'Type', **properties)
             else:
                 element = Element[atom_type.atomic_number]
-                dest.write('  <Type name="%s" class="%s" element="%s" mass="%s"/>\n'
-                           % (name, name, element, atom_type.mass)
-                          )
-        dest.write(' </AtomTypes>\n')
+                etree.SubElement(xml_section, 'Type', element=str(element), **properties)
 
-    def _write_omm_residues(self, dest, skip_residues):
+    @needs_lxml
+    def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
+        if valid_patches_for_residue is None:
+            valid_patches_for_residue = dict()
         written_residues = set()
-        dest.write(' <Residues>\n')
+        xml_section = etree.SubElement(xml_root, 'Residues')
         for name, residue in iteritems(self.residues):
             if name in skip_residues: continue
             templhash = OpenMMParameterSet._templhasher(residue)
             if templhash in written_residues: continue
             written_residues.add(templhash)
+            # Write residue
             if residue.override_level == 0:
-                dest.write('  <Residue name="%s">\n' % residue.name)
+                xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name)
             else:
-                dest.write('  <Residue name="%s" override="%d">\n' % (residue.name,
-                           residue.override_level))
+                xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name, override=str(residue.override_level))
+            # Write residue contents
             for atom in residue.atoms:
-                dest.write('   <Atom name="%s" type="%s" charge="%s"/>\n' %
-                           (atom.name, atom.type, atom.charge))
+                etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
             for bond in residue.bonds:
-                dest.write('   <Bond atomName1="%s" atomName2="%s"/>\n' %
-                           (bond.atom1.name, bond.atom2.name))
+                etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
             if residue.head is not None:
-                dest.write('   <ExternalBond atomName="%s"/>\n' %
-                           residue.head.name)
+                etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
-                dest.write('   <ExternalBond atomName="%s"/>\n' %
-                           residue.tail.name)
-            dest.write('  </Residue>\n')
-        dest.write(' </Residues>\n')
+                etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
+            if residue.name in valid_patches_for_residue:
+                for patch_name in valid_patches_for_residue[residue.name]:
+                    etree.SubElement(xml_residue, 'AllowPatch', name=patch_name)
 
-    def _write_omm_bonds(self, dest, skip_types):
+    def _determine_valid_patch_combinations(self, skip_residues):
+        """
+        Determine valid (permissible) combinations of patches with residues that
+        lead to integral net charges.
+
+        Parameters
+        ----------
+        skip_residues : set of ResidueTemplate
+            List of residues to skip
+
+        Returns
+        -------
+        valid_residues_for_patch : dict
+            valid_residues_for_patch[patch] is a list of residues compatible with that patch
+        valid_patches_for_residue : dict
+            valid_patches_for_residue[residue] is a list of patches compatible with that residue
+
+        """
+        # Attempt to patch every residue, recording only valid combinations.
+        valid_residues_for_patch = defaultdict(list)
+        valid_patches_for_residue = defaultdict(list)
+        for patch in self.patches.values():
+            for residue in self.residues.values():
+                if residue in skip_residues: continue
+                # Attempt to patch the residue.
+                try:
+                    residue.apply_patch(patch)
+                except IncompatiblePatchError as e:
+                    # Patching failed; continue to next patch
+                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
+                    continue
+
+                valid_residues_for_patch[patch.name].append(residue.name)
+                valid_patches_for_residue[residue.name].append(patch.name)
+
+        return [valid_residues_for_patch, valid_patches_for_residue]
+
+    @needs_lxml
+    def _write_omm_patches(self, xml_root, valid_residues_for_patch, write_apply_to_residue=False):
+        """
+        Write patch definitions for OpenMM ForceField
+
+        Parameters
+        ----------
+        xml_root : lxml.etree.Element
+            The XML Element write the <Patches> section to.
+        valid_residues_for_patch : dict of str : str
+            valid_residues_for_patch[patch_name] lists the residue names valid for this patch
+        write_apply_to_residue : bool, optional, default=False
+            If True, will write <ApplyToResidue> tags.
+
+        """
+        if not self.patches: return
+        written_patches = set()
+        xml_patches = etree.SubElement(xml_root, 'Patches')
+        for name, patch in iteritems(self.patches):
+            # Require that at least one valid patch combination exists for this patch
+            if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
+                continue
+
+            templhash = OpenMMParameterSet._templhasher(patch)
+            if templhash in written_patches: continue
+            written_patches.add(templhash)
+            if patch.override_level == 0:
+                patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name)
+            else:
+                patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name, override=str(patch.override_level))
+
+            # Construct an example patched residue
+            # TODO: We should also ensure that *all* compatible residues have the
+            # same added/changed atoms and deleted bonds, just to be safe.
+            residue_name = valid_residues_for_patch[name][0]
+            try:
+                residue = self.residues[residue_name]
+            except KeyError as e:
+                msg =  'Compatible residue not found in self.residues\n'
+                msg += '   patch name: %s\n' % name
+                msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
+                msg += '   residue name: %s\n' % residue_name
+                msg += str(e)
+                raise(msg)
+            patched_residue = residue.apply_patch(patch)
+            #patch_xml.append( etree.Comment('Using residue %s as reference template' % residue.name) )
+
+            for atom in patch.atoms:
+                if atom.name not in residue:
+                    etree.SubElement(patch_xml, 'AddAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
+                else:
+                    etree.SubElement(patch_xml, 'ChangeAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
+
+            for atom_name in patch.delete_atoms:
+                etree.SubElement(patch_xml, 'RemoveAtom', name=atom_name)
+
+            for bond in patch.bonds:
+                etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+
+            for bond in patched_residue.bonds:
+                if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
+                    etree.SubElement(patch_xml, 'AddBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+            for bond in residue.bonds:
+                if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
+                    etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+
+            if (residue.head is not None) and (patched_residue.head is None):
+                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.head.name)
+            if (residue.tail is not None) and (patched_residue.tail is None):
+                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.tail.name)
+
+            if (residue.head is None) and (patched_residue.head is not None):
+                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.head.name)
+            if (residue.tail is None) and (patched_residue.tail is not None):
+                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.tail.name)
+
+            if write_apply_to_residue:
+                for residue_name in valid_residues_for_patch[patch.name]:
+                    etree.SubElement(patch_xml, 'ApplyToResidue', name=residue_name)
+
+    @needs_lxml
+    def _write_omm_bonds(self, xml_root, skip_types):
         if not self.bond_types: return
-        dest.write(' <HarmonicBondForce>\n')
+        xml_force = etree.SubElement(xml_root, 'HarmonicBondForce')
         bonds_done = set()
         lconv = u.angstroms.conversion_factor_to(u.nanometers)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
@@ -318,13 +566,12 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            dest.write('  <Bond type1="%s" type2="%s" length="%s" k="%s"/>\n'
-                       % (a1, a2, bond.req*lconv, bond.k*kconv))
-        dest.write(' </HarmonicBondForce>\n')
+            etree.SubElement(xml_force, 'Bond', type1=a1, type2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
 
-    def _write_omm_angles(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_angles(self, xml_root, skip_types):
         if not self.angle_types: return
-        dest.write(' <HarmonicAngleForce>\n')
+        xml_force = etree.SubElement(xml_root, 'HarmonicAngleForce')
         angles_done = set()
         tconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) * 2
@@ -333,17 +580,18 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            dest.write('  <Angle type1="%s" type2="%s" type3="%s" '
-                       'angle="%s" k="%s"/>\n' %
-                       (a1, a2, a3, angle.theteq*tconv, angle.k*kconv))
-        dest.write(' </HarmonicAngleForce>\n')
+            etree.SubElement(xml_force, 'Angle', type1=a1, type2=a2, type3=a3, angle=str(angle.theteq*tconv), k=str(angle.k*kconv))
 
-    def _write_omm_dihedrals(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_dihedrals(self, xml_root, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
         # The from_structure method ensures that, even if the containing
         # Structure has separate dihedral entries for each torsion
-        dest.write(' <PeriodicTorsionForce>\n')
+        if improper_dihedrals_ordering == 'default':
+            xml_force = etree.SubElement(xml_root, 'PeriodicTorsionForce')
+        else:
+            xml_force = etree.SubElement(xml_root, 'PeriodicTorsionForce', ordering=improper_dihedrals_ordering)
         diheds_done = set()
         pconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -354,14 +602,13 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
             diheds_done.add((a4, a3, a2, a1))
-            dest.write('  <Proper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s"' % (nowild(a1), a2, a3, nowild(a4)))
+            terms = dict()
             for i, term in enumerate(dihed):
                 i += 1
-                dest.write(' periodicity%d="%d" phase%d="%s" k%d="%s"' %
-                           (i, term.per, i, term.phase*pconv, i,
-                            term.phi_k*kconv))
-            dest.write('/>\n')
+                terms['periodicity%d' % i] = str(term.per)
+                terms['phase%d' % i] = str(term.phase*pconv)
+                terms['k%d' % i] = str(term.phi_k*kconv)
+            etree.SubElement(xml_force, 'Proper', type1=nowild(a1), type2=a2, type3=a3, type4=nowild(a4), **terms)
         # Now do the periodic impropers. OpenMM expects the central atom to be
         # listed first. ParameterSet goes out of its way to list it third
         # (consistent with Amber) except in instances where order is random (as
@@ -378,35 +625,29 @@ class OpenMMParameterSet(ParameterSet):
             if a2 != 'X' and a3 == 'X':
                 # Single wild-card entries put the wild-card in position 2
                 a2, a3 = a3, a2
-            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" periodicity1="%d" phase1="%s" k1="%s"/>\n' %
-                       (a1, nowild(a2), nowild(a3), nowild(a4), improp.per,
-                        improp.phase*pconv, improp.phi_k*kconv)
-            )
-        dest.write(' </PeriodicTorsionForce>\n')
+            etree.SubElement(xml_force, 'Improper', type1=a1, type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+                       periodicity1=str(improp.per), phase1=str(improp.phase*pconv), k1=str(improp.phi_k*kconv))
 
-    def _write_omm_impropers(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_impropers(self, xml_root, skip_types):
         if not self.improper_types: return
-        dest.write(' <CustomTorsionForce energy="k*(theta-theta0)^2">\n')
-        dest.write('  <PerTorsionParameter name="k"/>\n')
-        dest.write('  <PerTorsionParameter name="theta0"/>\n')
+        xml_force = etree.SubElement(xml_root, 'CustomTorsionForce', energy="k*(theta-theta0)^2")
+        etree.SubElement(xml_force, 'PerTorsionParameter', name="k")
+        etree.SubElement(xml_force, 'PerTorsionParameter', name="theta0")
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
         tconv = u.degree.conversion_factor_to(u.radian)
         def nowild(name):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
-            dest.write('  <Improper type1="%s" type2="%s" type3="%s" '
-                       'type4="%s" k="%s" theta0="%s"/>\n' %
-                       (nowild(a1), nowild(a2), nowild(a3), nowild(a4),
-                       improp.psi_k*kconv, improp.psi_eq*tconv)
-            )
-        dest.write(' </CustomTorsionForce>\n')
+            etree.SubElement(xml_force, 'Improper', type1=nowild(a1), type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+                       k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
 
-    def _write_omm_urey_bradley(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_urey_bradley(self, xml_root, skip_types):
         if not self.urey_bradley_types: return None
-        dest.write(' <!-- Urey-Bradley terms -->\n')
-        dest.write(' <AmoebaUreyBradleyForce>\n')
+        xml_root.append( etree.Comment("Urey-Bradley terms") )
+        xml_force = etree.SubElement(xml_root, 'AmoebaUreyBradleyForce')
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
         _ambfrc = u.kilocalorie_per_mole/u.angstrom**2
         _ommfrc = u.kilojoule_per_mole/u.nanometer**2
@@ -416,14 +657,12 @@ class OpenMMParameterSet(ParameterSet):
             if any((a in skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
-            dest.write('  <UreyBradley type1="%s" type2="%s" type3="%s" d="%s" k="%s"/>\n'
-                       % (a1, a2, a3, urey.req*length_conv, urey.k*frc_conv))
+            etree.SubElement(xml_force, 'UreyBradley', type1=a1, type2=a2, type3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
 
-        dest.write(' </AmoebaUreyBradleyForce>\n')
-
-    def _write_omm_cmaps(self, dest, skip_types):
+    @needs_lxml
+    def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        dest.write(' <CmapTorsionForce>\n')
+        xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -431,28 +670,26 @@ class OpenMMParameterSet(ParameterSet):
             if id(cmap) in maps: continue
             maps[id(cmap)] = counter
             counter += 1
-            dest.write('  <Map>\n')
+            xml_map = etree.SubElement(xml_force, 'Map')
             grid = cmap.grid.switch_range().T
+            map_string = ''
             for i in range(cmap.resolution):
-                dest.write('  ')
                 base = i * cmap.resolution
                 for j in range(cmap.resolution):
-                    dest.write(' %s' % (grid[base+j]*econv))
-                dest.write('\n')
-            dest.write('  </Map>\n')
+                    map_string += ' %s' % (grid[base+j]*econv)
+                map_string += '\n'
+            xml_map.text = map_string
         used_torsions = set()
         for (a1, a2, a3, a4, _, _, _, a5), cmap in iteritems(self.cmap_types):
             if any((a in skip_types for a in (a1, a2, a3, a4, a5))): continue
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
-            dest.write('   <Torsion map="%d" type1="%s" type2="%s" '
-                       'type3="%s" type4="%s" type5="%s"/>\n' %
-                       (maps[id(cmap)], a1, a2, a3, a4, a5)
-            )
-        dest.write(' </CmapTorsionForce>\n')
+            etree.SubElement(xml_force, 'Torsion', map=str(maps[id(cmap)]),
+                       type1=a1, type2=a2, type3=a3, type4=a4, type5=a5)
 
-    def _write_omm_nonbonded(self, dest, skip_types, separate_ljforce):
+    @needs_lxml
+    def _write_omm_nonbonded(self, xml_root, skip_types, separate_ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -483,9 +720,8 @@ class OpenMMParameterSet(ParameterSet):
             lj14scale = 1.0 / self.default_scnb
 
         # Write NonbondedForce records.
-        dest.write(' <NonbondedForce coulomb14scale="%s" lj14scale="%s">\n' %
-                   (coulomb14scale, lj14scale))
-        dest.write('  <UseAttributeFromResidue name="charge"/>\n')
+        xml_force = etree.SubElement(xml_root, 'NonbondedForce', coulomb14scale=str(coulomb14scale), lj14scale=str(lj14scale))
+        etree.SubElement(xml_force, 'UseAttributeFromResidue', name="charge")
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
@@ -508,11 +744,10 @@ class OpenMMParameterSet(ParameterSet):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, abs(epsilon)))
-        dest.write(' </NonbondedForce>\n')
+            etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
-    def _write_omm_LennardJonesForce(self, dest, skip_types, separate_ljforce):
+    @needs_lxml
+    def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
         if not self.nbfix_types and not separate_ljforce: return
         # Convert Conversion factors for writing in natural OpenMM units
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
@@ -533,7 +768,7 @@ class OpenMMParameterSet(ParameterSet):
             lj14scale = 1.0 / self.default_scnb
 
         # write L-J records
-        dest.write(' <LennardJonesForce lj14scale="%s">\n' % lj14scale)
+        xml_force = etree.SubElement(xml_root, 'LennardJonesForce', lj14scale=str(lj14scale))
         for name, atom_type in iteritems(self.atom_types):
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
@@ -551,24 +786,18 @@ class OpenMMParameterSet(ParameterSet):
                 else:
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
-
-            dest.write('  <Atom type="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (name, sigma, abs(epsilon)))
+            etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
 
         # write NBFIX records
         for (atom_types, value) in iteritems(self.nbfix_types):
             emin = value[0] * ene_conv
             rmin = value[1] * length_conv
-            # convert to sigma
-            sigma = 2 * rmin/(2**(1.0/6))
-            dest.write('  <NBFixPair type1="%s" type2="%s" sigma="%s" epsilon="%s"/>\n' %
-                       (atom_types[0], atom_types[1], sigma, emin))
-        dest.write(' </LennardJonesForce>\n')
-
+            # convert to sigma; note that NBFIX types are not rmin/2 but rmin
+            sigma = rmin/(2**(1.0/6))
+            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
 
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported
         # options are specified
         if self.combining_rule == 'geometric':
-            raise NotImplementedError('Geometric combining rule not currently '
-                                      'supported.')
+            raise NotImplementedError('Geometric combining rule not currently supported.')

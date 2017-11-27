@@ -13,12 +13,13 @@ addons:
 matrix:
   include:
     - { os: linux, env: PYTHON_VERSION=2.7 }
-    - { os: linux, env: PYTHON_VERSION=3.5 MINIMAL_PACKAGES=yes }
-    - { os: linux, env: PYTHON_VERSION=3.4 }
+    - { os: linux, env: PYTHON_VERSION=3.6 MINIMAL_PACKAGES=yes }
+    - { os: linux, env: PYTHON_VERSION=3.5 }
     - { os: linux, env: PYTHON_VERSION=pypy }
-    - { os: osx, env: PYTHON_VERSION=3.4 MINIMAL_PACKAGES=yes }
+#   - { os: osx, env: PYTHON_VERSION=3.4 MINIMAL_PACKAGES=yes }
 
 install:
-    - source devtools/travis-ci/install.sh
-    - python setup.py install
-    - source devtools/travis-ci/runtest.sh
+    - source devtools/ci/travis/install.sh
+    - pip install .
+    - python -c "import parmed; print(parmed.__version__)"
+    - source devtools/ci/travis/runtest.sh
