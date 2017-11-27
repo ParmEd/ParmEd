@@ -24,7 +24,7 @@ conda --version
 
 # Now add the packages we want
 conda install --quiet -yn ${CONDAENV} numpy scipy pandas nose openmm coverage nose-timer \
-                                      python-coveralls ambermini=16.16 netCDF4
+                                      python-coveralls ambermini=16.16 netCDF4 lxml
 conda install --quiet -yn ${CONDAENV} pyflakes=1.0.0
 conda install --quiet -yn ${CONDAENV} rdkit==2015.09.1 -c omnia
 conda install --quiet -yn ${CONDAENV} boost==1.59.0 -c omnia

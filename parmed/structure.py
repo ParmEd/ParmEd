@@ -1428,9 +1428,9 @@ class Structure(object):
         Parameters
         ----------
         fname : str or file-like object
-            Name of the file or file-like object to save. If ``format`` is 
-            ``None`` (see below), the file type will be determined based on 
-            the filename extension. If ``fname`` is file-like object,  ``format`` 
+            Name of the file or file-like object to save. If ``format`` is
+            ``None`` (see below), the file type will be determined based on
+            the filename extension. If ``fname`` is file-like object,  ``format``
             must be  provided. If the type cannot be determined, a ValueError is raised.
         format : str, optional
             The case-insensitive keyword specifying what type of file ``fname``
@@ -2793,10 +2793,10 @@ class Structure(object):
         ene_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
         # We need a CustomNonbondedForce to implement the geometric combining
         # rules
-        force = mm.CustomNonbondedForce('eps1*eps2*(sigr6^2-sigr6); sigr6=sigr2*sigr2*sigr2; '
-                                        'sigr2=(sigc/r)^2; sigc=sig1*sig2')
-        force.addPerParticleParameter('eps')
-        force.addPerParticleParameter('sig')
+        force = mm.CustomNonbondedForce('epsilon1*epsilon2*(sigr6^2-sigr6); sigr6=sigr2*sigr2*sigr2; '
+                                        'sigr2=(sigc/r)^2; sigc=sigma1*sigma2')
+        force.addPerParticleParameter('epsilon')
+        force.addPerParticleParameter('sigma')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
         if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
                 nonbondedMethod is app.CutoffPeriodic):

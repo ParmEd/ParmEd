@@ -134,7 +134,7 @@ class _OpenMMStateContents(object):
     def _get_data(state, getter, unit, shape=None, **kwargs):
         try:
             stuff = getattr(state, getter)(**kwargs)
-        except TypeError:
+        except Exception:
             return None
         else:
             stuff = stuff.value_in_unit(unit)
