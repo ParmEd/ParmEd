@@ -2635,8 +2635,9 @@ class Structure(object):
 
         # Any exclusion partners we already added will zero-out existing
         # exclusions/exceptions
-        for a2 in atom.exclusion_partners:
-            force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
+        for atom in self.atoms:
+            for a2 in atom.exclusion_partners:
+                force.addException(atom.idx, a2.idx, 0.0, 0.5, 0.0, True)
 
         if switchDistance and nonbondedMethod is not app.NoCutoff:
             if u.is_quantity(switchDistance):
