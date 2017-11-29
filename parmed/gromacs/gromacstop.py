@@ -1434,7 +1434,7 @@ class GromacsTopologyFile(Structure):
                     eps *= eps_conversion
                     sig *= 0.1
                     dest.write('{0} {1} 1 {2} {3}\n'.format(
-                        a1, a2, sig/2**(1/6), eps))
+                        key[0], key[1], sig/2**(1/6), eps))
             # Print all parameter types unless we asked for inline
             if parameters != 'inline':
                 if params.bond_types:
