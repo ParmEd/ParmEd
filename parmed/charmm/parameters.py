@@ -75,7 +75,7 @@ class CharmmParameterSet(ParameterSet):
         return other
 
     @staticmethod
-    def _convert(data, type, msg=''):
+    def _convert(data, type, msg='', line_index=None, line=None):
         """
         Converts a data type to a desired type, raising CharmmError if it
         fails
@@ -83,7 +83,12 @@ class CharmmParameterSet(ParameterSet):
         try:
             return type(data)
         except ValueError:
-            raise CharmmError('Could not convert %s to %s' % (msg, type))
+            msg = 'Could not convert %s to %s\n' % (msg, type)
+            if line_index is not None:
+                msg += 'input line %d\n' % line_index
+            if line is not None:
+                msg += 'input line: %s\n' % line
+            raise CharmmError(msg)
 
     def __init__(self, *args):
         # Instantiate the list types
@@ -358,12 +363,13 @@ class CharmmParameterSet(ParameterSet):
                             raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
                                               'from NONBONDED card')
                         if self._declared_nbrules:
-                            # We already specified it -- make sure it's the same
-                            # as the one we specified before
-                            _, dt0 = next(iteritems(self.dihedral_types))
-                            diff = abs(dt0[0].scee - scee)
-                            if diff > TINY:
-                                raise CharmmError('Inconsistent 1-4 scalings')
+                            if len(self.dihedral_types) > 0:
+                                # We already specified it -- make sure it's the same
+                                # as the one we specified before
+                                _, dt0 = next(iteritems(self.dihedral_types))
+                                diff = abs(dt0[0].scee - scee)
+                                if diff > TINY:
+                                    raise CharmmError('Inconsistent 1-4 scalings')
                         else:
                             scee = 1 / scee
                             for key, dtl in iteritems(self.dihedral_types):
@@ -401,9 +407,9 @@ class CharmmParameterSet(ParameterSet):
                 if words[0].upper() == 'END':
                     continue
                 try:
-                    idx = conv(words[1], int, 'atom type')
+                    idx = conv(words[1], int, 'atom type', line_index=i, line=line)
                     name = words[2].upper()
-                    mass = conv(words[3], float, 'atom mass')
+                    mass = conv(words[3], float, 'atom mass', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse MASS section.')
                 # The parameter file might or might not have an element name
@@ -427,8 +433,8 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
-                    k = conv(words[2], float, 'bond force constant')
-                    req = conv(words[3], float, 'bond equilibrium dist')
+                    k = conv(words[2], float, 'bond force constant', line_index=i, line=line)
+                    req = conv(words[3], float, 'bond equilibrium dist', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
@@ -454,8 +460,8 @@ class CharmmParameterSet(ParameterSet):
                     type1 = words[0].upper()
                     type2 = words[1].upper()
                     type3 = words[2].upper()
-                    k = conv(words[3], float, 'angle force constant')
-                    theteq = conv(words[4], float, 'angle equilibrium value')
+                    k = conv(words[3], float, 'angle force constant', line_index=i, line=line)
+                    theteq = conv(words[4], float, 'angle equilibrium value', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse angles.')
 
@@ -475,8 +481,8 @@ class CharmmParameterSet(ParameterSet):
                     self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
                 try:
-                    ubk = conv(words[5], float, 'Urey-Bradley force constant')
-                    ubeq = conv(words[6], float, 'Urey-Bradley equil. value')
+                    ubk = conv(words[5], float, 'Urey-Bradley force constant', line_index=i, line=line)
+                    ubeq = conv(words[6], float, 'Urey-Bradley equil. value', line_index=i, line=line)
                     ubtype = BondType(ubk, ubeq)
                     ubtype.penalty = penalty
                 except IndexError:
@@ -494,9 +500,9 @@ class CharmmParameterSet(ParameterSet):
                     type2 = words[1].upper()
                     type3 = words[2].upper()
                     type4 = words[3].upper()
-                    k = conv(words[4], float, 'dihedral force constant')
-                    n = conv(words[5], float, 'dihedral periodicity')
-                    phase = conv(words[6], float, 'dihedral phase')
+                    k = conv(words[4], float, 'dihedral force constant', line_index=i, line=line)
+                    n = conv(words[5], float, 'dihedral periodicity', line_index=i, line=line)
+                    phase = conv(words[6], float, 'dihedral phase', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
                 key = (type1, type2, type3, type4)
@@ -534,8 +540,8 @@ class CharmmParameterSet(ParameterSet):
                     type2 = words[1].upper()
                     type3 = words[2].upper()
                     type4 = words[3].upper()
-                    k = conv(words[4], float, 'improper force constant')
-                    theteq = conv(words[5], float, 'improper equil. value')
+                    k = conv(words[4], float, 'improper force constant', line_index=i, line=line)
+                    theteq = conv(words[5], float, 'improper equil. value', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
                 # If we have a 7th column, that is the real psi0 (and the 6th
@@ -543,7 +549,7 @@ class CharmmParameterSet(ParameterSet):
                 # improper torsion (so it needs to be added to the
                 # improper_periodic_types list)
                 try:
-                    tmp = conv(words[6], float, 'improper equil. value')
+                    tmp = conv(words[6], float, 'improper equil. value', line_index=i, line=line)
                 except IndexError:
                     per = 0
                 else:
@@ -589,7 +595,7 @@ class CharmmParameterSet(ParameterSet):
                         type6 = words[5].upper()
                         type7 = words[6].upper()
                         type8 = words[7].upper()
-                        res = conv(words[8], int, 'CMAP resolution')
+                        res = conv(words[8], int, 'CMAP resolution', line_index=i, line=line)
                     except IndexError:
                         raise CharmmError('Could not parse CMAP data.')
                     # order the torsions independently
@@ -608,8 +614,8 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     atype = words[0].upper()
                     # 1st column is ignored
-                    epsilon = conv(words[2], float, 'vdW epsilon term')
-                    rmin = conv(words[3], float, 'vdW Rmin/2 term')
+                    epsilon = conv(words[2], float, 'vdW epsilon term', line_index=i, line=line)
+                    rmin = conv(words[3], float, 'vdW Rmin/2 term', line_index=i, line=line)
                 except (IndexError, CharmmError):
                     # If we haven't read our first nonbonded term yet, we may
                     # just be parsing the settings that should be used. So
@@ -655,8 +661,8 @@ class CharmmParameterSet(ParameterSet):
                 # See if we have 1-4 parameters
                 try:
                     # 4th column is ignored
-                    eps14 = conv(words[5], float, '1-4 vdW epsilon term')
-                    rmin14 = conv(words[6], float, '1-4 vdW Rmin/2 term')
+                    eps14 = conv(words[5], float, '1-4 vdW epsilon term', line_index=i, line=line)
+                    rmin14 = conv(words[6], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
                 except IndexError:
                     eps14 = rmin14 = None
                 nonbonded_types[atype] = [epsilon, rmin, eps14, rmin14]
@@ -668,11 +674,11 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     at1 = words[0].upper()
                     at2 = words[1].upper()
-                    emin = abs(conv(words[2], float, 'NBFIX Emin'))
-                    rmin = conv(words[3], float, 'NBFIX Rmin')
+                    emin = abs(conv(words[2], float, 'NBFIX Emin', line_index=i, line=line))
+                    rmin = conv(words[3], float, 'NBFIX Rmin', line_index=i, line=line)
                     try:
-                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4'))
-                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4')
+                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4', line_index=i, line=line))
+                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4', line_index=i, line=line)
                     except IndexError:
                         emin14 = rmin14 = None
                     try:
@@ -732,15 +738,16 @@ class CharmmParameterSet(ParameterSet):
         hpatches = dict()
         tpatches = dict()
         line = next(f)
+        line_index = 0
         try:
             while line:
                 line = line.strip()
                 if line[:4].upper() == 'MASS':
                     words = line.split()
                     try:
-                        idx = conv(words[1], int, 'atom type')
+                        idx = conv(words[1], int, 'atom type', line_index=line_index, line=line)
                         name = words[2].upper()
-                        mass = conv(words[3], float, 'atom mass')
+                        mass = conv(words[3], float, 'atom mass', line_index=line_index, line=line)
                     except IndexError:
                         raise CharmmError('Could not parse MASS section of %s' % tfile)
                     # The parameter file might or might not have an element name
@@ -888,6 +895,7 @@ class CharmmParameterSet(ParameterSet):
                     continue
                 # Get the next line and cycle through
                 line = next(f)
+                line_index += 1
         except StopIteration:
             pass
 
