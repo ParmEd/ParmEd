@@ -57,6 +57,16 @@ AMBER user can overwrite installed version by
 python setup.py install --prefix=$AMBERHOME
 ```
 
+Testing ParmEd
+========
+
+In order to automatically run the ParmEd tests, execute the following:
+
+```
+cd test
+nosetests .
+```
+
 Examples
 ========
 
