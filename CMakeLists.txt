@@ -28,4 +28,4 @@ install(CODE "
     	 build -b \"${BUILD_DIR}\" ${PYTHON_COMPILER_ARG}
     	 install -f ${PYTHON_PREFIX_ARG} --no-setuptools
     	\"--install-scripts=\${CMAKE_INSTALL_PREFIX_BS}${BINDIR}\"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})" COMPONENT Python)
