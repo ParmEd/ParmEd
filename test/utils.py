@@ -27,6 +27,18 @@ except ImportError:
     app = openmm_version = CPU = Reference = mm = None
 
 try:
+    import networkx as nx
+    has_networkx = True
+except ImportError:
+    has_networkx = False
+
+try:
+    from lxml import etree
+    has_lxml = True
+except ImportError:
+    has_lxml = False
+
+try:
     from string import uppercase
 except ImportError:
     from string import ascii_uppercase as uppercase

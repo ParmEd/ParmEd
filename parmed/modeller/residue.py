@@ -388,6 +388,7 @@ class ResidueTemplate(object):
         * The patch specifies that an atom is to be deleted that doesn't exist in the residue
         * A bond specified as being added in the patch does not have both atom names present after adding/deleting atoms from the patch
         * The new net charge is not integral to the specified precision
+        * The residue is not modified in any way (no atoms or bonds added/changed/deleted)
 
         Parameters
         ----------
@@ -411,10 +412,13 @@ class ResidueTemplate(object):
         # Create a copy
         # TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?
         residue = _copy.copy(self)
+        # Record whether we've actually modified the residue.
+        modifications_made = False
         # Delete atoms
         for atom_name in patch.delete_atoms:
             try:
                 residue.delete_atom(atom_name)
+                modifications_made = True
             except KeyError as e:
                 raise IncompatiblePatchError(str(e))
         # Add or replace atoms
@@ -425,23 +429,26 @@ class ResidueTemplate(object):
                 residue[atom.name].charge = atom.charge
             else:
                 residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
+            modifications_made = True
         # Add bonds
         for (atom1_name, atom2_name, order) in patch.add_bonds:
             try:
                 # Remove dangling bonds
                 for name in [atom1_name, atom2_name]:
-                    if name == residue.head:
+                    if residue.head and (name == residue.head.name):
                         residue.head = None
-                    if name == residue.tail:
+                    if residue.tail and (name == residue.tail.name):
                         residue.tail = None
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)
+                modifications_made = True
             except IndexError as e:
                 raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
                 residue._impr.remove(impr)
+                # removal of impropers doesn't do anything as far as OpenMM is concerned, so don't note this as a modification having been made
             except ValueError as e:
                 raise IncompatiblePatchError('Improper %s was not found in residue to be patched.' % impr)
         # Check that the net charge is integral.
@@ -455,6 +462,9 @@ class ResidueTemplate(object):
         if not nx.is_connected(G):
             components = [ c for c in nx.connected_components(G) ]
             raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
+        # Make sure the patch has actually modified the residue
+        if not modifications_made:
+            raise IncompatiblePatchError('Patch did not modify residue.')
 
         return residue
 
