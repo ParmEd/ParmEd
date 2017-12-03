@@ -54,6 +54,9 @@ class PdbxReader(object):
             self.__parser(self.__tokenizer(self.__ifh), containerList)
         except StopIteration:
             pass
+        except DeprecationWarning as e:
+            if 'StopIteration' not in str(e):
+                raise
         else:
             raise PdbxError()
 

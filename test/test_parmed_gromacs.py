@@ -626,6 +626,22 @@ class TestGromacsTop(FileIOTestCase):
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(set(a.name for a in a1.bond_partners),
                              set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology/molfile files
+        fn3 = get_fn('test_mol.itp', written=True)
+        top.write(fn, parameters=fn2, molfile=fn3)
+        top2 = load_file(fn)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertAlmostEqual(a1.atom_type.sigma, a2.atom_type.sigma, places=3)
+            self.assertAlmostEqual(a1.atom_type.epsilon, a2.atom_type.epsilon, places=3)
+            self.assertEqual(a1.atom_type.name, a2.atom_type.name)
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
         # Now force writing pair types...
         top.defaults.gen_pairs = 'no'
         top.write(fn, parameters=fn)

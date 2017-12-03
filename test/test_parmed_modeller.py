@@ -9,12 +9,17 @@ try:
     import pandas as pd
 except ImportError:
     pd = None
+try:
+    import networkx as nx
+except ImportError:
+    nx = None
 import os
 import parmed as pmd
 from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
 from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
+                             PatchTemplate,
                              PROTEIN, SOLVENT, StandardBiomolecularResidues)
 from parmed.formats import Mol2File, PDBFile
 from parmed.geometry import distance2
@@ -53,6 +58,20 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertEqual(df.shape, (6, 20))
         self.assertAlmostEqual(df.charge.sum(), 0)
         self.assertEqual(df.atomic_number.sum(), 23)
+
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
+    def test_to_networkx(self):
+        """ Test converting ResidueTemplate to NetworkX graph """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a5, a6)
+        G1 = self.templ.to_networkx()
+        assert not nx.is_connected(G1)
+        self.templ.add_bond(a2, a5)
+        G2 = self.templ.to_networkx()
+        assert nx.is_connected(G2)
 
     def test_add_atom(self):
         """ Tests the ResidueTemplate.add_atom function """
@@ -235,6 +254,51 @@ class TestResidueTemplate(unittest.TestCase):
         rescont[0].fix_charges()
         for a, c in zip(rescont[0].atoms, charges):
             self.assertEqual(a.charge, c)
+
+    def test_delete_atom(self):
+        """ Tests the ResidueTemplate.delete_atom function """
+        templ = copy(self.templ)
+        a1, a2, a3, a4, a5, a6 = templ.atoms
+        a7 = Atom(name='Unimportant', type='black hole')
+        templ.add_bond(a1, a2)
+        templ.add_bond(a2, a3)
+        templ.add_bond(a3, a4)
+        templ.add_bond(a2, a5)
+        templ.add_bond(a5, a6)
+        templ.delete_atom(a6)
+        #self.assertRaises(RuntimeError, lambda: templ.delete_atom(a7))
+        self.assertIn(a1, a2.bond_partners)
+        self.assertIn(a2, a1.bond_partners)
+        self.assertIn(a3, a2.bond_partners)
+        self.assertIn(a2, a3.bond_partners)
+        self.assertIn(a5, a2.bond_partners)
+        self.assertIn(a2, a5.bond_partners)
+        self.assertNotIn(a5, a6.bond_partners)
+        self.assertNotIn(a6, a5.bond_partners)
+        self.assertEqual(len(templ.bonds), 4)
+
+    @unittest.skipIf(nx is None, "Cannot test without networkx")
+    def test_patch_residue(self):
+        """ Tests ResidueTemplate.patch_residue function """
+        templ = self.templ
+        a1, a2, a3, a4, a5, a6 = templ.atoms
+        templ.add_bond(a1, a2)
+        templ.add_bond(a2, a3)
+        templ.add_bond(a3, a4)
+        templ.add_bond(a2, a5)
+        templ.add_bond(a5, a6)
+        patch = PatchTemplate()
+        patch.delete_atoms.append(a6.name)
+        residue = self.templ.apply_patch(patch)
+        self.assertEqual(len(residue.atoms), 5)
+        self.assertEqual(len(residue.bonds), 4)
+        a1, a2, a3, a4, a5 = residue.atoms
+        self.assertIn(a1, a2.bond_partners)
+        self.assertIn(a2, a1.bond_partners)
+        self.assertIn(a3, a2.bond_partners)
+        self.assertIn(a2, a3.bond_partners)
+        self.assertIn(a5, a2.bond_partners)
+        self.assertIn(a2, a5.bond_partners)
 
     def test_add_bonds_atoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
@@ -1030,7 +1094,7 @@ class TestAmberOFFLeapCompatibility(utils.FileIOTestCase):
         AmberOFFLibrary.write(offlib, 'testinternal.lib')
         f = open('tleap_orig.in', 'w')
         f.write("""\
-source %s
+source "%s"
 l = sequence {ALA ARG ASH ASN ASP CYM CYS CYX GLH GLN GLU GLY HID HIE HIP \
               HYP ILE LEU LYN LYS MET PHE PRO SER THR TRP TYR VAL}
 set default PBRadii mbondi2
@@ -1078,7 +1142,7 @@ quit
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\
-source %s
+source "%s"
 l = sequence {%s %s}
 savePDB l alphabet.pdb
 saveAmberParm l alphabet.parm7 alphabet.rst7

@@ -169,7 +169,9 @@ class _FourAtomTerm(object):
     def __init__(self, atom1, atom2, atom3, atom4):
         if (atom1 is atom2 or atom1 is atom3 or atom1 is atom4 or atom2 is atom3 or
                 atom2 is atom4 or atom3 is atom4):
-            raise MoleculeError('4-atom term cannot have duplicate atoms')
+            raise MoleculeError('4-atom term cannot have duplicate atoms! '
+                                'Atoms are: %s %s %s %s' % (atom1, atom2,
+                                                            atom3, atom4))
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
@@ -833,7 +835,8 @@ class Atom(_ListItem):
         elif isinstance(self, ExtraPoint):
             other.children.append(self)
         if self is other:
-            raise MoleculeError("Cannot bond atom to itself!")
+            raise MoleculeError("Cannot bond atom to itself! "
+                                "Atoms are: %s %s" % (self, other))
         self._bond_partners.append(other)
         other._bond_partners.append(self)
 
@@ -854,7 +857,8 @@ class Atom(_ListItem):
         :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise MoleculeError("Cannot angle an atom with itself!")
+            raise MoleculeError("Cannot angle an atom with itself! "
+                                "Atoms are: %s %s" % (self, other))
         self._angle_partners.append(other)
         other._angle_partners.append(self)
 
@@ -875,7 +879,8 @@ class Atom(_ListItem):
         :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise MoleculeError("Cannot dihedral an atom with itself!")
+            raise MoleculeError("Cannot dihedral an atom with itself! "
+                                "Atoms are: %s %s" % (self, other))
         self._dihedral_partners.append(other)
         other._dihedral_partners.append(self)
 
@@ -896,7 +901,9 @@ class Atom(_ListItem):
         :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise MoleculeError('Cannot coupled-dihedral atom to itself')
+            raise MoleculeError('Cannot coupled-dihedral atom to itself '
+                                'Atoms are: %s %s' % (self, other))
+
         self._tortor_partners.append(other)
         other._tortor_partners.append(self)
 
@@ -917,7 +924,8 @@ class Atom(_ListItem):
         :class:`MoleculeError` if `other is self`
         """
         if self is other:
-            raise MoleculeError("Cannot exclude an atom from itself")
+            raise MoleculeError("Cannot exclude an atom from itself! "
+                                "Atoms are: %s %s" % (self, other))
         self._exclusion_partners.append(other)
         other._exclusion_partners.append(self)
 
@@ -1701,7 +1709,8 @@ class Bond(object):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise MoleculeError('Cannot bond atom to itself!')
+            raise MoleculeError('Cannot bond atom to itself! '
+                                'Atoms are: %s %s' % (atom1, atom2))
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
@@ -1914,7 +1923,8 @@ class Angle(object):
     def __init__(self, atom1, atom2, atom3, type=None):
         # Make sure we're not angling me to myself
         if atom1 is atom2 or atom1 is atom3 or atom2 is atom3:
-            raise MoleculeError('Cannot angle atom to itself!')
+            raise MoleculeError('Cannot angle atom to itself! '
+                                'Atoms are: %s %s %s' % (atom1, atom2, atom3))
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
@@ -2732,7 +2742,8 @@ class UreyBradley(Bond):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise MoleculeError('Cannot angle atom to itself!')
+            raise MoleculeError('Cannot bond atom to itself! '
+                                'Atoms are %s %s' % (atom1, atom2))
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
@@ -3058,7 +3069,9 @@ class Cmap(object):
         for i in range(len(atmlist)):
             for j in range(i+1, len(atmlist)):
                 if atmlist[i] is atmlist[j]:
-                    raise MoleculeError('Cannot cmap atom to itself!')
+                    raise MoleculeError('Cannot cmap atom to itself! '
+                                        'Atoms are %s %s' % (atmlist[i],
+                                                             atmlist[j]))
         # Set up instances
         self.atom1 = atom1
         self.atom2 = atom2
@@ -4764,7 +4777,7 @@ class NonbondedExceptionType(_ParameterType, _ListItem):
 
     def __repr__(self):
         return '<%s; rmin=%.4f, epsilon=%.4f, chgscale=%.4f>' % (
-                type(self).__name__, self.rmin, self.epsilon, self.chgscale)
+            type(self).__name__, self.rmin, self.epsilon, self.chgscale)
 
     @_exception_to_notimplemented
     def __eq__(self, other):
