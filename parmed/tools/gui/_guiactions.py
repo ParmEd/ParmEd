@@ -468,7 +468,7 @@ def changeredustate(root, amber_prmtop, messages):
     var_list = [StringVar(), StringVar()]
     description=('Changes the reduction state of a redox-active titratable residue that\n'
                  'can be treated with constant redox potential MD in Amber.')
-    cmd_window = _guiwidgets.ActionWindow('changeReduState', amber_prmtop,
+    cmd_window = _guiwidgets.ActionWindow('changeRedoxState', amber_prmtop,
                         widget_list, var_list, description)
     cmd_window.wait_window()
    
@@ -477,7 +477,7 @@ def changeredustate(root, amber_prmtop, messages):
    
     var_list = [v.get() for v in var_list]
     try:
-        action = actions.changeReduState(amber_prmtop, 
+        action = actions.changeRedoxState(amber_prmtop, 
                                                ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))

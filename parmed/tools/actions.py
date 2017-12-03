@@ -1355,7 +1355,7 @@ class changeProtState(Action):
             
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-class changeReduState(Action):
+class changeRedoxState(Action):
     """
     Changes the reduction state of a given titratable residue that can be
     treated via constant redox potential MD in Amber.
