@@ -897,6 +897,27 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(sum([r.ter for r in parsed.residues]), 5)
         self.assertEqual(sum([r.ter for r in copy(parsed).residues]), 5)
 
+    def test_ter_not_increase_tercount(self):
+        s = """
+ATOM      1  N   CYX L   1      57.464  29.769  15.871  1.00 25.39           N
+ATOM      2  SG  CYX L   1      56.982  27.807  18.150  1.00 14.20           S
+TER       3      CYX L   1
+ATOM      4  N   CYX H   2      36.233  17.035  12.739  1.00 10.49           N
+ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
+"""
+        parm = pmd.read_PDB(StringIO(s))
+        buf = StringIO()
+        parm.write_pdb(buf)
+        buf.seek(0)
+        content = buf.read()
+        assert "TER       3      CYX L   1" in content
+
+        buf = StringIO()
+        parm.write_pdb(buf, increase_tercount=False)
+        buf.seek(0)
+        content = buf.read()
+        assert "TER       2      CYX L   1" in content
+
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
         pdbfile = read_PDB(get_fn('bigz.pdb'))
