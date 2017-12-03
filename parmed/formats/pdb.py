@@ -691,7 +691,8 @@ class PDBFile(object):
 
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
-              write_anisou=False, charmm=False, standard_resnames=False):
+              write_anisou=False, charmm=False,
+              standard_resnames=False, increase_tercount=True):
         """ Write a PDB file from a Structure instance
 
         Parameters
@@ -736,6 +737,9 @@ class PDBFile(object):
         standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values.
+        increase_tercount : bool, optional, default True
+            If True, the TER atom number field increased by one compared to
+            atom card preceding it; this conforms to PDB standard.
 
         Notes
         -----
@@ -894,11 +898,14 @@ class PDBFile(object):
                                 anisou[1], anisou[2], anisou[3],
                                 anisou[4], anisou[5], el, ''))
                 if res.ter or (len(struct.bonds) > 0 and _needs_ter_card(res)):
-                    dest.write(terrec % (anum+1, resname, res.chain, rnum))
-                    if renumber:
-                        nmore += 1
+                    if increase_tercount:
+                        dest.write(terrec % (anum+1, resname, res.chain, rnum))
+                        if renumber:
+                            nmore += 1
+                        else:
+                            last_number += 1
                     else:
-                        last_number += 1
+                        dest.write(terrec % (anum, resname, res.chain, rnum))
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 

@@ -702,6 +702,14 @@ class TestGromacsTop(FileIOTestCase):
         self.assertGreater(len(top2.urey_bradleys), 0)
         self.assertEqual(len(top2.urey_bradleys), len(ctop.urey_bradleys))
 
+    def test_nonbond_params(self):
+        """ Test the reading  and writing of the `nonbond_params` directive """
+        top = load_file(get_fn('nonbond_params.top'))
+        assert top.has_NBFIX()
+        top.write(get_fn('test_nonbond_params.top'))
+        top_test = load_file(get_fn('test_nonbond_params.top'))
+        assert top_test.has_NBFIX()
+
     def test_private_functions(self):
         """ Tests private helper functions for GromacsTopologyFile """
         Defaults = gmx.gromacstop._Defaults
