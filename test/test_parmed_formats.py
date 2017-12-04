@@ -259,6 +259,12 @@ class TestFileLoader(FileIOTestCase):
             self.assertEqual(a1.residue.name, a2.residue.name)
         np.testing.assert_allclose(pdb.coordinates, pdb2.coordinates)
 
+    def test_dbref_keyword(self):
+        """ Tests automatic detection of PDB file with DBREF record(s) """
+        fn = get_fn('3p49.pdb', written=True)
+        download_PDB('3p49', saveto=fn)
+        formats.load_file(fn)
+
     def test_natom_hasbox_keywords(self):
         """ Tests that the hasbox/natom arguments are special-cased in load_file """
         crd = formats.load_file(get_fn('tz2.truncoct.crd'), natom=5827,

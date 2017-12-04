@@ -123,14 +123,15 @@ class PDBFile(object):
 
         try:
             for line in fileobject:
-                if line[:6] in ('CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
+                if line[:6] in {'CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
                         'MASTER', 'AUTHOR', 'CAVEAT', 'COMPND', 'EXPDTA',
                         'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
                         'SPRSDE', 'TITLE ', 'ANISOU', 'CISPEP', 'CONECT',
                         'DBREF ', 'HELIX ', 'HET   ', 'LINK  ', 'MODRES',
                         'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
                         'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL',
-                        'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER'):
+                        'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER', 'DBREF ',
+                        'DBREF2', 'DBREF1', 'DBREF', 'HET'}:
                     continue
                 # Hack to support reduce-added flags
                 elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
