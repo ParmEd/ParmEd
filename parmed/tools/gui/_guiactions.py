@@ -440,7 +440,7 @@ def changeprotstate(root, amber_prmtop, messages):
     widget_list = [('MaskEntry', 'Residue to change protonation state'),
                    ('Entry', 'Protonation state to change to')]
     var_list = [StringVar(), StringVar()]
-    description=('Changes the protonation state of a titratable residue that\n'
+    description=('Changes the protonation state of a pH-active titratable residue that\n'
                  'can be treated with constant pH MD in Amber.')
     cmd_window = _guiwidgets.ActionWindow('changeProtState', amber_prmtop,
                         widget_list, var_list, description)
@@ -452,6 +452,32 @@ def changeprotstate(root, amber_prmtop, messages):
     var_list = [v.get() for v in var_list]
     try:
         action = actions.changeProtState(amber_prmtop, 
+                                               ArgumentList(var_list))
+    except Exception as err:
+        showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
+        return
+    action.execute()
+    messages.write('%s\n' % action)
+
+#~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~
+
+def changeredustate(root, amber_prmtop, messages):
+    # We need a mask and a state
+    widget_list = [('MaskEntry', 'Residue to change reduction state'),
+                   ('Entry', 'Reduction state to change to')]
+    var_list = [StringVar(), StringVar()]
+    description=('Changes the reduction state of a redox-active titratable residue that\n'
+                 'can be treated with constant redox potential MD in Amber.')
+    cmd_window = _guiwidgets.ActionWindow('changeRedoxState', amber_prmtop,
+                        widget_list, var_list, description)
+    cmd_window.wait_window()
+   
+    # Bail out if we didn't get any variables
+    if not True in [bool(v.get()) for v in var_list]: return
+   
+    var_list = [v.get() for v in var_list]
+    try:
+        action = actions.changeRedoxState(amber_prmtop, 
                                                ArgumentList(var_list))
     except Exception as err:
         showerror('Unexpected Error!', '%s: %s' % (type(err).__name__, err))
