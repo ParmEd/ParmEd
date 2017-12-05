@@ -4,7 +4,7 @@ from __future__ import division
 import os
 import sys
 
-__author__ = 'Jason Swails'
+__author__ = 'Vinicius Wilian D Cruzeiro: work adapted from Jason Swails'
 __version__ = '16.0'
 
 try:
@@ -27,29 +27,19 @@ else:
     LineBuffer = residues._LineBuffer
 
 parser = ArgumentParser(epilog='''This program will read a topology file and
-                        generate a cpin file for constant pH simulations with
+                        generate a cein file for constant Redox Potential simulations with
                         sander or pmemd''', usage='%(prog)s [Options]')
 parser.add_argument('-v', '--version', action='version', version='%s: %s' %
                     (parser.prog, __version__))
 parser.add_argument('-d', '--debug', dest='debug', action='store_const',
                     help='Enable verbose tracebacks to debug this program',
                     const=True, default=False)
-parser.add_argument('-oldfmt', '--old-format', dest='oldfmt', action='store_const',
-                   help='''Print output file in a format compatible with AMBER 16
-                   and older versions''',
-                   const=True, default=False)
 group = parser.add_argument_group('Output files')
 group.add_argument('-o', '--output', dest='output', metavar='FILE',
                    help='Output file. Defaults to standard output')
-group.add_argument('-op', '--output-prmtop', dest='outparm', metavar='FILE',
-                   help='''For explicit solvent simulations, a custom set of
-                   radii are necessary to obtain reasonable results for
-                   carboxylate pKas (e.g., AS4 and GL4 residues). If specified,
-                   this file will be the prmtop compatible with the reference
-                   energies in the printed cpin file.''', default=None)
 group = parser.add_argument_group('Required Arguments')
 group.add_argument('-p', dest='prmtop', metavar='FILE', required=False,
-                   help='Topology file to be used in constant pH simulation',
+                   help='Topology file to be used in constant Redox Potential simulation',
                    type=str, default='prmtop')
 group = parser.add_argument_group('Simulation Options')
 group.add_argument('-igb', dest='igb', metavar='IGB', required=False, type=int,
@@ -61,19 +51,19 @@ group.add_argument('-intdiel', dest='intdiel', metavar='DIEL', type=float,
                    the evaluation of the GB potential. Default %(default)s.''')
 group = parser.add_argument_group('Residue Selection Options')
 group.add_argument('-resnames', dest='resnames', metavar='RES', nargs='*',
-                   help='Residue names to include in CPIN file', default=None)
+                   help='Residue names to include in CEIN file', default=None)
 group.add_argument('-notresnames', dest='notresnames', metavar='RES', nargs='*',
-                   help='Residue names to exclude from CPIN file', default=None)
+                   help='Residue names to exclude from CEIN file', default=None)
 group.add_argument('-resnums', dest='resnums', metavar='NUM',
-                   nargs='*', help='Residue numbers to include in CPIN file',
+                   nargs='*', help='Residue numbers to include in CEIN file',
                    default=None)
 group.add_argument('-notresnums', dest='notresnums', nargs='*', metavar='NUM',
-                 help='Residue numbers to exclude from CPIN file', default=None)
-group.add_argument('-minpKa', dest='minpka', metavar='pKa', type=float,
-                   help='Minimum reference pKa to include in CPIN file',
+                 help='Residue numbers to exclude from CEIN file', default=None)
+group.add_argument('-mineo', dest='minpka', metavar='Eo', type=float,
+                   help='Minimum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=-999999)
-group.add_argument('-maxpKa', dest='maxpka', metavar='pKa', type=float,
-                   help='Maximum reference pKa to include in CPIN file',
+group.add_argument('-maxeo', dest='maxpka', metavar='Eo', type=float,
+                   help='Maximum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=9999999)
 group = parser.add_argument_group('System Information')
 group.add_argument('-states', dest='resstates', metavar='NUM', nargs='*',
@@ -82,7 +72,7 @@ group.add_argument('-system', dest='system', metavar='<system name>',
                    help='Name of system to titrate. No effect on simulation.',
                    default='Unknown')
 group = parser.add_argument_group('Residue Information', '''If any options here
-              are used, no CPIN file will be written. These arguments take
+              are used, no CEIN file will be written. These arguments take
               precedence and are mutually exclusive with each other.''')
 group.add_argument('--describe', dest='descres', metavar='RESNAME', nargs='*',
                    help='Print out the details of given residues', default=None)
@@ -94,10 +84,10 @@ def print_residues(resnames,mode):
         if not hasattr(residues, resname):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
-        if not getattr(residues, resname).typ == "ph" and mode == 1:
-            print ('%s is not a pH titratable residue\n' % resname)
+        if not getattr(residues, resname).typ == "redox" and mode == 1:
+            print ('%s is not a Redox Potential titratable residue\n' % resname)
             sys.exit(0)
-        if getattr(residues, resname).typ == "ph":
+        if getattr(residues, resname).typ == "redox":
             print (str(getattr(residues, resname)) + '\n')
 
 def list_residues():
@@ -105,7 +95,7 @@ def list_residues():
     line = LineBuffer(sys.stdout)
     strarray = []
     for resname in residues.titratable_residues:
-        if getattr(residues, resname).typ == "ph":
+        if getattr(residues, resname).typ == "redox":
             strarray.append(resname)
     line.add_words(', '.join(strarray).split(),
                    space_delimited=True)
@@ -158,11 +148,6 @@ def main(opt):
 
     if opt.intdiel != 1 and opt.intdiel != 2:
         raise AmberError('-intdiel must be either 1 or 2 currently')
-    
-    # Print warning about old format
-    if opt.oldfmt:
-        sys.stderr.write('Warning: The old format of the CPIN file can only be used for simulations with temp0=300.0!\n'
-                         '         You should use the new format for simulations with temperatures other than 300.0 Kelvins\n')
 
     # Set the list of residue names we will be willing to titrate
     titratable_residues = []
@@ -174,12 +159,12 @@ def main(opt):
         for resname in resnames:
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
-            elif not getattr(residues, resname).typ == "ph":
-                raise AmberError('%s is not a pH titratable residue!' % resname)
+            elif not getattr(residues, resname).typ == "redox":
+                raise AmberError('%s is not a Redox Potential titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
-            if getattr(residues, resname).typ == "ph":
+            if getattr(residues, resname).typ == "redox":
                 titratable_residues.append(resname)
 
     solvent_ions = ['WAT', 'Na+', 'Br-', 'Cl-', 'Cs+', 'F-', 'I-', 'K+', 'Li+',
@@ -261,37 +246,12 @@ def main(opt):
     else:
         output = open(opt.output, 'w')
 
-    main_reslist.write_cpin(output, opt.igb, opt.intdiel, opt.oldfmt, "ph")
+    main_reslist.write_cpin(output, opt.igb, opt.intdiel, False, "redox")
 
     if opt.output is not None:
         output.close()
 
-    if solvated:
-        if opt.outparm is None:
-            has_carboxylate = False
-            for res in main_reslist:
-                if res is residues.AS4 or res is residues.GL4 or res is residues.PRN:
-                    has_carboxylate = True
-                    break
-            if has_carboxylate:
-                sys.stderr.write(
-                        'Warning: Carboxylate residues in explicit solvent '
-                        'simulations require a modified topology file!\n'
-                        'Use the -op flag to print one.\n'
-                )
-        else:
-            changeRadii(parm, 'mbondi2').execute()
-            change(parm, 'RADII', ':AS4,GL4,PRN@OD=,OE=,O1=,O2=', 1.3).execute()
-            parm.overwrite = True
-            parm.write_parm(opt.outparm)
-    else:
-        if opt.outparm is not None:
-            sys.stderr.write(
-                    'A new prmtop is only necessary for explicit solvent '
-                    'CpHMD/pH-REMD simulations.\n'
-            )
-
-    sys.stderr.write('CPIN generation complete!\n')
+    sys.stderr.write('CEIN generation complete!\n')
 
 if __name__ == '__main__':
     opt = parser.parse_args()
@@ -311,7 +271,7 @@ if __name__ == '__main__':
             print_residues(opt.descres,1)
         sys.exit(0)
 
-    # Go ahead and make the CPIN file.
+    # Go ahead and make the CEIN file.
     try:
         main(opt)
     except ParmedError as e:

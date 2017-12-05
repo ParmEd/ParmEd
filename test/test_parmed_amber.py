@@ -2677,6 +2677,20 @@ class TestAmberTitratableResidues(FileIOTestCase):
         fobj3.seek(0)
         self.assertEqual(fobj3.read().split(), words)
 
+    def test_old_cpin_creation(self):
+        """ Test TitratableResidueList and cpin creation at the old format """
+        import cpinutil
+        parm = get_fn('trx.prmtop')
+        output = get_fn('test.old.cpin', written=True)
+        opt = cpinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm,'--old-format', '-states', '0,0,1,0,1,1,0,1,0,1,1,1', '-o', output]
+        )
+        cpinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('test.old.cpin'), get_fn('test.old.cpin', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
+
     def test_cpin_creation(self):
         """ Test TitratableResidueList and cpin creation """
         import cpinutil
@@ -2691,21 +2705,35 @@ class TestAmberTitratableResidues(FileIOTestCase):
                        absolute_error=1e-6, spacechar='=,')
         )
 
+    def test_cein_creation(self):
+        """ Test cein creation """
+        import ceinutil
+        parm = get_fn('mp8.prmtop')
+        output = get_fn('mp8.cein', written=True)
+        opt = ceinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm, '-o', output]
+        )
+        ceinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('mp8.cein'), get_fn('mp8.cein', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
+
     def test_titratable_residue(self):
         """ Tests the TitratableResidue object """
         as4 = titratable_residues.AS4
         self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
         # Test error handling for TitratableResidue
         newres = titratable_residues.TitratableResidue(
-                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0
+                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0, "ph"
         )
         self.assertEqual(newres.pKa, 7.0)
         self.assertRaises(AmberError, lambda:
-                newres.add_state(3, [10.0, 20.0], 10.0)
+                newres.add_state(3, [10.0, 20.0], 10.0, 10.0, 7.0)
         )
         self.assertRaises(AmberError, lambda:
                 newres.add_states([3, 2, 1], [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,
-                    5, 6, 7]], [10, 20, 30])
+                    5, 6, 7]], [10, 20, 30], [10, 20, 30], [7.0, 0.0, 0.0])
         )
         self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
         newres.set_first_state(0)
