@@ -1422,7 +1422,7 @@ class GromacsTopologyFile(Structure):
             dest.write('\n[ defaults ]\n')
             dest.write('; nbfunc        comb-rule       gen-pairs       '
                         'fudgeLJ fudgeQQ\n')
-            dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
+            dest.write('%-15d %-15d %-15s %-12.8g %-12.8g\n\n' %
                         (self.defaults.nbfunc, self.defaults.comb_rule,
                         self.defaults.gen_pairs, self.defaults.fudgeLJ,
                         self.defaults.fudgeQQ))
@@ -1453,7 +1453,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('%-8s ' % atom_type.bond_type)
                 if print_atnum:
                     parfile.write('%8d ' % atom_type.atomic_number)
-                parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
+                parfile.write('%10.5f  %10.6f  A %15.8g %15.8g\n' % (
                               atom_type.mass, atom_type.charge, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
