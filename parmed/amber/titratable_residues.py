@@ -957,8 +957,8 @@ U.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # d
 U.check()
 
 # HEH: HEME ring + parts of 2 HIS + 2 CYS
-refene1 = _ReferenceEnergy(igb2=0, igb8=0)
-refene1.solvent_energies(igb2=0, igb8=0)
+refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-15.493731, igb5=-16.349152, igb7=-16.509509, igb8=-22.025653) # Implicit
