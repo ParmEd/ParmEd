@@ -235,6 +235,7 @@ class GromacsGroFile(object):
         varwidth = 5 + precision
         crdfmt = '%%%d.%df' % (varwidth, precision)
         velfmt = '%%%d.%df' % (varwidth, precision+1)
+        boxfmt = '%%%d.%df' % (varwidth, precision) 
         for atom in struct.atoms:
             resid = (atom.residue.idx + 1) % 100000
             atid = (atom.idx + 1) % 100000
@@ -253,17 +254,17 @@ class GromacsGroFile(object):
             a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
                             *struct.box))
             if all([abs(x-90) < TINY for x in struct.box[3:]]):
-                dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
+                dest.write(boxfmt*3 % (a[0]/10.0, b[1]/10.0, c[2]/10.0))
             else:
-                dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
-                           a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
+                dest.write(boxfmt*9 % (a[0]/10.0, b[1]/10.0, c[2]/10.0, a[1]/10.0,
+                           a[2]/10.0, b[0]/10.0, b[2]/10.0, c[0]/10.0, c[1]/10.0))
             dest.write('\n')
         elif not nobox and struct.atoms:
             # Find the extent of the molecule in all dimensions, and buffer it
             # by 5 A
             crds = struct.coordinates
             diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
-            dest.write('%10.5f'*3 % (diff[0], diff[1], diff[2]))
+            dest.write(boxfmt*3 % (diff[0], diff[1], diff[2]))
             dest.write('\n')
         if own_handle:
             dest.close()
