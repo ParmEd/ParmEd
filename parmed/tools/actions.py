@@ -1290,15 +1290,16 @@ class changeProtState(Action):
         """
         if 'ASH' in residues.titratable_residues: return None
         dummyrefene1 = residues._ReferenceEnergy()
-        dummyrefene1.set_pKa(1.0)
+        dummyrefene1_old = residues._ReferenceEnergy()
+        dummyrefene1_old.set_pKa(1.0)
         dummyrefene2 = residues._ReferenceEnergy()
         atomnames = ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG', 'OD1', 'OD2', 'HD21', 'C', 'O']
-        ash = residues.TitratableResidue('ASH', atomnames, pka=4.0)
-        ash.add_state(protcnt=0, refene=dummyrefene1,
+        ash = residues.TitratableResidue('ASH', atomnames, pka=4.0, typ="ph")
+        ash.add_state(protcnt=0, refene=dummyrefene1, refene_old=dummyrefene1_old, pka_corr=0.0,
                       charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.1783, -0.0122, -0.0122, 0.7994,
                                -0.8014, -0.8014, 0.0, 0.5973, -0.5679]
                      )
-        ash.add_state(protcnt=1, refene=dummyrefene2,
+        ash.add_state(protcnt=1, refene=dummyrefene2, refene_old=dummyrefene2, pka_corr=4.0,
                       charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488, 0.0488, 0.6462,
                                -0.5554, -0.6376, 0.4747, 0.5973, -0.5679]
                      )
@@ -1306,12 +1307,12 @@ class changeProtState(Action):
 
         atomnames = ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG', 'HG2', 'HG3', 'CD', 'OE1',
                      'OE2', 'HE21', 'C', 'O']
-        glh = residues.TitratableResidue('GLH', atomnames, pka=4.4)
-        glh.add_state(protcnt=0, refene=dummyrefene1,
+        glh = residues.TitratableResidue('GLH', atomnames, pka=4.4, typ="ph")
+        glh.add_state(protcnt=0, refene=dummyrefene1, refene_old=dummyrefene1_old, pka_corr=0.0,
                       charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0398, -0.0173, -0.0173, 0.0136,
                                -0.0425, -0.0425, 0.8054, -0.8188, -0.8188, 0.0, 0.5973, -0.5679]
                      )
-        glh.add_state(protcnt=1, refene=dummyrefene2,
+        glh.add_state(protcnt=1, refene=dummyrefene2, refene_old=dummyrefene2, pka_corr=4.4,
                       charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256, 0.0256, -0.0174,
                                0.0430, 0.0430, 0.6801, -0.5838, -0.6511, 0.4641, 0.5973, -0.5679]
                      )
@@ -1332,6 +1333,8 @@ class changeProtState(Action):
         if not resname in residues.titratable_residues:
             raise ChangeStateError("Residue %s isn't defined as a titratable "
                                    "residue in titratable_residues.py" % resname)
+        if not getattr(residues, resname).typ == "ph":
+            raise ChangeStateError('Redidue %s is not a pH titratable residue' % resname)
 
         res = getattr(residues, resname)
 
@@ -1347,6 +1350,59 @@ class changeProtState(Action):
             if sel[atom.idx] != 1:
                 raise ChangeStateError('You must select 1 and only 1 entire residue of which to '
                                        'change the protonation state')
+            # Actually make the change
+            self.parm.parm_data['CHARGE'][atom.idx] = atom.charge = charges[i]
+            
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class changeRedoxState(Action):
+    """
+    Changes the reduction state of a given titratable residue that can be
+    treated via constant redox potential MD in Amber.
+    """
+    usage = '<mask> <state #>'
+    strictly_supported = (AmberParm,)
+    def init(self, arg_list):
+        self.state = arg_list.get_next_int()
+        self.mask = AmberMask(self.parm, arg_list.get_next_mask())
+
+    def __str__(self):
+        sel = self.mask.Selection()
+        if sum(sel) == 0:
+            return "No residues selected for state change"
+        res = self.parm.atoms[sel.index(1)].residue
+        return 'Changing reduction state of residue %d (%s) to %d' % (res.idx+1, res.name,
+                                                                        self.state)
+
+    def execute(self):
+        from parmed.amber import titratable_residues as residues
+        sel = self.mask.Selection()
+        # If we didn't select any residues, just return
+        if sum(sel) == 0: return
+        residue = self.parm.atoms[sel.index(1)].residue
+        resname = residue.name
+        # Get the charges from cein_data. The first 2 elements are energy and
+        # electron count so the charges are chgs[2:]
+        if not resname in residues.titratable_residues:
+            raise ChangeStateError("Residue %s isn't defined as a titratable "
+                                   "residue in titratable_residues.py" % resname)
+        if not getattr(residues, resname).typ == "redox":
+            raise ChangeStateError('Redidue %s is not a redox potential titratable residue' % resname)
+
+        res = getattr(residues, resname)
+
+        if self.state >= len(res.states):
+            raise ChangeStateError('Residue %s only has titratable states 0--%d. You chose state %d'
+                                   % (resname, len(res.states)-1, self.state))
+
+        if sum(sel) != len(res.states[self.state].charges):
+            raise ChangeStateError('You must select one and only one entire titratable residue')
+
+        charges = res.states[self.state].charges
+        for i, atom in enumerate(residue.atoms):
+            if sel[atom.idx] != 1:
+                raise ChangeStateError('You must select 1 and only 1 entire residue of which to '
+                                       'change the reduction state')
             # Actually make the change
             self.parm.parm_data['CHARGE'][atom.idx] = atom.charge = charges[i]
 

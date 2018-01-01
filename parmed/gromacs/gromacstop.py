@@ -1230,6 +1230,7 @@ class GromacsTopologyFile(Structure):
         gmxtop.adjust_types = struct.adjust_types
         gmxtop.combining_rule = struct.combining_rule
         gmxtop.box = struct.box
+        gmxtop.nrexcl = struct.nrexcl
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
@@ -1457,6 +1458,18 @@ class GromacsTopologyFile(Structure):
                               atom_type.mass, atom_type.charge, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
+            # Nonbonded parameters
+            if self.has_NBFIX():
+                typemap = dict(self.parameterset.nbfix_types)
+                dest.write('[ nonbond_params ]\n')
+                eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
+                for key, val in typemap.items():
+                    eps = val[0] # kcal
+                    sig = val[1] # Angstrom
+                    eps *= eps_conversion
+                    sig *= 0.1
+                    dest.write('{0} {1} 1 {2} {3}\n'.format(
+                        key[0], key[1], sig/2**(1/6), eps))
             # Print all parameter types unless we asked for inline
             if parameters != 'inline':
                 if params.bond_types:

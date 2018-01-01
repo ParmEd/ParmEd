@@ -6,7 +6,7 @@ titratable residue treated.
 from __future__ import print_function, division
 
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
-                       'DG', 'DT', 'AP', 'CP', 'G', 'U']
+                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN']
 
 from parmed.exceptions import AmberWarning, AmberError
 from parmed.utils.six.moves import range
@@ -20,10 +20,12 @@ class _State(object):
     """ A protonation state """
     sort_by_resnum = True
 
-    def __init__(self, protcnt, charges, refene):
+    def __init__(self, protcnt, charges, refene, refene_old, pka_corr):
         self.charges = charges
         self.refene = refene
+        self.refene_old = refene_old
         self.protcnt = protcnt
+        self.pka_corr = pka_corr
 
 class _ReferenceEnergy(object):
     """ Reference energies for various solvent models """
@@ -44,11 +46,6 @@ class _ReferenceEnergy(object):
         Add solvent reference energies, copying the GB reference energies if
         none are explicitly given
         """
-        if igb1 is None: igb1 = self.igb1
-        if igb2 is None: igb2 = self.igb2
-        if igb5 is None: igb5 = self.igb5
-        if igb7 is None: igb7 = self.igb7
-        if igb8 is None: igb8 = self.igb8
         self.solvent = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
 
     def dielc2_energies(self, igb1=None, igb2=None, igb5=None,
@@ -127,31 +124,32 @@ class TitratableResidue(object):
     the Constant pH MD method implemented in sander
     """
 
-    def __init__(self, resname, atom_list, pka):
+    def __init__(self, resname, atom_list, pka, typ):
         self.resname = resname
         self.atom_list = list(atom_list) # list of atom names
         self.states = []
         self.first_state = -1
         self.first_charge = -1
         self.pKa = pka
+        self.typ = typ
 
     def _str_refenes(self, solvent=False, igb=2, dielc=1.0):
         """
         Converts all reference energies into a formatted string with a message
         saying if the energy is not set
         """
-        igb = str(igb)
-        if solvent:
-            _getattr = lambda state, igb: getattr(state.solvent, 'igb%d' % igb)
-        else:
-            _getattr = lambda state, igb: getattr(state, 'igb%d' % igb)
-
         ret_str = ''
         for state in self.states:
             if dielc == 2:
-                refene = _getattr(state.refene.dielc2, int(igb))
+                if solvent:
+                    refene = getattr(state.refene.dielc2.solvent, 'igb%d'%igb)
+                else:
+                    refene = getattr(state.refene.dielc2, 'igb%d'%igb)
             else:
-                refene = _getattr(state.refene, int(igb))
+                if solvent:
+                    refene = getattr(state.refene.solvent, 'igb%d'%igb)
+                else:
+                    refene = getattr(state.refene, 'igb%d'%igb)
 
             if refene is None:
                 ret_str += '%12s' % 'Not Set'
@@ -161,19 +159,38 @@ class TitratableResidue(object):
         return ret_str
 
     def __str__(self):
-        ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
-                   ''.join(['%12s' % ('STATE %d' % i) for i in
-                           range(len(self.states))]) + '\n'
-        )
+        if (self.typ=="ph"):
+            ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
+                       ''.join(['%12s' % ('STATE %d' % i) for i in
+                               range(len(self.states))]) + '\n'
+            )
+        elif (self.typ=="redox"):
+            ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.pKa, 'ATOM') +
+                       ''.join(['%12s' % ('STATE %d' % i) for i in
+                               range(len(self.states))]) + '\n'
+            )
         for i, atom in enumerate(self.atom_list):
             ret_str += ('%8s' % atom +
                         ''.join(['%12.4f' % (state.charges[i])
                                 for state in self.states]) + '\n'
             )
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        ret_str += ('%8s' % 'Prot Cnt' +
-                    ''.join(['%12d' % state.protcnt for state in self.states]) +
-                    '\n')
+        if (self.typ=="ph"):
+            ret_str += ('%8s' % 'Prot Cnt' +
+                        ''.join(['%12d' % state.protcnt for state in self.states]) +
+                        '\n')
+            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+            ret_str += ('%8s' % 'pKa Corr' +
+                        ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
+                        '\n')
+        elif (self.typ=="redox"):
+            ret_str += ('%8s' % 'Elec Cnt' +
+                        ''.join(['%12d' % state.protcnt for state in self.states]) +
+                        '\n')
+            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+            ret_str += ('%8s' % 'Eo Corr' +
+                        ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
+                        '\n')
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
         ret_str += ('Reference Energies (ES = Explicit solvent, IS = Implicit '
                     'solvent)\n\n')
@@ -182,10 +199,10 @@ class TitratableResidue(object):
         ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5) + '\n'
         ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7) + '\n'
         ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8) + '\n'
-        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1) + '\n'
+        ret_str += '%8s' % ('igb=1 ES') + self._str_refenes(True, 1) + '\n'
         ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2) + '\n'
         ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5) + '\n'
-        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7) + '\n'
+        ret_str += '%8s' % ('igb=7 ES') + self._str_refenes(True, 7) + '\n'
         ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8) + '\n'
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
         ret_str += 'Reference Energies for Internal Dielectric of 2.0\n\n'
@@ -194,27 +211,27 @@ class TitratableResidue(object):
         ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5, 2) + '\n'
         ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7, 2) + '\n'
         ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8, 2) + '\n'
-        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(True, 1, 2) + '\n'
+        ret_str += '%8s' % ('igb=1 ES') + self._str_refenes(True, 1, 2) + '\n'
         ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2, 2) + '\n'
         ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5, 2) + '\n'
-        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(True, 7, 2) + '\n'
+        ret_str += '%8s' % ('igb=7 ES') + self._str_refenes(True, 7, 2) + '\n'
         ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8, 2) + '\n'
         return ret_str
 
-    def add_state(self, protcnt, charges, refene):
+    def add_state(self, protcnt, charges, refene, refene_old, pka_corr):
         """ Add a single titratable state for this titratable residue """
-        new_state = _State(protcnt, charges, refene)
+        new_state = _State(protcnt, charges, refene, refene_old, pka_corr)
         if len(new_state.charges) != len(self.atom_list):
             raise AmberError('Wrong number of charges for new state')
         self.states.append(new_state)
 
-    def add_states(self, protcnts, charges, refenes):
+    def add_states(self, protcnts, charges, refenes, refenes_old, pka_corrs):
         """ Add multiple titratable states for this titratable residue """
-        if len(protcnts) != len(charges) or len(protcnts) != len(refenes):
+        if len(protcnts) != len(charges) or len(protcnts) != len(refenes) or len(protcnts) != len(refenes_old) or len(protcnts) != len(pka_corrs):
             raise AmberError('Inconsistent list of parameters for '
                              'TitratableResidue.add_states')
         for i in range(len(protcnts)):
-            self.add_state(protcnts[i], charges[i], refenes[i])
+            self.add_state(protcnts[i], charges[i], refenes[i], refenes_old[i], pka_corrs[i])
 
     def cpin_pointers(self, first_atom):
         """ Sets and returns the cpin info """
@@ -256,7 +273,10 @@ class TitratableResidue(object):
         # consistent between the first state and every other state
         for i in range(1, len(sum_charges)):
             charge_diff = sum_charges[i] - sum_charges[0]
-            prot_diff = protcnts[i] - protcnts[0]
+            if (self.typ=="ph"):
+                prot_diff = protcnts[i] - protcnts[0]
+            elif (self.typ=="redox"):
+                prot_diff = protcnts[0] - protcnts[i]
             if abs(charge_diff - prot_diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
                               'in %s' % self.resname, AmberWarning)
@@ -264,7 +284,7 @@ class TitratableResidue(object):
         # for all but one of them
         notset = 0
         for state in self.states:
-            notset += int(state.refene.pKa_is_set)
+            notset += int(state.refene_old.pKa_is_set)
         if notset != len(self.states) - 1:
             warnings.warn('Not enough states are pKa-adjusted in %s' %
                           self.resname)
@@ -324,17 +344,20 @@ class TitratableResidueList(list):
                     self.residue_nums[i], self.residue_nums[i+1] = \
                         self.residue_nums[i+1], self.residue_nums[i]
 
-    def write_cpin(self, output, igb=2, intdiel=1.0, coions=False):
+    def write_cpin(self, output, igb=2, intdiel=1.0, oldfmt=False, typ="ph", coions=False):
         """ Writes the CPIN file based on the titrated residues """
         # Reset all residues
         for res in self: res.reset()
         # Sort our residue list
         self.sort()
         buf = _LineBuffer(output)
-        buf.add_word('&CNSTPH')
+        if (typ=="ph"):
+            buf.add_word('&CNSTPH')
+        elif (typ=="redox"):
+            buf.add_word('&CNSTE')
         buf.flush()
         buf.add_word(' CHRGDAT=')
-        charges, energies, protcnts, pointers = [], [], [], []
+        charges, energies, protcnts, pka_corrs, pointers = [], [], [], [], []
         first_charge = 0
         first_state = 0
         for i, res in enumerate(self):
@@ -345,9 +368,15 @@ class TitratableResidueList(list):
                 for state in res.states:
                     # See which dielectric reference energies we want
                     if intdiel == 2:
-                        refene = state.refene.dielc2
+                        if (not oldfmt):
+                            refene = state.refene.dielc2
+                        else:
+                            refene = state.refene_old.dielc2
                     else:
-                        refene = state.refene
+                        if (not oldfmt):
+                            refene = state.refene
+                        else:
+                            refene = state.refene_old
                     # See if we want the explicit solvent refene or not
                     if self.solvated:
                         energies.append(getattr(refene.solvent, 'igb%d' % igb))
@@ -355,6 +384,8 @@ class TitratableResidueList(list):
                         energies.append(getattr(refene, 'igb%d' % igb))
                     # Add protonation count of this state
                     protcnts.append(state.protcnt)
+                    # Add pka reference of this state
+                    pka_corrs.append(state.pka_corr)
 
                 first_state += len(res.states)
                 new_charges = []
@@ -369,7 +400,10 @@ class TitratableResidueList(list):
             buf.add_word('%s,' % charge)
         buf.flush()
         # Print the protcnts
-        buf.add_word(' PROTCNT=')
+        if (typ=="ph"):
+            buf.add_word(' PROTCNT=')
+        elif (typ=="redox"):
+            buf.add_word(' ELECCNT=')
         for protcnt in protcnts:
             buf.add_word('%d,' % protcnt)
         buf.flush()
@@ -403,11 +437,24 @@ class TitratableResidueList(list):
                                  "igb = %d" % (i, igb))
             buf.add_word('%.6f,' % energy)
         buf.flush()
+        # Print the pKa reference
+        if (not oldfmt):
+            if (typ=="ph"):
+                buf.add_word(' PKA_CORR=')
+            elif (typ=="redox"):
+                buf.add_word(' EO_CORR=')
+            for pka_corr in pka_corrs:
+                buf.add_word('%.4f,' % pka_corr)
+            buf.flush()
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))
         if self.solvated:
-            buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
-                        (self.first_sol, igb, intdiel))
+            if (typ=="ph"):
+                buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
+                            (self.first_sol, igb, intdiel))
+            elif (typ=="redox"):
+                buf.add_word('CEFIRST_SOL=%d, CE_IGB=%d, CE_INTDIEL=%s, ' %
+                            (self.first_sol, igb, intdiel))
             buf.flush()
             # Now scan through all of the waters
         buf.flush()
@@ -417,69 +464,81 @@ class TitratableResidueList(list):
 
 # Aspartate
 refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb1=21.4298008, igb2=26.8894581, igb5=26.5980488,
                  igb7=23.4181107, igb8=26.3448911)
-refene2.solvent_energies(igb2=33.2613028)
+refene2.solvent_energies(igb2=33.2613028, igb5=32.064349, igb7=28.262350, igb8=31.286037)
 refene2.dielc2_energies(igb2=12.676908, igb5=13.084913)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(4.0, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb1=21.4298008, igb2=26.8894581, igb5=26.5980488,
+                 igb7=23.4181107, igb8=26.3448911)
+refene2_old.solvent_energies(igb2=33.2613028, igb5=32.064349, igb7=28.262350, igb8=31.286037)
+refene2_old.dielc2_energies(igb2=12.676908, igb5=13.084913)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(4.0, deprotonated=False)
 
 AS4 = TitratableResidue('AS4', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'OD1', 'OD2', 'HD21', 'C', 'O', 'HD22', 'HD11', 'HD12'],
-                        pka=4.0)
-AS4.add_state(protcnt=0, refene=refene1, # deprotonated
+                        pka=4.0, typ="ph")
+AS4.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.1783, -0.0122,
               -0.0122, 0.7994, -0.8014, -0.8014, 0.0, 0.5973, -0.5679, 0.0, 0.0,
               0.0])
-AS4.add_state(protcnt=1, refene=refene2, # protonated syn-O2
+AS4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.0, # protonated syn-O2
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488, 0.0488,
               0.6462, -0.5554, -0.6376, 0.4747, 0.5973, -0.5679, 0.0, 0.0, 0.0])
-AS4.add_state(protcnt=1, refene=refene2, # protonated anti-O2
+AS4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.0, # protonated anti-O2
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488, 0.0488,
               0.6462, -0.5554, -0.6376, 0.0, 0.5973, -0.5679, 0.4747, 0.0, 0.0])
-AS4.add_state(protcnt=1, refene=refene2, # protonated syn-O1
+AS4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.0, # protonated syn-O1
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488, 0.0488,
               0.6462, -0.6376, -0.5554, 0.0, 0.5973, -0.5679, 0.0, 0.4747, 0.0])
-AS4.add_state(protcnt=1, refene=refene2, # protonated anti-O1
+AS4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.0, # protonated anti-O1
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.0316, 0.0488, 0.0488,
               0.6462, -0.6376, -0.5554, 0.0, 0.5973, -0.5679, 0.0, 0.0, 0.4747])
 AS4.check() # check that everything is consistent
 
 # Glutamate
 refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb1=3.89691326, igb2=8.4057785, igb5=8.0855764,
                igb7=5.305949, igb8=8.3591335)
-refene2.solvent_energies(igb2=15.20019319)
+refene2.solvent_energies(igb2=15.20019319, igb5=13.533409, igb7=10.682953, igb8=13.242410)
 refene2.dielc2_energies(igb2=3.455596, igb5=3.957270)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(4.4, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb1=3.89691326, igb2=8.4057785, igb5=8.0855764,
+               igb7=5.305949, igb8=8.3591335)
+refene2_old.solvent_energies(igb2=15.20019319, igb5=13.533409, igb7=10.682953, igb8=13.242410)
+refene2_old.dielc2_energies(igb2=3.455596, igb5=3.957270)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(4.4, deprotonated=False)
 
 GL4 = TitratableResidue('GL4', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'HG2', 'HG3', 'CD', 'OE1', 'OE2', 'HE21', 'C', 'O',
-                        'HE22', 'HE11', 'HE12'], pka=4.4)
-GL4.add_state(protcnt=0, refene=refene1, # deprotonated
+                        'HE22', 'HE11', 'HE12'], pka=4.4, typ="ph")
+GL4.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0398, -0.0173,
               -0.0173, 0.0136, -0.0425, -0.0425, 0.8054, -0.8188, -0.8188, 0.0,
               0.5973, -0.5679, 0.0, 0.0, 0.0])
-GL4.add_state(protcnt=1, refene=refene2, # protonated syn-O2
+GL4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.4, # protonated syn-O2
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256, 0.0256,
               -0.0174, 0.0430, 0.0430, 0.6801, -0.5838, -0.6511, 0.4641, 0.5973,
               -0.5679, 0.0, 0.0, 0.0])
-GL4.add_state(protcnt=1, refene=refene2, # protonated anti-O2
+GL4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.4, # protonated anti-O2
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256, 0.0256,
               -0.0174, 0.0430, 0.0430, 0.6801, -0.5838, -0.6511, 0.0, 0.5973,
               -0.5679, 0.4641, 0.0, 0.0])
-GL4.add_state(protcnt=1, refene=refene2, # protonated syn-O1
+GL4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.4, # protonated syn-O1
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256, 0.0256,
               -0.0174, 0.0430, 0.0430, 0.6801, -0.6511, -0.5838, 0.0, 0.5973,
               -0.5679, 0.0, 0.4641, 0.0])
-GL4.add_state(protcnt=1, refene=refene2, # protonated syn-O2
+GL4.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.4, # protonated syn-O2
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0071, 0.0256, 0.0256,
               -0.0174, 0.0430, 0.0430, 0.6801, -0.6511, -0.5838, 0.0, 0.5973,
               -0.5679, 0.0, 0.0, 0.4641])
@@ -487,24 +546,29 @@ GL4.check()
 
 # Tyrosine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-65.113428, igb5=-64.166385, igb8=-61.3305355)
 refene2.solvent_energies(igb2=-65.003415, igb5=-64.047229)
 refene2.dielc2_energies(igb2=-32.167520, igb5=-31.751177)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(9.6, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=-65.113428, igb5=-64.166385, igb8=-61.3305355)
+refene2_old.solvent_energies(igb2=-65.003415, igb5=-64.047229)
+refene2_old.dielc2_energies(igb2=-32.167520, igb5=-31.751177)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(9.6, deprotonated=True)
 
 TYR = TitratableResidue('TYR', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'CD1', 'HD1', 'CE1', 'HE1', 'CZ', 'OH', 'HH', 'CE2',
-                        'HE2', 'CD2', 'HD2', 'C', 'O'], pka=9.6)
-TYR.add_state(protcnt=1, refene=refene1, # protonated
+                        'HE2', 'CD2', 'HD2', 'C', 'O'], pka=9.6, typ="ph")
+TYR.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.6, # protonated
               charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.0152, 0.0295,
               0.0295, -0.0011, -0.1906, 0.1699, -0.2341, 0.1656, 0.3226,
               -0.5579, 0.3992, -0.2341, 0.1656, -0.1906, 0.1699, 0.5973,
               -0.5679])
-TYR.add_state(protcnt=0, refene=refene2, # deprotonated
+TYR.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.0858, 0.0190,
               0.0190, -0.2130, -0.1030, 0.1320, -0.4980, 0.1320, 0.7770,
               -0.8140, 0.0, -0.4980, 0.1320, -0.1030, 0.1320, 0.5973, -0.5679])
@@ -512,34 +576,46 @@ TYR.check()
 
 # Histidine
 refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb1=-4.208863, igb2=-2.84183, igb5=-2.86001,
                igb7=-1.741947, igb8=-3.4000)
 refene2.solvent_energies(igb2=-2.77641, igb5=-2.90517)
 refene2.dielc2_energies(igb2=-1.628110, igb5=-1.691093)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(6.5, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb1=-4.208863, igb2=-2.84183, igb5=-2.86001,
+               igb7=-1.741947, igb8=-3.4000)
+refene2_old.solvent_energies(igb2=-2.77641, igb5=-2.90517)
+refene2_old.dielc2_energies(igb2=-1.628110, igb5=-1.691093)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(6.5, deprotonated=True)
 refene3 = _ReferenceEnergy(igb1=-8.230643, igb2=-6.58793, igb5=-6.70726,
                igb7=-5.118453, igb8=-6.3190)
 refene3.solvent_energies(igb2=-6.483630, igb5=-6.82684)
 refene3.dielc2_energies(igb2=-3.444200, igb5=-3.070113)
 refene3.dielc2.solvent_energies()
-refene3.set_pKa(7.1, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene3_old = _ReferenceEnergy(igb1=-8.230643, igb2=-6.58793, igb5=-6.70726,
+               igb7=-5.118453, igb8=-6.3190)
+refene3_old.solvent_energies(igb2=-6.483630, igb5=-6.82684)
+refene3_old.dielc2_energies(igb2=-3.444200, igb5=-3.070113)
+refene3_old.dielc2.solvent_energies()
+refene3_old.set_pKa(7.1, deprotonated=True)
 
 HIP = TitratableResidue('HIP', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'ND1', 'HD1', 'CE1', 'HE1', 'NE2', 'HE2', 'CD2', 'HD2',
-                        'C', 'O'], pka=6.6)
-HIP.add_state(protcnt=2, refene=refene1, # HIP
+                        'C', 'O'], pka=6.6, typ="ph")
+HIP.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=7.1, # HIP
               charges=[-0.3479, 0.2747, -0.1354, 0.1212, -0.0414, 0.0810,
               0.0810, -0.0012, -0.1513, 0.3866, -0.0170, 0.2681, -0.1718,
               0.3911, -0.1141, 0.2317, 0.7341, -0.5894])
-HIP.add_state(protcnt=1, refene=refene2, # HID
+HIP.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=0.6, # HID
               charges=[-0.3479, 0.2747, -0.1354, 0.1212, -0.1110, 0.0402,
               0.0402, -0.0266, -0.3811, 0.3649, 0.2057, 0.1392, -0.5727, 0.0,
               0.1292, 0.1147, 0.7341, -0.5894])
-HIP.add_state(protcnt=1, refene=refene3, # HIE
+HIP.add_state(protcnt=1, refene=refene3, refene_old=refene3_old, pka_corr=0.0, # HIE
               charges=[-0.3479, 0.2747, -0.1354, 0.1212, -0.1012, 0.0367,
               0.0367, 0.1868, -0.5432, 0.0, 0.1635, 0.1435, -0.2795, 0.3339,
               -0.2207, 0.1862, 0.7341, -0.5894])
@@ -550,20 +626,25 @@ refene1 = _ReferenceEnergy(igb2=-15.2423959, igb5=-14.5392838, igb8=-18.393654)
 refene1.solvent_energies(igb2=-15.1417977, igb5=-14.3152107)
 refene1.dielc2_energies(igb2=-7.239587, igb5=-6.825997)
 refene1.dielc2.solvent_energies()
-refene1.set_pKa(10.4, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene1_old = _ReferenceEnergy(igb2=-15.2423959, igb5=-14.5392838, igb8=-18.393654)
+refene1_old.solvent_energies(igb2=-15.1417977, igb5=-14.3152107)
+refene1_old.dielc2_energies(igb2=-7.239587, igb5=-6.825997)
+refene1_old.dielc2.solvent_energies()
+refene1_old.set_pKa(10.4, deprotonated=False)
 refene2 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
-refene2.solvent_energies()
+refene2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene2.dielc2.solvent_energies()
+refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 LYS = TitratableResidue('LYS', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'HG2', 'HG3', 'CD', 'HD2', 'HD3', 'CE', 'HE2' ,'HE3',
-                        'NZ', 'HZ1', 'HZ2', 'HZ3', 'C', 'O'], pka=10.4)
-LYS.add_state(protcnt=3, refene=refene1, # protonated
+                        'NZ', 'HZ1', 'HZ2', 'HZ3', 'C', 'O'], pka=10.4, typ="ph")
+LYS.add_state(protcnt=3, refene=refene1, refene_old=refene1_old, pka_corr=10.4, # protonated
               charges=[-0.3479, 0.2747, -0.2400, 0.1426, -0.0094, 0.0362,
               0.0362, 0.0187, 0.0103, 0.0103, -0.0479, 0.0621, 0.0621, -0.0143,
               0.1135, 0.1135, -0.3854, 0.3400, 0.3400, 0.3400, 0.7341, -0.5894])
-LYS.add_state(protcnt=2, refene=refene2, # deprotonated
+LYS.add_state(protcnt=2, refene=refene2, refene_old=refene2, pka_corr=0.0, # deprotonated
               charges=[-0.3479, 0.2747, -0.2400, 0.1426, -0.10961, 0.0340,
               0.0340, 0.06612, 0.01041, 0.01041, -0.03768, 0.01155, 0.01155,
               0.32604, -0.03358, -0.03358, -1.03581, 0.0, 0.38604, 0.38604,
@@ -575,18 +656,23 @@ refene1 = _ReferenceEnergy(igb2=77.4666763, igb5=76.2588331, igb8=71.5804519)
 refene1.solvent_energies(igb2=77.6041407, igb5=76.2827217)
 refene1.dielc2_energies(igb2=38.090523, igb5=37.454637)
 refene1.dielc2.solvent_energies(igb2=38.489170)
-refene1.set_pKa(8.5, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene1_old = _ReferenceEnergy(igb2=77.4666763, igb5=76.2588331, igb8=71.5804519)
+refene1_old.solvent_energies(igb2=77.6041407, igb5=76.2827217)
+refene1_old.dielc2_energies(igb2=38.090523, igb5=37.454637)
+refene1_old.dielc2.solvent_energies(igb2=38.489170)
+refene1_old.set_pKa(8.5, deprotonated=False)
 refene2 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
-refene2.solvent_energies()
+refene2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene2.dielc2.solvent_energies()
+refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 CYS = TitratableResidue('CYS', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'SG',
-                        'HG', 'C', 'O'], pka=8.5)
-CYS.add_state(protcnt=1, refene=refene1, # protonated
+                        'HG', 'C', 'O'], pka=8.5, typ="ph")
+CYS.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=8.5, # protonated
               charges=[-0.4157, 0.2719, 0.0213, 0.1124, -0.1231, 0.1112, 0.1112,
                        -0.3119, 0.1933, 0.5973, -0.5679])
-CYS.add_state(protcnt=0, refene=refene2, # deprotonated
+CYS.add_state(protcnt=0, refene=refene2, refene_old=refene2, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, 0.0213, 0.1124, -0.3593, 0.1122, 0.1122,
                        -0.8844, 0.0, 0.5973, -0.5679])
 CYS.check()
@@ -596,24 +682,29 @@ refene1 = _ReferenceEnergy(igb2=-19.8442, igb5=-19.8442)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=-9.106013, igb5=-9.404867)
 refene1.dielc2.solvent_energies(igb2=-9.779586)
-refene1.set_pKa(3.9, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene1_old = _ReferenceEnergy(igb2=-19.8442, igb5=-19.8442)
+refene1_old.solvent_energies()
+refene1_old.dielc2_energies(igb2=-9.106013, igb5=-9.404867)
+refene1_old.dielc2.solvent_energies(igb2=-9.779586)
+refene1_old.set_pKa(3.9, deprotonated=True)
 refene2 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
-refene2.solvent_energies()
+refene2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene2.dielc2.solvent_energies()
+refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 DAP = TitratableResidue('DAP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                         "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                         'N7', 'C5', 'C6', 'N6', 'H61', 'H62', 'N1', 'C2', 'H2',
                         'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'",
-                        'H1'], pka=3.9)
-DAP.add_state(protcnt=1, refene=refene1, # deprotonated
+                        'H1'], pka=3.9, typ="ph")
+DAP.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=0.0, # deprotonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, 0.0431, 0.1838, -0.0268, 0.1607,
               0.1877, -0.6175, 0.0725, 0.6897, -0.9123, 0.4167, 0.4167, -0.7624,
               0.5716, 0.0598, -0.7417, 0.38, 0.0713, 0.0985, -0.0854, 0.0718,
               0.0718, -0.5232, 0.0])
-DAP.add_state(protcnt=2, refene=refene2, # protonated
+DAP.add_state(protcnt=2, refene=refene2, refene_old=refene2, pka_corr=3.9, # protonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, 0.0431, 0.1838, 0.0944, 0.1617,
               0.2281, -0.5674, 0.1358, 0.5711, -0.8251, 0.4456, 0.4456, -0.575,
@@ -626,24 +717,29 @@ refene1 = _ReferenceEnergy(igb2=-40.526, igb5=-40.526)
 refene1.solvent_energies()
 refene1.dielc2_energies(igb2=-19.447553, igb5=-19.842087)
 refene1.dielc2.solvent_energies(igb2=-20.121129)
-refene1.set_pKa(4.3, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene1_old = _ReferenceEnergy(igb2=-40.526, igb5=-40.526)
+refene1_old.solvent_energies()
+refene1_old.dielc2_energies(igb2=-19.447553, igb5=-19.842087)
+refene1_old.dielc2.solvent_energies(igb2=-20.121129)
+refene1_old.set_pKa(4.3, deprotonated=True)
 refene2 = _ReferenceEnergy(igb2=0, igb5=0)
-refene2.solvent_energies()
+refene2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene2.dielc2.solvent_energies()
+refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 DCP = TitratableResidue('DCP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                         "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                         'C5', 'H5', 'C4', 'N4', 'H41', 'H42', 'N3', 'C2', 'O2',
                         "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'", 'H3'],
-                        pka=4.3)
-DCP.add_state(protcnt=1, refene=refene1, # deprotonated
+                        pka=4.3, typ="ph")
+DCP.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=0.0, # deprotonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, -0.0116, 0.1963, -0.0339,
               -0.0183, 0.2293, -0.5222, 0.1863, 0.8439, -0.9773, 0.4314, 0.4314,
               -0.7748, 0.7959, -0.6548, 0.0713, 0.0985, -0.0854, 0.0718, 0.0718,
               -0.5232, 0.0])
-DCP.add_state(protcnt=2, refene=refene2, # protonated
+DCP.add_state(protcnt=2, refene=refene2, refene_old=refene2, pka_corr=4.3, # protonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, -0.0116, 0.1963, 0.2167, -0.0282,
               0.2713, -0.4162, 0.2179, 0.6653, -0.859, 0.4598, 0.4598, -0.4956,
@@ -653,27 +749,32 @@ DCP.check()
 
 # Deoxy-guanine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-90.0011, igb5=-90.0011)
 refene2.solvent_energies()
 refene2.dielc2_energies(igb2=-44.031593, igb5=-43.588343)
 refene2.dielc2.solvent_energies(igb2=-45.090067)
-refene2.set_pKa(9.2, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=-90.0011, igb5=-90.0011)
+refene2_old.solvent_energies()
+refene2_old.dielc2_energies(igb2=-44.031593, igb5=-43.588343)
+refene2_old.dielc2.solvent_energies(igb2=-45.090067)
+refene2_old.set_pKa(9.2, deprotonated=True)
 
 DG = TitratableResidue('DG', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                        'N7', 'C5', 'C6', 'O6', 'N1', 'H1', 'C2', 'N2', 'H21',
                        'H22', 'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "H2'2",
-                       "O3'"], pka=9.2)
-DG.add_state(protcnt=1, refene=refene1, # protonated
+                       "O3'"], pka=9.2, typ="ph")
+DG.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.0358, 0.1746, 0.0577, 0.0736,
              0.1997, -0.5725, 0.1991, 0.4918, -0.5699, -0.5053, 0.352, 0.7432,
              -0.923, 0.4235, 0.4235, -0.6636, 0.1814, 0.0713, 0.0985, -0.0854,
              0.0718, 0.0718, -0.5232])
-DG.add_state(protcnt=0, refene=refene2, # deprotonated
+DG.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # deprotonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.0358, 0.1746, -0.0507, 0.0779,
              0.1516, -0.6122, 0.0806, 0.7105, -0.7253, -0.8527, 0.0, 0.9561,
@@ -683,27 +784,32 @@ DG.check()
 
 # Deoxy-thymine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-56.7729, igb5=-56.7729)
 refene2.solvent_energies(igb2=-28.429391)
 refene2.dielc2_energies(igb2=-28.085730, igb5=-27.298290)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(9.7, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=-56.7729, igb5=-56.7729)
+refene2_old.solvent_energies(igb2=-28.429391)
+refene2_old.dielc2_energies(igb2=-28.085730, igb5=-27.298290)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(9.7, deprotonated=True)
 
 DT = TitratableResidue('DT', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                        'C5', 'C7', 'H71', 'H72', 'H73', 'C4', 'O4', 'N3', 'H3',
                        'C2', 'O2', "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'"],
-                       pka=9.7)
-DT.add_state(protcnt=1, refene=refene1, # protonated
+                       pka=9.7, typ="ph")
+DT.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.7, # protonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.068, 0.1804, -0.0239, -0.2209,
              0.2607, 0.0025, -0.2269, 0.077, 0.077, 0.077, 0.5194, -0.5563,
              -0.434, 0.342, 0.5677, -0.5881, 0.0713, 0.0985, -0.0854, 0.0718,
              0.0718, -0.5232])
-DT.add_state(protcnt=0, refene=refene2, # deprotonated
+DT.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # deprotonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.068, 0.1804, -0.2861, -0.1874,
              0.2251, -0.1092, -0.2602, 0.0589, 0.0589, 0.0589, 0.8263, -0.7396,
@@ -713,28 +819,34 @@ DT.check()
 
 # Adenine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=14.851840012, igb5=15.1166001033)
 refene2.solvent_energies(igb2=15.026098360790293,igb5=15.143651997474915)
 refene2.solvent_energies()
 refene2.dielc2_energies(igb2=6.953887, igb5=7.092043)
 refene2.dielc2.solvent_energies(igb2=7.544988)
-refene2.set_pKa(3.5, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=14.851840012, igb5=15.1166001033)
+refene2_old.solvent_energies(igb2=15.026098360790293,igb5=15.143651997474915)
+refene2_old.solvent_energies()
+refene2_old.dielc2_energies(igb2=6.953887, igb5=7.092043)
+refene2_old.dielc2.solvent_energies(igb2=7.544988)
+refene2_old.set_pKa(3.5, deprotonated=False)
 
 AP = TitratableResidue('AP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                        'N7', 'C5', 'C6', 'N6', 'H61', 'H62', 'N1', 'C2', 'H2',
                        'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2",
-                       "O3'", 'H1'], pka=3.9)
-AP.add_state(protcnt=0, refene=refene1, # deprotonated
+                       "O3'", 'H1'], pka=3.9, typ="ph")
+AP.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0394, 0.2007, -0.0251, 0.2006, 0.1553,
              -0.6073, 0.0515, 0.7009, -0.9019, 0.4115, 0.4115, -0.7615, 0.5875,
              0.0473, -0.6997, 0.3053, 0.2022, 0.0615, 0.067, 0.0972, -0.6139,
              0.4186, -0.5246, 0.0])
-AP.add_state(protcnt=1, refene=refene2, # protonated
+AP.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=3.5, # protonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0394, 0.2007, 0.0961, 0.2011, 0.1965,
              -0.5569, 0.1136, 0.5845, -0.8152, 0.4403, 0.4403, -0.5776, 0.4435,
@@ -744,27 +856,32 @@ AP.check()
 
 # Cytosine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=37.501800178, igb5=38.0081251132)
 refene2.solvent_energies(igb2=37.378544257354164, igb5=37.90444570773976)
 refene2.dielc2_energies(igb2=18.483513, igb5=19.016390)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(4.2, deprotonated=False)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=37.501800178, igb5=38.0081251132)
+refene2_old.solvent_energies(igb2=37.378544257354164, igb5=37.90444570773976)
+refene2_old.dielc2_energies(igb2=18.483513, igb5=19.016390)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(4.2, deprotonated=False)
 
 CP = TitratableResidue('CP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                        'C5', 'H5', 'C4', 'N4', 'H41', 'H42', 'N3', 'C2', 'O2',
                        "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2", "O3'", 'H3'],
-                       pka=4.3)
-CP.add_state(protcnt=1, refene=refene1, # deprotonated
+                       pka=4.3, typ="ph")
+CP.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0066, 0.2029, -0.0484, 0.0053, 0.1958,
              -0.5215, 0.1928, 0.8185, -0.953, 0.4234, 0.4234, -0.7584, 0.7538,
              -0.6252, 0.2022, 0.0615, 0.067, 0.0972, -0.6139, 0.4186, -0.5246,
              0.0])
-CP.add_state(protcnt=2, refene=refene2, # protonated
+CP.add_state(protcnt=2, refene=refene2, refene_old=refene2_old, pka_corr=4.2, # protonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0066, 0.2029, 0.1954, 0.0028, 0.2366,
              -0.4218, 0.2253, 0.6466, -0.8363, 0.4518, 0.4518, -0.4871, 0.5039,
@@ -774,27 +891,32 @@ CP.check()
 
 # Guanine
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-97.094725165, igb5=-96.0365352027)
 refene2.solvent_energies(igb2=-97.31657849010276, igb5=-95.95654436492156)
 refene2.dielc2_energies(igb2=-47.410980, igb5=-47.008233)
 refene2.dielc2.solvent_energies(igb2=-48.222021)
-refene2.set_pKa(9.2, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=-97.094725165, igb5=-96.0365352027)
+refene2_old.solvent_energies(igb2=-97.31657849010276, igb5=-95.95654436492156)
+refene2_old.dielc2_energies(igb2=-47.410980, igb5=-47.008233)
+refene2_old.dielc2.solvent_energies(igb2=-48.222021)
+refene2_old.set_pKa(9.2, deprotonated=True)
 
 G = TitratableResidue('G', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                       "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8', 'N7',
                       'C5', 'C6', 'O6', 'N1', 'H1', 'C2', 'N2', 'H21', 'H22',
                       'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2",
-                      "O3'"], pka=9.2)
-G.add_state(protcnt=1, refene=refene1, # protonated
+                      "O3'"], pka=9.2, typ="ph")
+G.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0191, 0.2006, 0.0492, 0.1374, 0.164,
             -0.5709, 0.1744, 0.477, -0.5597, -0.4787, 0.3424, 0.7657, -0.9672,
             0.4364, 0.4364, -0.6323, 0.1222, 0.2022, 0.0615, 0.067, 0.0972,
             -0.6139, 0.4186, -0.5246])
-G.add_state(protcnt=0, refene=refene2, # deprotonated
+G.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # deprotonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0191, 0.2006, -0.0623, 0.1479, 0.1137,
             -0.6127, 0.0488, 0.7137, -0.7191, -0.8557, 0.0, 0.9976, -1.0387,
@@ -804,27 +926,133 @@ G.check()
 
 # Uracil
 refene1 = _ReferenceEnergy(igb2=0, igb5=0)
-refene1.solvent_energies()
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
-refene1.dielc2.solvent_energies()
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 refene2 = _ReferenceEnergy(igb2=-136.326020191, igb5=-134.938275039)
 refene2.solvent_energies(igb2=-136.5653533428478, igb5=-135.06973320905044)
 refene2.dielc2_energies(igb2=-67.270690, igb5=-66.605330)
 refene2.dielc2.solvent_energies()
-refene2.set_pKa(9.2, deprotonated=True)
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=-136.326020191, igb5=-134.938275039)
+refene2_old.solvent_energies(igb2=-136.5653533428478, igb5=-135.06973320905044)
+refene2_old.dielc2_energies(igb2=-67.270690, igb5=-66.605330)
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(9.2, deprotonated=True)
 
 U = TitratableResidue('U', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                       "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6', 'C5',
                       'H5', 'C4', 'O4', 'N3', 'H3', 'C2', 'O2', "C3'", "H3'",
-                      "C2'", "H2'1", "O2'", "HO'2", "O3'"], pka=9.3)
-U.add_state(protcnt=1, refene=refene1, # protonated
+                      "C2'", "H2'1", "O2'", "HO'2", "O3'"], pka=9.3, typ="ph")
+U.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0674, 0.1824, 0.0418, -0.1126, 0.2188,
             -0.3635, 0.1811, 0.5952, -0.5761, -0.3549, 0.3154, 0.4687, -0.5477,
             0.2022, 0.0615, 0.067, 0.0972, -0.6139, 0.4186, -0.5246])
-U.add_state(protcnt=0, refene=refene2, # deprotonated
+U.add_state(protcnt=0, refene=refene2, refene_old=refene2_old, pka_corr=0.0, # deprotonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0674, 0.1824, -0.2733, 0.0264, 0.1501,
             -0.582, 0.156, 0.9762, -0.7808, -0.9327, 0.0, 0.8698, -0.7435,
             0.2022, 0.0615, 0.067, 0.0972, -0.6139, 0.4186, -0.5246])
 U.check()
+
+# HEH: HEME ring + parts of 2 HIS + 2 CYS
+refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene2 = _ReferenceEnergy(igb2=-15.493731, igb5=-16.349152, igb7=-16.509509, igb8=-22.025653) # Implicit
+refene2.solvent_energies(igb2=-15.209270, igb5=-15.840853, igb7=-15.495868) # Explicit
+refene2.dielc2_energies()
+refene2.dielc2.solvent_energies()
+# Copying the reference energy to be printted on the old CEIN format
+refene2_old = _ReferenceEnergy(igb2=-15.493731, igb5=-16.349152, igb7=-16.509509, igb8=-22.025653) # Implicit
+refene2_old.solvent_energies(igb2=-15.209270, igb5=-15.840853, igb7=-15.495868) # Explicit
+refene2_old.dielc2_energies()
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(-0.203, deprotonated=False)
+
+HEH = TitratableResidue('HEH', ['FE', 'NA', 'C1A', 'C2A', 'C3A', 'CMA', 'HMA1', 'HMA2', 'HMA3', 'C4A',
+                                'CHB', 'HHB', 'C1B', 'NB', 'C2B', 'CMB', 'HMB1', 'HMB2', 'HMB3', 'C3B',
+                                'CAB', 'HAB', 'CBB', 'HBB1', 'HBB2', 'HBB3', 'C4B', 'CHC', 'HHC', 'C1C',
+                                'NC', 'C2C', 'CMC', 'HMC1', 'HMC2', 'HMC3', 'C3C', 'CAC', 'HAC', 'CBC',
+                                'HBC1', 'HBC2', 'HBC3', 'C4C', 'CHD', 'HHD', 'C1D', 'ND', 'C2D', 'CMD',
+                                'HMD1', 'HMD2', 'HMD3', 'C3D', 'C4D', 'CHA', 'HHA', 'CBC1', 'HB2C',
+                                'HB3C', 'SGC1', 'CB1', 'HB21', 'HB31', 'CG1', 'ND11', 'HD11', 'CE11',
+                                'HE11', 'NE21', 'CD21', 'HD21', 'CBB2', 'HB2B', 'HB3B', 'SGB2', 'CB2',
+                                'HB22', 'HB32', 'CG2', 'ND12', 'HD12', 'CE12', 'HE12', 'NE22', 'CD22',
+                                'HD22'],
+                        pka=-0.203, typ="redox")
+# pka = EO (standard redox potential, given in Volts) for HEH residue
+HEH.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=0.0, # FE3+ (oxidized state) 
+              charges=[ 0.6660, -0.1530, -0.0956,  0.1274,  0.1624, -0.2600,  0.0743,  0.0743,  0.0743, 
+                       -0.0766, -0.0586,  0.1300, -0.0206, -0.2560,  0.1394, -0.2240,  0.0663,  0.0663, 
+                        0.0663,  0.0734, -0.0935,  0.1765, -0.4035,  0.1375,  0.1375,  0.1375,  0.0504, 
+                       -0.1806,  0.1430,  0.0364, -0.2390,  0.1784, -0.2325,  0.0635,  0.0635,  0.0635, 
+                        0.0084, -0.0570,  0.2130, -0.4090,  0.1357,  0.1357,  0.1357, -0.0266, -0.0576, 
+                        0.1360, -0.1156, -0.1130,  0.1604, -0.2575,  0.0752,  0.0752,  0.0752,  0.1444, 
+                       -0.1126,  0.0104,  0.1090, -0.3349,  0.1297,  0.1297, -0.1760, -0.0803,  0.0269, 
+                        0.0269,  0.1990, -0.2930,  0.3650,  0.0120,  0.1180, -0.0400, -0.2020,  0.1790, 
+                       -0.3349,  0.1297,  0.1297, -0.1760, -0.0803,  0.0269,  0.0269,  0.1990, -0.2930, 
+                        0.3650,  0.0120,  0.1180, -0.0400, -0.2020,  0.1790]
+              )
+HEH.add_state(protcnt=3, refene=refene2, refene_old=refene2_old, pka_corr=-0.203, # FE2+ (reduced state)
+              charges=[ 0.4800, -0.1337, -0.1455,  0.1285,  0.1325, -0.2545,  0.0608,  0.0608,  0.0608, 
+                       -0.0865, -0.0815,  0.1220, -0.0425, -0.2490,  0.1605, -0.1935,  0.0422,  0.0422, 
+                        0.0422, -0.0025, -0.0390,  0.1720, -0.4255,  0.1348,  0.1348,  0.1348,  0.0405, 
+                       -0.1725,  0.1320, -0.0525, -0.1980,  0.2125, -0.1985,  0.0405,  0.0405,  0.0405, 
+                       -0.0355, -0.0195,  0.1915, -0.4340,  0.1320,  0.1320,  0.1320, -0.0275, -0.0805, 
+                        0.1290, -0.1275, -0.1020,  0.1335, -0.2525,  0.0615,  0.0615,  0.0615,  0.1415, 
+                       -0.1575,  0.0275,  0.0950, -0.3343,  0.1300,  0.1300, -0.2315, -0.0967,  0.0187, 
+                        0.0187,  0.2030, -0.3450,  0.3550,  0.0110,  0.1090, -0.0270, -0.2170,  0.1750, 
+                       -0.3343,  0.1300,  0.1300, -0.2315, -0.0967,  0.0187,  0.0187,  0.2030, -0.3450, 
+                        0.3550,  0.0110,  0.1090, -0.0270, -0.2170,  0.1750]
+              ) 
+HEH.check()
+
+# Propionate
+refene1 = _ReferenceEnergy(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.dielc2_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene2 = _ReferenceEnergy(igb2=10.356928, igb5=9.943308, igb7=7.020632, igb8=5.259028) # Implicit
+refene2.solvent_energies(igb2=16.751825, igb5=15.661934, igb7=12.906876, igb8=15.024553) # Explicit
+refene2.dielc2_energies()
+refene2.dielc2.solvent_energies()
+# Copying the reference energy to be printted on the old CPIN format
+refene2_old = _ReferenceEnergy(igb2=10.356928, igb5=9.943308, igb7=7.020632, igb8=5.259028) # Implicit
+refene2_old.solvent_energies(igb2=16.751825, igb5=15.661934, igb7=12.906876, igb8=15.024553) # Explicit
+refene2_old.dielc2_energies()
+refene2_old.dielc2.solvent_energies()
+refene2_old.set_pKa(4.85, deprotonated=False)
+
+PRN = TitratableResidue('PRN',
+                        ['CA', 'HA1', 'HA2', 'CB', 'HB1', 'HB2', 'CG',
+                        'O1', 'O2', 'H11', 'H12', 'H21', 'H22'], pka=4.85, typ="ph")
+
+PRN.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
+              charges=[-0.0508, -0.0173,
+              -0.0173, 0.0026, -0.0425, -0.0425, 0.8054, -0.8188, -0.8188, 0.0,
+              0.0, 0.0, 0.0])
+
+PRN.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.85, # protonated syn-O1
+              charges=[-0.0181, 0.0256, 0.0256,
+              -0.0284, 0.0430, 0.0430, 0.6801, -0.6511, -0.5838, 0.4641, 
+              0.0, 0.0, 0.0])
+
+PRN.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.85, # protonated anti-O1
+              charges=[-0.0181, 0.0256, 0.0256,
+              -0.0284, 0.0430, 0.0430, 0.6801, -0.6511, -0.5838, 0.0, 
+              0.4641, 0.0, 0.0])
+
+PRN.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.85, # protonated syn-O2
+              charges=[-0.0181, 0.0256, 0.0256,
+              -0.0284, 0.0430, 0.0430, 0.6801, -0.5838, -0.6511, 0.0, 
+              0.0, 0.4641, 0.0])
+
+PRN.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.85, # protonated anti-O2
+              charges=[-0.0181, 0.0256, 0.0256,
+              -0.0284, 0.0430, 0.0430, 0.6801, -0.5838, -0.6511, 0.0, 
+              0.0, 0.0, 0.4641])
+
+PRN.check()
