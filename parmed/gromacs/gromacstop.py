@@ -1454,7 +1454,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('%-8s ' % atom_type.bond_type)
                 if print_atnum:
                     parfile.write('%8d ' % atom_type.atomic_number)
-                parfile.write('%10.6f  %10.8f  A %14.7g %14.7g\n' % (
+                parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
                               atom_type.mass, atom_type.charge, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
@@ -1513,13 +1513,13 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
+                        part = '%-5s %-5s %-5s    %%d   %12.7f   %12.7f' % (
                                 key[0], key[1], key[2], param.theteq,
                                 param.k*conv)
                         if key in params.urey_bradley_types:
                             ub = params.urey_bradley_types[key]
                             parfile.write(part % 5)
-                            parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
+                            parfile.write('  %12.7f  %12.7f\n' % (0.1*ub.req,
                                           ub.k*bconv))
                         else:
                             parfile.write(part % 1)
@@ -1563,7 +1563,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('[ dihedraltypes ]\n')
                     parfile.write('; i  j       k       l       func     q0    '
                                   'cq\n')
-                    fmt = '%-6s %-6s %-6s %-6s    %d   %.4f   %.4f\n'
+                    fmt = '%-6s %-6s %-6s %-6s    %d   %.6f   %.6f\n'
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
                     for key, param in iteritems(params.improper_types):
                         parfile.write(fmt % (key[0], key[1], key[2], key[3],
