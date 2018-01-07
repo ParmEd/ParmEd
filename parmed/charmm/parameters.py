@@ -415,8 +415,8 @@ class CharmmParameterSet(ParameterSet):
                 # The parameter file might or might not have an element name
                 try:
                     elem = words[4].upper()
-                    if len(elem) in (1, 2):
-                        elem = elem.lower(); elem[0] = elem[0].upper()
+                    if len(elem) == 2:
+                        elem = elem[0] + elem[1].lower()
                     atomic_number = AtomicNum[elem]
                 except (IndexError, KeyError):
                     # Figure it out from the mass
