@@ -1423,7 +1423,7 @@ class GromacsTopologyFile(Structure):
             dest.write('\n[ defaults ]\n')
             dest.write('; nbfunc        comb-rule       gen-pairs       '
                         'fudgeLJ fudgeQQ\n')
-            dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
+            dest.write('%-15d %-15d %-15s %-12.8g %-12.8g\n\n' %
                         (self.defaults.nbfunc, self.defaults.comb_rule,
                         self.defaults.gen_pairs, self.defaults.fudgeLJ,
                         self.defaults.fudgeQQ))
@@ -1454,7 +1454,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('%-8s ' % atom_type.bond_type)
                 if print_atnum:
                     parfile.write('%8d ' % atom_type.atomic_number)
-                parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
+                parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
                               atom_type.mass, atom_type.charge, atom_type.sigma/10,
                               atom_type.epsilon*econv))
             parfile.write('\n')
@@ -1496,7 +1496,7 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.8f %.8f\n' %
+                        parfile.write('%-5s %-5s  1  %.9f %.9f\n' %
                                       (key[0], key[1], param.sigma*lconv,
                                        param.epsilon*econv))
                     parfile.write('\n')
@@ -1513,13 +1513,13 @@ class GromacsTopologyFile(Structure):
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
+                        part = '%-5s %-5s %-5s    %%d   %12.7f   %12.7f' % (
                                 key[0], key[1], key[2], param.theteq,
                                 param.k*conv)
                         if key in params.urey_bradley_types:
                             ub = params.urey_bradley_types[key]
                             parfile.write(part % 5)
-                            parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
+                            parfile.write('  %12.7f  %12.7f\n' % (0.1*ub.req,
                                           ub.k*bconv))
                         else:
                             parfile.write(part % 1)
@@ -1563,7 +1563,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('[ dihedraltypes ]\n')
                     parfile.write('; i  j       k       l       func     q0    '
                                   'cq\n')
-                    fmt = '%-6s %-6s %-6s %-6s    %d   %.4f   %.4f\n'
+                    fmt = '%-6s %-6s %-6s %-6s    %d   %.6f   %.6f\n'
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
                     for key, param in iteritems(params.improper_types):
                         parfile.write(fmt % (key[0], key[1], key[2], key[3],
@@ -1775,8 +1775,8 @@ class GromacsTopologyFile(Structure):
                         sum(a.charge for a in residue)))
             for atom in residue:
                 runchg += atom.charge
-                dest.write('%5d %10s %6d %6s %6s %6d %10.6f %10.4f   ; '
-                           'qtot %.4f\n' % (atom.idx+1, atom.type,
+                dest.write('%5d %10s %6d %6s %6s %6d %10.8f %10.6f   ; '
+                           'qtot %.6f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
                             atom.idx+1, atom.charge, atom.mass, runchg))
         dest.write('\n')
@@ -1829,7 +1829,7 @@ class GromacsTopologyFile(Structure):
                         key not in params.pair_types or
                         adjust.type != params.pair_types[key]) and \
                         adjust.type is not None:
-                    dest.write(' %.8f %.8f' % (adjust.type.sigma*lconv,
+                    dest.write(' %.9f %.9f' % (adjust.type.sigma*lconv,
                                                adjust.type.epsilon*econv))
                 dest.write('\n')
             dest.write('\n')
@@ -1848,7 +1848,7 @@ class GromacsTopologyFile(Structure):
                     continue # pragma: no cover
                 dest.write('%7d %6d %5d' % (a1.idx+1, a2.idx+1, 1))
                 if struct.defaults.gen_pairs == 'no':
-                    dest.write('  %.5f  %.5f' %
+                    dest.write('  %.9f  %.9f' %
                                (0.5*(a1.sigma_14+a2.sigma_14)*lconv,
                                 math.sqrt(a1.epsilon_14*a2.epsilon_14)*econv))
                 dest.write('\n')
@@ -1885,10 +1885,10 @@ class GromacsTopologyFile(Structure):
                             key in params.urey_bradley_types and
                             ubtype == params.urey_bradley_types[key])
                 if writeparams or not param_equal:
-                    dest.write('   %.5f %f' % (angle.type.theteq,
+                    dest.write('   %.7f %f' % (angle.type.theteq,
                                                angle.type.k*conv))
                     if angle.funct == 5:
-                        dest.write(' %.5f %f' % (ubtype.req/10, ubtype.k*conv2))
+                        dest.write(' %.7f %f' % (ubtype.req/10, ubtype.k*conv2))
                 dest.write('\n')
             dest.write('\n')
         # Dihedrals
@@ -1915,16 +1915,16 @@ class GromacsTopologyFile(Structure):
                 if writeparams or key not in typedict or \
                         _diff_diheds(dihed.type, typedict[key]):
                     if isinstance(dihed.type, DihedralTypeList):
-                        dest.write('  %.5f  %.5f  %d' % (dihed.type[0].phase,
+                        dest.write('  %.6f  %.6f  %d' % (dihed.type[0].phase,
                             dihed.type[0].phi_k*conv, int(dihed.type[0].per)))
                         for dt in dihed.type[1:]:
-                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.5f  %d' %
+                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.7f  %d' %
                                     (dihed.atom1.idx+1, dihed.atom2.idx+1,
                                      dihed.atom3.idx+1, dihed.atom4.idx+1,
                                      dihed.funct, dt.phase, dt.phi_k*conv,
                                      int(dt.per)))
                     else:
-                        dest.write('  %.5f  %.5f  %d' % (dihed.type.phase,
+                        dest.write('  %.7f  %.7f  %d' % (dihed.type.phase,
                             dihed.type.phi_k*conv, int(dihed.type.per)))
                 dest.write('\n')
             dest.write('\n')
@@ -1936,7 +1936,7 @@ class GromacsTopologyFile(Structure):
                        'c4', 'c5'))
             dest.write('\n')
             conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            paramfmt = '  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f'
+            paramfmt = '  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f'
             for dihed in struct.rb_torsions:
                 dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
@@ -1973,7 +1973,7 @@ class GromacsTopologyFile(Structure):
                 # BUGBUG: We always write improper types since we don't
                 # currently store the correct ordering of the types in the
                 # improper section
-                dest.write('  %12.5f  %12.5f\n' % (dihed.type.psi_eq,
+                dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_eq,
                                                    dihed.type.psi_k*conv))
             dest.write('\n')
         # Cmaps
@@ -2009,7 +2009,7 @@ class GromacsTopologyFile(Structure):
                         break
                 else:
                     raise GromacsError('Cannot determine SETTLE geometry') # pragma: no cover
-            dest.write('1     1   %.5f   %.5f\n\n#endif\n\n' % (doh, dhh))
+            dest.write('1     1   %.8f   %.8f\n\n#endif\n\n' % (doh, dhh))
         # Virtual sites
         if EPs:
             ftypes = set(type(a.frame_type) for a in EPs)
