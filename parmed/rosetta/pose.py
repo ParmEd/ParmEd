@@ -74,7 +74,7 @@ class RosettaPose(object):
                 else:
                     atom = Atom(**params)
 
-                atom.xx, atom.xy, atom.xz = (at.xyz()[0], at.xyz[1], at.xyz[2])
+                atom.xx, atom.xy, atom.xz = (at.xyz()[0], at.xyz()[1], at.xyz()[2])
 
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
