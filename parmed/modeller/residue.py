@@ -3,13 +3,14 @@ This contains the basic residue template and residue building libraries
 typically used in modelling applications
 """
 
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import copy as _copy
 import numpy as np
 import os
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
+from parmed.periodic_table import AtomicNum, Element
 from parmed.utils.six import iteritems
 from parmed.exceptions import IncompatiblePatchError
 import warnings
@@ -220,6 +221,18 @@ class ResidueTemplate(object):
         if atom1 not in atom2.bond_partners:
             self.bonds.append(Bond(atom1, atom2, order=order))
 
+    def delete_bond(self, bond):
+        """ Delete a bond from this residue template.
+
+        Parameters
+        ----------
+        bond : :class:`Bond`
+            The bond to be deleted
+
+        """
+        bond.delete()
+        self.bonds.remove(bond)
+
     @classmethod
     def from_residue(cls, residue):
         """
@@ -268,6 +281,38 @@ class ResidueTemplate(object):
         except AttributeError:
             self._crd = np.array([[a.xx, a.xy, a.xz] for a in self])
         return self._crd
+
+    @property
+    def empirical_chemical_formula(self):
+        """ Return the empirical chemical formula (in Hill notation) as a string (e.g. 'H2O', 'C6H12'), omitting EPs """
+        # Count number of appearances of each element
+        element_count = defaultdict(int)
+        for atom in self.atoms:
+            element = Element[atom.atomic_number]
+            element_count[element] += 1
+        # Pop EPs if they are present, since they are not chemical
+        if 'EP' in element_count:
+            element_count.pop('EP')
+        # Render to string using Hill notation
+        # https://en.wikipedia.org/wiki/Chemical_formula#Hill_system
+        def format_and_pop_element(element_count, element):
+            count = element_count.pop(element)
+            if count == 1:
+                return element
+            return element + str(count)
+
+        chemical_formula = ''
+        # If carbon is present, first list C, then H (if present)
+        if 'C' in element_count:
+            chemical_formula += format_and_pop_element(element_count, 'C')
+            if 'H' in element_count:
+                chemical_formula += format_and_pop_element(element_count, 'H')
+        # Remaining elements are listed alphabetically
+        alphabetical_elements = sorted(element_count.keys())
+        for element in alphabetical_elements:
+            chemical_formula += format_and_pop_element(element_count, element)
+
+        return chemical_formula
 
     @property
     def net_charge(self):
