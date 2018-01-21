@@ -19,6 +19,7 @@ from .geometry import angle, dihedral, distance2
 from .utils.decorators import deprecated
 from .utils.six import iteritems, string_types
 from .utils.six.moves import range, zip
+from .periodic_table import Element
 
 __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'ChiralFrame', 'Cmap',
            'CmapType', 'Dihedral', 'DihedralType', 'DihedralTypeList', 'Improper', 'ImproperType',
@@ -813,6 +814,9 @@ class Atom(_ListItem):
     @element.setter
     def element(self, value):
         self.atomic_number = value
+    @property
+    def element_name(self):
+        return Element[self.atomic_number]
 
     #===================================================
 
