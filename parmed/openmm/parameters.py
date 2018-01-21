@@ -92,12 +92,45 @@ class OpenMMParameterSet(ParameterSet):
             raise NotImplementedError('Cannot yet read OpenMM Parameter sets')
 
     @classmethod
+    def _remediate_residue_template(cls, params, residue):
+        """
+        Modify non-compliant residue templates to conform with OpenMM requirements.
+
+        * To correctly detect waters, OpenMM ffxml water models must not contain
+          non-chemical bond constraints. Theses are removed when importing
+          foreign parameter sets (e.g., CHARMM) into OpenMM parameter sets,
+          and not restored on conversion from OpenMM to other formats
+
+        """
+        # Populate atomic numbers in residue template
+        # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
+        for atom in residue.atoms:
+            atom.atomic_number = params.atom_types_str[atom.type].atomic_number
+
+        # Check waters
+        if residue.empirical_chemical_formula == 'H2O':
+            # Remove any H-H bonds if they are present
+            for bond in residue.bonds:
+                if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
+                    LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
+                    residue.delete_bond(bond)
+
+    @classmethod
     def from_parameterset(cls, params, copy=False):
         """
         Instantiates a CharmmParameterSet from another ParameterSet (or
         subclass). The main thing this feature is responsible for is converting
         lower-case atom type names into all upper-case and decorating the name
         to ensure each atom type name is unique.
+
+        Warning
+        -------
+        Converting parameter sets to OpenMM can be lossy, and can modify the
+        original parameter set unless ``copy=True``:
+        * To correctly detect waters, OpenMM ffxml water models must not contain
+          non-chemical bond constraints. Theses are removed when importing
+          foreign parameter sets (e.g., CHARMM) into OpenMM parameter sets,
+          and not restored on conversion from OpenMM to other formats.
 
         Parameters
         ----------
@@ -118,6 +151,7 @@ class OpenMMParameterSet(ParameterSet):
         if copy:
             # Make a copy so we don't modify the original
             params = _copy(params)
+
         new_params.atom_types = new_params.atom_types_str = params.atom_types
         new_params.atom_types_int = params.atom_types_int
         new_params.atom_types_tuple = params.atom_types_tuple
@@ -138,6 +172,7 @@ class OpenMMParameterSet(ParameterSet):
         # add only ResidueTemplate instances (no ResidueTemplateContainers)
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
+                OpenMMParameterSet._remediate_residue_template(new_params, residue)
                 new_params.residues[name] = residue
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
