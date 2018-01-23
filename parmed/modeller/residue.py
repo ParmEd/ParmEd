@@ -10,7 +10,6 @@ import os
 from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
-from parmed.periodic_table import AtomicNum, Element
 from parmed.utils.six import iteritems
 from parmed.exceptions import IncompatiblePatchError
 import warnings
@@ -288,8 +287,7 @@ class ResidueTemplate(object):
         # Count number of appearances of each element
         element_count = defaultdict(int)
         for atom in self.atoms:
-            element = Element[atom.atomic_number]
-            element_count[element] += 1
+            element_count[atom.element_name] += 1
         # Pop EPs if they are present, since they are not chemical
         if 'EP' in element_count:
             element_count.pop('EP')
