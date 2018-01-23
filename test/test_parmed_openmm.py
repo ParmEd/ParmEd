@@ -615,8 +615,9 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'),
-                                              get_fn('toppar_water_ions.str'))
+                                              get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
+        del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
         ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
@@ -638,8 +639,9 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_cgenff.prm'),
                                               get_fn('top_all36_cgenff.rtf'),
-                                              get_fn('toppar_water_ions.str'))
+                                              get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
+        del params.residues['TP3M'] # Delete to avoid duplicate water template topologies        
         ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
