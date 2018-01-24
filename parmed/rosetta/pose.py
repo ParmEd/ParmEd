@@ -12,7 +12,7 @@ from parmed.topologyobjects import Atom, ExtraPoint, Bond
 from parmed.utils.six.moves import range
 
 try:
-    from rosetta import Pose, AtomID
+    from pyrosetta import Pose, AtomID
 except ImportError:
     Pose = AtomID = None
 
@@ -74,7 +74,7 @@ class RosettaPose(object):
                 else:
                     atom = Atom(**params)
 
-                atom.xx, atom.xy, atom.xz = tuple(at.xyz())
+                atom.xx, atom.xy, atom.xz = (at.xyz()[0], at.xyz()[1], at.xyz()[2])
 
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
