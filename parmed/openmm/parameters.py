@@ -105,6 +105,8 @@ class OpenMMParameterSet(ParameterSet):
         # Populate atomic numbers in residue template
         # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
         for atom in residue.atoms:
+            if atom.type not in params.atom_types_str:
+                raise Exception('Residue {} contains atom type {} not found in parameter set'.format(residue.name, atom.type))
             atom.atomic_number = params.atom_types_str[atom.type].atomic_number
 
         # Check waters

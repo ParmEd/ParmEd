@@ -641,7 +641,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                                               get_fn('top_all36_cgenff.rtf'),
                                               get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
-        del params.residues['TP3M'] # Delete to avoid duplicate water template topologies        
+        del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
         ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
