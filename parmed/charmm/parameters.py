@@ -349,7 +349,7 @@ class CharmmParameterSet(ParameterSet):
             if line.upper().startswith('CMAP'):
                 section = 'CMAP'
                 continue
-            if line.upper().startswith('NONBONDED'):
+            if line.upper().startswith('NONBOND'):
                 read_first_nonbonded = declared_geometric = False
                 section = 'NONBONDED'
                 # Get nonbonded keywords
