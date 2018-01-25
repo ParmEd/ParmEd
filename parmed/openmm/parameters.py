@@ -106,7 +106,8 @@ class OpenMMParameterSet(ParameterSet):
         # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
         for atom in residue.atoms:
             if atom.type not in params.atom_types_str:
-                raise Exception('Residue {} contains atom type {} not found in parameter set'.format(residue.name, atom.type))
+                warnings.warn('Residue {} contains atom type {} not found in parameter set and will be dropped.'.format(residue.name, atom.type))
+                return False
             atom.atomic_number = params.atom_types_str[atom.type].atomic_number
 
         # Check waters
@@ -116,6 +117,8 @@ class OpenMMParameterSet(ParameterSet):
                 if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
+
+        return True
 
     @classmethod
     def from_parameterset(cls, params, copy=False):
@@ -172,10 +175,12 @@ class OpenMMParameterSet(ParameterSet):
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
         # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                OpenMMParameterSet._remediate_residue_template(new_params, residue)
-                new_params.residues[name] = residue
+                if OpenMMParameterSet._remediate_residue_template(new_params, residue):
+                    remediated_residues.append(residue)
+            new_params.residues = { residue.name : residue for residue in remediated_residues }
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 new_params.patches[name] = patch
