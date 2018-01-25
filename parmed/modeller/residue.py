@@ -157,10 +157,7 @@ class ResidueTemplate(object):
         # Remove all bonds involving this atom
         for bond in list(self.bonds):
             if (bond.atom1 == atom) or (bond.atom2 == atom):
-                # Remove this bond from all atoms it spans
-                bond.delete()
-                # Delete the bond from the residue
-                self.bonds.remove(bond)
+                self.delete_bond(bond)
 
         # Remove all impropers involving this atom
         for impr in list(self._impr):
@@ -229,8 +226,11 @@ class ResidueTemplate(object):
             The bond to be deleted
 
         """
-        bond.delete()
-        self.bonds.remove(bond)
+        if bond in self.bonds:
+            bond.delete()
+            self.bonds.remove(bond)
+        else:
+            raise Exception('The specified bond {} is not present in this residue {}'.format(bond, self))
 
     @classmethod
     def from_residue(cls, residue):
