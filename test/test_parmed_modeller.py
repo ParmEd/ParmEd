@@ -105,6 +105,24 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertEqual(len(struct.residues), 1)
         self.assertEqual(len(struct.bonds), 5)
 
+    def test_delete_bond(self):
+        """ Tests the ResidueTemplate.delete_bond function """
+        templ = self.templ
+
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+
+        bond = templ.bonds[0]
+        self.assertEqual(len(templ.bonds), 5)
+        templ.delete_bond(bond)
+        self.assertEqual(len(templ.bonds), 4)
+        # Make sure we can't delete the bond again
+        self.assertRaises(ValueError, lambda: templ.delete_bond(bond))
+
     def test_copy(self):
         """ Tests ResidueTemplate __copy__ functionality """
         for atom in self.templ:

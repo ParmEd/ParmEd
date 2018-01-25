@@ -230,7 +230,7 @@ class ResidueTemplate(object):
             bond.delete()
             self.bonds.remove(bond)
         else:
-            raise Exception('The specified bond {} is not present in this residue {}'.format(bond, self))
+            raise ValueError('The specified bond {} does not belong to this residue {}'.format(bond, self))
 
     @classmethod
     def from_residue(cls, residue):
