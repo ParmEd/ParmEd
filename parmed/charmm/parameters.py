@@ -337,19 +337,19 @@ class CharmmParameterSet(ParameterSet):
             if line.upper().startswith('BOND'):
                 section = 'BONDS'
                 continue
-            if line.upper().startswith('ANGLE') or line.upper().startswith('THETA'):
+            if line.upper().startswith('ANGL') or line.upper().startswith('THETA'):
                 section = 'ANGLES'
                 continue
             if line.upper().startswith('DIHE') or line.upper().startswith('PHI'):
                 section = 'DIHEDRALS'
                 continue
-            if line.upper().startswith('IMPROPER') or line.upper().startswith('IMPHI'):
+            if line.upper().startswith('IMPR') or line.upper().startswith('IMPHI'):
                 section = 'IMPROPER'
                 continue
             if line.upper().startswith('CMAP'):
                 section = 'CMAP'
                 continue
-            if line.upper().startswith('NONBOND'):
+            if line.upper().startswith('NONB') or line.upper().startswith('NBON'):
                 read_first_nonbonded = declared_geometric = False
                 section = 'NONBONDED'
                 # Get nonbonded keywords
@@ -386,6 +386,15 @@ class CharmmParameterSet(ParameterSet):
                 section = 'NBFIX'
                 continue
             if line.upper().startswith('HBOND'):
+                section = None
+                continue
+            if(line.upper().startswith('FLUC') or 
+               line.upper().startswith('KAPP') or
+               line.upper().startswith('LCH2') or
+               line.upper().startswith('14TG')):
+                section = None
+                continue
+            if line.upper().startswith('PRIN'):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
