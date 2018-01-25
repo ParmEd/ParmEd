@@ -112,7 +112,7 @@ class OpenMMParameterSet(ParameterSet):
         # Check waters
         if residue.empirical_chemical_formula == 'H2O':
             # Remove any H-H bonds if they are present
-            for bond in residue.bonds:
+            for bond in list(residue.bonds):
                 if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
