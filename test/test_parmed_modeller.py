@@ -51,6 +51,16 @@ class TestResidueTemplate(unittest.TestCase):
         repr(PROTEIN) # make sure it works, don't care what its value is
         assert str(PROTEIN) == 'PROTEIN'
 
+    def test_chemical_formula(self):
+        """ Test computation of empirical chemical formula. """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a2, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+        self.assertEqual(self.templ.empirical_chemical_formula, 'C2H3O')
+
     @unittest.skipIf(pd is None, "Cannot test without pandas")
     def test_data_frame(self):
         """ Test converting ResidueTemplate to a DataFrame """

@@ -159,6 +159,7 @@ class TestTopologyObjects(unittest.TestCase):
         # the first atom)
         self.assertEqual(a1.atomic_number, 6)
         self.assertEqual(a1.element, 6)
+        self.assertEqual(a1.element_name, 'C')
         self.assertEqual(a1.name, 'C1')
         self.assertEqual(a1.type, 'CT')
         self.assertEqual(a1.charge, -0.1)
@@ -1117,7 +1118,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(repr(dihed_types[0]), '<DihedralTypes %s>' % list.__repr__(dihed_types[0]))
         # Now try DihedralTypeList.from_rbtorsion
         dtl = DihedralTypeList.from_rbtorsion(RBTorsionType(1, 2, 3, -4, -1, 0))
-        
+
         # Now test DihedralTypeList.__copy__
         cp = copy(dihed_types[0])
         self.assertIsNot(cp, dihed_types[0])
