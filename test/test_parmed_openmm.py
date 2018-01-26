@@ -609,6 +609,26 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 @unittest.skipUnless(has_networkx, 'Cannot test without networkx')
 class TestWriteCHARMMParameters(FileIOTestCase):
 
+    def test_write_xml_parameters_charmm_multisite_waters(self):
+        """ Test writing XML parameter files from Charmm multisite water parameter files and reading them back into OpenMM ForceField """
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('toppar_water_ions_tip5p.str'))
+        )
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFile='toppar_water_ions_tip5p.str',
+                         Reference='MacKerrell'
+                     )
+        )
+        forcefield = app.ForceField(ffxml_filename)
+        # Parameterize water box
+        pdbfile = app.PDBFile(get_fn('waterbox.pdb'))
+        modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
+        modeller.addExtraParticles(forcefield)
+        system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.NoCutoff)
+
     def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
 

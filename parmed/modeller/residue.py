@@ -81,6 +81,7 @@ class ResidueTemplate(object):
     def __init__(self, name=''):
         self.atoms = AtomList()
         self.bonds = TrackedList()
+        self.lonepairs = list() # TODO: Should this be a TrackedList?
         self.name = name
         self.head = None
         self.tail = None

@@ -7,6 +7,7 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+import math
 from functools import wraps
 from contextlib import closing
 import datetime
@@ -471,6 +472,25 @@ class OpenMMParameterSet(ParameterSet):
                 etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
             for bond in residue.bonds:
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+            for (index, lonepair) in enumerate(residue.lonepairs):
+                (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
+                if lptype == 'relative':
+                    xweights = [-1.0, 0.0, 1.0]
+                elif lptype == 'bisector':
+                    xweights = [-1.0, 0.5, 0.5]
+                else:
+                    raise ValueError('Unknown lonepair type: '+lptype)
+                r /= 10.0 # convert to nanometers
+                theta *= math.pi / 180.0 # convert to radians
+                phi = (180 - phi) * math.pi / 180.0 # convert to radians
+                p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
+                p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
+                etree.SubElement(xml_residue, 'VirtualSite', index=str(index),
+                    atom1=a1, atom2=a2, atom3=a3, excludeWith=a4,
+                    wo1="1", wo2="0", wo3="0",
+                    wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
+                    wy1="0", wy2="-1", wy3="1",
+                    p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
             if residue.head is not None:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
