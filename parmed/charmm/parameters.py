@@ -101,7 +101,7 @@ class CharmmParameterSet(ParameterSet):
         for arg in args:
             if arg.endswith('.rtf') or arg.endswith('.top'):
                 tops.append(arg)
-            elif arg.endswith('.par') or arg.endswith('.prm'):
+            elif arg.endswith('.par') or arg.endswith('.prm') or arg.endswith('.xplor'):
                 pars.append(arg)
             elif arg.endswith('.str'):
                 strs.append(arg)
@@ -282,7 +282,9 @@ class CharmmParameterSet(ParameterSet):
         Reads all of the parameters from a parameter file. Versions 36 and
         later of the CHARMM force field files have an ATOMS section defining
         all of the atom types.  Older versions need to load this information
-        from the RTF/TOP files.
+        from the RTF/TOP files. The syntax of CHARMM parameter file is 
+        similar to XPLOR parameter format, therefore this routine may also 
+        read parameter files in XPLOR format.
 
         Parameters
         ----------
@@ -300,6 +302,189 @@ class CharmmParameterSet(ParameterSet):
         file first. Failure to do so will result in a raised RuntimeError.
         """
         conv = CharmmParameterSet._convert
+        # Function to add a new bond type or change a present one
+        def add_bondtype(self, words, lindex, line, penalty):
+            try:
+                type1 = words[0].upper()
+                type2 = words[1].upper()
+                k = conv(words[2], float, 'bond force constant', line_index=lindex, line=line)
+                req = conv(words[3], float, 'bond equilibrium dist', line_index=lindex, line=line)
+            except IndexError:
+                raise CharmmError('Could not parse bonds.')
+            key = (min(type1, type2), max(type1, type2))
+            bond_type = BondType(k, req)
+            if key in self.bond_types:
+                # See if existing bond type has a different value and replaces it with a warning
+                if self.bond_types[key] != bond_type:
+                    # Replace. Warn if they are different
+                    warnings.warn('Replacing bond %r, %r with %r' %
+                                  (key, self.bond_types[key], bond_type), ParameterWarning)
+                    self.bond_types[(type1, type2)] = bond_type
+                    self.bond_types[(type2, type1)] = bond_type
+            else: # key not present
+                self.bond_types[(type1, type2)] = bond_type
+                self.bond_types[(type2, type1)] = bond_type
+            bond_type.penalty = penalty
+
+        # Function to add a new angle type or change a present one
+        def add_angletype(self, words, lindex, line, penalty):
+            try:
+                type1 = words[0].upper()
+                type2 = words[1].upper()
+                type3 = words[2].upper()
+                k = conv(words[3], float, 'angle force constant', line_index=lindex, line=line)
+                theteq = conv(words[4], float, 'angle equilibrium value', line_index=lindex, line=line)
+            except IndexError:
+                raise CharmmError('Could not parse angles.')
+            angle_type = AngleType(k, theteq)
+            key = (type1, type2, type3)
+            if key in self.angle_types:
+                # See if the existing angle type list has a different value
+                # and replaces it with a warning
+                if self.angle_types[key] != angle_type:
+                    # Replace. Warn if they are different
+                    warnings.warn('Replacing angle %r, %r with %r' %
+                                  (key, self.angle_types[key], angle_type), ParameterWarning)
+                    self.angle_types[(type1, type2, type3)] = angle_type
+                    self.angle_types[(type3, type2, type1)] = angle_type
+            else: # key not present
+                self.angle_types[(type1, type2, type3)] = angle_type
+                self.angle_types[(type3, type2, type1)] = angle_type
+            # See if we have a urey-bradley
+            try:
+                ind=5
+                if 'UB' in words[5].upper():
+                    ind+=1
+                ubk = conv(words[ind], float, 'Urey-Bradley force constant', line_index=lindex, line=line)
+                ubeq = conv(words[ind+1], float, 'Urey-Bradley equil. value', line_index=lindex, line=line)
+                ubtype = BondType(ubk, ubeq)
+                ubtype.penalty = penalty
+            except IndexError:
+                ubtype = NoUreyBradley
+            self.urey_bradley_types[(type1, type2, type3)] = ubtype
+            self.urey_bradley_types[(type3, type2, type1)] = ubtype
+            angle_type.penalty = penalty
+
+        # Function to add a new dihedral type or change a present one
+        def add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty):
+            key = (type1, type2, type3, type4)
+            # See if this is a second (or more) term of the dihedral group
+            # that's already present.
+            dihedral = DihedralType(k, n, phase)
+            dihedral.penalty = penalty
+            if key in self.dihedral_types:
+                # See if the existing dihedral type list has a term with
+                # the same periodicity -- If so, replace it
+                replaced = False
+                for i, dtype in enumerate(self.dihedral_types[key]):
+                    if dtype.per == dihedral.per:
+                        # Replace. Warn if they are different
+                        if dtype != dihedral:
+                            warnings.warn('Replacing dihedral %r with %r' % (dtype, dihedral),
+                                            ParameterWarning)
+                        self.dihedral_types[key][i] = dihedral
+                        replaced = True
+                        break
+                if not replaced:
+                    self.dihedral_types[key].append(dihedral)
+            else: # key not present
+                dtl = DihedralTypeList()
+                dtl.append(dihedral)
+                self.dihedral_types[(type1, type2, type3, type4)] = dtl
+                self.dihedral_types[(type4, type3, type2, type1)] = dtl
+
+        # Function to add a new improper type or change a present one
+        def add_impropertype(self, words, lindex, line, penalty):
+            try:
+                type1 = words[0].upper()
+                type2 = words[1].upper()
+                type3 = words[2].upper()
+                type4 = words[3].upper()
+                k = conv(words[4], float, 'improper force constant', line_index=lindex, line=line)
+                theteq = conv(words[5], float, 'improper equil. value', line_index=lindex, line=line)
+            except IndexError:
+                raise CharmmError('Could not parse dihedrals.')
+            # If we have a 7th column, that is the real psi0 (and the 6th
+            # is the multiplicity, which will indicate this is a periodic
+            # improper torsion (so it needs to be added to the
+            # improper_periodic_types list)
+            try:
+                tmp = conv(words[6], float, 'improper equil. value', line_index=lindex, line=line)
+            except IndexError:
+                per = 0
+            else:
+                per = int(theteq)
+                theteq = tmp
+            # Improper types seem not to always have the central atom
+            # defined in the first place, so just have the key a fully
+            # sorted list. We still depend on the PSF having properly
+            # ordered improper atoms
+            key = tuple(sorted([type1, type2, type3, type4]))
+            if per == 0:
+                improp = ImproperType(k, theteq)
+                self.improper_types[key] = improp
+            else:
+                improp = DihedralType(k, per, theteq)
+                self.improper_periodic_types[key] = improp
+                improp.improper = True
+            improp.penalty = penalty
+
+
+        # Function to add a new improper type or change a present one
+        def add_nbfixtype(self, words, lindex, line):
+            try:
+                at1 = words[0].upper()
+                at2 = words[1].upper()
+                emin = abs(conv(words[2], float, 'NBFIX Emin', line_index=i, line=line))
+                rmin = conv(words[3], float, 'NBFIX Rmin', line_index=i, line=line)
+                try:
+                    emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4', line_index=i, line=line))
+                    rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4', line_index=i, line=line)
+                except IndexError:
+                    emin14 = rmin14 = None
+                try:
+                    self.atom_types_str[at1].add_nbfix(at2, rmin, emin, rmin14, emin14)
+                    self.atom_types_str[at2].add_nbfix(at1, rmin, emin, rmin14, emin14)
+                except KeyError:
+                    # Some stream files define NBFIX terms with an atom that
+                    # is defined in another toppar file that does not
+                    # necessarily have to be loaded. As a result, not every
+                    # NBFIX found here will necessarily need to be applied.
+                    # If we can't find a particular atom type, don't bother
+                    # adding that nbfix and press on
+                    pass
+            except IndexError:
+                raise CharmmError('Could not parse NBFIX terms.')
+            self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
+
+        def check_nonbonded_args(self, words, scee, declared_geometric):
+            for i, word in enumerate(words):
+                if word.upper().startswith('E14FAC'):
+                    try:
+                        scee = float(words[i+1])
+                    except (ValueError, IndexError):
+                        raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
+                                          'from NONBONDED card')
+                    if self._declared_nbrules:
+                        if len(self.dihedral_types) > 0:
+                            # We already specified it -- make sure it's the same
+                            # as the one we specified before
+                            _, dt0 = next(iteritems(self.dihedral_types))
+                            diff = abs(dt0[0].scee - scee)
+                            if diff > TINY:
+                                raise CharmmError('Inconsistent 1-4 scalings')
+                    else:
+                        scee = 1 / scee
+                        for key, dtl in iteritems(self.dihedral_types):
+                            for dt in dtl:
+                                dt.scee = scee
+                elif word.upper().startswith('GEOM'):
+                    if self._declared_nbrules and self.combining_rule != 'geometric':
+                        raise CharmmError('Cannot combine parameter files with different '
+                                          'combining rules')
+                    self.combining_rule = 'geometric'
+                    declared_geometric = True
+
         if isinstance(pfile, str):
             own_handle = True
             f = CharmmFile(pfile)
@@ -318,6 +503,8 @@ class CharmmParameterSet(ParameterSet):
         nonbonded_types = dict() # Holder
         parameterset = None
         declared_geometric = False
+        multiple_dihedral = 0
+        nbonds_set = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -327,67 +514,175 @@ class CharmmParameterSet(ParameterSet):
             if not line:
                 # This is a blank line
                 continue
-            if parameterset is None and line.strip().startswith('*>>'):
-                parameterset = line.strip()[1:78]
+            if parameterset is None and line.strip().startswith('*>'):
+                parameterset = line.strip()[1:78].replace('>','').replace('<','')
+                continue
+            # Continue reading dihedral definitions with MULTIPLE field
+            if multiple_dihedral>1 and not line.startswith('!'):
+                words = line.split()
+                try:
+                    k = conv(words[0], float, 'dihedral force constant', line_index=i, line=line)
+                    n = conv(words[1], float, 'dihedral periodicity', line_index=i, line=line)
+                    phase = conv(words[2], float, 'dihedral phase', line_index=i, line=line)
+                except IndexError:
+                    raise CharmmError('Could not parse dihedrals.')
+                pens = _penaltyre.findall(comment)
+                if len(pens) == 1:
+                    penalty = float(pens[0])
+                else:
+                    penalty = None
+                add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty)
+                multiple_dihedral-=1
                 continue
             # Set section if this is a section header
             if line.upper().startswith('ATOM'):
                 section = 'ATOMS'
                 continue
             if line.upper().startswith('BOND'):
-                section = 'BONDS'
-                continue
-            if line.upper().startswith('ANGL') or line.upper().startswith('THETA'):
-                section = 'ANGLES'
-                continue
+                # Is a single line bond definition or a section?
+                if len(line.split())>4 and '!' not in line.split()[1:4]:
+                    words = line.split()[1:]
+                    pens = _penaltyre.findall(comment)
+                    if len(pens) == 1:
+                        penalty = float(pens[0])
+                    else:
+                        penalty = None
+                    add_bondtype(self, words, i, line, penalty)
+                    section = None
+                    continue
+                else:
+                    section = 'BONDS'
+                    continue
+            if line.upper().startswith('ANGL') or line.upper().startswith('THET'):
+                # Is a single line definition or a section?
+                if len(line.split())>5 and '!' not in line.split()[1:5]:
+                    words = line.split()[1:]
+                    pens = _penaltyre.findall(comment)
+                    if len(pens) == 1:
+                        penalty = float(pens[0])
+                    else:
+                        penalty = None
+                    add_angletype(self, words, i, line, penalty)
+                    section = None
+                    continue
+                else:
+                    section = 'ANGLES'
+                    continue
             if line.upper().startswith('DIHE') or line.upper().startswith('PHI'):
-                section = 'DIHEDRALS'
-                continue
-            if line.upper().startswith('IMPR') or line.upper().startswith('IMPHI'):
-                section = 'IMPROPER'
-                continue
+                # Is a single line definition or a section?
+                if len(line.split())>7 and '!' not in line.split()[1:7]:
+                    # Get single line dihedral definitions and keyword MULTIPLE
+                    words = line.split()[1:]
+                    try:
+                        type1 = words[0].upper()
+                        type2 = words[1].upper()
+                        type3 = words[2].upper()
+                        type4 = words[3].upper()
+                        if words[4].upper().startswith('MULTIPLE'):
+                            multiple_dihedral = int(words[5])
+                            k = conv(words[6], float, 'dihedral force constant', line_index=i, line=line)
+                            n = conv(words[7], float, 'dihedral periodicity', line_index=i, line=line)
+                            phase = conv(words[8], float, 'dihedral phase', line_index=i, line=line)
+                        else:
+                            k = conv(words[4], float, 'dihedral force constant', line_index=i, line=line)
+                            n = conv(words[5], float, 'dihedral periodicity', line_index=i, line=line)
+                            phase = conv(words[6], float, 'dihedral phase', line_index=i, line=line)
+                    except IndexError:
+                        raise CharmmError('Could not parse dihedrals.')
+                    pens = _penaltyre.findall(comment)
+                    if len(pens) == 1:
+                        penalty = float(pens[0])
+                    else:
+                        penalty = None
+                    add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty)
+                    section = None
+                    continue
+                else:
+                    section = 'DIHEDRALS'
+                    continue
+            if line.upper().startswith('IMPR') or line.upper().startswith('IMPH'):
+                # Is a single line definition or a section?
+                if len(line.split())>7 and '!' not in line.split()[1:7]:
+                    words = line.split()[1:]
+                    pens = _penaltyre.findall(comment)
+                    if len(pens) == 1:
+                        penalty = float(pens[0])
+                    else:
+                        penalty = None
+                    add_impropertype(self, words, i, line, penalty)
+                    section = None
+                    continue
+                else:
+                    section = 'IMPROPER'
+                    continue
             if line.upper().startswith('CMAP'):
                 section = 'CMAP'
                 continue
-            if line.upper().startswith('NONB') or line.upper().startswith('NBON'):
-                read_first_nonbonded = declared_geometric = False
-                section = 'NONBONDED'
-                # Get nonbonded keywords
-                words = line.split()[1:]
-                scee = None
-                for i, word in enumerate(words):
-                    if word.upper() == 'E14FAC':
-                        try:
-                            scee = float(words[i+1])
-                        except (ValueError, IndexError):
-                            raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
-                                              'from NONBONDED card')
-                        if self._declared_nbrules:
-                            if len(self.dihedral_types) > 0:
-                                # We already specified it -- make sure it's the same
-                                # as the one we specified before
-                                _, dt0 = next(iteritems(self.dihedral_types))
-                                diff = abs(dt0[0].scee - scee)
-                                if diff > TINY:
-                                    raise CharmmError('Inconsistent 1-4 scalings')
-                        else:
-                            scee = 1 / scee
-                            for key, dtl in iteritems(self.dihedral_types):
-                                for dt in dtl:
-                                    dt.scee = scee
-                    elif word.upper().startswith('GEOM'):
-                        if self._declared_nbrules and self.combining_rule != 'geometric':
-                            raise CharmmError('Cannot combine parameter files with different '
-                                              'combining rules')
-                        self.combining_rule = 'geometric'
-                        declared_geometric = True
+            if line.upper().startswith('NBON'):
+                declared_geometric = False
+                nbonds_set = False
+                section = 'NBONDS'
                 continue
-            if line.upper().startswith('NBFIX'):
-                section = 'NBFIX'
-                continue
-            if line.upper().startswith('HBOND'):
+            if line.upper().startswith('NONB'): 
+                # Is a single line definition or a section?
+                # Possible options in NONBOUNDED fields
+                nonb_options = ['NBXMOD', 'EPS', 'E14FAC', 'CUTNB', 'CTOFNB', 
+                                'CDIEL', 'ATOM', 'GEOM', 'WMIN', 'CTONNB']
+                any_options = [True if item.upper() in nonb_options else False for item in line.split()]
+                if len(line.split())>5 and '!' not in line.split()[1:5] and True not in any_options:
+                    words = line.split()[1:]
+                    try:
+                        atype = words[0].upper()
+                        epsilon = conv(words[1], float, 'vdW epsilon term', line_index=i, line=line)
+                        rmin = conv(words[2], float, 'vdW Rmin/2 term', line_index=i, line=line)
+                    except (IndexError, CharmmError):
+                        pass
+                    # OK, we've read our first nonbonded section for sure now.
+                    # Make sure we did not try to read in a str file that did
+                    # not define GEOM if a previous file did, since
+                    # Lorentz-Berthelot and geometric combining rules are
+                    # incompatible
+                    if (self._declared_nbrules and self.combining_rule == 'geometric' and
+                        not declared_geometric):
+                        raise CharmmError('Cannot combine parameter files with '
+                                          'different combining rules')
+                    read_first_nonbonded = True
+                    self._declared_nbrules = True
+                    # See if we have 1-4 parameters
+                    try:
+                        eps14 = conv(words[3], float, '1-4 vdW epsilon term', line_index=i, line=line)
+                        rmin14 = conv(words[4], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
+                        # Check if 1-4 parameters are different
+                        # do need to specify if same?
+                        if eps14 == epsilon and rmin14 == rmin:
+                            eps14 = rmin14 = None
+                    except IndexError:
+                        eps14 = rmin14 = None
+                    nonbonded_types[atype] = [epsilon, rmin, eps14, rmin14]
+                    section=None
+                    continue
+                else:
+                    read_first_nonbonded = declared_geometric = False
+                    section = 'NONBONDED'
+                    # Get nonbonded keywords
+                    words = line.split()[1:]
+                    scee = None
+                    check_nonbonded_args(self, words, scee, declared_geometric)
+                    continue
+            if line.upper().startswith('NBFI'):
+                # Is a single line definition or a section?
+                if len(line.split())>6 and '!' not in line.split()[1:6]:
+                    words = line.split()[1:]
+                    add_nbfixtype(self, words, i, line)
+                    section = None
+                    continue
+                else:
+                    section = 'NBFIX'
+                    continue
+            if line.upper().startswith('HBON'):
                 section = None
                 continue
+            # Some fields related to SPAS parameters
             if(line.upper().startswith('FLUC') or 
                line.upper().startswith('KAPP') or
                line.upper().startswith('LCH2') or
@@ -439,66 +734,13 @@ class CharmmParameterSet(ParameterSet):
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
-                try:
-                    type1 = words[0].upper()
-                    type2 = words[1].upper()
-                    k = conv(words[2], float, 'bond force constant', line_index=i, line=line)
-                    req = conv(words[3], float, 'bond equilibrium dist', line_index=i, line=line)
-                except IndexError:
-                    raise CharmmError('Could not parse bonds.')
-                key = (min(type1, type2), max(type1, type2))
-                bond_type = BondType(k, req)
-                if key in self.bond_types:
-                    # See if existing bond type has a different value and replaces it with a warning
-                    if self.bond_types[key] != bond_type:
-                        # Replace. Warn if they are different
-                        warnings.warn('Replacing bond %r, %r with %r' %
-                                      (key, self.bond_types[key], bond_type), ParameterWarning)
-                        self.bond_types[(type1, type2)] = bond_type
-                        self.bond_types[(type2, type1)] = bond_type
-                else: # key not present
-                    self.bond_types[(type1, type2)] = bond_type
-                    self.bond_types[(type2, type1)] = bond_type
-                bond_type.penalty = penalty
+                add_bondtype(self, words, i, line, penalty)
                 continue
             if section.upper() == 'ANGLES':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
-                try:
-                    type1 = words[0].upper()
-                    type2 = words[1].upper()
-                    type3 = words[2].upper()
-                    k = conv(words[3], float, 'angle force constant', line_index=i, line=line)
-                    theteq = conv(words[4], float, 'angle equilibrium value', line_index=i, line=line)
-                except IndexError:
-                    raise CharmmError('Could not parse angles.')
-
-                angle_type = AngleType(k, theteq)
-                key = (type1, type2, type3)
-                if key in self.angle_types:
-                    # See if the existing angle type list has a different value
-                    # and replaces it with a warning
-                    if self.angle_types[key] != angle_type:
-                        # Replace. Warn if they are different
-                        warnings.warn('Replacing angle %r, %r with %r' %
-                                      (key, self.angle_types[key], angle_type), ParameterWarning)
-                        self.angle_types[(type1, type2, type3)] = angle_type
-                        self.angle_types[(type3, type2, type1)] = angle_type
-                else: # key not present
-                    self.angle_types[(type1, type2, type3)] = angle_type
-                    self.angle_types[(type3, type2, type1)] = angle_type
-                # See if we have a urey-bradley
-                try:
-                    ubk = conv(words[5], float, 'Urey-Bradley force constant', line_index=i, line=line)
-                    ubeq = conv(words[6], float, 'Urey-Bradley equil. value', line_index=i, line=line)
-                    ubtype = BondType(ubk, ubeq)
-                    ubtype.penalty = penalty
-                except IndexError:
-                    ubtype = NoUreyBradley
-                self.urey_bradley_types[(type1, type2, type3)] = ubtype
-                self.urey_bradley_types[(type3, type2, type1)] = ubtype
-                angle_type.penalty = penalty
+                add_angletype(self, words, i, line, penalty)
                 continue
             if section.upper() == 'DIHEDRALS':
                 words = line.split()
@@ -514,69 +756,13 @@ class CharmmParameterSet(ParameterSet):
                     phase = conv(words[6], float, 'dihedral phase', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
-                key = (type1, type2, type3, type4)
-                # See if this is a second (or more) term of the dihedral group
-                # that's already present.
-                dihedral = DihedralType(k, n, phase)
-                dihedral.penalty = penalty
-                if key in self.dihedral_types:
-                    # See if the existing dihedral type list has a term with
-                    # the same periodicity -- If so, replace it
-                    replaced = False
-                    for i, dtype in enumerate(self.dihedral_types[key]):
-                        if dtype.per == dihedral.per:
-                            # Replace. Warn if they are different
-                            if dtype != dihedral:
-                                warnings.warn('Replacing dihedral %r with %r' % (dtype, dihedral),
-                                              ParameterWarning)
-                            self.dihedral_types[key][i] = dihedral
-                            replaced = True
-                            break
-                    if not replaced:
-                        self.dihedral_types[key].append(dihedral)
-                else: # key not present
-                    dtl = DihedralTypeList()
-                    dtl.append(dihedral)
-                    self.dihedral_types[(type1, type2, type3, type4)] = dtl
-                    self.dihedral_types[(type4, type3, type2, type1)] = dtl
+                add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty)
                 continue
             if section.upper() == 'IMPROPER':
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
-                try:
-                    type1 = words[0].upper()
-                    type2 = words[1].upper()
-                    type3 = words[2].upper()
-                    type4 = words[3].upper()
-                    k = conv(words[4], float, 'improper force constant', line_index=i, line=line)
-                    theteq = conv(words[5], float, 'improper equil. value', line_index=i, line=line)
-                except IndexError:
-                    raise CharmmError('Could not parse dihedrals.')
-                # If we have a 7th column, that is the real psi0 (and the 6th
-                # is the multiplicity, which will indicate this is a periodic
-                # improper torsion (so it needs to be added to the
-                # improper_periodic_types list)
-                try:
-                    tmp = conv(words[6], float, 'improper equil. value', line_index=i, line=line)
-                except IndexError:
-                    per = 0
-                else:
-                    per = int(theteq)
-                    theteq = tmp
-                # Improper types seem not to always have the central atom
-                # defined in the first place, so just have the key a fully
-                # sorted list. We still depend on the PSF having properly
-                # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
-                if per == 0:
-                    improp = ImproperType(k, theteq)
-                    self.improper_types[key] = improp
-                else:
-                    improp = DihedralType(k, per, theteq)
-                    self.improper_periodic_types[key] = improp
-                    improp.improper = True
-                improp.penalty = penalty
+                add_impropertype(self, words, i, line, penalty)
                 continue
             if section.upper() == 'CMAP':
                 # This is the most complicated part, since cmap parameters span
@@ -615,6 +801,15 @@ class CharmmParameterSet(ParameterSet):
                     current_cmap_res = res
                     current_cmap_data = []
                 continue
+            if section.upper() == 'NBONDS':
+                # Now get the nonbonded options
+                words = line.split()
+                if words[0].upper == 'END':
+                    nbonds_set = True
+                    continue
+                scee = None
+                check_nonbonded_args(self, words, scee, declared_geometric)
+                continue
             if section.upper() == 'NONBONDED':
                 # Now get the nonbonded values
                 words = line.split()
@@ -630,30 +825,7 @@ class CharmmParameterSet(ParameterSet):
                     # just be parsing the settings that should be used. So
                     # soldier on
                     if read_first_nonbonded: raise
-                    for i, word in enumerate(words):
-                        if word.upper() == 'E14FAC':
-                            try:
-                                scee = float(words[i+1])
-                            except (ValueError, IndexError):
-                                raise CharmmError('Could not parse electrostatic scaling constant')
-                            if self._declared_nbrules:
-                                # We already specified it -- make sure it's the
-                                # same as the one we specified before
-                                _, dt0 = next(iteritems(self.dihedral_types))
-                                diff = abs(dt0[0].scee - scee)
-                                if diff > TINY:
-                                    raise CharmmError('Inconsistent 1-4 scalings')
-                            else:
-                                scee = 1 / scee
-                                for key, dtl in iteritems(self.dihedral_types):
-                                    for dt in dtl:
-                                        dt.scee = scee
-                        elif word.upper().startswith('GEOM'):
-                            if self._declared_nbrules and self.combining_rule != 'geometric':
-                                raise CharmmError('Cannot combine parameter files with different '
-                                                  'combining rules')
-                            self.combining_rule = 'geometric'
-                            declared_geometric = True
+                    check_nonbonded_args(self, words, scee, declared_geometric)
                     continue
                 else:
                     # OK, we've read our first nonbonded section for sure now.
@@ -680,30 +852,7 @@ class CharmmParameterSet(ParameterSet):
                 words = line.split()
                 if words[0].upper() == 'END':
                     continue
-                try:
-                    at1 = words[0].upper()
-                    at2 = words[1].upper()
-                    emin = abs(conv(words[2], float, 'NBFIX Emin', line_index=i, line=line))
-                    rmin = conv(words[3], float, 'NBFIX Rmin', line_index=i, line=line)
-                    try:
-                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4', line_index=i, line=line))
-                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4', line_index=i, line=line)
-                    except IndexError:
-                        emin14 = rmin14 = None
-                    try:
-                        self.atom_types_str[at1].add_nbfix(at2, rmin, emin, rmin14, emin14)
-                        self.atom_types_str[at2].add_nbfix(at1, rmin, emin, rmin14, emin14)
-                    except KeyError:
-                        # Some stream files define NBFIX terms with an atom that
-                        # is defined in another toppar file that does not
-                        # necessarily have to be loaded. As a result, not every
-                        # NBFIX found here will necessarily need to be applied.
-                        # If we can't find a particular atom type, don't bother
-                        # adding that nbfix and press on
-                        pass
-                except IndexError:
-                    raise CharmmError('Could not parse NBFIX terms.')
-                self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
+                add_nbfixtype(self, words, i, line)
         # If we had any CMAP terms, then the last one will not have been added
         # yet. Add it here
         if current_cmap is not None:
