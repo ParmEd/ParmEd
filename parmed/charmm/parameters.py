@@ -95,7 +95,7 @@ class CharmmParameterSet(ParameterSet):
         """
         Converts sigma parameter of L-J from XPLOR to CHARMM rmin
         """
-        return (-eps, sigma * 2**(-1/6) * 2)
+        return (-eps, sigma * 2**(1/6) / 2.)
 
     def __init__(self, *args):
         # Instantiate the list types
