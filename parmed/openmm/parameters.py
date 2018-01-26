@@ -116,9 +116,12 @@ class OpenMMParameterSet(ParameterSet):
             # Remove any H-H bonds if they are present
             for bond in list(residue.bonds):
                 if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
+                    # Remove nonphysical H-H bonds
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
-
+                elif (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
+                    LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
+                    residue.delete_bond(bond)
         return True
 
     @classmethod

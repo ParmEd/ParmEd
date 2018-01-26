@@ -624,6 +624,9 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         )
         forcefield = app.ForceField(ffxml_filename)
 
+        # Check that water has the right number of bonds
+        assert len(params.residues['TIP5'].bonds) == 2, "TIP5P should only have two bonds, but instead has {}".format(params.residues['TIP5'].bonds)
+
         # Parameterize water box
         pdbfile = app.PDBFile(get_fn('waterbox.pdb'))
         modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
@@ -653,6 +656,10 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                      )
         )
         forcefield = app.ForceField(ffxml_filename)
+
+        # Check that water has the right number of bonds
+        assert len(params.residues['TIP3'].bonds) == 2, "TIP3P should only have two bonds"
+
         # Parameterize alanine tripeptide in vacuum
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
