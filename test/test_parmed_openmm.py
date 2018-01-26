@@ -623,11 +623,18 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                      )
         )
         forcefield = app.ForceField(ffxml_filename)
+
         # Parameterize water box
         pdbfile = app.PDBFile(get_fn('waterbox.pdb'))
         modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
         modeller.addExtraParticles(forcefield)
         system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.NoCutoff)
+
+        # Parameterize water box
+        pdbfile = app.PDBFile(get_fn('waterbox-tip3p.pdb'))
+        modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
+        modeller.addExtraParticles(forcefield)
+        system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.PME)
 
     def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
