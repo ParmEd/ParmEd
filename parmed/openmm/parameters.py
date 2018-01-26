@@ -485,8 +485,8 @@ class OpenMMParameterSet(ParameterSet):
                 phi = (180 - phi) * math.pi / 180.0 # convert to radians
                 p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
                 p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
-                etree.SubElement(xml_residue, 'VirtualSite', index=str(index),
-                    atom1=a1, atom2=a2, atom3=a3, excludeWith=a4,
+                etree.SubElement(xml_residue, 'VirtualSite', type="localCoords", index=str(index),
+                    siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
                     wo1="1", wo2="0", wo3="0",
                     wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
                     wy1="0", wy2="-1", wy3="1",
