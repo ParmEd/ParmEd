@@ -90,6 +90,13 @@ class CharmmParameterSet(ParameterSet):
                 msg += 'input line: %s\n' % line
             raise CharmmError(msg)
 
+    @staticmethod
+    def _xplortocharmm(eps, sigma):
+        """
+        Converts sigma parameter of L-J from XPLOR to CHARMM rmin
+        """
+        return (-eps, sigma * 2**(-1/6) * 2)
+
     def __init__(self, *args):
         # Instantiate the list types
         super(CharmmParameterSet, self).__init__()
@@ -302,6 +309,7 @@ class CharmmParameterSet(ParameterSet):
         file first. Failure to do so will result in a raised RuntimeError.
         """
         conv = CharmmParameterSet._convert
+        xtoc = CharmmParameterSet._xplortocharmm
         # Function to add a new bond type or change a present one
         def add_bondtype(self, words, lindex, line, penalty):
             try:
@@ -539,7 +547,7 @@ class CharmmParameterSet(ParameterSet):
                 section = 'ATOMS'
                 continue
             if line.upper().startswith('BOND'):
-                # Is a single line bond definition or a section?
+                # Is a single line bond definition (XPLOR format) or a section?
                 if len(line.split())>4 and '!' not in line.split()[1:4]:
                     words = line.split()[1:]
                     pens = _penaltyre.findall(comment)
@@ -624,7 +632,7 @@ class CharmmParameterSet(ParameterSet):
                 section = 'NBONDS'
                 continue
             if line.upper().startswith('NONB'): 
-                # Is a single line definition or a section?
+                # Is a single line definition (XPLOR format) or a section?
                 # Possible options in NONBOUNDED fields
                 nonb_options = ['NBXMOD', 'EPS', 'E14FAC', 'CUTNB', 'CTOFNB', 
                                 'CDIEL', 'ATOM', 'GEOM', 'WMIN', 'CTONNB']
@@ -633,8 +641,9 @@ class CharmmParameterSet(ParameterSet):
                     words = line.split()[1:]
                     try:
                         atype = words[0].upper()
-                        epsilon = conv(words[1], float, 'vdW epsilon term', line_index=i, line=line)
-                        rmin = conv(words[2], float, 'vdW Rmin/2 term', line_index=i, line=line)
+                        eps = conv(words[1], float, 'vdW epsilon term', line_index=i, line=line)
+                        sigma = conv(words[2], float, 'vdW Rmin/2 term', line_index=i, line=line)
+                        epsilon, rmin = xtoc(eps, sigma)
                     except (IndexError, CharmmError):
                         pass
                     # OK, we've read our first nonbonded section for sure now.
@@ -650,8 +659,9 @@ class CharmmParameterSet(ParameterSet):
                     self._declared_nbrules = True
                     # See if we have 1-4 parameters
                     try:
-                        eps14 = conv(words[3], float, '1-4 vdW epsilon term', line_index=i, line=line)
-                        rmin14 = conv(words[4], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
+                        epsilon14 = conv(words[3], float, '1-4 vdW epsilon term', line_index=i, line=line)
+                        sigma14 = conv(words[4], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
+                        eps14, rmin14 = xtoc(epsilon14, sigma14)
                         # Check if 1-4 parameters are different
                         # do need to specify if same?
                         if eps14 == epsilon and rmin14 == rmin:
@@ -865,7 +875,17 @@ class CharmmParameterSet(ParameterSet):
         # is not satisfied
         try:
             for key in nonbonded_types:
-                self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
+                if key in self.atom_types_str:
+                    self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
+                else:
+                    # To extract the parameters for all atom types that are 
+                    # not in topology/structure but in the given .par file, we add 
+                    # dummy AtomTypes with index, mass, atomic number equal to -1.
+                    atype = AtomType(name=key, number=-1, mass=-1, atomic_number=-1)
+                    self.atom_types_str[atype.name] = atype
+                    self.atom_types_int[atype.number] = atype
+                    self.atom_types_tuple[(atype.name, atype.number)] = atype
+                    self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
         except KeyError:
             warnings.warn('Atom type %s not present in AtomType list' % key, ParameterWarning)
         if parameterset is not None:
