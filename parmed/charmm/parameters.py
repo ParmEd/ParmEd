@@ -12,6 +12,7 @@ import os
 import re
 import warnings
 from copy import copy as _copy
+from collections import OrderedDict
 
 from ..constants import TINY
 from ..exceptions import CharmmError, ParameterWarning
@@ -733,10 +734,10 @@ class CharmmParameterSet(ParameterSet):
             own_handle = False
             f = tfile
         hpatch = tpatch = None # default Head and Tail patches
-        residues = dict()
-        patches = dict()
-        hpatches = dict()
-        tpatches = dict()
+        residues = OrderedDict()
+        patches = OrderedDict()
+        hpatches = OrderedDict()
+        tpatches = OrderedDict()
         line = next(f)
         line_index = 0
         try:
