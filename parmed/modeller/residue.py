@@ -149,9 +149,9 @@ class ResidueTemplate(object):
         atom = self._map[atom_name]
 
         # Adjust head and tail if needed
-        if (self.head is not None) and (self.head.name == atom_name):
+        if self.head == atom:
             self.head = None
-        if (self.tail is not None) and (self.tail.name == atom_name):
+        if self.tail == atom:
             self.tail = None
 
         # Remove all bonds involving this atom
