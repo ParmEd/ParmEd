@@ -704,7 +704,7 @@ class OpenMMParameterSet(ParameterSet):
     @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
+        xml_force = etree.SubElement(xml_root, 'CMAPTorsionForce')
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
