@@ -778,6 +778,15 @@ class OpenMMParameterSet(ParameterSet):
                 # turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions
                 sigma = 1.0
                 epsilon = 0.0
+            else:
+                # NonbondedForce cannot handle distinct 14 parameters
+                # We need to use a separate LennardJonesForce instead
+                # TODO: Can we autodetect this and switch on separate_ljforce earlier?
+                if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
+                    raise NotImplementedError('OpenMM <NonbondedForce> cannot handle '
+                        'distinct 1-4 sigma and epsilon parameters; '
+                        'use separate_ljforce=True instead')
+
             # Ensure we don't have sigma = 0
             if (sigma == 0.0):
                 if (epsilon == 0.0):
@@ -828,7 +837,29 @@ class OpenMMParameterSet(ParameterSet):
                 else:
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
-            etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
+
+            # Handle special values used for 14 interactions
+            if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
+                sigma14 = atom_type.sigma_14 * length_conv  # in md_unit_system
+                epsilon14 = atom_type.epsilon_14 * ene_conv # in md_unit_system
+
+                # Ensure we don't have sigma = 0
+                if sigma14 == 0.0:
+                    if (epsilon14 == 0.0):
+                        sigma14 = 1.0 # reset sigma = 1
+                    else:
+                        raise ValueError("For atom type '%s', sigma_14 = 0 but "
+                                        "epsilon_14 != 0." % name)
+            else:
+                sigma14 = None
+                epsilon14 = None
+
+            attributes = { 'type' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
+            if epsilon14 is not None:
+                attributes['epsilon14'] = str(abs(epsilon14))
+            if sigma14 is not None:
+                attributes['sigma14'] = str(sigma14)
+            etree.SubElement(xml_force, 'Atom', **attributes)
 
         # write NBFIX records
         for (atom_types, value) in iteritems(self.nbfix_types):
