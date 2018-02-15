@@ -24,7 +24,7 @@ import warnings
 from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 
 try:
     from lxml import etree
