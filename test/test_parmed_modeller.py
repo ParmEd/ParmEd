@@ -312,21 +312,24 @@ class TestResidueTemplate(unittest.TestCase):
         a1, a2, a3, a4, a5, a6 = templ.atoms
         templ.add_bond(a1, a2)
         templ.add_bond(a2, a3)
-        templ.add_bond(a3, a4)
+        templ.add_bond(a2, a4)
         templ.add_bond(a2, a5)
         templ.add_bond(a5, a6)
+        self.assertIs(templ.tail, templ[4])
         patch = PatchTemplate()
+        patch.delete_atoms.append(a5.name)
         patch.delete_atoms.append(a6.name)
         residue = self.templ.apply_patch(patch)
-        self.assertEqual(len(residue.atoms), 5)
-        self.assertEqual(len(residue.bonds), 4)
-        a1, a2, a3, a4, a5 = residue.atoms
+        self.assertEqual(len(residue.atoms), 4)
+        self.assertEqual(len(residue.bonds), 3)
+        a1, a2, a3, a4 = residue.atoms
         self.assertIn(a1, a2.bond_partners)
         self.assertIn(a2, a1.bond_partners)
         self.assertIn(a3, a2.bond_partners)
         self.assertIn(a2, a3.bond_partners)
-        self.assertIn(a5, a2.bond_partners)
-        self.assertIn(a2, a5.bond_partners)
+        self.assertIn(a4, a2.bond_partners)
+        self.assertIn(a2, a4.bond_partners)
+        self.assertIs(residue.tail, None)
 
     def test_add_bonds_atoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
