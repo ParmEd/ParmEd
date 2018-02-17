@@ -24,7 +24,8 @@ from parmed.utils.six.moves import range
 import warnings
 from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
-from collections import defaultdict
+
+from collections import OrderedDict
 
 try:
     from lxml import etree
@@ -178,13 +179,16 @@ class OpenMMParameterSet(ParameterSet):
         new_params._combining_rule = params.combining_rule
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
-        # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Maintain original residue ordering
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
                 if OpenMMParameterSet._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
-            new_params.residues = { residue.name : residue for residue in remediated_residues }
+            new_params.residues = OrderedDict()
+            for residue in remediated_residues:
+                new_params.residues[residue.name] = residue
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 new_params.patches[name] = patch
@@ -521,8 +525,13 @@ class OpenMMParameterSet(ParameterSet):
 
         """
         # Attempt to patch every residue, recording only valid combinations.
-        valid_residues_for_patch = defaultdict(list)
-        valid_patches_for_residue = defaultdict(list)
+        valid_residues_for_patch = OrderedDict()
+        for patch in self.patches.values():
+            valid_residues_for_patch[patch.name] = list()
+        valid_patches_for_residue = OrderedDict()
+        for residue in self.residues.values():
+            valid_patches_for_residue[residue.name] = list()
+
         for patch in self.patches.values():
             for residue in self.residues.values():
                 if residue in skip_residues: continue
@@ -727,7 +736,7 @@ class OpenMMParameterSet(ParameterSet):
     @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
+        xml_force = etree.SubElement(xml_root, 'CMAPTorsionForce')
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
