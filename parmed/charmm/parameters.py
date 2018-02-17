@@ -859,6 +859,21 @@ class CharmmParameterSet(ParameterSet):
                             pass
                         elif line[:6].upper() == 'ACCEPT':
                             pass
+                        elif line[:8].upper() == 'LONEPAIR':
+                            # See: https://www.charmm.org/charmm/documentation/by-version/c40b1/params/doc/lonepair/
+                            # TODO: This currently doesn't handle some formats, like Note 3 in the above URL
+                            words = line.split()
+                            lptype_keyword = words[1][0:4].upper()
+                            if lptype_keyword not in ['BISE', 'RELE']:
+                                raise CharmmError('LONEPAIR type {} not supported; only BISEctor and RELEtive supported.'.format(words[1]))
+                            a1, a2, a3, a4 = words[2:6]
+                            keywords = { words[index][0:4].upper() : float(words[index+1]) for index in range(6,len(words),2) }
+                            r = keywords['DIST'] # angstrom
+                            theta = keywords['ANGL'] # degrees
+                            phi = keywords['DIHE'] # degrees
+                            lptypes = { 'BISE' : 'bisector', 'RELE' : 'relative' }
+                            lonepair = (lptypes[lptype_keyword], a1, a2, a3, a4, r, theta, phi) # TODO: Define a LonePair object?
+                            res.lonepairs.append(lonepair)
                         elif line[:2].upper() == 'IC':
                             words = line.split()[1:]
                             ictable.append(([w.upper() for w in words[:4]],
