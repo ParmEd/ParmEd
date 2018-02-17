@@ -609,6 +609,36 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
 @unittest.skipUnless(has_networkx, 'Cannot test without networkx')
 class TestWriteCHARMMParameters(FileIOTestCase):
 
+    def test_write_xml_parameters_charmm_multisite_waters(self):
+        """ Test writing XML parameter files from Charmm multisite water parameter files and reading them back into OpenMM ForceField """
+
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.charmm.CharmmParameterSet(get_fn('toppar_water_ions_tip5p.str'))
+        )
+        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        params.write(ffxml_filename,
+                     provenance=dict(
+                         OriginalFile='toppar_water_ions_tip5p.str',
+                         Reference='MacKerrell'
+                     )
+        )
+        forcefield = app.ForceField(ffxml_filename)
+
+        # Check that water has the right number of bonds
+        assert len(params.residues['TIP5'].bonds) == 2, "TIP5P should only have two bonds, but instead has {}".format(params.residues['TIP5'].bonds)
+
+        # Parameterize water box
+        pdbfile = app.PDBFile(get_fn('waterbox.pdb'))
+        modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
+        modeller.addExtraParticles(forcefield)
+        system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.NoCutoff)
+
+        # Parameterize water box
+        pdbfile = app.PDBFile(get_fn('waterbox-tip3p.pdb'))
+        modeller = app.Modeller(pdbfile.topology, pdbfile.positions)
+        modeller.addExtraParticles(forcefield)
+        system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.PME)
+
     def test_write_xml_parameters_charmm(self):
         """ Test writing XML parameter files from Charmm parameter files and reading them back into OpenMM ForceField """
 
@@ -626,6 +656,10 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                      )
         )
         forcefield = app.ForceField(ffxml_filename)
+
+        # Check that water has the right number of bonds
+        assert len(params.residues['TIP3'].bonds) == 2, "TIP3P should only have two bonds"
+
         # Parameterize alanine tripeptide in vacuum
         pdbfile = app.PDBFile(get_fn('ala_ala_ala.pdb'))
         system = forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)

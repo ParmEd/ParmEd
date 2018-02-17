@@ -7,6 +7,7 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+import math
 from functools import wraps
 from contextlib import closing
 import datetime
@@ -23,7 +24,8 @@ from parmed.utils.six.moves import range
 import warnings
 from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
-from collections import defaultdict
+
+from collections import OrderedDict
 
 try:
     from lxml import etree
@@ -115,9 +117,12 @@ class OpenMMParameterSet(ParameterSet):
             # Remove any H-H bonds if they are present
             for bond in list(residue.bonds):
                 if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
+                    # Remove nonphysical H-H bonds
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
-
+                elif (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
+                    LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
+                    residue.delete_bond(bond)
         return True
 
     @classmethod
@@ -174,13 +179,16 @@ class OpenMMParameterSet(ParameterSet):
         new_params._combining_rule = params.combining_rule
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
-        # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Maintain original residue ordering
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
                 if OpenMMParameterSet._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
-            new_params.residues = { residue.name : residue for residue in remediated_residues }
+            new_params.residues = OrderedDict()
+            for residue in remediated_residues:
+                new_params.residues[residue.name] = residue
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 new_params.patches[name] = patch
@@ -471,6 +479,25 @@ class OpenMMParameterSet(ParameterSet):
                 etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
             for bond in residue.bonds:
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+            for (index, lonepair) in enumerate(residue.lonepairs):
+                (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
+                if lptype == 'relative':
+                    xweights = [-1.0, 0.0, 1.0]
+                elif lptype == 'bisector':
+                    xweights = [-1.0, 0.5, 0.5]
+                else:
+                    raise ValueError('Unknown lonepair type: '+lptype)
+                r /= 10.0 # convert to nanometers
+                theta *= math.pi / 180.0 # convert to radians
+                phi = (180 - phi) * math.pi / 180.0 # convert to radians
+                p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
+                p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
+                etree.SubElement(xml_residue, 'VirtualSite', type="localCoords", index=str(index),
+                    siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
+                    wo1="1", wo2="0", wo3="0",
+                    wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
+                    wy1="0", wy2="-1", wy3="1",
+                    p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
             if residue.head is not None:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
@@ -498,8 +525,13 @@ class OpenMMParameterSet(ParameterSet):
 
         """
         # Attempt to patch every residue, recording only valid combinations.
-        valid_residues_for_patch = defaultdict(list)
-        valid_patches_for_residue = defaultdict(list)
+        valid_residues_for_patch = OrderedDict()
+        for patch in self.patches.values():
+            valid_residues_for_patch[patch.name] = list()
+        valid_patches_for_residue = OrderedDict()
+        for residue in self.residues.values():
+            valid_patches_for_residue[residue.name] = list()
+
         for patch in self.patches.values():
             for residue in self.residues.values():
                 if residue in skip_residues: continue
