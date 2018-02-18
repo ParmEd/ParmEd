@@ -4892,6 +4892,8 @@ class AtomType(object):
         1-4 nonbonded interactions
     sigma : ``float``
         This is the sigma parameter, which is just equal to Rmin*2^(1/6)
+    sigma_14 : ``float``
+        This is the sigma parameter corresponding to rmin_14, which is just equal to Rmin_14*2^(1/6)
     nbfix : ``dict(str:tuple)``
         A hash that maps atom type names of other atom types with which _this_
         atom type has a defined NBFIX with a tuple containing the terms
