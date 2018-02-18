@@ -311,8 +311,8 @@ class OpenMMParameterSet(ParameterSet):
             dest.write(xml)
 
     def _find_explicit_impropers(self):
-        improper_harmonic = OrderedDict()
-        improper_periodic = OrderedDict()
+        improper_harmonic = {}
+        improper_periodic = {}
 
         def get_types(residue, atomname):
             """Return list of atom type(s) that match the given atom name.
@@ -323,83 +323,83 @@ class OpenMMParameterSet(ParameterSet):
 
             a_names = [a.name for a in residue.atoms]
             a_types = [a.type for a in residue.atoms]
+
+            if atomname == '-C':
+                return C_types
+            elif atomname == '+N':
+                return N_types
+            elif atomname[0] in ['-', '+']:
+                raise ValueError('Unknown atom name %s' % atomname)
+            else:
+                return [ a_types[a_names.index(atomname)] ]
+
+        for name, residue in iteritems(self.residues):
             for impr in residue._impr:
-                MATCH = False
-                a1, a2,a3, a4 = impr
-                if a2[0] == '-' or a2[0] == '+':
-                    a2 = a2[1:]
-                if a3[0] == '-' or a3[0] == '+':
-                    a3 = a3[1:]
-                if a4[0] == '-' or a4[0] == '+':
-                    a4 = a4[1:]
-                t1 = a_types[a_names.index(a1)]
-                t2 = a_types[a_names.index(a2)]
-                t3 = a_types[a_names.index(a3)]
-                t4 = a_types[a_names.index(a4)]
-                key = tuple(sorted((t1, t2, t3, t4)))
-                altkeys1 = (t1, t2, t3, t4)
-                altkeys2 = (t4, t3, t2, t1)
-                if key in self.improper_types:
-                    improper_harmonic[altkeys1] = self.improper_types[key]
-                    MATCH = True
-                elif key in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                    MATCH = True
-                elif altkeys1 in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
-                    MATCH = True
-                elif altkeys2 in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
-                    MATCH = True
+                types = [ get_types(residue, atomname) for atomname in impr ]
+                for (t1, t2, t3, t4) in itertools.product(*types):
+                    MATCH = False
+                    key = tuple(sorted((t1, t2, t3, t4)))
+                    altkeys1 = (t1, t2, t3, t4)
+                    altkeys2 = (t4, t3, t2, t1)
+                    if key in self.improper_types:
+                        improper_harmonic[altkeys1] = self.improper_types[key]
+                        MATCH = True
+                    elif key in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                        MATCH = True
+                    elif altkeys1 in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
+                        MATCH = True
+                    elif altkeys2 in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
+                        MATCH = True
+                    else:
+                        # Check for wildcards
+                        key_placeholder = None
+                        for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                            key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                            if key in self.improper_types:
+                                if MATCH and key != key_placeholder:
+                                    flag = (altkeys1[0], altkeys1[-1])
+                                    if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                        # Match was already found.
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                      altkeys1, key_placeholder))
+                                        break
 
-                else:
-                    # Check for wildcards
-                    key_placeholder = None
-                    for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                        key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                        if key in self.improper_types:
-                            if MATCH and key != key_placeholder:
-                                flag = (altkeys1[0], altkeys1[-1])
-                                if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                    # Match was already found.
-                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                  altkeys1, key_placeholder))
-                                    break
+                                    if flag[0] == key[0] and flag[1] == key[1]:
+                                        improper_harmonic[altkeys1] = self.improper_types[key]
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                        altkeys1, key), ParameterWarning)
 
-                                if flag[0] == key[0] and flag[1] == key[1]:
-                                    improper_harmonic[altkeys1] = self.improper_types[key]
-                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                    altkeys1, key), ParameterWarning)
+                                MATCH = True
+                                key_placeholder = key
+                                improper_harmonic[altkeys1] = self.improper_types[key]
+                            if key not in self.improper_types:
+                                for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                                    key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                                    if key in self.improper_periodic_types:
+                                        if MATCH and key != key_placeholder:
+                                            flag = (altkeys1[0], altkeys1[-1])
+                                            if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                                # Match already found.
+                                                warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                              key_placeholder, altkeys1, key_placeholder), ParameterWarning)
+                                                break
 
+                                            if flag[0] == key[0] and flag[1] == key[1]:
+                                                warnings.warn("More than one improper matches for {}. Using {}".format(
+                                                        altkeys1, key), ParameterWarning)
+                                                improper_periodic[altkeys1] = self.improper_periodic_types[key]
 
-                            MATCH = True
-                            key_placeholder = key
-                            improper_harmonic[altkeys1] = self.improper_types[key]
-                        if key not in self.improper_types:
-                            for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                                key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                                if key in self.improper_periodic_types:
-                                    if MATCH and key != key_placeholder:
-                                        flag = (altkeys1[0], altkeys1[-1])
-                                        if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                            # Match already found.
-                                            warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                          key_placeholder, altkeys1, key_placeholder), ParameterWarning)
-                                            break
+                                        MATCH = True
+                                        key_placeholder = key
+                                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                    if not MATCH:
+                        warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
 
-                                        if flag[0] == key[0] and flag[1] == key[1]:
-                                            warnings.warn("More than one improper matches for {}. Using {}".format(
-                                                    altkeys1, key), ParameterWarning)
-                                            improper_periodic[altkeys1] = self.improper_periodic_types[key]
-
-                                    MATCH = True
-                                    key_placeholder = key
-                                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                        elif not MATCH:
-                            warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
         self.improper_periodic_types = improper_periodic
         self.improper_types = improper_harmonic
-
 
     def _compress_impropers(self):
         """
