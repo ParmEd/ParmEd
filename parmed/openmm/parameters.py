@@ -282,6 +282,8 @@ class OpenMMParameterSet(ParameterSet):
         if charmm_imp:
             self._find_explicit_impropers()
 
+        self._compress_impropers()
+
         root = etree.Element('ForceField')
         self._write_omm_provenance(root, provenance)
         self._write_omm_atom_types(root, skip_types)
@@ -309,9 +311,16 @@ class OpenMMParameterSet(ParameterSet):
             dest.write(xml)
 
     def _find_explicit_impropers(self):
-        improper_harmonic = {}
-        improper_periodic = {}
-        for name, residue in iteritems(self.residues):
+        improper_harmonic = OrderedDict()
+        improper_periodic = OrderedDict()
+
+        def get_types(residue, atomname):
+            """Return list of atom type(s) that match the given atom name.
+            # TODO: Find a more general way to discover all the types that need to be expanded for +N and -C
+            """
+            C_types = ['CC', 'CD', 'C'] # atom types associated with '-C'
+            N_types = ['NH1', 'NH2', 'NH3', 'N', 'NP'] # atom types associated with '+N'
+
             a_names = [a.name for a in residue.atoms]
             a_types = [a.type for a in residue.atoms]
             for impr in residue._impr:
@@ -390,6 +399,33 @@ class OpenMMParameterSet(ParameterSet):
                             warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
         self.improper_periodic_types = improper_periodic
         self.improper_types = improper_harmonic
+
+
+    def _compress_impropers(self):
+        """
+        OpenMM's ForceField cannot handle impropers that match the same four atoms
+        in more than one order, so Peter Eastman wants us to compress duplicates
+        and increment the spring constant accordingly.
+
+        """
+        if not self.improper_types: return
+
+        unique_keys = OrderedDict() # unique_keys[key] is the key to retrieve the improper from improper_types
+        improper_types = OrderedDict() # replacement for self.improper_types with compressed impropers
+        for atoms, improper in iteritems(self.improper_types):
+            # Compute a unique key
+            unique_key = tuple(sorted(atoms))
+            if unique_key in unique_keys:
+                # Accumulate spring constant, discarding this contribution
+                # TODO: Do we need to check if `psi_eq` is the same?
+                atoms2 = unique_keys[unique_key]
+                improper_types[atoms2].psi_k += improper.psi_k
+            else:
+                # Store this improper
+                unique_keys[unique_key] = atoms
+                improper_types[atoms] = improper
+
+        self.improper_types = improper_types
 
     def _find_unused_residues(self):
         skip_residues = set()
