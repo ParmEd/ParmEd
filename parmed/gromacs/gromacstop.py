@@ -38,7 +38,10 @@ from parmed.utils.six.moves import range
 
 try:
     import pwd
-    _username = pwd.getpwuid(os.getuid())[0]
+    try:
+        _username = pwd.getpwuid(os.getuid())[0]
+    except KeyError:
+        _username = 'username'
     _userid = os.getuid()
     _uname = os.uname()[1]
 except ImportError:
@@ -47,6 +50,7 @@ except ImportError:
     _userid = 0                     # pragma: no cover
     import platform                 # pragma: no cover
     _uname = platform.node()        # pragma: no cover
+
 
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
