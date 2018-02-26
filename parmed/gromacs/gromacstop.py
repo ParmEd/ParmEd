@@ -1293,7 +1293,7 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def write(self, dest, combine=None, parameters='inline', molfile=None):
+    def write(self, dest, combine=None, parameters='inline', molfile=None, itp=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -1324,6 +1324,13 @@ class GromacsTopologyFile(Structure):
             This will change where the following topology sections are
             written: moleculetype, atoms, bonds, pairs, angles, dihedrals,
             cmap, settles, virtual_sites2, virtual_sites3 and exclusions.
+        itp : bool, optional
+            If True the following topology sections are not written:
+            defaults, atomtypes, nonbond_params, bondtypes, pairtypes,
+            angletypes, dihedraltypes, cmaptypes, system and molecules
+            Thus only the individual molecules will be written in a stand-alone
+            fashion, i.e. an itp-file.
+            If True the molfile parameter will be set to None
 
         Raises
         ------
@@ -1362,6 +1369,8 @@ class GromacsTopologyFile(Structure):
                              'a file-like object')
 
         # Determine where to write the molecules
+        if itp :
+            molfile = None
         own_molfile_handle = False
         include_molfile = None
         if molfile is None:
@@ -1420,46 +1429,48 @@ class GromacsTopologyFile(Structure):
        os.path.split(sys.argv[0])[1], __version__,
        os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
        (' '.join(sys.argv)).encode('unicode_escape').decode('utf-8')))
-            dest.write('\n[ defaults ]\n')
-            dest.write('; nbfunc        comb-rule       gen-pairs       '
-                        'fudgeLJ fudgeQQ\n')
-            dest.write('%-15d %-15d %-15s %-12.8g %-12.8g\n\n' %
-                        (self.defaults.nbfunc, self.defaults.comb_rule,
-                        self.defaults.gen_pairs, self.defaults.fudgeLJ,
-                        self.defaults.fudgeQQ))
+            if not itp :
+                dest.write('\n[ defaults ]\n')
+                dest.write('; nbfunc        comb-rule       gen-pairs       '
+                            'fudgeLJ fudgeQQ\n')
+                dest.write('%-15d %-15d %-15s %-12.8g %-12.8g\n\n' %
+                            (self.defaults.nbfunc, self.defaults.comb_rule,
+                            self.defaults.gen_pairs, self.defaults.fudgeLJ,
+                            self.defaults.fudgeQQ))
             if include_parfile is not None:
                 dest.write('#include "%s"\n\n' % include_parfile)
             # Print all atom types
-            parfile.write('[ atomtypes ]\n')
-            if any(typ._bond_type is not None
-                    for key, typ in iteritems(params.atom_types)):
-                print_bond_types = True
-            else:
-                print_bond_types = False
-            if all(typ.atomic_number != -1
-                    for key, typ in iteritems(params.atom_types)):
-                print_atnum = True
-            else:
-                print_atnum = False
-            parfile.write('; name    ')
-            if print_bond_types:
-                parfile.write('bond_type ')
-            if print_atnum:
-                parfile.write('at.num    ')
-            parfile.write('mass    charge ptype  sigma      epsilon\n')
-            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            for key, atom_type in iteritems(params.atom_types):
-                parfile.write('%-7s ' % atom_type)
+            if not itp :
+                parfile.write('[ atomtypes ]\n')
+                if any(typ._bond_type is not None
+                        for key, typ in iteritems(params.atom_types)):
+                    print_bond_types = True
+                else:
+                    print_bond_types = False
+                if all(typ.atomic_number != -1
+                        for key, typ in iteritems(params.atom_types)):
+                    print_atnum = True
+                else:
+                    print_atnum = False
+                parfile.write('; name    ')
                 if print_bond_types:
-                    parfile.write('%-8s ' % atom_type.bond_type)
+                    parfile.write('bond_type ')
                 if print_atnum:
-                    parfile.write('%8d ' % atom_type.atomic_number)
-                parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
-                              atom_type.mass, atom_type.charge, atom_type.sigma/10,
-                              atom_type.epsilon*econv))
-            parfile.write('\n')
+                    parfile.write('at.num    ')
+                parfile.write('mass    charge ptype  sigma      epsilon\n')
+                econv = u.kilocalories.conversion_factor_to(u.kilojoules)
+                for key, atom_type in iteritems(params.atom_types):
+                    parfile.write('%-7s ' % atom_type)
+                    if print_bond_types:
+                        parfile.write('%-8s ' % atom_type.bond_type)
+                    if print_atnum:
+                        parfile.write('%8d ' % atom_type.atomic_number)
+                    parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
+                                  atom_type.mass, atom_type.charge, atom_type.sigma/10,
+                                  atom_type.epsilon*econv))
+                parfile.write('\n')
             # Nonbonded parameters
-            if self.has_NBFIX():
+            if not itp and self.has_NBFIX():
                 typemap = dict(self.parameterset.nbfix_types)
                 dest.write('[ nonbond_params ]\n')
                 eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -1471,7 +1482,7 @@ class GromacsTopologyFile(Structure):
                     dest.write('{0} {1} 1 {2} {3}\n'.format(
                         key[0], key[1], sig/2**(1/6), eps))
             # Print all parameter types unless we asked for inline
-            if parameters != 'inline':
+            if not itp and parameters != 'inline':
                 if params.bond_types:
                     parfile.write('[ bondtypes ]\n')
                     parfile.write('; i    j  func       b0          kb\n')
@@ -1571,7 +1582,7 @@ class GromacsTopologyFile(Structure):
                     parfile.write('\n')
             # CMAP grids are never printed inline, so if we have them, we need
             # to write a dedicated section for them
-            if params.cmap_types:
+            if not itp and params.cmap_types:
                     parfile.write('[ cmaptypes ]\n\n')
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
@@ -1614,42 +1625,44 @@ class GromacsTopologyFile(Structure):
                     GromacsTopologyFile._write_molecule(molecule, _molfile,
                                                         title, params,
                                                         parameters == 'inline')
-                # System
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title')
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(molecules):
-                        if i in lst:
-                            break
+                if not itp :
+                    # System
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
                     else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
+                        dest.write('Generic title')
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    total_mols = sum(len(m[1]) for m in molecules)
+                    i = 0
+                    while i < total_mols:
+                        for j, (molecule, lst) in enumerate(molecules):
+                            if i in lst:
+                                break
+                        else:
+                            raise AssertionError('Could not find molecule %d '
+                                                 'in list' % i)
+                        ii = i
+                        while ii < total_mols and ii in lst:
+                            ii += 1
+                        dest.write('%-15s %6d\n' % (names[j], ii-i))
+                        i = ii
             elif isinstance(combine, string_types) and combine.lower() == 'all':
                 GromacsTopologyFile._write_molecule(self, _molfile, 'system',
                                                     params,
                                                     parameters == 'inline')
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title') # pragma: no cover
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                dest.write('%-15s %6d\n' % ('system', 1))
+                if not itp :
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
+                    else:
+                        dest.write('Generic title') # pragma: no cover
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 molecules = self.split()
                 nmols = sum(len(m[1]) for m in molecules)
@@ -1728,29 +1741,30 @@ class GromacsTopologyFile(Structure):
                     GromacsTopologyFile._write_molecule(molecule, _molfile,
                                                         title, params,
                                                         parameters == 'inline')
-                # System
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title') # pragma: no cover
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in new_molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(new_molecules):
-                        if i in lst:
-                            break
+                if not itp :
+                    # System
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
                     else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
+                        dest.write('Generic title') # pragma: no cover
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    total_mols = sum(len(m[1]) for m in new_molecules)
+                    i = 0
+                    while i < total_mols:
+                        for j, (molecule, lst) in enumerate(new_molecules):
+                            if i in lst:
+                                break
+                        else:
+                            raise AssertionError('Could not find molecule %d '
+                                                 'in list' % i)
+                        ii = i
+                        while ii < total_mols and ii in lst:
+                            ii += 1
+                        dest.write('%-15s %6d\n' % (names[j], ii-i))
+                        i = ii
         finally:
             if own_handle:
                 dest.close()
