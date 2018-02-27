@@ -276,6 +276,7 @@ class GromacsTopologyFile(Structure):
         dihedral_types = dict()
         exc_types = dict()
         structure_contents = []
+        molnames = []
         if defines is None:
             defines = OrderedDict(FLEXIBLE=1)
         proper_multiterm_dihedrals = dict()
@@ -296,6 +297,7 @@ class GromacsTopologyFile(Structure):
                                            % molname)
                     molecule = Structure()
                     molecules[molname] = (molecule, nrexcl)
+                    molnames.append(molname)
                     molecule.nrexcl = nrexcl
                     bond_types = dict()
                     angle_types = dict()
@@ -422,6 +424,13 @@ class GromacsTopologyFile(Structure):
                     a, b, t = self._parse_pairtypes(line)
                     params.pair_types[(a, b)] = params.pair_types[(b, a)] = t
             itplist = f.included_files
+
+        # If the file did not contain the molecules section, perhaps
+        # because it was an itp-file. We assume that each molecule loaded
+        # should be contained once in this structure
+        if not structure_contents :
+            for name in molnames :
+                structure_contents.append((name, 1))
 
         # Combine first, then parametrize. That way, we don't have to create
         # copies of the ParameterType instances in self.parameterset
