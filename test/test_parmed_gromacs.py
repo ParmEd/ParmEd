@@ -702,6 +702,71 @@ class TestGromacsTop(FileIOTestCase):
         self.assertGreater(len(top2.urey_bradleys), 0)
         self.assertEqual(len(top2.urey_bradleys), len(ctop.urey_bradleys))
 
+    def test_gromacs_itp_write(self):
+        """ Tests the GromacsTopologyFile writer with itp option """
+        def total_diheds(dlist):
+            n = 0
+            for d in dlist:
+                if isinstance(d.type, DihedralTypeList):
+                    n += len(d.type)
+                elif not d.improper:
+                    n += 1
+            return n
+        parm = load_file(get_fn('ash.parm7'))
+        top = GromacsTopologyFile.from_structure(parm)
+        # Write parameters and topology to same filename
+        fn = get_fn('test.itp', written=True)
+        top.write(fn, parameters=fn, itp=True)
+        top2 = load_file(fn, parametrize=False)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try passing open files
+        with open(fn, 'w') as f:
+            top.write(f, parameters=f, itp=True)
+        top2 = load_file(fn, parametrize=False)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology file
+        fn2 = get_fn('test.itp', written=True)
+        top.write(fn, parameters=fn2, itp=True)
+        top2 = load_file(fn, parametrize=False)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+        # Now try separate parameter/topology/molfile files
+        fn3 = get_fn('test_mol.itp', written=True)
+        top.write(fn, parameters=fn2, molfile=fn3, itp=True)
+        top2 = load_file(fn, parametrize=False)
+        self.assertEqual(len(top2.atoms), len(top.atoms))
+        self.assertEqual(len(top2.bonds), len(top.bonds))
+        self.assertEqual(len(top2.angles), len(top.angles))
+        self.assertEqual(total_diheds(top2.dihedrals), total_diheds(top.dihedrals))
+        for a1, a2 in zip(top2.atoms, top.atoms):
+            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(set(a.name for a in a1.bond_partners),
+                             set(a.name for a in a2.bond_partners))
+
     def test_nonbond_params(self):
         """ Test the reading  and writing of the `nonbond_params` directive """
         top = load_file(get_fn('nonbond_params.top'))
