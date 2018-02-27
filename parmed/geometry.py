@@ -302,7 +302,10 @@ def dihedral(a1, a2, a3, a4):
     l1 = np.sqrt(np.dot(v1xv2, v1xv2))
     l2 = np.sqrt(np.dot(v2xv3, v2xv3))
     cosa = np.dot(v1xv2, v2xv3) / (l1 * l2)
-    return np.degrees(np.arccos(cosa))
+    if np.dot(v3, v1xv2) <= 0.0 :
+        return np.degrees(np.arccos(cosa))
+    else :
+        return -np.degrees(np.arccos(cosa))
 
 def _cross(v1, v2):
     """ Computes the cross-product """
