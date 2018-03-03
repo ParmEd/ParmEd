@@ -534,6 +534,8 @@ class OpenMMParameterSet(ParameterSet):
                     wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
                     wy1="0", wy2="-1", wy3="1",
                     p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
+            for atom in residue.connections:
+                etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.head is not None:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
