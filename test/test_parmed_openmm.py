@@ -507,6 +507,10 @@ CHIS = CHIE
                      sourcePackage='AmberTools', sourcePackageVersion='15'))
         )
         forcefield = app.ForceField(ffxml_filename)
+        # Make sure the forcefield can handle proteins with disulfide bonds
+        pdbfile = app.PDBFile(get_fn('3qyt_fix.pdb'))
+        forcefield.createSystem(pdbfile.topology, nonbondedMethod=app.NoCutoff)
+
 
     def test_write_xml_parameters_gaff(self):
         """ Test writing XML parameters loaded from Amber GAFF parameter files """
