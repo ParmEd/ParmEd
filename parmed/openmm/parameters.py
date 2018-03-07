@@ -7,6 +7,7 @@ Author(s): Jason Swails
 from __future__ import absolute_import, print_function, division
 
 from copy import copy as _copy
+import math
 from functools import wraps
 from contextlib import closing
 import datetime
@@ -23,7 +24,8 @@ from parmed.utils.six.moves import range
 import warnings
 from parmed.exceptions import ParameterWarning, IncompatiblePatchError
 import itertools
-from collections import defaultdict
+
+from collections import OrderedDict
 
 try:
     from lxml import etree
@@ -92,12 +94,53 @@ class OpenMMParameterSet(ParameterSet):
             raise NotImplementedError('Cannot yet read OpenMM Parameter sets')
 
     @classmethod
+    def _remediate_residue_template(cls, params, residue):
+        """
+        Modify non-compliant residue templates to conform with OpenMM requirements.
+
+        * To correctly detect waters, OpenMM ffxml water models must not contain
+          non-chemical bond constraints. Theses are removed when importing
+          foreign parameter sets (e.g., CHARMM) into OpenMM parameter sets,
+          and not restored on conversion from OpenMM to other formats
+
+        """
+        # Populate atomic numbers in residue template
+        # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
+        for atom in residue.atoms:
+            if atom.type not in params.atom_types_str:
+                warnings.warn('Residue {} contains atom type {} not found in parameter set and will be dropped.'.format(residue.name, atom.type))
+                return False
+            atom.atomic_number = params.atom_types_str[atom.type].atomic_number
+
+        # Check waters
+        if residue.empirical_chemical_formula == 'H2O':
+            # Remove any H-H bonds if they are present
+            for bond in list(residue.bonds):
+                if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
+                    # Remove nonphysical H-H bonds
+                    LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
+                    residue.delete_bond(bond)
+                elif (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
+                    LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
+                    residue.delete_bond(bond)
+        return True
+
+    @classmethod
     def from_parameterset(cls, params, copy=False):
         """
         Instantiates a CharmmParameterSet from another ParameterSet (or
         subclass). The main thing this feature is responsible for is converting
         lower-case atom type names into all upper-case and decorating the name
         to ensure each atom type name is unique.
+
+        Warning
+        -------
+        Converting parameter sets to OpenMM can be lossy, and can modify the
+        original parameter set unless ``copy=True``:
+        * To correctly detect waters, OpenMM ffxml water models must not contain
+          non-chemical bond constraints. Theses are removed when importing
+          foreign parameter sets (e.g., CHARMM) into OpenMM parameter sets,
+          and not restored on conversion from OpenMM to other formats.
 
         Parameters
         ----------
@@ -118,6 +161,7 @@ class OpenMMParameterSet(ParameterSet):
         if copy:
             # Make a copy so we don't modify the original
             params = _copy(params)
+
         new_params.atom_types = new_params.atom_types_str = params.atom_types
         new_params.atom_types_int = params.atom_types_int
         new_params.atom_types_tuple = params.atom_types_tuple
@@ -135,10 +179,16 @@ class OpenMMParameterSet(ParameterSet):
         new_params._combining_rule = params.combining_rule
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
-        # add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Add only ResidueTemplate instances (no ResidueTemplateContainers)
+        # Maintain original residue ordering
+        remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                new_params.residues[name] = residue
+                if OpenMMParameterSet._remediate_residue_template(new_params, residue):
+                    remediated_residues.append(residue)
+            new_params.residues = OrderedDict()
+            for residue in remediated_residues:
+                new_params.residues[residue.name] = residue
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 new_params.patches[name] = patch
@@ -232,6 +282,8 @@ class OpenMMParameterSet(ParameterSet):
         if charmm_imp:
             self._find_explicit_impropers()
 
+        self._compress_impropers()
+
         root = etree.Element('ForceField')
         self._write_omm_provenance(root, provenance)
         self._write_omm_atom_types(root, skip_types)
@@ -261,85 +313,119 @@ class OpenMMParameterSet(ParameterSet):
     def _find_explicit_impropers(self):
         improper_harmonic = {}
         improper_periodic = {}
-        for name, residue in iteritems(self.residues):
+
+        def get_types(residue, atomname):
+            """Return list of atom type(s) that match the given atom name.
+            # TODO: Find a more general way to discover all the types that need to be expanded for +N and -C
+            """
+            C_types = ['CC', 'CD', 'C'] # atom types associated with '-C'
+            N_types = ['NH1', 'NH2', 'NH3', 'N', 'NP'] # atom types associated with '+N'
+
             a_names = [a.name for a in residue.atoms]
             a_types = [a.type for a in residue.atoms]
+
+            if atomname == '-C':
+                return C_types
+            elif atomname == '+N':
+                return N_types
+            elif atomname[0] in ['-', '+']:
+                raise ValueError('Unknown atom name %s' % atomname)
+            else:
+                return [ a_types[a_names.index(atomname)] ]
+
+        for name, residue in iteritems(self.residues):
             for impr in residue._impr:
-                MATCH = False
-                a1, a2,a3, a4 = impr
-                if a2[0] == '-' or a2[0] == '+':
-                    a2 = a2[1:]
-                if a3[0] == '-' or a3[0] == '+':
-                    a3 = a3[1:]
-                if a4[0] == '-' or a4[0] == '+':
-                    a4 = a4[1:]
-                t1 = a_types[a_names.index(a1)]
-                t2 = a_types[a_names.index(a2)]
-                t3 = a_types[a_names.index(a3)]
-                t4 = a_types[a_names.index(a4)]
-                key = tuple(sorted((t1, t2, t3, t4)))
-                altkeys1 = (t1, t2, t3, t4)
-                altkeys2 = (t4, t3, t2, t1)
-                if key in self.improper_types:
-                    improper_harmonic[altkeys1] = self.improper_types[key]
-                    MATCH = True
-                elif key in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                    MATCH = True
-                elif altkeys1 in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
-                    MATCH = True
-                elif altkeys2 in self.improper_periodic_types:
-                    improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
-                    MATCH = True
+                types = [ get_types(residue, atomname) for atomname in impr ]
+                for (t1, t2, t3, t4) in itertools.product(*types):
+                    MATCH = False
+                    key = tuple(sorted((t1, t2, t3, t4)))
+                    altkeys1 = (t1, t2, t3, t4)
+                    altkeys2 = (t4, t3, t2, t1)
+                    if key in self.improper_types:
+                        improper_harmonic[altkeys1] = self.improper_types[key]
+                        MATCH = True
+                    elif key in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                        MATCH = True
+                    elif altkeys1 in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
+                        MATCH = True
+                    elif altkeys2 in self.improper_periodic_types:
+                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
+                        MATCH = True
+                    else:
+                        # Check for wildcards
+                        key_placeholder = None
+                        for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                            key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                            if key in self.improper_types:
+                                if MATCH and key != key_placeholder:
+                                    flag = (altkeys1[0], altkeys1[-1])
+                                    if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                        # Match was already found.
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                      altkeys1, key_placeholder))
+                                        break
 
-                else:
-                    # Check for wildcards
-                    key_placeholder = None
-                    for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                        key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                        if key in self.improper_types:
-                            if MATCH and key != key_placeholder:
-                                flag = (altkeys1[0], altkeys1[-1])
-                                if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                    # Match was already found.
-                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                  altkeys1, key_placeholder))
-                                    break
+                                    if flag[0] == key[0] and flag[1] == key[1]:
+                                        improper_harmonic[altkeys1] = self.improper_types[key]
+                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
+                                                        altkeys1, key), ParameterWarning)
 
-                                if flag[0] == key[0] and flag[1] == key[1]:
-                                    improper_harmonic[altkeys1] = self.improper_types[key]
-                                    warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                    altkeys1, key), ParameterWarning)
+                                MATCH = True
+                                key_placeholder = key
+                                improper_harmonic[altkeys1] = self.improper_types[key]
+                            if key not in self.improper_types:
+                                for anchor in itertools.combinations([t1, t2, t3, t4], 2):
+                                    key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
+                                    if key in self.improper_periodic_types:
+                                        if MATCH and key != key_placeholder:
+                                            flag = (altkeys1[0], altkeys1[-1])
+                                            if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
+                                                # Match already found.
+                                                warnings.warn("{} and {} match improper {}. Using {}".format(key,
+                                                              key_placeholder, altkeys1, key_placeholder), ParameterWarning)
+                                                break
 
+                                            if flag[0] == key[0] and flag[1] == key[1]:
+                                                warnings.warn("More than one improper matches for {}. Using {}".format(
+                                                        altkeys1, key), ParameterWarning)
+                                                improper_periodic[altkeys1] = self.improper_periodic_types[key]
 
-                            MATCH = True
-                            key_placeholder = key
-                            improper_harmonic[altkeys1] = self.improper_types[key]
-                        if key not in self.improper_types:
-                            for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                                key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                                if key in self.improper_periodic_types:
-                                    if MATCH and key != key_placeholder:
-                                        flag = (altkeys1[0], altkeys1[-1])
-                                        if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                            # Match already found.
-                                            warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                          key_placeholder, altkeys1, key_placeholder), ParameterWarning)
-                                            break
+                                        MATCH = True
+                                        key_placeholder = key
+                                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
+                    if not MATCH:
+                        warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
 
-                                        if flag[0] == key[0] and flag[1] == key[1]:
-                                            warnings.warn("More than one improper matches for {}. Using {}".format(
-                                                    altkeys1, key), ParameterWarning)
-                                            improper_periodic[altkeys1] = self.improper_periodic_types[key]
-
-                                    MATCH = True
-                                    key_placeholder = key
-                                    improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                        elif not MATCH:
-                            warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
         self.improper_periodic_types = improper_periodic
         self.improper_types = improper_harmonic
+
+    def _compress_impropers(self):
+        """
+        OpenMM's ForceField cannot handle impropers that match the same four atoms
+        in more than one order, so Peter Eastman wants us to compress duplicates
+        and increment the spring constant accordingly.
+
+        """
+        if not self.improper_types: return
+
+        unique_keys = OrderedDict() # unique_keys[key] is the key to retrieve the improper from improper_types
+        improper_types = OrderedDict() # replacement for self.improper_types with compressed impropers
+        for atoms, improper in iteritems(self.improper_types):
+            # Compute a unique key
+            unique_key = tuple(sorted(atoms))
+            if unique_key in unique_keys:
+                # Accumulate spring constant, discarding this contribution
+                # TODO: Do we need to check if `psi_eq` is the same?
+                atoms2 = unique_keys[unique_key]
+                improper_types[atoms2].psi_k += improper.psi_k
+            else:
+                # Store this improper
+                unique_keys[unique_key] = atoms
+                improper_types[atoms] = improper
+
+        self.improper_types = improper_types
 
     def _find_unused_residues(self):
         skip_residues = set()
@@ -429,6 +515,27 @@ class OpenMMParameterSet(ParameterSet):
                 etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
             for bond in residue.bonds:
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
+            for (index, lonepair) in enumerate(residue.lonepairs):
+                (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
+                if lptype == 'relative':
+                    xweights = [-1.0, 0.0, 1.0]
+                elif lptype == 'bisector':
+                    xweights = [-1.0, 0.5, 0.5]
+                else:
+                    raise ValueError('Unknown lonepair type: '+lptype)
+                r /= 10.0 # convert to nanometers
+                theta *= math.pi / 180.0 # convert to radians
+                phi = (180 - phi) * math.pi / 180.0 # convert to radians
+                p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
+                p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
+                etree.SubElement(xml_residue, 'VirtualSite', type="localCoords", index=str(index),
+                    siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
+                    wo1="1", wo2="0", wo3="0",
+                    wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
+                    wy1="0", wy2="-1", wy3="1",
+                    p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
+            for atom in residue.connections:
+                etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.head is not None:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
@@ -456,8 +563,13 @@ class OpenMMParameterSet(ParameterSet):
 
         """
         # Attempt to patch every residue, recording only valid combinations.
-        valid_residues_for_patch = defaultdict(list)
-        valid_patches_for_residue = defaultdict(list)
+        valid_residues_for_patch = OrderedDict()
+        for patch in self.patches.values():
+            valid_residues_for_patch[patch.name] = list()
+        valid_patches_for_residue = OrderedDict()
+        for residue in self.residues.values():
+            valid_patches_for_residue[residue.name] = list()
+
         for patch in self.patches.values():
             for residue in self.residues.values():
                 if residue in skip_residues: continue
@@ -662,7 +774,7 @@ class OpenMMParameterSet(ParameterSet):
     @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
-        xml_force = etree.SubElement(xml_root, 'CmapTorsionForce')
+        xml_force = etree.SubElement(xml_root, 'CMAPTorsionForce')
         maps = dict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
@@ -736,6 +848,15 @@ class OpenMMParameterSet(ParameterSet):
                 # turn off L-J. Will use LennardJonesForce to use CostumNonbondedForce to compute L-J interactions
                 sigma = 1.0
                 epsilon = 0.0
+            else:
+                # NonbondedForce cannot handle distinct 14 parameters
+                # We need to use a separate LennardJonesForce instead
+                # TODO: Can we autodetect this and switch on separate_ljforce earlier?
+                if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
+                    raise NotImplementedError('OpenMM <NonbondedForce> cannot handle '
+                        'distinct 1-4 sigma and epsilon parameters; '
+                        'use separate_ljforce=True instead')
+
             # Ensure we don't have sigma = 0
             if (sigma == 0.0):
                 if (epsilon == 0.0):
@@ -786,7 +907,29 @@ class OpenMMParameterSet(ParameterSet):
                 else:
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
-            etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
+
+            # Handle special values used for 14 interactions
+            if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
+                sigma14 = atom_type.sigma_14 * length_conv  # in md_unit_system
+                epsilon14 = atom_type.epsilon_14 * ene_conv # in md_unit_system
+
+                # Ensure we don't have sigma = 0
+                if sigma14 == 0.0:
+                    if (epsilon14 == 0.0):
+                        sigma14 = 1.0 # reset sigma = 1
+                    else:
+                        raise ValueError("For atom type '%s', sigma_14 = 0 but "
+                                        "epsilon_14 != 0." % name)
+            else:
+                sigma14 = None
+                epsilon14 = None
+
+            attributes = { 'type' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
+            if epsilon14 is not None:
+                attributes['epsilon14'] = str(abs(epsilon14))
+            if sigma14 is not None:
+                attributes['sigma14'] = str(sigma14)
+            etree.SubElement(xml_force, 'Atom', **attributes)
 
         # write NBFIX records
         for (atom_types, value) in iteritems(self.nbfix_types):

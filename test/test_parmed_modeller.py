@@ -51,6 +51,16 @@ class TestResidueTemplate(unittest.TestCase):
         repr(PROTEIN) # make sure it works, don't care what its value is
         assert str(PROTEIN) == 'PROTEIN'
 
+    def test_chemical_formula(self):
+        """ Test computation of empirical chemical formula. """
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a2, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+        self.assertEqual(self.templ.empirical_chemical_formula, 'C2H3O')
+
     @unittest.skipIf(pd is None, "Cannot test without pandas")
     def test_data_frame(self):
         """ Test converting ResidueTemplate to a DataFrame """
@@ -104,6 +114,24 @@ class TestResidueTemplate(unittest.TestCase):
         self.assertEqual(len(struct.atoms), 6)
         self.assertEqual(len(struct.residues), 1)
         self.assertEqual(len(struct.bonds), 5)
+
+    def test_delete_bond(self):
+        """ Tests the ResidueTemplate.delete_bond function """
+        templ = self.templ
+
+        a1, a2, a3, a4, a5, a6 = self.templ.atoms
+        self.templ.add_bond(a1, a2)
+        self.templ.add_bond(a2, a3)
+        self.templ.add_bond(a3, a4)
+        self.templ.add_bond(a2, a5)
+        self.templ.add_bond(a5, a6)
+
+        bond = templ.bonds[0]
+        self.assertEqual(len(templ.bonds), 5)
+        templ.delete_bond(bond)
+        self.assertEqual(len(templ.bonds), 4)
+        # Make sure we can't delete the bond again
+        self.assertRaises(ValueError, lambda: templ.delete_bond(bond))
 
     def test_copy(self):
         """ Tests ResidueTemplate __copy__ functionality """
@@ -284,21 +312,24 @@ class TestResidueTemplate(unittest.TestCase):
         a1, a2, a3, a4, a5, a6 = templ.atoms
         templ.add_bond(a1, a2)
         templ.add_bond(a2, a3)
-        templ.add_bond(a3, a4)
+        templ.add_bond(a2, a4)
         templ.add_bond(a2, a5)
         templ.add_bond(a5, a6)
+        self.assertIs(templ.tail, templ[4])
         patch = PatchTemplate()
+        patch.delete_atoms.append(a5.name)
         patch.delete_atoms.append(a6.name)
         residue = self.templ.apply_patch(patch)
-        self.assertEqual(len(residue.atoms), 5)
-        self.assertEqual(len(residue.bonds), 4)
-        a1, a2, a3, a4, a5 = residue.atoms
+        self.assertEqual(len(residue.atoms), 4)
+        self.assertEqual(len(residue.bonds), 3)
+        a1, a2, a3, a4 = residue.atoms
         self.assertIn(a1, a2.bond_partners)
         self.assertIn(a2, a1.bond_partners)
         self.assertIn(a3, a2.bond_partners)
         self.assertIn(a2, a3.bond_partners)
-        self.assertIn(a5, a2.bond_partners)
-        self.assertIn(a2, a5.bond_partners)
+        self.assertIn(a4, a2.bond_partners)
+        self.assertIn(a2, a4.bond_partners)
+        self.assertIs(residue.tail, None)
 
     def test_add_bonds_atoms(self):
         """ Tests the ResidueTemplate.add_bond function w/ indices """
