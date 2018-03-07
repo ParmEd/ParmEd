@@ -492,6 +492,7 @@ class CharmmParameterSet(ParameterSet):
                                           'combining rules')
                     self.combining_rule = 'geometric'
                     declared_geometric = True
+            return declared_geometric
 
         if isinstance(pfile, str):
             own_handle = True
@@ -512,7 +513,6 @@ class CharmmParameterSet(ParameterSet):
         parameterset = None
         declared_geometric = False
         multiple_dihedral = 0
-        nbonds_set = False
         for i, line in enumerate(f):
             line = line.strip()
             try:
@@ -595,14 +595,14 @@ class CharmmParameterSet(ParameterSet):
                             k = conv(words[4], float, 'dihedral force constant', line_index=i, line=line)
                             n = conv(words[5], float, 'dihedral periodicity', line_index=i, line=line)
                             phase = conv(words[6], float, 'dihedral phase', line_index=i, line=line)
+                        pens = _penaltyre.findall(comment)
+                        if len(pens) == 1:
+                            penalty = float(pens[0])
+                        else:
+                            penalty = None
+                        add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty)
                     except IndexError:
                         raise CharmmError('Could not parse dihedrals.')
-                    pens = _penaltyre.findall(comment)
-                    if len(pens) == 1:
-                        penalty = float(pens[0])
-                    else:
-                        penalty = None
-                    add_dihedraltype(self, type1, type2, type3, type4, k, n, phase, penalty)
                     section = None
                     continue
                 else:
@@ -628,7 +628,6 @@ class CharmmParameterSet(ParameterSet):
                 continue
             if line.upper().startswith('NBON'):
                 declared_geometric = False
-                nbonds_set = False
                 section = 'NBONDS'
                 continue
             if line.upper().startswith('NONB'): 
@@ -677,7 +676,7 @@ class CharmmParameterSet(ParameterSet):
                     # Get nonbonded keywords
                     words = line.split()[1:]
                     scee = None
-                    check_nonbonded_args(self, words, scee, declared_geometric)
+                    declared_geometric = check_nonbonded_args(self, words, scee, declared_geometric)
                     continue
             if line.upper().startswith('NBFI'):
                 # Is a single line definition or a section?
@@ -815,10 +814,9 @@ class CharmmParameterSet(ParameterSet):
                 # Now get the nonbonded options
                 words = line.split()
                 if words[0].upper == 'END':
-                    nbonds_set = True
                     continue
                 scee = None
-                check_nonbonded_args(self, words, scee, declared_geometric)
+                declared_geometric = check_nonbonded_args(self, words, scee, declared_geometric)
                 continue
             if section.upper() == 'NONBONDED':
                 # Now get the nonbonded values
@@ -835,7 +833,7 @@ class CharmmParameterSet(ParameterSet):
                     # just be parsing the settings that should be used. So
                     # soldier on
                     if read_first_nonbonded: raise
-                    check_nonbonded_args(self, words, scee, declared_geometric)
+                    declared_geometric = check_nonbonded_args(self, words, scee, declared_geometric)
                     continue
                 else:
                     # OK, we've read our first nonbonded section for sure now.
