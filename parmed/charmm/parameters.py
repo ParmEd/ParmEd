@@ -513,7 +513,11 @@ class CharmmParameterSet(ParameterSet):
         parameterset = None
         declared_geometric = False
         multiple_dihedral = 0
-        for i, line in enumerate(f):
+        type1 = None
+        type2 = None
+        type3 = None
+        type4 = None
+            for i, line in enumerate(f):
             line = line.strip()
             try:
                 comment = f.comment
