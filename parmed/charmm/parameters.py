@@ -517,7 +517,7 @@ class CharmmParameterSet(ParameterSet):
         type2 = None
         type3 = None
         type4 = None
-            for i, line in enumerate(f):
+        for i, line in enumerate(f):
             line = line.strip()
             try:
                 comment = f.comment

@@ -1,0 +1,6 @@
+[console_scripts]
+parmed = parmed.scripts:clapp
+
+[gui_scripts]
+xparmed = parmed.scripts:guiapp
+

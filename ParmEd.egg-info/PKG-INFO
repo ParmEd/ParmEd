@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: ParmEd
+Version: 3.0.0+13.ge835eee2
+Summary: Amber parameter file editor
+Home-page: http://jswails.wikidot.com/parmed
+Author: Jason Swails
+Author-email: jason.swails@gmail.com
+License: LGPL (or GPL if released with AmberTools)
+Description: UNKNOWN
+Platform: UNKNOWN
