@@ -160,6 +160,7 @@ if __name__ == '__main__':
           packages=packages,
           ext_modules=extensions,
           cmdclass=cmdclass,
+          test_suite='nose.collector',
           package_data={'parmed.modeller': ['data/*.lib']},
           **kws
     )
