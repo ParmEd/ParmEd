@@ -2136,14 +2136,16 @@ class Structure(object):
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
-
         elif constraints == app.HBonds:
             for bond in self.bonds:
+                if isinstance(bond.atom1, ExtraPoint): continue
+                if isinstance(bond.atom2, ExtraPoint): continue
                 if bond.atom1.element == 1 or bond.atom2.element == 1:
                     constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
-
         if rigidWater:
             for bond in self.bonds:
+                if isinstance(bond.atom1, ExtraPoint): continue
+                if isinstance(bond.atom2, ExtraPoint): continue
                 if is_water[bond.atom1.residue.idx]:
                     constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
 
@@ -2172,6 +2174,8 @@ class Structure(object):
         # Add angle constraints
         for angle in self.angles:
             if frozenset((angle.atom1.idx, angle.atom2.idx, angle.atom3.idx)) in constraint_angle_set:
+                if frozenset((angle.atom1.idx, angle.atom3.idx)) in constraint_bond_set:
+                    continue
                 # Constrain this angle
                 l1 = l2 = None
                 for bond in angle.atom2.bonds:
@@ -2183,8 +2187,7 @@ class Structure(object):
                 if l1 is None or l2 is None: continue  # no bonds found...
                 cost = math.cos(angle.type.theteq * DEG_TO_RAD)
                 length = math.sqrt(l1 * l1 + l2 * l2 - 2 * l1 * l2 * cost)
-                system.addConstraint(angle.atom1.idx, angle.atom3.idx, length)
-        
+                system.addConstraint(angle.atom1.idx, angle.atom3.idx, length) 
     #===================================================
 
     @needs_openmm
