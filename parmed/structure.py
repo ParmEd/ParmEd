@@ -2118,43 +2118,73 @@ class Structure(object):
             If True, water bonds are constrained regardless of whether
             constrains is None
         """
+
         if constraints is None and not rigidWater: return
         if constraints not in (None, app.HBonds, app.AllBonds, app.HAngles):
             raise ValueError("Unrecognized constraints option (%s)" %
                              constraints)
+
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
-        # Rigid water only
-        if constraints is None:
-            is_water = _settler(self)
+
+        constraint_bond_set = set()
+        constraint_angle_set = set()
+        is_water = _settler(self)
+
+        if constraints == app.AllBonds or constraints == app.HAngles:
             for bond in self.bonds:
                 # Skip all extra points... don't constrain those
-                if isinstance(bond.atom1, ExtraPoint) or isinstance(bond.atom2, ExtraPoint):
-                    continue
-                if is_water[bond.atom1.residue.idx]:
-                    system.addConstraint(bond.atom1.idx, bond.atom2.idx, bond.type.req*length_conv)
-            return
-        # Other types of constraints
-        for bond in self.bonds:
-            if constraints is not app.HBonds or 1 in (bond.atom1.element, bond.atom2.element):
-                system.addConstraint(bond.atom1.idx, bond.atom2.idx, bond.type.req*length_conv)
-        if constraints is app.HAngles:
-            for angle in self.angles:
-                num_h = (angle.atom1.element == 1) + (angle.atom3.element == 1)
-                if num_h == 2 or (num_h == 1 and angle.atom2.element == 8):
-                    # Constrain this angle
-                    l1 = l2 = None
-                    for bond in angle.atom2.bonds:
-                        if bond in angle and angle.atom1 in bond:
-                            l1 = bond.type.req * length_conv
-                        elif bond in angle and angle.atom3 in bond:
-                            l2 = bond.type.req * length_conv
-                    # Law of cosines to find the constraint distance
-                    if l1 is None or l2 is None:
-                        continue # no bonds found...
-                    cost = math.cos(angle.type.theteq*DEG_TO_RAD)
-                    length = math.sqrt(l1*l1 + l2*l2 - 2*l1*l2*cost) * length_conv
-                    system.addConstraint(angle.atom1.idx, angle.atom3.idx, length)
+                if isinstance(bond.atom1, ExtraPoint): continue
+                if isinstance(bond.atom2, ExtraPoint): continue
+                constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
 
+        elif constraints == app.HBonds:
+            for bond in self.bonds:
+                if bond.atom1.element == 1 or bond.atom2.element == 1:
+                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+
+        if rigidWater:
+            for bond in self.bonds:
+                if is_water[bond.atom1.residue.idx]:
+                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+
+        # Add bond constraints
+        for bond in self.bonds:
+            if frozenset((bond.atom1.idx, bond.atom2.idx)) in constraint_bond_set:
+                system.addConstraint(bond.atom1.idx, bond.atom2.idx, bond.type.req * length_conv)
+
+        if constraints == app.HAngles:
+            for angle in self.angles:
+                numH = 0
+                if angle.atom1.element == 1:
+                    numH += 1
+                if angle.atom3.element == 1:
+                    numH += 1
+                if numH == 2 or (numH == 1 and angle.atom2.element == 8):
+                    constraint_angle_set.add(frozenset((angle.atom1.idx,
+                                                        angle.atom2.idx,
+                                                        angle.atom3.idx)))
+        if rigidWater:
+            for angle in self.angles:
+                if is_water[angle.atom1.residue.idx]:
+                    constraint_angle_set.add(frozenset((angle.atom1.idx,
+                                                        angle.atom2.idx,
+                                                        angle.atom3.idx)))
+        # Add angle constraints
+        for angle in self.angles:
+            if frozenset((angle.atom1.idx, angle.atom2.idx, angle.atom3.idx)) in constraint_angle_set:
+                # Constrain this angle
+                l1 = l2 = None
+                for bond in angle.atom2.bonds:
+                    if bond in angle and angle.atom1 in bond:
+                        l1 = bond.type.req * length_conv
+                    elif bond in angle and angle.atom3 in bond:
+                        l2 = bond.type.req * length_conv
+                # Law of cosines to find the constraint distance
+                if l1 is None or l2 is None: continue  # no bonds found...
+                cost = math.cos(angle.type.theteq * DEG_TO_RAD)
+                length = math.sqrt(l1 * l1 + l2 * l2 - 2 * l1 * l2 * cost)
+                system.addConstraint(angle.atom1.idx, angle.atom3.idx, length)
+        
     #===================================================
 
     @needs_openmm
