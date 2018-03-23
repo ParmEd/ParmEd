@@ -889,8 +889,7 @@ class Structure(object):
                 # information, as it is more reliable
                 a.atomic_number = templ.map[a.name].atomic_number
                 for bp in templ.map[a.name].bond_partners:
-                    if (bp.name in resatoms and
-                            resatoms[bp.name] not in a.bond_partners):
+                    if (bp.name in resatoms and resatoms[bp.name] not in a.bond_partners):
                         if a not in resatoms[bp.name].bond_partners:
                             self.bonds.append(Bond(a, resatoms[bp.name]))
         # Now go through each residue and assign heads and tails. This walks
@@ -900,8 +899,7 @@ class Structure(object):
         for i, res in enumerate(self.residues[:-1]):
             templ = _res_in_templlib(res, all_residues)
             # TER cards and changing chains prevents bonding to the next residue
-            if res.ter or (res.chain and
-                    (res.chain != self.residues[i+1].chain)):
+            if res.ter or (res.chain and (res.chain != self.residues[i+1].chain)):
                 continue
             ntempl = _res_in_templlib(self.residues[i+1], all_residues)
             if templ is None and ntempl is None:
@@ -913,13 +911,15 @@ class Structure(object):
                 # See if any atom in templ is close enough to bond to the head
                 # atom of the next residue's template
                 for head in self.residues[i+1].atoms:
-                    if head.name == ntempl.head:
+                    if head.name == ntempl.head.name:
                         break
                 else:
+                    LOGGER.warning('Could not find the head atom of the next template! Bond '
+                                   'pattern may be wrong, which could lead to extra TER cards in a '
+                                   'PDB file')
                     continue # head atom not found!
                 for a in res.atoms:
-                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
-                                                             head.atomic_number)]
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number, head.atomic_number)]
                     if distance2(a, head) < maxdist:
                         if a not in head.bond_partners:
                             self.bonds.append(Bond(a, head))
@@ -936,8 +936,7 @@ class Structure(object):
                 else:
                     continue # tail not found
                 for a in self.residues[i+1].atoms:
-                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number,
-                                                             tail.atomic_number)]
+                    maxdist = STANDARD_BOND_LENGTHS_SQUARED[(a.atomic_number, tail.atomic_number)]
                     if distance2(a, tail) < maxdist:
                         if a not in tail.bond_partners:
                             self.bonds.append(Bond(a, tail))
@@ -987,10 +986,8 @@ class Structure(object):
         pairs = find_atom_pairs(self, mindist, unassigned_atoms)
         for atom in unassigned_atoms:
             for partner in pairs[atom.idx]:
-                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
-                                                         partner.atomic_number)]
-                if (distance2(atom, partner) < maxdist and
-                        atom not in partner.bond_partners):
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number, partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and atom not in partner.bond_partners):
                     self.bonds.append(Bond(atom, partner))
             # Now look through all atoms in this template if it's a template
             # that's already been assigned. If it's already in an unassigned
@@ -1005,10 +1002,8 @@ class Structure(object):
             for partner in atom.residue.atoms:
                 if partner is atom:
                     continue
-                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number,
-                                                         partner.atomic_number)]
-                if (distance2(atom, partner) < maxdist and
-                        atom not in partner.bond_partners):
+                maxdist = STANDARD_BOND_LENGTHS_SQUARED[(atom.atomic_number, partner.atomic_number)]
+                if (distance2(atom, partner) < maxdist and atom not in partner.bond_partners):
                     self.bonds.append(Bond(atom, partner))
         # All reasonable bonds have now been added
 
@@ -1111,8 +1106,7 @@ class Structure(object):
                 num = res.idx
             else:
                 num = res.number
-            struct.add_atom(copy(atom), res.name, num, res.chain,
-                            res.insertion_code, res.segid)
+            struct.add_atom(copy(atom), res.name, num, res.chain, res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -1217,8 +1211,7 @@ class Structure(object):
                 # selection for speed -- orders of magnitude improvement in
                 # efficiency
                 ressel, atomsel = selection
-                if (isinstance(ressel, integer_types) and
-                        isinstance(atomsel, integer_types)):
+                if isinstance(ressel, integer_types) and isinstance(atomsel, integer_types):
                     return self.residues[ressel][atomsel]
                 has_chain = False
             elif len(selection) == 3:
@@ -1226,9 +1219,8 @@ class Structure(object):
                 chainmap = defaultdict(TrackedList)
                 for r in self.residues:
                     chainmap[r.chain].append(r)
-                if (isinstance(chainsel, string_types) and
-                        isinstance(ressel, integer_types) and
-                        isinstance(atomsel, integer_types)):
+                if (isinstance(chainsel, string_types) and isinstance(ressel, integer_types) and
+                    isinstance(atomsel, integer_types)):
                     # Special-case single-atom selection for efficiency
                     chainmap = dict(chainmap) # no longer defaultdict
                     try:
@@ -1261,15 +1253,13 @@ class Structure(object):
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
                 resset = set(list(range(len(self.residues)))[ressel])
-            elif isinstance(ressel, string_types) or isinstance(ressel,
-                    integer_types):
+            elif isinstance(ressel, string_types) or isinstance(ressel, integer_types):
                 resset = set([ressel])
             else:
                 resset = set(ressel)
             if isinstance(atomsel, slice):
                 atomset = set(list(range(len(self.atoms)))[atomsel])
-            elif isinstance(atomsel, string_types) or isinstance(atomsel,
-                    integer_types):
+            elif isinstance(atomsel, string_types) or isinstance(atomsel, integer_types):
                 atomset = set([atomsel])
             else:
                 atomset = set(atomsel)
@@ -1283,10 +1273,8 @@ class Structure(object):
                         chain.claim()
                     selection = [
                             (a.residue.chain in chainset) and
-                            (a.residue.name in resset or
-                                a.residue.idx in resset) and
-                            (a.name in atomset or
-                                a.idx-a.residue[0].idx in atomset)
+                            (a.residue.name in resset or a.residue.idx in resset) and
+                            (a.name in atomset or a.idx-a.residue[0].idx in atomset)
 
                             for a in self.atoms
                     ]
@@ -1386,8 +1374,7 @@ class Structure(object):
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
                     for a1, a2 in zip(struct.atoms, sel):
-                        assert None not in (a1.residue, a2.residue), \
-                                'Residues must all be set'
+                        assert None not in (a1.residue, a2.residue), 'Residues must all be set'
                         if a1.residue.name != a2.residue.name: break
                         if a1.name != a2.name: break
                         if '%.6f' % a1.charge != '%.6f' % a2.charge: break
@@ -1481,8 +1468,7 @@ class Structure(object):
                 raise RuntimeError('Must provide supported format if using file-like object')
         all_ints = True
         for atom in self.atoms:
-            if (isinstance(atom.type, integer_types) and
-                    atom.atom_type is not UnassignedAtomType):
+            if (isinstance(atom.type, integer_types) and atom.atom_type is not UnassignedAtomType):
                 atom.type = str(atom.atom_type)
             else:
                 all_ints = False
@@ -1519,9 +1505,8 @@ class Structure(object):
             elif format == 'CHARMMCRD':
                 charmm.CharmmCrdFile.write(self, fname, **kwargs)
             elif format == 'AMBER':
-                if (self.trigonal_angles or self.out_of_plane_bends or
-                        self.torsion_torsions or self.pi_torsions or
-                        self.stretch_bends or self.chiral_frames or
+                if (self.trigonal_angles or self.out_of_plane_bends or self.torsion_torsions or
+                        self.pi_torsions or self.stretch_bends or self.chiral_frames or
                         self.multipole_frames):
                     s = amber.AmoebaParm.from_structure(self)
                     s.write_parm(fname, **kwargs)
