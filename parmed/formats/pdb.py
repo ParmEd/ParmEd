@@ -331,7 +331,9 @@ class PDBFile(object):
         last_resid = 1
         resend = 26
         res_hex = False
+        res_other = False
         atom_hex = False
+        atom_other = False
         atom_overflow = False
         ZEROSET = set('0')
         altloc_ids = set()
@@ -383,7 +385,10 @@ class PDBFile(object):
                         if not res_hex and resid == '9999':
                             resid = 9999
                         elif not res_hex:
-                            res_hex = int(resid, 16) == 10000
+                            try:
+                                res_hex = int(resid, 16) == 10000
+                            except ValueError:
+                                res_other = True
                         # So now we know if we use hexadecimal or not. If we do,
                         # convert. Otherwise, stay put
                         if res_hex:
@@ -397,6 +402,8 @@ class PDBFile(object):
                         elif resid == '1000' and line[26] == '0':
                             resend += 1
                             resid = 10000
+                        elif res_other:
+                            resid = last_resid + 1
                         else:
                             resid = int(resid)
                     elif resend > 26:
@@ -421,7 +428,7 @@ class PDBFile(object):
                                 atnum = last_atom_added.number + 1
                             else:
                                 raise
-                    elif atom_overflow:
+                    elif atom_overflow or atom_other:
                         atnum = last_atom_added.number + 1
                     else:
                         try:
@@ -431,8 +438,12 @@ class PDBFile(object):
                                 atom_overflow = True
                                 atnum = last_atom_added.number + 1
                             else:
-                                atnum = int(atnum, 16)
-                                atom_hex = True
+                                try:
+                                    atnum = int(atnum, 16)
+                                    atom_hex = True
+                                except ValueError:
+                                    atnum = last_atom_added.number + 1
+                                    atom_other = True
                     # It's possible that the residue number has cycled so much
                     # that it is now filled with ****'s. In that case, start a
                     # new residue if the current residue repeats the same atom
