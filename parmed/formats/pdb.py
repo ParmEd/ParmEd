@@ -440,10 +440,16 @@ class PDBFile(object):
                             else:
                                 try:
                                     atnum = int(atnum, 16)
-                                    atom_hex = True
                                 except ValueError:
                                     atnum = last_atom_added.number + 1
                                     atom_other = True
+                                else:
+                                    if atnum == last_atom_added.number + 1:
+                                        # Assume VMD numbers continuously
+                                        atom_hex = True
+                                    else:
+                                        atom_other = True
+                                        atnum = last_atom_added.number + 1
                     # It's possible that the residue number has cycled so much
                     # that it is now filled with ****'s. In that case, start a
                     # new residue if the current residue repeats the same atom
