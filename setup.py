@@ -62,6 +62,8 @@ elif os.environ.get('CXX', '').endswith('pgcc'):
     # PGI compilers don't play nicely with Python extensions. So force GCC
     sys.stderr.write('PGI compilers do not work with Python extensions generally. '
                      'Using GCC instead.\n')
+    os.environ['CC'] = 'gcc'
+    os.environ['CXX'] = 'g++'
 
 # parmed package and all its subpackages
 packages = ['parmed', 'parmed.amber', 'parmed.modeller',
