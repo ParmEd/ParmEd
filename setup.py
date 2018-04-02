@@ -58,7 +58,7 @@ if sys.platform == 'darwin' and not is_pypy:
     # gcc... sigh.
     os.environ['CXX'] = 'clang++'
     os.environ['CC'] = 'clang'
-elif os.environ.get('CXX', '').endswith('pgcc'):
+elif os.environ.get('CC', '').endswith('pgcc'):
     # PGI compilers don't play nicely with Python extensions. So force GCC
     sys.stderr.write('PGI compilers do not work with Python extensions generally. '
                      'Using GCC instead.\n')
