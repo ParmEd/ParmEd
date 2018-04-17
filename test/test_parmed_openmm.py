@@ -531,6 +531,23 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         forcefield = app.ForceField(ffxml_filename)
 
+    def test_write_xml_parameters_antechamber(self):
+        """ Test writing XML residue definition from Antechamber mol2 """
+        leaprc = "molecule = loadmol2 %s\n" % get_fn('molecule.mol2')
+        leaprc += "loadamberparams %s\n" % get_fn('molecule.frcmod')
+        leaprc = StringIO(leaprc)
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.amber.AmberParameterSet.from_leaprc(leaprc),
+                remediate_residues=False
+        )
+        ffxml_filename = get_fn('residue.xml', written=True)
+        params.write(ffxml_filename)
+        try:
+            forcefield = app.ForceField(ffxml_filename)
+        except KeyError:
+            # A KeyError is expected
+            pass
+
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
