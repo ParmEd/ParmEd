@@ -196,7 +196,7 @@ class OpenMMParameterSet(ParameterSet):
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue, drop_residues_without_parameters=drop_residues_without_parameters):
+                if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
 
         new_params.residues = OrderedDict()
