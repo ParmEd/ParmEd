@@ -198,14 +198,24 @@ class OpenMMParameterSet(ParameterSet):
             if isinstance(residue, ResidueTemplate):
                 if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
-
-        new_params.residues = OrderedDict()
         for residue in remediated_residues:
             new_params.residues[residue.name] = residue
 
+        # Only add unique patches
+        def patch_is_equivalent(patch1, patch2):
+            """Return True if patches are equivalent to OpenMM."""
+            return (set(patch1.add_bonds)==set(patch2.add_bonds)) and (set(patch1.delete_atoms)==set(patch2.delete_atoms))
+
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
-                new_params.patches[name] = patch
+                patch_is_unique = True
+                for existing_patch in new_params.patches.values():
+                    if patch_is_equivalent(patch, existing_patch):
+                        warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, existing_patch))
+                        patch_is_unique = False
+                        break
+                if patch_is_unique:
+                    new_params.patches[name] = patch
 
         return new_params
 

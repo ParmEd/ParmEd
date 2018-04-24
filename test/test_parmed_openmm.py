@@ -668,6 +668,12 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                                               get_fn('top_all36_prot.rtf'),
                                               get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
+
+        # Check that patch ACE remains but duplicate patches ACED, ACP, ACPD
+        assert 'ACE' in params.patches, "Patch ACE was expected to be retained, but is missing"
+        for name in ['ACED', 'ACP', 'ACPD']:
+            assert name not in params.patches, "Duplicate patch {} was expected to be pruned, but is present".format(name)
+
         del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
         ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
@@ -760,5 +766,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                          OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrel'
                      ),
-                     charmm_imp=True)
+                     charmm_imp=True,
+                     separate_ljforce=True,
+                     )
         forcefield = app.ForceField(ffxml_filename)
