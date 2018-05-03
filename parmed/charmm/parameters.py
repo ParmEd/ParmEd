@@ -556,11 +556,12 @@ class CharmmParameterSet(ParameterSet):
                 else:
                     per = int(theteq)
                     theteq = tmp
-                # Improper types seem not to always have the central atom
-                # defined in the first place, so just have the key a fully
-                # sorted list. We still depend on the PSF having properly
-                # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
+                #We will sort from the inside out, since an improper in CHARMM basically defines two planes,
+                #and tries to keep them coplanar (123, 234). We do a dictionary sort that respects the inversion.
+                if type2 < type3 or ((type2 == type3) and (type1 <= type4)):
+                    key = [type1, type2, type3, type4]
+                else:
+                    key = [type4, type3, type2, type1]
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
