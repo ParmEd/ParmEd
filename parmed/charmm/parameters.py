@@ -560,7 +560,7 @@ class CharmmParameterSet(ParameterSet):
                 # defined in the first place, so just have the key a fully
                 # sorted list. We still depend on the PSF having properly
                 # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
+                key = (type1, type2, type3, type4)
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
@@ -961,6 +961,43 @@ class CharmmParameterSet(ParameterSet):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
+
+    def match_improper_type(self, a1, a2, a3, a4):
+        """ Matches an improper type based on atom type names """
+        typ = self._match_improper_with_typemap(self.improper_types, a1, a2, a3, a4)
+        if typ is None:
+            typ = self._match_improper_with_typemap(self.improper_periodic_types, a1, a2, a3, a4)
+        return typ
+
+    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
+        # These are the rules specified in io.doc:
+
+        #         There are five choices for wildcard usage for improper dihedrals;
+        # 1) A - B - C - D  (all four atoms, double specification allowed)
+        # 2) A - X - X - B
+        # 3) X - A - B - C
+        # 4) X - A - B - X
+        # 5) X - X - A - B
+        # When classifying an improper dihedral, the first acceptable match (from
+        # the above order) is chosen. The match may be made in either direction
+        # ( A - B - C - D = D - C - B - A).
+
+        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
+        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
+
+        if (a1, 'X', 'X', a2) in typemap: return typemap[(a1, 'X', 'X', a2)]
+        if (a2, 'X', 'X', a1) in typemap: return typemap[(a2, 'X', 'X', a1)]
+
+        if ('X', a1, a2, a3) in typemap: return typemap[('X', a1, a2, a3)]
+        if (a3, a2, a1, 'X') in typemap: return typemap[(a3, a2, a1, 'X')]
+
+        if ('X', a1, a2, 'X') in typemap: return typemap[('X', a1, a2, 'X')]
+        if ('X', a2, a1, 'X') in typemap: return typemap[('X', a2, a1, 'X')]
+
+        if ('X', 'X', a1, a2) in typemap: return typemap[('X', 'X', a1, a2)]
+        if (a2, a1, 'X', 'X') in typemap: return typemap[(a2, a1, 'X', 'X')]
+
+        return None
 
     def write(self, top=None, par=None, str=None):
         """ Write a CHARMM parameter set to a file
