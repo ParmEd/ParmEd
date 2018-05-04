@@ -334,9 +334,11 @@ class NetCDFRestart(object):
         self.closed or (hasattr(self, '_ncfile') and self._ncfile.close())
 
     def flush(self):
-        if nc is None:
-            # netCDF4.Dataset does not have a flush method
+        try:
             self._ncfile.flush()
+        except AttributeError:
+            # netCDF4.Dataset's flush method is called sync :-P
+            self._ncfile.sync()
 
 @add_metaclass(FileFormatType)
 class NetCDFTraj(object):
