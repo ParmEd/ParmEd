@@ -547,6 +547,8 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         except KeyError:
             # A KeyError is expected
             pass
+        else:
+            assert False, "app.ForceField() should fail with a KeyError when residue templates without parameters are not removed, but it did not."
 
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
