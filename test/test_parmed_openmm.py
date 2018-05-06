@@ -531,6 +531,25 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         forcefield = app.ForceField(ffxml_filename)
 
+    def test_write_xml_parameters_antechamber(self):
+        """ Test writing XML residue definition from Antechamber mol2 """
+        leaprc = "molecule = loadmol2 %s\n" % get_fn('molecule.mol2')
+        leaprc += "loadamberparams %s\n" % get_fn('molecule.frcmod')
+        leaprc = StringIO(leaprc)
+        params = openmm.OpenMMParameterSet.from_parameterset(
+                pmd.amber.AmberParameterSet.from_leaprc(leaprc),
+                remediate_residues=False
+        )
+        ffxml_filename = get_fn('residue.xml', written=True)
+        params.write(ffxml_filename)
+        try:
+            forcefield = app.ForceField(ffxml_filename)
+        except KeyError:
+            # A KeyError is expected
+            pass
+        else:
+            assert False, "app.ForceField() should fail with a KeyError when residue templates without parameters are not removed, but it did not."
+
     def test_write_xml_parameters_amber_write_unused(self):
         """Test the write_unused argument in writing XML files"""
         params = openmm.OpenMMParameterSet.from_parameterset(
@@ -651,6 +670,12 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                                               get_fn('top_all36_prot.rtf'),
                                               get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
+
+        # Check that patch ACE remains but duplicate patches ACED, ACP, ACPD
+        assert 'ACE' in params.patches, "Patch ACE was expected to be retained, but is missing"
+        for name in ['ACED', 'ACP', 'ACPD']:
+            assert name not in params.patches, "Duplicate patch {} was expected to be pruned, but is present".format(name)
+
         del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
         ffxml_filename = get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
@@ -743,5 +768,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                          OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
                          Reference='MacKerrel'
                      ),
-                     charmm_imp=True)
+                     charmm_imp=True,
+                     separate_ljforce=True,
+                     )
         forcefield = app.ForceField(ffxml_filename)

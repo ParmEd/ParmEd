@@ -103,6 +103,14 @@ class OpenMMParameterSet(ParameterSet):
           foreign parameter sets (e.g., CHARMM) into OpenMM parameter sets,
           and not restored on conversion from OpenMM to other formats
 
+        Parameters
+        ----------
+        params : :class:`parmed.parameters.ParameterSet`
+            ParameterSet containing the list of parameters to be converted to a
+            OpenMM-compatible parameter set
+        residue : :class:`parmed.modeller.Residue`
+            The residue to remediate
+
         """
         # Populate atomic numbers in residue template
         # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
@@ -126,9 +134,9 @@ class OpenMMParameterSet(ParameterSet):
         return True
 
     @classmethod
-    def from_parameterset(cls, params, copy=False):
+    def from_parameterset(cls, params, copy=False, remediate_residues=True):
         """
-        Instantiates a CharmmParameterSet from another ParameterSet (or
+        Instantiates an OpenMMParameterSet from another ParameterSet (or
         subclass). The main thing this feature is responsible for is converting
         lower-case atom type names into all upper-case and decorating the name
         to ensure each atom type name is unique.
@@ -145,11 +153,14 @@ class OpenMMParameterSet(ParameterSet):
         Parameters
         ----------
         params : :class:`parmed.parameters.ParameterSet`
-            ParameterSet containing the list of parameters to be converted to a
-            CHARMM-compatible set
-        copy : bool, optional
+            ParameterSet containing the list of parameters to be converted to as
+            OpenMM-compatible parameter set
+        copy : bool, optional, default=False
             If True, the returned parameter set is a deep copy of ``params``. If
             False, the returned parameter set is a shallow copy. Default False.
+        remediate_residues : bool, optional, default=True
+            If True, will remove non-chemical bonds and drop Residue definitions
+            that are missing parameters
 
         Returns
         -------
@@ -179,19 +190,32 @@ class OpenMMParameterSet(ParameterSet):
         new_params._combining_rule = params.combining_rule
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
+
         # Add only ResidueTemplate instances (no ResidueTemplateContainers)
         # Maintain original residue ordering
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                if OpenMMParameterSet._remediate_residue_template(new_params, residue):
+                if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
-            new_params.residues = OrderedDict()
-            for residue in remediated_residues:
-                new_params.residues[residue.name] = residue
+        for residue in remediated_residues:
+            new_params.residues[residue.name] = residue
+
+        # Only add unique patches
+        def patch_is_equivalent(patch1, patch2):
+            """Return True if patches are equivalent to OpenMM."""
+            return (set(patch1.add_bonds)==set(patch2.add_bonds)) and (set(patch1.delete_atoms)==set(patch2.delete_atoms))
+
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
-                new_params.patches[name] = patch
+                patch_is_unique = True
+                for existing_patch in new_params.patches.values():
+                    if patch_is_equivalent(patch, existing_patch):
+                        warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, existing_patch))
+                        patch_is_unique = False
+                        break
+                if patch_is_unique:
+                    new_params.patches[name] = patch
 
         return new_params
 

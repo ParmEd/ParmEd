@@ -1,0 +1,83 @@
+@<TRIPOS>MOLECULE
+2-(ethylamino)-1,2-diphenyl-ethanol
+   37    38     0     0     0
+SMALL
+USER_CHARGES
+
+@<TRIPOS>ATOM
+      1 C1          1.4622    1.5826   -4.2713 C.3       1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1452
+      2 C2          1.5369    1.5268   -5.7592 C.3       1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.0952
+      3 N1          1.9627    0.3522   -3.6734 N.3       1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.8195
+      4 C3          2.9723    1.3260   -1.6921 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1146
+      5 C4          2.7299    2.1102   -0.5643 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1191
+      6 C5          3.7277    2.9518   -0.0725 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1292
+      7 C6          4.9679    3.0090   -0.7084 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1251
+      8 C7          5.2103    2.2247   -1.8362 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1292
+      9 C8          4.2125    1.3832   -2.3280 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1191
+     10 C9          3.2973   -1.6035   -1.5056 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.0772
+     11 C10         3.8057   -2.3637   -2.5588 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1069
+     12 C11         5.0838   -2.9149   -2.4677 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1334
+     13 C12         5.8536   -2.7058   -1.3234 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1239
+     14 C13         5.3452   -1.9456   -0.2702 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1334
+     15 C14         4.0671   -1.3944   -0.3613 C.ar      1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.1069
+     16 C15         1.9309   -1.0140   -1.6029 C.3       1 2-(ethylamino)-1,2-diphenyl-ethanol         0.2040
+     17 C16         1.8881    0.4112   -2.2266 C.3       1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1817
+     18 O1          1.3789   -0.9474   -0.2766 O.3       1 2-(ethylamino)-1,2-diphenyl-ethanol        -0.5932
+     19 H1          0.4267    1.7156   -3.9441 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0329
+     20 H2          2.0634    2.4102   -3.8834 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0329
+     21 H3          1.1597    2.4538   -6.2045 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0396
+     22 H4          2.5670    1.3594   -6.0923 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0396
+     23 H5          0.9219    0.6986   -6.1311 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0396
+     24 H6          1.4049   -0.4337   -4.0064 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.3673
+     25 H7          1.7668    2.0728   -0.0623 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1324
+     26 H8          3.5392    3.5620    0.8058 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1324
+     27 H9          5.7446    3.6644   -0.3254 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1323
+     28 H10         6.1758    2.2693   -2.3315 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1324
+     29 H11         4.4100    0.7752   -3.2069 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1324
+     30 H12         3.2134   -2.5325   -3.4543 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1320
+     31 H13         5.4798   -3.5063   -3.2879 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1308
+     32 H14         6.8487   -3.1352   -1.2526 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1298
+     33 H15         5.9444   -1.7828    0.6209 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1308
+     34 H16         3.6790   -0.8030    0.4638 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.1320
+     35 H17         1.2556   -1.6809   -2.1690 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0339
+     36 H18         0.9027    0.8516   -2.0266 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.0751
+     37 H19         0.4723   -0.6313   -0.3843 H         1 2-(ethylamino)-1,2-diphenyl-ethanol         0.4167
+@<TRIPOS>BOND
+     1    1    2 1
+     2    1    3 1
+     3    4    5 ar
+     4    5    6 ar
+     5    6    7 ar
+     6    7    8 ar
+     7    8    9 ar
+     8    4    9 ar
+     9   10   11 ar
+    10   11   12 ar
+    11   12   13 ar
+    12   13   14 ar
+    13   14   15 ar
+    14   10   15 ar
+    15   16   17 1
+    16   10   16 1
+    17    4   17 1
+    18   16   18 1
+    19    3   17 1
+    20    1   19 1
+    21    1   20 1
+    22    2   21 1
+    23    2   22 1
+    24    2   23 1
+    25    3   24 1
+    26    5   25 1
+    27    6   26 1
+    28    7   27 1
+    29    8   28 1
+    30    9   29 1
+    31   11   30 1
+    32   12   31 1
+    33   13   32 1
+    34   14   33 1
+    35   15   34 1
+    36   16   35 1
+    37   17   36 1
+    38   18   37 1
