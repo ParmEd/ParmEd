@@ -616,7 +616,10 @@ class CharmmPsfFile(Structure):
             # Store the atoms
             a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
             at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
-            key = tuple(sorted([at1, at2, at3, at4]))
+            if at2 < at3 or ((at2 == at3) and (at1 <= at4)):
+                key = [at1, at2, at3, at4]
+            else:
+                key = [at4, at3, at2, at1]
             altkey1 = a1.type, a2.type, a3.type, a4.type
             altkey2 = a4.type, a3.type, a2.type, a1.type
             # Check for exact harmonic or exact periodic
