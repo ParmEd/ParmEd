@@ -12,7 +12,7 @@ from copy import copy as _copy
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
                                UnassignedAtomType)
-from ..exceptions import CharmmError, CharmmWarning, ParameterError, ParameterWarning
+from ..exceptions import CharmmError, CharmmWarning, ParameterError
 from ..structure import needs_openmm, Structure
 from ..utils.io import genopen
 from ..utils.six import wraps
@@ -20,7 +20,6 @@ from ..utils.six.moves import zip, range
 from ..utils.six import string_types
 import re
 import warnings
-import itertools
 
 def _catchindexerror(func):
     """

@@ -13,6 +13,7 @@ import re
 import warnings
 from copy import copy as _copy
 from collections import OrderedDict
+from itertools import combinations
 
 from ..constants import TINY
 from ..exceptions import CharmmError, ParameterWarning
@@ -561,6 +562,7 @@ class CharmmParameterSet(ParameterSet):
                 # sorted list. We still depend on the PSF having properly
                 # ordered improper atoms
                 key = (type1, type2, type3, type4)
+                self._improper_key_map[tuple(sorted(key))] = key
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
@@ -964,38 +966,33 @@ class CharmmParameterSet(ParameterSet):
 
     def match_improper_type(self, a1, a2, a3, a4):
         """ Matches an improper type based on atom type names """
-        typ = self._match_improper_with_typemap(self.improper_types, a1, a2, a3, a4)
+        args = (a1, a2, a3, a4)
+        typ = self._match_improper_with_typemap(self.improper_types, *args)
         if typ is None:
-            typ = self._match_improper_with_typemap(self.improper_periodic_types, a1, a2, a3, a4)
+            typ = self._match_improper_with_typemap(self.improper_periodic_types, *args)
         return typ
 
     def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
-        # These are the rules specified in io.doc:
-
-        #         There are five choices for wildcard usage for improper dihedrals;
-        # 1) A - B - C - D  (all four atoms, double specification allowed)
-        # 2) A - X - X - B
-        # 3) X - A - B - C
-        # 4) X - A - B - X
-        # 5) X - X - A - B
-        # When classifying an improper dihedral, the first acceptable match (from
-        # the above order) is chosen. The match may be made in either direction
-        # ( A - B - C - D = D - C - B - A).
 
         if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
         if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
 
-        if (a1, 'X', 'X', a2) in typemap: return typemap[(a1, 'X', 'X', a2)]
-        if (a2, 'X', 'X', a1) in typemap: return typemap[(a2, 'X', 'X', a1)]
+        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
+        # all systems CHARMM supports :(
 
-        if ('X', a1, a2, a3) in typemap: return typemap[('X', a1, a2, a3)]
-        if (a3, a2, a1, 'X') in typemap: return typemap[(a3, a2, a1, 'X')]
+        key = tuple(sorted([a1, a2, a3, a4]))
+        if self._improper_key_map.get(key, None) in typemap:
+            return typemap[self._improper_key_map[key]]
 
-        if ('X', a1, a2, 'X') in typemap: return typemap[('X', a1, a2, 'X')]
-        if ('X', a2, a1, 'X') in typemap: return typemap[('X', a2, a1, 'X')]
+        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
+            key = tuple(sorted([exact1, exact2, exact3, 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
 
-        if ('X', 'X', a1, a2) in typemap: return typemap[('X', 'X', a1, a2)]
-        if (a2, a1, 'X', 'X') in typemap: return typemap[(a2, a1, 'X', 'X')]
+        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
+            key = tuple(sorted([exact1, exact2, 'X', 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
 
         return None
 
@@ -1117,10 +1114,6 @@ class CharmmParameterSet(ParameterSet):
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.phi_k, int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
-            if key[2] == 'X':
-                key = (key[0], key[2], key[3], key[1])
-            elif key[3] == 'X':
-                key = (key[0], key[3], key[1], key[2])
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.psi_k, 0, typ.psi_eq))
         if self.cmap_types:

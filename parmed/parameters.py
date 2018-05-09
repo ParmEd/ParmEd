@@ -92,6 +92,7 @@ class ParameterSet(object):
         self.residues = OrderedDict()
         self.patches = OrderedDict()
         self.default_scee = self.default_scnb = 1.0
+        self._improper_key_map = OrderedDict()
 
     def __copy__(self):
         other = type(self)()
@@ -148,6 +149,7 @@ class ParameterSet(object):
             other.residues[key] = copy(item)
         for key, item in iteritems(self.patches):
             other.patches[key] = copy(item)
+        other._improper_key_map = copy(self._improper_key_map)
         other.combining_rule = self.combining_rule
 
         return other
