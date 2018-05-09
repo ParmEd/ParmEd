@@ -669,7 +669,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(len(params.bond_types), 266)
         self.assertEqual(len(params.cmap_types), 12)
         self.assertEqual(len(params.dihedral_types), 772)
-        self.assertEqual(len(params.improper_types), 33)
+        self.assertEqual(len(params.improper_types), 43)
         self.assertEqual(len(params.nbfix_types), 0)
         self.assertEqual(len(params.parametersets), 1)
         self.assertEqual(len(params.urey_bradley_types), 685)
@@ -697,9 +697,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
                 self.assertIs(res.first_patch, params.patches['NTER'])
         # Look at the number of unique terms
         def uniques(stuff):
-            myset = set()
-            for key in stuff: myset.add(id(stuff[key]))
-            return len(myset)
+            return len({id(value) for value in stuff.values()})
         self.assertEqual(uniques(params.angle_types), 356)
         self.assertEqual(uniques(params.atom_types_int), 95)
         self.assertEqual(uniques(params.atom_types_str), 95)
@@ -707,7 +705,7 @@ class TestCharmmParameters(utils.FileIOTestCase):
         self.assertEqual(uniques(params.bond_types), 140)
         self.assertEqual(uniques(params.cmap_types), 6)
         self.assertEqual(uniques(params.dihedral_types), 396)
-        self.assertEqual(uniques(params.improper_types), 33)
+        self.assertEqual(uniques(params.improper_types), 43)
         self.assertEqual(uniques(params.urey_bradley_types), 105)
         obj = params.condense()
         self.assertTrue(obj is params)
