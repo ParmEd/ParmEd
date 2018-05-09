@@ -12,7 +12,7 @@ from copy import copy as _copy
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
                                UnassignedAtomType)
-from ..exceptions import CharmmError, CharmmWarning, ParameterError, ParameterWarning
+from ..exceptions import CharmmError, CharmmWarning, ParameterError
 from ..structure import needs_openmm, Structure
 from ..utils.io import genopen
 from ..utils.six import wraps
@@ -20,7 +20,6 @@ from ..utils.six.moves import zip, range
 from ..utils.six import string_types
 import re
 import warnings
-import itertools
 
 def _catchindexerror(func):
     """
@@ -612,68 +611,10 @@ class CharmmPsfFile(Structure):
             dihedral.type.list = self.dihedral_types
         # Now do the impropers
         for imp in self.impropers:
-            MATCH = False
-            # Store the atoms
-            a1, a2, a3, a4 = imp.atom1, imp.atom2, imp.atom3, imp.atom4
-            at1, at2, at3, at4 = a1.type, a2.type, a3.type, a4.type
-            key = tuple(sorted([at1, at2, at3, at4]))
-            altkey1 = a1.type, a2.type, a3.type, a4.type
-            altkey2 = a4.type, a3.type, a2.type, a1.type
-            # Check for exact harmonic or exact periodic
-            if key in parmset.improper_types:
-                imp.type = parmset.improper_types[key]
-                MATCH = True
-            elif key in parmset.improper_periodic_types:
-                imp.type = parmset.improper_periodic_types[key]
-                MATCH = True
-            elif altkey1 in parmset.improper_periodic_types:
-                imp.type = parmset.improper_periodic_types[altkey1]
-                MATCH = True
-            elif altkey2 in parmset.improper_periodic_types:
-                imp.type = parmset.improper_periodic_types[altkey2]
-                MATCH = True
-            else:
-                # Check for wild-card harmonic
-                key_placeholder = None
-                for anchor in itertools.combinations([at1, at2, at3, at4], 2):
-                    key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                    if key in parmset.improper_types:
-                        if MATCH and key != key_placeholder:
-                            flag = (altkey1[0], altkey1[-1])
-                            if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                # Match was already found
-                                warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                              altkey1, key_placeholder), ParameterWarning)
-                                break
-                            if flag[0] == key[0] and flag[1] == key[1]:
-                                imp.type = parmset.improper_types[key]
-                                warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                              altkey1, key), ParameterWarning)
-                        key_placeholder = key
-                        imp.type = parmset.improper_types[key]
-                        MATCH = True
-
-                    # Check for wild-card in periodic
-                    if key not in parmset.improper_types:
-                        for anchor in itertools.combinations([at1, at2, at3, at4], 2):
-                            key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                            if key in parmset.improper_periodic_types:
-                                if MATCH and key != key_placeholder:
-                                    flag = (altkey1[0], altkey1[-1])
-                                    if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                        # Match was already found
-                                        warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                      key_placeholder, altkey1, key_placeholder), ParameterWarning)
-                                        break
-                                    if flag[0] == key[0] and flag[1] == key[1]:
-                                        warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                      key_placeholder, altkey1, key), ParameterWarning)
-                                        imp.type = parmset.improper_periodic_types[key]
-                                MATCH = True
-                                key_placeholder = key
-                                imp.type = parmset.improper_periodic_types[key]
-                    elif not MATCH:
-                        warnings.warn("No improper parameter found for {}".format(altkey1), ParameterWarning)
+            a1, a2, a3, a4 = imp.atom1.type, imp.atom2.type, imp.atom3.type, imp.atom4.type
+            imp.type = parmset.match_improper_type(a1, a2, a3, a4)
+            if imp.type is None:
+                raise ParameterError('No improper type for %s, %s, %s, and %s', a1, a2, a3, a4)
             imp.type.used = False
         # prepare list of harmonic impropers present in system
         del self.improper_types[:]

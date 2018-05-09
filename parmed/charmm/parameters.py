@@ -13,6 +13,7 @@ import re
 import warnings
 from copy import copy as _copy
 from collections import OrderedDict
+from itertools import combinations
 
 from ..constants import TINY
 from ..exceptions import CharmmError, ParameterWarning
@@ -560,7 +561,8 @@ class CharmmParameterSet(ParameterSet):
                 # defined in the first place, so just have the key a fully
                 # sorted list. We still depend on the PSF having properly
                 # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
+                key = (type1, type2, type3, type4)
+                self._improper_key_map[tuple(sorted(key))] = key
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
@@ -962,6 +964,38 @@ class CharmmParameterSet(ParameterSet):
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
 
+    def match_improper_type(self, a1, a2, a3, a4):
+        """ Matches an improper type based on atom type names """
+        args = (a1, a2, a3, a4)
+        typ = self._match_improper_with_typemap(self.improper_types, *args)
+        if typ is None:
+            typ = self._match_improper_with_typemap(self.improper_periodic_types, *args)
+        return typ
+
+    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
+
+        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
+        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
+
+        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
+        # all systems CHARMM supports :(
+
+        key = tuple(sorted([a1, a2, a3, a4]))
+        if self._improper_key_map.get(key, None) in typemap:
+            return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
+            key = tuple(sorted([exact1, exact2, exact3, 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
+            key = tuple(sorted([exact1, exact2, 'X', 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        return None
+
     def write(self, top=None, par=None, str=None):
         """ Write a CHARMM parameter set to a file
 
@@ -1080,10 +1114,6 @@ class CharmmParameterSet(ParameterSet):
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.phi_k, int(typ.per), typ.phase))
         for key, typ in iteritems(self.improper_types):
-            if key[2] == 'X':
-                key = (key[0], key[2], key[3], key[1])
-            elif key[3] == 'X':
-                key = (key[0], key[3], key[1], key[2])
             f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
                     (key[0], key[1], key[2], key[3], typ.psi_k, 0, typ.psi_eq))
         if self.cmap_types:
