@@ -425,6 +425,8 @@ class Atom(_ListItem):
     vdw_weight : ``float``
         In the AMOEBA force field, this is the weight of the van der Waals
         interaction on the parent atom
+    cgnr : ``int``
+        Charge group number, as required in GROMOS type force fields
 
     Notes
     -----
@@ -467,7 +469,7 @@ class Atom(_ListItem):
                  charge=None, mass=0.0, nb_idx=0, solvent_radius=0.0,
                  screen=0.0, tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
                  bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
-                 rmin14=None, epsilon14=None):
+                 rmin14=None, epsilon14=None, cgnr=0):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -506,6 +508,7 @@ class Atom(_ListItem):
         self._rmin14 = _strip_units(rmin14, u.angstroms)
         self._epsilon14 = _strip_units(epsilon14, u.kilocalories_per_mole)
         self.children = []
+        self.cgnr = cgnr # GROMOS type charge group number
 
     #===================================================
 
@@ -515,7 +518,7 @@ class Atom(_ListItem):
                   charge=item.charge, mass=item.mass, nb_idx=item.nb_idx,
                   solvent_radius=item.solvent_radius, screen=item.screen, tree=item.tree,
                   join=item.join, irotat=item.irotat, occupancy=item.occupancy,
-                  bfactor=item.bfactor, altloc=item.altloc)
+                  bfactor=item.bfactor, altloc=item.altloc, cgnr=item.cgnr)
         new.atom_type = item.atom_type
         new.anisou = copy(item.anisou)
         for key in item.other_locations:

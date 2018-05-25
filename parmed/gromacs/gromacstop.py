@@ -1805,7 +1805,7 @@ class GromacsTopologyFile(Structure):
                 dest.write('%5d %10s %6d %6s %6s %6d %10.8f %10.6f   ; '
                            'qtot %.6f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
-                            atom.idx+1, atom.charge, atom.mass, runchg))
+                            atom.cgnr, atom.charge, atom.mass, runchg))
         dest.write('\n')
         # Do valence terms now
         EPs = [a for a in struct.atoms if isinstance(a, ExtraPoint)]
