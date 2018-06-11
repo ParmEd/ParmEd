@@ -262,7 +262,7 @@ class NetCDFRestart(object):
 
     @property
     def velocities(self):
-        if self.hasvels:
+        if 'velocities' in self._ncfile.variables:
             vels = self._ncfile.variables['velocities'][:]
             return (vels.reshape((-1, self.atom, 3)) * self.velocity_scale)
         else:
@@ -273,11 +273,11 @@ class NetCDFRestart(object):
         self._ncfile.variables['velocities'][:] = \
                     np.reshape(stuff, (self.atom, 3)) / self.velocity_scale
         self.flush()
-        self.hasvels = True
 
     @property
     def cell_lengths(self):
-        return self._ncfile.variables['cell_lengths'][:]
+        if 'cell_lengths' in self._ncfile.variables:
+            return self._ncfile.variables['cell_lengths'][:]
 
     @cell_lengths.setter
     def cell_lengths(self, stuff):
@@ -286,7 +286,8 @@ class NetCDFRestart(object):
 
     @property
     def cell_angles(self):
-        return self._ncfile.variables['cell_angles'][:]
+        if 'cell_angles' in self._ncfile.variables:
+            return self._ncfile.variables['cell_angles'][:]
 
     @cell_angles.setter
     def cell_angles(self, stuff):
@@ -295,17 +296,14 @@ class NetCDFRestart(object):
 
     @property
     def box(self):
-        if self.hasbox:
+        if self.cell_lengths is not None and self.cell_angles is not None:
             leng, ang = self.cell_lengths, self.cell_angles
             return np.concatenate((leng, ang))
-        else:
-            return None
 
     @box.setter
     def box(self, stuff):
         self.cell_lengths = stuff[:3]
         self.cell_angles = stuff[3:]
-        self.hasbox = True
 
     @property
     def time(self):
