@@ -2,23 +2,6 @@
 This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
-
-Copyright (C) 2010 - 2015  Jason Swails
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
 """
 from __future__ import division
 
@@ -318,8 +301,7 @@ class AmberParm(AmberFormat, Structure):
                 return _copy.copy(struct)
             return struct
         if struct.unknown_functional:
-            raise TypeError('Cannot instantiate an AmberParm from unknown '
-                            'functional')
+            raise TypeError('Cannot instantiate an AmberParm from unknown functional')
         if (struct.urey_bradleys or struct.impropers or struct.cmaps or
                 struct.trigonal_angles or struct.pi_torsions or
                 struct.out_of_plane_bends or struct.stretch_bends or
@@ -353,20 +335,7 @@ class AmberParm(AmberFormat, Structure):
         del inst.adjusts[:]
         inst.pointers = {}
         inst.LJ_types = {}
-        nbfixes = inst.atoms.assign_nbidx_from_types()
-        # Give virtual sites a name that Amber understands
-        for atom in inst.atoms:
-            if isinstance(atom, ExtraPoint): atom.type = 'EP'
-        # Fill the Lennard-Jones arrays/dicts
-        ntyp = 0
-        for atom in inst.atoms:
-            inst.LJ_types[atom.type] = atom.nb_idx
-            ntyp = max(ntyp, atom.nb_idx)
-        inst.LJ_radius = [0 for i in range(ntyp)]
-        inst.LJ_depth = [0 for i in range(ntyp)]
-        for atom in inst.atoms:
-            inst.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
-            inst.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        nbfixes = inst._set_nbidx_lj_params()
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
         inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
@@ -384,6 +353,25 @@ class AmberParm(AmberFormat, Structure):
         # Setting box sets some of the flag data appropriately
         inst.box = inst.get_box()
         return inst
+
+    #===================================================
+
+    def _set_nbidx_lj_params(self):
+        nbfixes = self.atoms.assign_nbidx_from_types()
+        # Give virtual sites a name that Amber understands
+        for atom in self.atoms:
+            atom.type = atom.type if not isinstance(atom, ExtraPoint) else 'EP'
+        # Fill the Lennard-Jones arrays/dicts
+        ntyp = 0
+        for atom in self.atoms:
+            self.LJ_types[atom.type] = atom.nb_idx
+            ntyp = max(ntyp, atom.nb_idx)
+        self.LJ_radius = [0 for i in range(ntyp)]
+        self.LJ_depth = [0 for i in range(ntyp)]
+        for atom in self.atoms:
+            self.LJ_radius[atom.nb_idx-1] = atom.atom_type.rmin
+            self.LJ_depth[atom.nb_idx-1] = atom.atom_type.epsilon
+        return nbfixes
 
     #===================================================
 
@@ -436,8 +424,13 @@ class AmberParm(AmberFormat, Structure):
         return self
 
     def __iadd__(self, other):
+        if self.has_NBFIX() or self.has_1012():
+            raise ValueError('Cannot combine Amber systems with NBFIX or 10-12 parameters')
         super(AmberParm, self).__iadd__(other)
+        # Make sure we properly recompute the LJ tables
+        nbfixes = self._set_nbidx_lj_params()
         self.remake_parm()
+        self._set_nonbonded_tables(nbfixes)
         return self
 
     #===================================================
