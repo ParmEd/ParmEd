@@ -30,7 +30,7 @@ class AmberOFFLibrary(object):
 
     # Useful regexes
     _headerre = re.compile(r'!!index *array *str')
-    _resre = re.compile(r' *"(\S*)"$')
+    _resre = re.compile(r' *"(\S*)"\s*$')
     _sec1re = re.compile(r'!entry\.(\S*)\.unit\.atoms *table *str *name *str'
                          r' *type *int *typex *int *resx *int *flags *int'
                          r' *seq *int *elmnt *dbl *chg')
