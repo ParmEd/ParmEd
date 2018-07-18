@@ -27,7 +27,7 @@ else
     ./run_scripts.sh
     # Run nose under coverage, since that allows getting the full flexibility of
     # the coverage package without sacrificing nose functionality
-    test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv
+#   test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv
     coverage run --source=parmed --parallel-mode -m \
         nose -vs --with-timer --timer-ok=5s --timer-warning=12s \
              --timer-filter=warning,error .

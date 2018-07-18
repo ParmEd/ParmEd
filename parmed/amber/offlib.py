@@ -30,34 +30,34 @@ class AmberOFFLibrary(object):
 
     # Useful regexes
     _headerre = re.compile(r'!!index *array *str')
-    _resre = re.compile(r' *"(\S*)"$')
-    _sec1re = re.compile(r'!entry\.(\S*)\.unit\.atoms *table *str *name *str'
+    _resre = re.compile(r'\s*"(\S*?)"\s*$')
+    _sec1re = re.compile(r'!entry\.(\S*?)\.unit\.atoms *table *str *name *str'
                          r' *type *int *typex *int *resx *int *flags *int'
                          r' *seq *int *elmnt *dbl *chg')
-    _sec2re = re.compile(r'!entry\.(\S*)\.unit\.atomspertinfo *table *str'
+    _sec2re = re.compile(r'!entry\.(\S*?)\.unit\.atomspertinfo *table *str'
                          r' *pname *str *ptype *int *ptypex *int *pelmnt'
                          r' *dbl *pchg')
-    _sec3re = re.compile(r'!entry\.(\S*)\.unit\.boundbox *array *dbl')
-    _sec4re = re.compile(r'!entry\.(\S*)\.unit\.childsequence *single *int')
-    _sec5re = re.compile(r'!entry\.(\S*)\.unit\.connect *array *int')
-    _sec6re = re.compile(r'!entry\.(\S*)\.unit\.connectivity *table *int'
+    _sec3re = re.compile(r'!entry\.(\S*?)\.unit\.boundbox *array *dbl')
+    _sec4re = re.compile(r'!entry\.(\S*?)\.unit\.childsequence *single *int')
+    _sec5re = re.compile(r'!entry\.(\S*?)\.unit\.connect *array *int')
+    _sec6re = re.compile(r'!entry\.(\S*?)\.unit\.connectivity *table *int'
                          r' *atom1x *int *atom2x *int *flags')
-    _sec7re = re.compile(r'!entry\.(\S*)\.unit\.hierarchy *table *str'
+    _sec7re = re.compile(r'!entry\.(\S*?)\.unit\.hierarchy *table *str'
                          r' *abovetype *int *abovex *str *belowtype *int'
                          r' *belowx')
-    _sec8re = re.compile(r'!entry\.(\S*)\.unit\.name *single *str')
-    _sec9re = re.compile(r'!entry\.(\S*)\.unit\.positions *table *dbl *x'
+    _sec8re = re.compile(r'!entry\.(\S*?)\.unit\.name *single *str')
+    _sec9re = re.compile(r'!entry\.(\S*?)\.unit\.positions *table *dbl *x'
                          r' *dbl *y *dbl *z')
-    _sec10re = re.compile(r'!entry\.(\S*)\.unit\.residueconnect *table'
+    _sec10re = re.compile(r'!entry\.(\S*?)\.unit\.residueconnect *table'
                           r' *int *c1x *int *c2x *int *c3x *int *c4x *int'
                           r' *c5x *int *c6x')
-    _sec11re = re.compile(r'!entry\.(\S*)\.unit\.residues *table *str *name'
+    _sec11re = re.compile(r'!entry\.(\S*?)\.unit\.residues *table *str *name'
                           r' *int *seq *int *childseq *int *startatomx *str'
                           r' *restype *int *imagingx')
-    _sec12re = re.compile(r'!entry\.(\S*)\.unit\.residuesPdbSequenceNumber'
+    _sec12re = re.compile(r'!entry\.(\S*?)\.unit\.residuesPdbSequenceNumber'
                           r' *array *int')
-    _sec13re = re.compile(r'!entry\.(\S*)\.unit\.solventcap *array *dbl')
-    _sec14re = re.compile(r'!entry\.(\S*)\.unit\.velocities *table *dbl *x'
+    _sec13re = re.compile(r'!entry\.(\S*?)\.unit\.solventcap *array *dbl')
+    _sec14re = re.compile(r'!entry\.(\S*?)\.unit\.velocities *table *dbl *x'
                           r' *dbl *y *dbl *z')
 
     #===================================================

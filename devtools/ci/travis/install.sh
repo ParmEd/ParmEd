@@ -38,7 +38,7 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
         conda install -y -n myenv nglview -c bioconda
-        conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
+       #conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
         conda install -y -n myenv networkx
         conda install -y -n myenv lxml
     else
@@ -48,9 +48,9 @@ else # Otherwise, CPython... go through conda
     fi
     source activate myenv
     pip install pyflakes==1.0.0
-    if [ -z "$MINIMAL_PACKAGES" ]; then
-        pip uninstall parmed -y # from ambertools
-    fi
+   #if [ -z "$MINIMAL_PACKAGES" ]; then
+   #    pip uninstall parmed -y # from ambertools
+   #fi
 
     # DEBUG
     conda list
