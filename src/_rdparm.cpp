@@ -38,11 +38,14 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     ParmFormatMap parmFormats;
     std::vector<std::string> flagList;
     std::string version;
+    ExitStatus retval;
 
     Py_BEGIN_ALLOW_THREADS
 
-    ExitStatus retval = readparm(fname, flagList, parmData, parmComments,
-                                 unkParmData, parmFormats, version);
+    retval = readparm(fname, flagList, parmData, parmComments,
+                      unkParmData, parmFormats, version);
+
+    Py_END_ALLOW_THREADS
 
     if (retval == NOOPEN) {
         error_message = "Could not open " + fname + " for reading";
@@ -67,8 +70,6 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
         PyErr_SetString(PyExc_RuntimeError, error_message.c_str());
         return NULL;
     }
-
-    Py_END_ALLOW_THREADS
 
     // If we got here, the parsing must have been OK. Create the parm_data,
     // formats, and comments dicts to pass back to Python
