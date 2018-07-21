@@ -39,6 +39,8 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     std::vector<std::string> flagList;
     std::string version;
 
+    Py_BEGIN_ALLOW_THREADS
+
     ExitStatus retval = readparm(fname, flagList, parmData, parmComments,
                                  unkParmData, parmFormats, version);
 
@@ -65,6 +67,8 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
         PyErr_SetString(PyExc_RuntimeError, error_message.c_str());
         return NULL;
     }
+
+    Py_END_ALLOW_THREADS
 
     // If we got here, the parsing must have been OK. Create the parm_data,
     // formats, and comments dicts to pass back to Python
