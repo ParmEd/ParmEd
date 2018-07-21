@@ -16,6 +16,11 @@ typedef int Py_ssize_t;
 // Optimized readparm
 #include "readparm.h"
 
+void SetItem_PyDict_AndDecref(PyObject *dict, const char* key, PyObject *value) {
+    PyDict_SetItemString(dict, key, value);
+    Py_DECREF(value);
+}
+
 static PyObject* rdparm(PyObject *self, PyObject *args) {
 
     char *filename;
@@ -33,9 +38,14 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     ParmFormatMap parmFormats;
     std::vector<std::string> flagList;
     std::string version;
+    ExitStatus retval;
 
-    ExitStatus retval = readparm(fname, flagList, parmData, parmComments,
-                                 unkParmData, parmFormats, version);
+    Py_BEGIN_ALLOW_THREADS
+
+    retval = readparm(fname, flagList, parmData, parmComments,
+                      unkParmData, parmFormats, version);
+
+    Py_END_ALLOW_THREADS
 
     if (retval == NOOPEN) {
         error_message = "Could not open " + fname + " for reading";
@@ -115,11 +125,11 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                 PyErr_SetString(PyExc_RuntimeError, "This should be unreachable");
                 return NULL;
         }
-        PyDict_SetItemString(parm_data, flag.c_str(), list);
+        SetItem_PyDict_AndDecref(parm_data, flag.c_str(), list);
 
         // Now comments
         if (parmComments.count(flag) == 0) {
-            PyDict_SetItemString(comments, flag.c_str(), PyList_New(0));
+            SetItem_PyDict_AndDecref(comments, flag.c_str(), PyList_New(0));
         } else {
             int ncom = parmComments[flag].size();
             PyObject *commentList = PyList_New(ncom);
@@ -128,12 +138,12 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                 PyList_SET_ITEM(commentList, j,
                                 PyString_FromString(line.c_str()));
             }
-            PyDict_SetItemString(comments, flag.c_str(), commentList);
+            SetItem_PyDict_AndDecref(comments, flag.c_str(), commentList);
         }
 
         // Now formats
         PyObject *fmt = PyString_FromString(parmFormats[flag].fmt.c_str());
-        PyDict_SetItemString(formats, flag.c_str(), fmt);
+        SetItem_PyDict_AndDecref(formats, flag.c_str(), fmt);
 
         // Now flag list
         PyList_SET_ITEM(flag_list, (Py_ssize_t)i,
