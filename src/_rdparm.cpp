@@ -116,10 +116,13 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                 return NULL;
         }
         PyDict_SetItemString(parm_data, flag.c_str(), list);
+        Py_DECREF(list);
 
         // Now comments
         if (parmComments.count(flag) == 0) {
-            PyDict_SetItemString(comments, flag.c_str(), PyList_New(0));
+            PyObject *empty_list = PyList_New(0);
+            PyDict_SetItemString(comments, flag.c_str(), empty_list);
+            Py_DECREF(empty_list);
         } else {
             int ncom = parmComments[flag].size();
             PyObject *commentList = PyList_New(ncom);
@@ -129,11 +132,13 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                                 PyString_FromString(line.c_str()));
             }
             PyDict_SetItemString(comments, flag.c_str(), commentList);
+            Py_DECREF(commentList);
         }
 
         // Now formats
         PyObject *fmt = PyString_FromString(parmFormats[flag].fmt.c_str());
         PyDict_SetItemString(formats, flag.c_str(), fmt);
+        Py_DECREF(fmt);
 
         // Now flag list
         PyList_SET_ITEM(flag_list, (Py_ssize_t)i,
