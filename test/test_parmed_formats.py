@@ -1025,16 +1025,21 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
 
         coordinates = np.zeros((len(structure.atoms), 3))
 
-        structure.write_pdb("hetatom.pdb", use_hetatoms=True, coordinates=coordinates)
-        structure.write_pdb("no_hetatom.pdb", use_hetatoms=False, coordinates=coordinates)
+        output = StringIO()
 
-        with open('hetatom.pdb') as f:
-            for line, tag in zip(f, ['ATOM', 'ATOM', 'ATOM', 'HETATM']):
-                assert line.startswith(tag)
+        # Test 1: write HETATM tags
 
-        with open('no_hetatom.pdb') as f:
-            for line, tag in zip(f, ['ATOM', 'ATOM', 'ATOM', 'ATOM']):
-                assert line.startswith(tag)
+        structure.write_pdb(output, use_hetatoms=True, coordinates=coordinates)
+        output.seek(0)
+        for line, tag in zip(output, ['ATOM', 'ATOM', 'ATOM', 'HETATM']):
+            assert line.startswith(tag)
+
+        # Test 2: do NOT write HETATM tags
+
+        output.seek(0)
+        structure.write_pdb(output, use_hetatoms=False, coordinates=coordinates)
+        for line, tag in zip(output, ['ATOM', 'ATOM', 'ATOM', 'ATOM']):
+            assert line.startswith(tag)
 
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
