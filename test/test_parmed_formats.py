@@ -1014,6 +1014,28 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
         self.assertNotIn('WAT', resname_set)
         self.assertIn('HOH', resname_set)
 
+    def test_pdb_write_hetatoms(self):
+        """Tests HETATM/ATOM tag writing"""
+        structure = Structure()
+        a = Atom(name='CA', atomic_number=6)
+        structure.add_atom(a, 'ASH', 2, 'A')
+        structure.add_atom(a, 'DG', 2, 'A')
+        structure.add_atom(a, 'T', 2, 'A')
+        structure.add_atom(a, 'MOL', 2, 'A')
+
+        coordinates = np.zeros((len(structure.atoms), 3))
+
+        structure.write_pdb("hetatom.pdb", use_hetatoms=True, coordinates=coordinates)
+        structure.write_pdb("no_hetatom.pdb", use_hetatoms=False, coordinates=coordinates)
+
+        with open('hetatom.pdb') as f:
+            for line, tag in zip(f, ['ATOM', 'ATOM', 'ATOM', 'HETATM']):
+                assert line.startswith(tag)
+
+        with open('no_hetatom.pdb') as f:
+            for line, tag in zip(f, ['ATOM', 'ATOM', 'ATOM', 'ATOM']):
+                assert line.startswith(tag)
+
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
