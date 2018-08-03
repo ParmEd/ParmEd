@@ -1027,19 +1027,16 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
 
         output = StringIO()
 
-        # Test 1: write HETATM tags
+        tests = [{"use_hetatoms": True, "tags": ['ATOM', 'ATOM', 'ATOM', 'HETATM']},
+                 {"use_hetatoms": False, "tags": ['ATOM', 'ATOM', 'ATOM', 'ATOM']}]
 
-        structure.write_pdb(output, use_hetatoms=True, coordinates=coordinates)
-        output.seek(0)
-        for line, tag in zip(output, ['ATOM', 'ATOM', 'ATOM', 'HETATM']):
-            assert line.startswith(tag)
+        for test in tests:
+            output.seek(0)
+            structure.write_pdb(output, use_hetatoms=test["use_hetatoms"], coordinates=coordinates)
+            output.seek(0)
 
-        # Test 2: do NOT write HETATM tags
-
-        output.seek(0)
-        structure.write_pdb(output, use_hetatoms=False, coordinates=coordinates)
-        for line, tag in zip(output, ['ATOM', 'ATOM', 'ATOM', 'ATOM']):
-            assert line.startswith(tag)
+            for tag in test["tags"]:
+                assert output.readline().startswith(tag)
 
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
