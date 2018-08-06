@@ -1018,10 +1018,10 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
         """Tests HETATM/ATOM tag writing"""
         structure = Structure()
         a = Atom(name='CA', atomic_number=6)
-        structure.add_atom(a, 'ASH', 2, 'A')
-        structure.add_atom(a, 'DG', 2, 'A')
-        structure.add_atom(a, 'T', 2, 'A')
-        structure.add_atom(a, 'MOL', 2, 'A')
+        structure.add_atom(copy(a), 'ASH', 2, 'A')
+        structure.add_atom(copy(a), 'DG', 2, 'A')
+        structure.add_atom(copy(a), 'T', 2, 'A')
+        structure.add_atom(copy(a), 'MOL', 2, 'A')
 
         coordinates = np.zeros((len(structure.atoms), 3))
 
