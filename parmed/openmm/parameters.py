@@ -204,7 +204,24 @@ class OpenMMParameterSet(ParameterSet):
         # Only add unique patches
         def patch_is_equivalent(patch1, patch2):
             """Return True if patches are equivalent to OpenMM."""
-            return (set(patch1.add_bonds)==set(patch2.add_bonds)) and (set(patch1.delete_atoms)==set(patch2.delete_atoms))
+            # Compare atoms to be added or changed
+            def atomhash(atom):
+                """Return a hash for an atom that only accounts for name, type, and charge."""
+                return hash( (atom.name, atom.type, atom.charge) )
+            def atomset(atoms):
+                """Return a set of hashes for a list of atoms."""
+                return set([atomhash(atom) for atom in atoms])
+            if atomset(patch1.atoms) != set(patch2.atoms):
+                return False
+            # Compare bonds to be added
+            if set(patch1.add_bonds) != set(patch2.add_bonds):
+                return False
+            # Compare atoms to be deleted
+            if set(patch1.delete_atoms) != set(patch2.delete_atoms):
+                return False
+
+            # Patches are equivalent in XML content (if not in action on a residue)
+            return True
 
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
