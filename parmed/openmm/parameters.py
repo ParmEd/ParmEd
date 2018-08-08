@@ -475,13 +475,13 @@ class OpenMMParameterSet(ParameterSet):
         hash_info = tuple()
         # Sort tuples of atom properties by atom name
         if len(residue.atoms) > 0:
-            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms], key=lambda tup: tup[0]))
+            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms] ))
         # Sort list of deleted atoms by atom name
         if hasattr(residue, 'delete_atoms') and len(residue.delete_atoms) > 0:
             hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
         # Sort list of bonds by first bond name        
         if len(residue.bonds) > 0:
-            hash_info += tuple(sorted( [(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds], key=lambda tup: tup[0]))
+            hash_info += tuple(sorted( [(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds] ))
         # Add head and tail
         if residue.head:
             hash_info += (residue.head.name,)
