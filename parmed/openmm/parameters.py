@@ -202,37 +202,21 @@ class OpenMMParameterSet(ParameterSet):
             new_params.residues[residue.name] = residue
 
         # Only add unique patches
-        def patch_is_equivalent(patch1, patch2):
-            """Return True if patches are equivalent to OpenMM."""
-            # Compare atoms to be added or changed
-            def atomhash(atom):
-                """Return a hash for an atom that only accounts for name, type, and charge."""
-                return hash( (atom.name, atom.type, atom.charge) )
-            def atomset(atoms):
-                """Return a set of hashes for a list of atoms."""
-                return set([atomhash(atom) for atom in atoms])
-            if atomset(patch1.atoms) != set(patch2.atoms):
-                return False
-            # Compare bonds to be added
-            if set(patch1.add_bonds) != set(patch2.add_bonds):
-                return False
-            # Compare atoms to be deleted
-            if set(patch1.delete_atoms) != set(patch2.delete_atoms):
-                return False
-
-            # Patches are equivalent in XML content (if not in action on a residue)
-            return True
-
+        unique_patches = dict()
+        n_discarded_patches = 0
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
-                patch_is_unique = True
-                for existing_patch in new_params.patches.values():
-                    if patch_is_equivalent(patch, existing_patch):
-                        warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, existing_patch))
-                        patch_is_unique = False
-                        break
-                if patch_is_unique:
+                templhash = OpenMMParameterSet._templhasher(patch)
+                if templhash not in unique_patches: 
                     new_params.patches[name] = patch
+                    unique_patches[templhash] = patch
+                else:
+                    patch_collision = unique_patches[templhash]
+                    warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                    n_discarded_patches += 1
+                    
+        if (n_discarded_patches > 0):
+            warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
 
         return new_params
 
@@ -485,11 +469,26 @@ class OpenMMParameterSet(ParameterSet):
 
     @staticmethod
     def _templhasher(residue):
-        if len(residue.atoms) == 1:
-            atom = residue.atoms[0]
-            return hash((atom.atomic_number, atom.type, atom.charge))
-        # TODO implement hash for polyatomic residues
-        return id(residue)
+        """
+        Create a unique hash for each residue and patch template using only properties rendered to OpenMM ffxml.
+        """
+        hash_info = tuple()
+        # Sort tuples of atom properties by atom name
+        if len(residue.atoms) > 0:
+            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms], key=lambda tup: tup[0]))
+        # Sort list of deleted atoms by atom name
+        if hasattr(residue, 'delete_atoms') and len(residue.delete_atoms) > 0:
+            hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
+        # Sort list of bonds by first bond name        
+        if len(residue.bonds) > 0:
+            hash_info += tuple(sorted( [(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds], key=lambda tup: tup[0]))
+        # Add head and tail
+        if residue.head:
+            hash_info += (residue.head.name,)
+        if residue.tail:
+            hash_info += (residue.tail.name,)
+        # TODO: Is there any other data that is rendered to ffxml files we should include?
+        return hash(hash_info)
 
     @needs_lxml
     def _write_omm_provenance(self, root, provenance):
@@ -539,13 +538,16 @@ class OpenMMParameterSet(ParameterSet):
         if not self.residues: return
         if valid_patches_for_residue is None:
             valid_patches_for_residue = dict()
-        written_residues = set()
+        written_residues = dict()
         xml_section = etree.SubElement(xml_root, 'Residues')
         for name, residue in iteritems(self.residues):
             if name in skip_residues: continue
             templhash = OpenMMParameterSet._templhasher(residue)
-            if templhash in written_residues: continue
-            written_residues.add(templhash)
+            if templhash in written_residues: 
+                residue_collision = written_residues[templhash]
+                warnings.warn('Skipping writing of residue {} because OpenMM considers it identical to {}'.format(residue, residue_collision))
+                continue
+            written_residues[templhash] = residue
             # Write residue
             if residue.override_level == 0:
                 xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name)
@@ -643,16 +645,19 @@ class OpenMMParameterSet(ParameterSet):
 
         """
         if not self.patches: return
-        written_patches = set()
+        written_patches = dict()
         xml_patches = etree.SubElement(xml_root, 'Patches')
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
             if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
                 continue
 
-            templhash = OpenMMParameterSet._templhasher(patch)
-            if templhash in written_patches: continue
-            written_patches.add(templhash)
+            templhash = OpenMMParameterSet._templhasher(patch) # TODO: this may be redundant now
+            if templhash in written_patches: 
+                patch_collision = written_patches[templhash]
+                warnings.warn('Skipping writing of patch {} because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                continue
+            written_patches[templhash] = patch
             if patch.override_level == 0:
                 patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name)
             else:
