@@ -732,6 +732,19 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         # Ensure potentials are almost equal
         self.assertAlmostEqual(ffxml_potential, parmed_potential)
 
+    def test_duplicate_patch_removal(self):
+        """ Test importing CHARMM36 protein forcefield correctly removes duplicate patches """
+
+        charmm_params = pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
+                                                      get_fn('top_all36_prot.rtf'))
+
+        openmm_params = openmm.OpenMMParameterSet.from_parameterset(charmm_params)
+
+        assert 'ACE' in openmm_params.patches # appears first, should be retained
+        assert 'ACED' not in openmm_params.patches # duplicate for OpenMM, should be removed
+        assert 'ACP' not in openmm_params.patches # duplicate for OpenMM, should be removed
+        assert 'ACPD' not in openmm_params.patches # duplicate for OpenMM, should be removed
+
     def test_ljforce_charmm(self):
         """ Test writing LennardJonesForce without NBFIX from Charmm parameter files and reading them back into OpenMM ForceField """
 

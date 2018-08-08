@@ -202,20 +202,21 @@ class OpenMMParameterSet(ParameterSet):
             new_params.residues[residue.name] = residue
 
         # Only add unique patches
-        def patch_is_equivalent(patch1, patch2):
-            """Return True if patches are equivalent to OpenMM."""
-            return (set(patch1.add_bonds)==set(patch2.add_bonds)) and (set(patch1.delete_atoms)==set(patch2.delete_atoms))
-
+        unique_patches = OrderedDict()
+        n_discarded_patches = 0
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
-                patch_is_unique = True
-                for existing_patch in new_params.patches.values():
-                    if patch_is_equivalent(patch, existing_patch):
-                        warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, existing_patch))
-                        patch_is_unique = False
-                        break
-                if patch_is_unique:
+                templhash = OpenMMParameterSet._templhasher(patch)
+                if templhash not in unique_patches:
                     new_params.patches[name] = patch
+                    unique_patches[templhash] = patch
+                else:
+                    patch_collision = unique_patches[templhash]
+                    warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                    n_discarded_patches += 1
+
+        if (n_discarded_patches > 0):
+            warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
 
         return new_params
 
@@ -335,8 +336,8 @@ class OpenMMParameterSet(ParameterSet):
             dest.write(xml)
 
     def _find_explicit_impropers(self):
-        improper_harmonic = {}
-        improper_periodic = {}
+        improper_harmonic = OrderedDict()
+        improper_periodic = OrderedDict()
 
         def get_types(residue, atomname):
             """Return list of atom type(s) that match the given atom name.
@@ -468,11 +469,26 @@ class OpenMMParameterSet(ParameterSet):
 
     @staticmethod
     def _templhasher(residue):
-        if len(residue.atoms) == 1:
-            atom = residue.atoms[0]
-            return hash((atom.atomic_number, atom.type, atom.charge))
-        # TODO implement hash for polyatomic residues
-        return id(residue)
+        """
+        Create a unique hash for each residue and patch template using only properties rendered to OpenMM ffxml.
+        """
+        hash_info = tuple()
+        # Sort tuples of atom properties by atom name
+        if len(residue.atoms) > 0:
+            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms] ))
+        # Sort list of deleted atoms by atom name
+        if hasattr(residue, 'delete_atoms') and len(residue.delete_atoms) > 0:
+            hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
+        # Sort list of bonds by first bond name
+        if len(residue.bonds) > 0:
+            hash_info += tuple(sorted( [(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds] ))
+        # Add head and tail
+        if residue.head:
+            hash_info += (residue.head.name,)
+        if residue.tail:
+            hash_info += (residue.tail.name,)
+        # TODO: Is there any other data that is rendered to ffxml files we should include?
+        return hash(hash_info)
 
     @needs_lxml
     def _write_omm_provenance(self, root, provenance):
@@ -481,7 +497,7 @@ class OpenMMParameterSet(ParameterSet):
         date_generated = etree.SubElement(info, "DateGenerated")
         date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3]
 
-        provenance = provenance or dict()
+        provenance = provenance or OrderedDict()
         for tag, content in iteritems(provenance):
             if tag == 'DateGenerated': continue
             if not isinstance(content, list):
@@ -491,7 +507,7 @@ class OpenMMParameterSet(ParameterSet):
                     item = etree.Element(tag)
                     item.text = sub_content
                     info.append(item)
-                elif isinstance(sub_content, dict):
+                elif isinstance(sub_content, OrderedDict) or isinstance(sub_content, dict):
                     if tag not in sub_content:
                         raise KeyError('Content of an attribute-containing element '
                                        'specified incorrectly.')
@@ -521,14 +537,17 @@ class OpenMMParameterSet(ParameterSet):
     def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
-            valid_patches_for_residue = dict()
-        written_residues = set()
+            valid_patches_for_residue = OrderedDict()
+        written_residues = OrderedDict()
         xml_section = etree.SubElement(xml_root, 'Residues')
         for name, residue in iteritems(self.residues):
             if name in skip_residues: continue
             templhash = OpenMMParameterSet._templhasher(residue)
-            if templhash in written_residues: continue
-            written_residues.add(templhash)
+            if templhash in written_residues:
+                residue_collision = written_residues[templhash]
+                warnings.warn('Skipping writing of residue {} because OpenMM considers it identical to {}'.format(residue, residue_collision))
+                continue
+            written_residues[templhash] = residue
             # Write residue
             if residue.override_level == 0:
                 xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name)
@@ -626,16 +645,19 @@ class OpenMMParameterSet(ParameterSet):
 
         """
         if not self.patches: return
-        written_patches = set()
+        written_patches = OrderedDict()
         xml_patches = etree.SubElement(xml_root, 'Patches')
         for name, patch in iteritems(self.patches):
             # Require that at least one valid patch combination exists for this patch
             if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
                 continue
 
-            templhash = OpenMMParameterSet._templhasher(patch)
-            if templhash in written_patches: continue
-            written_patches.add(templhash)
+            templhash = OpenMMParameterSet._templhasher(patch) # TODO: this may be redundant now
+            if templhash in written_patches:
+                patch_collision = written_patches[templhash]
+                warnings.warn('Skipping writing of patch {} because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                continue
+            written_patches[templhash] = patch
             if patch.override_level == 0:
                 patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name)
             else:
@@ -738,7 +760,7 @@ class OpenMMParameterSet(ParameterSet):
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
             diheds_done.add((a4, a3, a2, a1))
-            terms = dict()
+            terms = OrderedDict()
             for i, term in enumerate(dihed):
                 i += 1
                 terms['periodicity%d' % i] = str(term.per)
@@ -799,7 +821,7 @@ class OpenMMParameterSet(ParameterSet):
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
         xml_force = etree.SubElement(xml_root, 'CMAPTorsionForce')
-        maps = dict()
+        maps = OrderedDict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
         for _, cmap in iteritems(self.cmap_types):
