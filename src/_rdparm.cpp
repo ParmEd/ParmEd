@@ -197,5 +197,7 @@ init_rdparm(void) {
 #else
     m = Py_InitModule3("_rdparm", optrdparmMethods,
             "Optimized prmtop file reading library written in C++");
+			
+	(void)m; // silence unused variable warning
 #endif
 }
