@@ -23,7 +23,6 @@ from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
 import warnings
 from parmed.exceptions import ParameterWarning, IncompatiblePatchError
-import itertools
 from itertools import product, combinations
 from ..topologyobjects import (DihedralType, ImproperType)
 
@@ -379,9 +378,9 @@ class OpenMMParameterSet(ParameterSet):
         """
         For every residue, find any explicitly-specified (e.g. CHARMM) improper torsions and identify all wild-card improper parameters that match.
         Expand all of these out into explicit impropers.
-        This is necessary for OpenMM to correctly handle impropers for these residues.        
+        This is necessary for OpenMM to correctly handle impropers for these residues.
 
-        .. todo :: 
+        .. todo ::
 
            * Do we need to do this for patches as well?
 
@@ -435,9 +434,9 @@ class OpenMMParameterSet(ParameterSet):
                         improper_found = True
                     else:
                         raise Exception('Something went wrong with improper type for {} returning an unexpected object {}'.format(key, improper))
-                    
+
                 # Warn if no improper was found
-                if not improper_found:                        
+                if not improper_found:
                     warnings.warn('No improper found for improper {} in residue {} (types were {})'.format(impr, name, types))
 
         # Update our impropers
