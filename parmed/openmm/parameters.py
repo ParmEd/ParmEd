@@ -437,7 +437,7 @@ class OpenMMParameterSet(ParameterSet):
 
                 # Warn if no improper was found
                 if not improper_found:
-                    warnings.warn('No improper found for improper {} in residue {} (types were {})'.format(impr, name, types))
+                    raise Exception('No improper found for improper {} in residue {} (types were {})'.format(impr, name, types))
 
         # Update our impropers
         self.improper_periodic_types = improper_periodic
