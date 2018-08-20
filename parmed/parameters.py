@@ -214,7 +214,7 @@ class ParameterSet(object):
         if struct.has_NBFIX():
             for atom in struct.atoms:
                 if atom.atom_type.nbfix:
-                    other_atoms = [*atom.atom_type.nbfix.keys()]
+                    other_atoms = list(atom.atom_type.nbfix.keys())
                     for other_atom in other_atoms:
                         (rmin, epsilon, rmin14, epsilon14) = atom.atom_type.nbfix[other_atom]
                         params.nbfix_types[(atom.type, other_atom)] = (rmin, epsilon)
