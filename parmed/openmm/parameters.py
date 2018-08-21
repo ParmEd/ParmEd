@@ -18,13 +18,13 @@ from ..modeller.residue import ResidueTemplate, PatchTemplate
 from ..parameters import ParameterSet
 from ..periodic_table import Element
 from ..topologyobjects import NoUreyBradley
-from .. import unit
+from .. import unit as u
 from ..utils.io import genopen
 from ..utils.six import add_metaclass, string_types, iteritems
 from ..utils.six.moves import range
 import warnings
 from ..exceptions import ParameterWarning, IncompatiblePatchError
-from itertools import product, combinations
+from itertools import product
 from ..topologyobjects import (DihedralType, ImproperType)
 
 
