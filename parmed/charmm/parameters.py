@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 import os
 import re
 import warnings
-from abc import ABCMeta
 from copy import copy as _copy
 from collections import OrderedDict
 from itertools import combinations
@@ -49,7 +48,6 @@ def _typeconv(name):
     return ('%sLTU' % name.upper()).replace('*', 'STR').replace(
             '+', 'P').replace('-', 'M')[:6]
 
-@add_metaclass(ABCMeta)
 class CharmmImproperMatchingMixin(object):
     """ Implements CHARMM-style improper matching """
 
