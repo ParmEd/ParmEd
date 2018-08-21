@@ -48,7 +48,41 @@ def _typeconv(name):
     return ('%sLTU' % name.upper()).replace('*', 'STR').replace(
             '+', 'P').replace('-', 'M')[:6]
 
-class CharmmParameterSet(ParameterSet):
+class CharmmImproperMatchingMixin(object):
+    """ Implements CHARMM-style improper matching """
+
+    def match_improper_type(self, a1, a2, a3, a4):
+        """ Matches an improper type based on atom type names """
+        typ = self._match_improper_with_typemap(self.improper_types, a1, a2, a3, a4)
+        if typ is None:
+            typ = self._match_improper_with_typemap(self.improper_periodic_types, a1, a2, a3, a4)
+        return typ
+
+    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
+
+        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
+        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
+
+        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
+        # all systems CHARMM supports :(
+
+        key = tuple(sorted([a1, a2, a3, a4]))
+        if self._improper_key_map.get(key, None) in typemap:
+            return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
+            key = tuple(sorted([exact1, exact2, exact3, 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
+            key = tuple(sorted([exact1, exact2, 'X', 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        return None
+
+class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
@@ -963,38 +997,6 @@ class CharmmParameterSet(ParameterSet):
                 # This is a Parameter file section
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
-
-    def match_improper_type(self, a1, a2, a3, a4):
-        """ Matches an improper type based on atom type names """
-        args = (a1, a2, a3, a4)
-        typ = self._match_improper_with_typemap(self.improper_types, *args)
-        if typ is None:
-            typ = self._match_improper_with_typemap(self.improper_periodic_types, *args)
-        return typ
-
-    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
-
-        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
-        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
-
-        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
-        # all systems CHARMM supports :(
-
-        key = tuple(sorted([a1, a2, a3, a4]))
-        if self._improper_key_map.get(key, None) in typemap:
-            return typemap[self._improper_key_map[key]]
-
-        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
-            key = tuple(sorted([exact1, exact2, exact3, 'X']))
-            if self._improper_key_map.get(key, None) in typemap:
-                return typemap[self._improper_key_map[key]]
-
-        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
-            key = tuple(sorted([exact1, exact2, 'X', 'X']))
-            if self._improper_key_map.get(key, None) in typemap:
-                return typemap[self._improper_key_map[key]]
-
-        return None
 
     def write(self, top=None, par=None, str=None):
         """ Write a CHARMM parameter set to a file
