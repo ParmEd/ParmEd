@@ -11,18 +11,19 @@ import math
 from functools import wraps
 from contextlib import closing
 import datetime
-from parmed.constants import DEFAULT_ENCODING
-from parmed.formats.registry import FileFormatType
-from parmed.modeller.residue import ResidueTemplate, PatchTemplate
-from parmed.parameters import ParameterSet
-from parmed.periodic_table import Element
-from parmed.topologyobjects import NoUreyBradley
-from parmed import unit as u
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
-from parmed.utils.six.moves import range
+from ..charmm.parameters import CharmmImproperMatchingMixin
+from ..constants import DEFAULT_ENCODING
+from ..formats.registry import FileFormatType
+from ..modeller.residue import ResidueTemplate, PatchTemplate
+from ..parameters import ParameterSet
+from ..periodic_table import Element
+from ..topologyobjects import NoUreyBradley
+from .. import unit
+from ..utils.io import genopen
+from ..utils.six import add_metaclass, string_types, iteritems
+from ..utils.six.moves import range
 import warnings
-from parmed.exceptions import ParameterWarning, IncompatiblePatchError
+from ..exceptions import ParameterWarning, IncompatiblePatchError
 from itertools import product, combinations
 from ..topologyobjects import (DihedralType, ImproperType)
 
@@ -50,7 +51,7 @@ def needs_lxml(func):
     return wrapper
 
 @add_metaclass(FileFormatType)
-class OpenMMParameterSet(ParameterSet):
+class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
     """ Class storing parameters from an OpenMM parameter set
 
     Parameters
@@ -202,7 +203,7 @@ class OpenMMParameterSet(ParameterSet):
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue):
+                if (not remediate_residues) or cls._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
         for residue in remediated_residues:
             new_params.residues[residue.name] = residue
@@ -340,39 +341,6 @@ class OpenMMParameterSet(ParameterSet):
                 f.write(xml)
         else:
             dest.write(xml)
-
-
-    def match_improper_type(self, a1, a2, a3, a4):
-        """ Matches a CHARMM improper type based on atom type names """
-        args = (a1, a2, a3, a4)
-        typ = self._match_improper_with_typemap(self.improper_types, *args)
-        if typ is None:
-            typ = self._match_improper_with_typemap(self.improper_periodic_types, *args)
-        return typ
-
-    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
-
-        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
-        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
-
-        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
-        # all systems CHARMM supports :(
-
-        key = tuple(sorted([a1, a2, a3, a4]))
-        if self._improper_key_map.get(key, None) in typemap:
-            return typemap[self._improper_key_map[key]]
-
-        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
-            key = tuple(sorted([exact1, exact2, exact3, 'X']))
-            if self._improper_key_map.get(key, None) in typemap:
-                return typemap[self._improper_key_map[key]]
-
-        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
-            key = tuple(sorted([exact1, exact2, 'X', 'X']))
-            if self._improper_key_map.get(key, None) in typemap:
-                return typemap[self._improper_key_map[key]]
-
-        return None
 
     def _find_explicit_impropers(self):
         """
