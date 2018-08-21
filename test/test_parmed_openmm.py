@@ -584,6 +584,10 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         forcefield = app.ForceField(ffxml)
 
+        # Load TIP3P water box to ensure there are no duplicate ion parameters
+        pdbfile = app.PDBFile(get_fn('tip3p_standard.pdb'))
+        system = forcefield.createSystem(pdbfile.topology)
+
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
         params = openmm.OpenMMParameterSet.from_parameterset(

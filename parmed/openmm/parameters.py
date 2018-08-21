@@ -461,7 +461,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         hash_info = tuple()
         # Sort tuples of atom properties by atom name
         if len(residue.atoms) > 0:
-            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms] ))
+            hash_info += tuple(sorted( [(atom.type, str(atom.charge)) for atom in residue.atoms] ))
         # Sort list of deleted atoms by atom name
         if hasattr(residue, 'delete_atoms') and len(residue.delete_atoms) > 0:
             hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
