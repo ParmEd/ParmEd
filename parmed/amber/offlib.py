@@ -133,6 +133,9 @@ class AmberOFFLibrary(object):
             raise RuntimeError('Unexpected EOF in Amber OFF library')
         # Now make sure we have the next expected line
         while line:
+            if not line.strip():
+                line = fileobj.readline()
+                continue
             rematch = AmberOFFLibrary._sec1re.match(line)
             if not rematch:
                 raise RuntimeError('Expected atoms table not found')

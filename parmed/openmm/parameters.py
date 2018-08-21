@@ -11,19 +11,22 @@ import math
 from functools import wraps
 from contextlib import closing
 import datetime
-from parmed.constants import DEFAULT_ENCODING
-from parmed.formats.registry import FileFormatType
-from parmed.modeller.residue import ResidueTemplate, PatchTemplate
-from parmed.parameters import ParameterSet
-from parmed.periodic_table import Element
-from parmed.topologyobjects import NoUreyBradley
-from parmed import unit as u
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
-from parmed.utils.six.moves import range
+from ..charmm.parameters import CharmmImproperMatchingMixin
+from ..constants import DEFAULT_ENCODING
+from ..formats.registry import FileFormatType
+from ..modeller.residue import ResidueTemplate, PatchTemplate
+from ..parameters import ParameterSet
+from ..periodic_table import Element
+from ..topologyobjects import NoUreyBradley
+from .. import unit as u
+from ..utils.io import genopen
+from ..utils.six import add_metaclass, string_types, iteritems
+from ..utils.six.moves import range
 import warnings
-from parmed.exceptions import ParameterWarning, IncompatiblePatchError
-import itertools
+from ..exceptions import ParameterWarning, IncompatiblePatchError
+from itertools import product
+from ..topologyobjects import (DihedralType, ImproperType)
+
 
 from collections import OrderedDict
 
@@ -48,7 +51,7 @@ def needs_lxml(func):
     return wrapper
 
 @add_metaclass(FileFormatType)
-class OpenMMParameterSet(ParameterSet):
+class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
     """ Class storing parameters from an OpenMM parameter set
 
     Parameters
@@ -191,12 +194,16 @@ class OpenMMParameterSet(ParameterSet):
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
 
+        # Copy CHARMM improper type map, if present, since this is needed for matching impropers
+        if hasattr(params, '_improper_key_map'):
+            new_params._improper_key_map = new_params._improper_key_map
+
         # Add only ResidueTemplate instances (no ResidueTemplateContainers)
         # Maintain original residue ordering
         remediated_residues = list()
         for name, residue in iteritems(params.residues):
             if isinstance(residue, ResidueTemplate):
-                if (not remediate_residues) or OpenMMParameterSet._remediate_residue_template(new_params, residue):
+                if (not remediate_residues) or cls._remediate_residue_template(new_params, residue):
                     remediated_residues.append(residue)
         for residue in remediated_residues:
             new_params.residues[residue.name] = residue
@@ -336,8 +343,24 @@ class OpenMMParameterSet(ParameterSet):
             dest.write(xml)
 
     def _find_explicit_impropers(self):
-        improper_harmonic = OrderedDict()
-        improper_periodic = OrderedDict()
+        """
+        For every residue, find any explicitly-specified (e.g. CHARMM) improper torsions and identify all wild-card improper parameters that match.
+        Expand all of these out into explicit impropers.
+        This is necessary for OpenMM to correctly handle impropers for these residues.
+
+        .. todo ::
+
+           * Do we need to do this for patches as well?
+
+        """
+
+        # Regenerate improper key map
+        self._improper_key_map = OrderedDict()
+        for key in self.improper_types.keys():
+            self._improper_key_map[tuple(sorted(key))] = key
+
+        improper_harmonic = OrderedDict() # improper_harmonic[key] is the harmonic improper parameter for unique key `key`
+        improper_periodic = OrderedDict() # improper_harmonic[key] is the periodic improper parameter for unique key `key`
 
         def get_types(residue, atomname):
             """Return list of atom type(s) that match the given atom name.
@@ -358,71 +381,33 @@ class OpenMMParameterSet(ParameterSet):
             else:
                 return [ a_types[a_names.index(atomname)] ]
 
+        # Iterate over all residues
+        # TODO: Do we have to iterate over all patched residues too?
         for name, residue in iteritems(self.residues):
             for impr in residue._impr:
+                # Get the list of types involved in this improper
                 types = [ get_types(residue, atomname) for atomname in impr ]
-                for (t1, t2, t3, t4) in itertools.product(*types):
-                    MATCH = False
-                    key = tuple(sorted((t1, t2, t3, t4)))
-                    altkeys1 = (t1, t2, t3, t4)
-                    altkeys2 = (t4, t3, t2, t1)
-                    if key in self.improper_types:
-                        improper_harmonic[altkeys1] = self.improper_types[key]
-                        MATCH = True
-                    elif key in self.improper_periodic_types:
-                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                        MATCH = True
-                    elif altkeys1 in self.improper_periodic_types:
-                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys1]
-                        MATCH = True
-                    elif altkeys2 in self.improper_periodic_types:
-                        improper_periodic[altkeys1] = self.improper_periodic_types[altkeys2]
-                        MATCH = True
+                improper_found = False
+                for key in product(*types):
+                    # Search for an improper that matches these types
+                    improper = self.match_improper_type(*key)
+                    if improper is None:
+                        continue
+                    # Add this to our types
+                    if isinstance(improper, ImproperType):
+                        improper_harmonic[key] = improper
+                        improper_found = True
+                    elif isinstance(improper, DihedralType):
+                        improper_periodic[key] = improper
+                        improper_found = True
                     else:
-                        # Check for wildcards
-                        key_placeholder = None
-                        for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                            key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                            if key in self.improper_types:
-                                if MATCH and key != key_placeholder:
-                                    flag = (altkeys1[0], altkeys1[-1])
-                                    if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                        # Match was already found.
-                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                      altkeys1, key_placeholder))
-                                        break
+                        raise Exception('Something went wrong with improper type for {} returning an unexpected object {}'.format(key, improper))
 
-                                    if flag[0] == key[0] and flag[1] == key[1]:
-                                        improper_harmonic[altkeys1] = self.improper_types[key]
-                                        warnings.warn("{} and {} match improper {}. Using {}".format(key, key_placeholder,
-                                                        altkeys1, key), ParameterWarning)
+                # Warn if no improper was found
+                if not improper_found:
+                    raise Exception('No improper found for improper {} in residue {} (types were {})'.format(impr, name, types))
 
-                                MATCH = True
-                                key_placeholder = key
-                                improper_harmonic[altkeys1] = self.improper_types[key]
-                            if key not in self.improper_types:
-                                for anchor in itertools.combinations([t1, t2, t3, t4], 2):
-                                    key = tuple(sorted([anchor[0], anchor[1], 'X', 'X']))
-                                    if key in self.improper_periodic_types:
-                                        if MATCH and key != key_placeholder:
-                                            flag = (altkeys1[0], altkeys1[-1])
-                                            if flag[0] == key_placeholder[0] and flag[1] == key_placeholder[1]:
-                                                # Match already found.
-                                                warnings.warn("{} and {} match improper {}. Using {}".format(key,
-                                                              key_placeholder, altkeys1, key_placeholder), ParameterWarning)
-                                                break
-
-                                            if flag[0] == key[0] and flag[1] == key[1]:
-                                                warnings.warn("More than one improper matches for {}. Using {}".format(
-                                                        altkeys1, key), ParameterWarning)
-                                                improper_periodic[altkeys1] = self.improper_periodic_types[key]
-
-                                        MATCH = True
-                                        key_placeholder = key
-                                        improper_periodic[altkeys1] = self.improper_periodic_types[key]
-                    if not MATCH:
-                        warnings.warn("No improper parameter found for {}".format(altkeys1), ParameterWarning)
-
+        # Update our impropers
         self.improper_periodic_types = improper_periodic
         self.improper_types = improper_harmonic
 
@@ -445,6 +430,7 @@ class OpenMMParameterSet(ParameterSet):
                 # TODO: Do we need to check if `psi_eq` is the same?
                 atoms2 = unique_keys[unique_key]
                 improper_types[atoms2].psi_k += improper.psi_k
+                warnings.warn('Compressing improper {} because it contains same atoms as {}'.format(improper, improper_types[atoms2]))
             else:
                 # Store this improper
                 unique_keys[unique_key] = atoms
