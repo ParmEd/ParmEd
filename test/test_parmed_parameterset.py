@@ -4,7 +4,7 @@ from __future__ import division, print_function
 import parmed as pmd
 from parmed.utils.six import iteritems
 import unittest
-import utils
+from utils import get_fn
 import warnings
 
 class TestParameterSet(unittest.TestCase):
@@ -101,3 +101,14 @@ class TestParameterSet(unittest.TestCase):
             self.assertEqual(ubt.req, 2.0)
             self.assertEqual(ubt.k, 150.0)
         warnings.filterwarnings('default', category=pmd.exceptions.ParameterWarning)
+
+    def test_nbfix_symmetry(self):
+        """ Tests that nbfixes are being added to each atom type """
+        struct = pmd.load_file(get_fn('2PPN_bulk.top'))
+        atom_types = list(set([a.atom_type for a in struct.atoms]))
+        atom_types[0].add_nbfix(atom_types[1].name, 1, 1)
+        atom_types[1].add_nbfix(atom_types[0].name, 1, 1)
+        parameterset = pmd.ParameterSet.from_structure(struct)
+        nbfixes = list(parameterset.nbfix_types.keys())
+        for nbfix_pair in nbfixes:
+            assert tuple(reversed(nbfix_pair)) not in nbfixes
