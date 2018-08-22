@@ -601,8 +601,9 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         """Test that no identical residues are written to XML, using the templhasher function."""
         # TODO add testing for multiatomic residues when support for those added
         params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
+                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
+                  os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
+        )
         new_residues = OrderedDict()
         for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
             new_residues[name] = params.residues[name]
@@ -615,8 +616,9 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
     def test_override_level(self):
         """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
         params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
+                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
+                  os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
+        )
         new_residues = OrderedDict()
         new_residues['K'] = params.residues['K']
         new_residues['NA'] = params.residues['NA']
