@@ -582,10 +582,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
         ffxml.seek(0)
+
         forcefield = app.ForceField(ffxml)
 
         # Load TIP3P water box to ensure there are no duplicate ion parameters
-        pdbfile = app.PDBFile(get_fn('tip3p_standard.pdb'))
+        pdbfile = app.PDBFile(get_fn('ionsjc.pdb'))
         system = forcefield.createSystem(pdbfile.topology)
 
     def test_write_xml_small_amber(self):
