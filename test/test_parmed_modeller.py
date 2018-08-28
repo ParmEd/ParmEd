@@ -1210,7 +1210,7 @@ quit
         self.assertEqual(len(parm1.atoms), len(parm2.atoms))
         self.assertEqual(len(parm1.bonds), len(parm2.bonds))
         for a1, a2 in zip(pdb1.atoms, pdb2.atoms):
-            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.name, a2.name, 'pdb1 atoms:\n{}\npdb2 atoms:\n{}\n'.format(pdb1.atoms, pdb2.atoms))
             self.assertEqual(a1.atomic_number, a2.atomic_number)
         for a1, a2 in zip(parm1.atoms, parm2.atoms):
             # Check EVERYTHING

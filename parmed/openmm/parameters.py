@@ -114,6 +114,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         residue : :class:`parmed.modeller.Residue`
             The residue to remediate
 
+        Returns
+        -------
+        missing_parameters : bool
+            If True, the residue template is missing some parameters
+
         """
         # Populate atomic numbers in residue template
         # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
@@ -198,15 +203,20 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         if hasattr(params, '_improper_key_map'):
             new_params._improper_key_map = new_params._improper_key_map
 
-        # Add only ResidueTemplate instances (no ResidueTemplateContainers)
-        # Maintain original residue ordering
-        remediated_residues = list()
-        for name, residue in iteritems(params.residues):
-            if isinstance(residue, ResidueTemplate):
-                if (not remediate_residues) or cls._remediate_residue_template(new_params, residue):
+        if remediate_residues:
+            # Add only ResidueTemplate instances (no ResidueTemplateContainers)
+            # Maintain original residue ordering
+            remediated_residues = list()
+            for name, residue in iteritems(params.residues):
+                if isinstance(residue, ResidueTemplate):
+                    # Don't discard the residue, but fix it if we need to
+                    cls._remediate_residue_template(new_params, residue)
                     remediated_residues.append(residue)
-        for residue in remediated_residues:
-            new_params.residues[residue.name] = residue
+            for residue in remediated_residues:
+                new_params.residues[residue.name] = residue
+        else:
+            # Don't remediate residues; just copy
+            new_params.residues = copy.deepcopy(params.residues)
 
         # Only add unique patches
         unique_patches = OrderedDict()
