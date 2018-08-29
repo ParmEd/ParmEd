@@ -216,7 +216,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 new_params.residues[residue.name] = residue
         else:
             # Don't remediate residues; just copy
-            new_params.residues = copy.deepcopy(params.residues)
+            for name, residue in iteritems(params.residues):
+                new_params.residues[residue.name] = residue
 
         # Only add unique patches
         unique_patches = OrderedDict()
