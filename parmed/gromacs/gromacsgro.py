@@ -205,7 +205,8 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, precision=3, nobox=False):
+    def write(struct, dest, precision=3, nobox=False, match_topology=False,
+              combine=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -221,7 +222,33 @@ class GromacsGroFile(object):
             is True, no box will be written. If False, the periodic box will be
             defined to enclose the solute with 0.5 nm clearance on all sides. If
             periodic box dimensions *are* defined, this variable has no effect.
+        match_topology : bool, optional
+            If this option is True the order of atoms written may be changed
+            so as to match those in a Gromacs topology file according to the
+            value of the combine argument. Default is False.
+        combine : 'all', None, or list of iterables, optional
+            Equivalent to the combine argument of the GromacsTopologyFile.write
+            method. If None, and match_topolgy is True, system atom order may
+            be changed to meet the need for contiguously bonded groups of atoms
+            to be part of a single moleculetype. All other values leave the
+            atom order unchanged. Default is None.
         """
+
+        def _write_atom_line(atom, atid, resid, has_vels, dest, precision):
+            varwidth = 5 + precision
+            crdfmt = '%%%d.%df' % (varwidth, precision)
+            velfmt = '%%%d.%df' % (varwidth, precision+1)
+            dest.write('%5d%-5s%5s%5d' % (resid, atom.residue.name[:5],
+                                          atom.name[:5], atid))
+            dest.write((crdfmt % (atom.xx/10))[:varwidth])
+            dest.write((crdfmt % (atom.xy/10))[:varwidth])
+            dest.write((crdfmt % (atom.xz/10))[:varwidth])
+            if has_vels:
+                dest.write((velfmt % (atom.vx/10))[:varwidth])
+                dest.write((velfmt % (atom.vy/10))[:varwidth])
+                dest.write((velfmt % (atom.vz/10))[:varwidth])
+            dest.write('\n')
+
         own_handle = False
         if isinstance(dest, string_types):
             dest = genopen(dest, 'w')
@@ -232,39 +259,40 @@ class GromacsGroFile(object):
         dest.write('GROningen MAchine for Chemical Simulation\n')
         dest.write('%5d\n' % len(struct.atoms))
         has_vels = all(hasattr(a, 'vx') for a in struct.atoms)
-        varwidth = 5 + precision
-        crdfmt = '%%%d.%df' % (varwidth, precision)
-        velfmt = '%%%d.%df' % (varwidth, precision+1)
-        boxfmt = '%%%d.%df ' % (max(varwidth, 10), max(precision, 5))
-        for atom in struct.atoms:
-            resid = (atom.residue.idx + 1) % 100000
-            atid = (atom.idx + 1) % 100000
-            dest.write('%5d%-5s%5s%5d' % (resid, atom.residue.name[:5],
-                                          atom.name[:5], atid))
-            dest.write((crdfmt % (0.1*atom.xx))[:varwidth])
-            dest.write((crdfmt % (0.1*atom.xy))[:varwidth])
-            dest.write((crdfmt % (0.1*atom.xz))[:varwidth])
-            if has_vels:
-                dest.write((velfmt % (0.1*atom.vx))[:varwidth])
-                dest.write((velfmt % (0.1*atom.vy))[:varwidth])
-                dest.write((velfmt % (0.1*atom.vz))[:varwidth])
-            dest.write('\n')
+        if match_topology and combine != 'all':
+            resid, atid = 0, 0
+            for i, (molecule, original_resids) in enumerate(struct.split()):
+                for residue in molecule.residues:
+                    for j in range(len(original_resids)):
+                        resid += 1
+                        for atom in struct.residues[residue.number+j].atoms:
+                            atid += 1
+                            _write_atom_line(
+                                atom, atid % 100000, resid % 100000,
+                                has_vels, dest, precision)
+        else:
+            for atom in struct.atoms:
+                resid = (atom.residue.idx + 1) % 100000
+                atid = (atom.idx + 1) % 100000
+                _write_atom_line(
+                    atom, atid, resid, has_vels, dest, precision)
+                
         # Box, in the weird format...
         if struct.box is not None:
             a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
                             *struct.box))
             if all([abs(x-90) < TINY for x in struct.box[3:]]):
-                dest.write(boxfmt*3 % (0.1*a[0], 0.1*b[1], 0.1*c[2]))
+                dest.write('%10.5f'*3 % (a[0]/10, b[1]/10, c[2]/10))
             else:
-                dest.write(boxfmt*9 % (0.1*a[0], 0.1*b[1], 0.1*c[2], 0.1*a[1],
-                           0.1*a[2], 0.1*b[0], 0.1*b[2], 0.1*c[0], 0.1*c[1]))
+                dest.write('%10.5f'*9 % (a[0]/10, b[1]/10, c[2]/10, a[1]/10,
+                           a[2]/10, b[0]/10, b[2]/10, c[0]/10, c[1]/10))
             dest.write('\n')
         elif not nobox and struct.atoms:
             # Find the extent of the molecule in all dimensions, and buffer it
             # by 5 A
             crds = struct.coordinates
-            diff = 0.1*(crds.max(axis=1) - crds.min(axis=1)) + 0.5
-            dest.write(boxfmt*3 % (diff[0], diff[1], diff[2]))
+            diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
+            dest.write('%10.5f'*3 % (diff[0], diff[1], diff[2]))
             dest.write('\n')
         if own_handle:
             dest.close()
