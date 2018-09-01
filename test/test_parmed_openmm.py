@@ -542,6 +542,9 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         ffxml_filename = get_fn('residue.xml', written=True)
         params.write(ffxml_filename)
+        # DEBUG
+        with open(ffxml_filename, 'r') as f:
+            print(f.read())
         try:
             forcefield = app.ForceField(ffxml_filename)
         except KeyError:

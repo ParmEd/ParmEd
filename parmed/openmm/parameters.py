@@ -309,7 +309,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                               'as write_unused is set to False', ParameterWarning)
         else:
             skip_residues = set()
-            skip_types = set()
+            skip_types = set()            
         if self.atom_types:
             try:
                 self.typeify_templates()
