@@ -240,7 +240,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False, show_progressbar=False):
+              improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
