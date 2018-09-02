@@ -240,7 +240,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False):
+              improper_dihedrals_ordering='default', charmm_imp=False, show_progressbar=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -309,7 +309,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                               'as write_unused is set to False', ParameterWarning)
         else:
             skip_residues = set()
-            skip_types = set()            
+            skip_types = set()
         if self.atom_types:
             try:
                 self.typeify_templates()
@@ -610,19 +610,16 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         for residue in self.residues.values():
             valid_patches_for_residue[residue.name] = list()
 
-        for patch in self.patches.values():
-            for residue in self.residues.values():
-                if residue in skip_residues: continue
-                # Attempt to patch the residue.
-                try:
-                    residue.apply_patch(patch)
-                except IncompatiblePatchError as e:
-                    # Patching failed; continue to next patch
-                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
-                    continue
+        # Create list of residues to check compatibility against
+        residues = [ residue for residue in self.residues.values() if (residue not in skip_residues) ]
 
-                valid_residues_for_patch[patch.name].append(residue.name)
-                valid_patches_for_residue[residue.name].append(patch.name)
+        # Check patch compatibilities
+        for patch in self.patches.values():
+            residue_compatibilities = [ residue.patch_is_compatible(patch) for residue in residues ]
+            for (residue, is_compatible) in zip(residues, residue_compatibilities):
+                if is_compatible:
+                    valid_residues_for_patch[patch.name].append(residue.name)
+                    valid_patches_for_residue[residue.name].append(patch.name)
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 
