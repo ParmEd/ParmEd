@@ -826,7 +826,7 @@ class TestGromacsTop(FileIOTestCase):
         self.assertRaises(ValueError, lambda: setter(3, -1))
         self.assertRaises(ValueError, lambda: setter(4, -1))
         self.assertRaises(IndexError, lambda: setter(5, 0))
-
+        
     _equal_atoms = utils.equal_atoms
 
 @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
@@ -1274,3 +1274,70 @@ class TestGromacsGro(FileIOTestCase):
             self.assertEqual(a3.xy, a2.xy)
             self.assertEqual(a1.xz, a2.xz)
             self.assertEqual(a3.xz, a2.xz)
+
+    def test_write_gro_matching_topology(self):
+        """Tests the usage of the match_topology and combine keyword arguments
+        to GromacsGroFile.write that can be used to write a Gro file with atom
+        ordering that always matches a GromacsTopologyFile written from the
+        same structure.
+        """
+        def compare_top_gro_atom_order(top_file, gro_file):
+            """Parse the provided StringIO objects and ensure the atom
+            order of the contained topology and gro files is the same.
+            """
+            top_file.seek(0)
+            gro_file.seek(0)
+            top = GromacsTopologyFile()
+            top.read(top_file, parametrize=False)
+            gro = GromacsGroFile.parse(gro_file, skip_bonds=True)
+
+            for top_at, gro_at in zip(top.atoms, gro.atoms):
+                assert top_at.name == gro_at.name
+
+        def create_gro_and_top(struct, match=True, combine=None):
+            """From a given Structure object write a topology and gro file
+            into StringIO objects"""
+            topology = GromacsTopologyFile.from_structure(struct)
+            top = StringIO()
+            topology.write(top, combine=combine)
+            gro = StringIO()
+            GromacsGroFile.write(
+                struct, gro, match_topology=match, combine=combine)
+            return top, gro
+
+        # Build a very simple 4 atom structure with 4 residues
+        struct = Structure()
+        for i, letter in enumerate('ABCD'):
+            atom = Atom(name=letter, type=letter)
+            atom.xx, atom.xy, atom.xz = (0., 0., 0.)
+            struct.add_atom(atom, resname=letter, resnum=i, chain=letter)
+
+        # test the possible combinations of the match and combine arguments
+        # in a system that IS NOT reordered when writing the topology
+        match_values = True, False
+        combine_values = None, 'all', [(0, 1)]
+        for match in match_values:
+            for combine in combine_values:
+                top, gro = create_gro_and_top(
+                    struct, match=match, combine=combine)
+                compare_top_gro_atom_order(top, gro)
+
+        # add a bond between the first and fourth atom
+        # now when making the topology the order of atoms will be changed
+        # (depending on the value of the combine argument)
+        bond = Bond(struct.atoms[0], struct.atoms[3])
+        struct.bonds.append(bond)
+
+        # test the possible combinations of the match and combine arguments
+        # in a system that IS reordered when writing the topology unless
+        # the value of combine is 'all'
+        for match in match_values:
+            for combine in combine_values:
+                top, gro = create_gro_and_top(
+                    struct, match=match, combine=combine)
+                if match or combine == 'all':
+                    compare_top_gro_atom_order(top, gro)
+                else:
+                    self.assertRaises(
+                        AssertionError,
+                        lambda: compare_top_gro_atom_order(top, gro))
