@@ -464,7 +464,7 @@ class ResidueTemplate(object):
                 residue.delete_atom(atom_name)
                 modifications_made = True
             except (KeyError, MoleculeError) as e:
-                raise IncompatiblePatchError(str(e))
+                raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
@@ -487,7 +487,7 @@ class ResidueTemplate(object):
                 residue.add_bond(atom1_name, atom2_name, order)
                 modifications_made = True
             except (IndexError, MoleculeError) as e:
-                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
+                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s (exception: %s)' % (atom1_name, atom2_name, list(residue._map.keys()), str(e)))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
