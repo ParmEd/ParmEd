@@ -532,7 +532,7 @@ class ResidueTemplate(object):
         try:
             self.apply_patch(patch)
             return True
-        except IncompatiblePatchError as e:
+        except IncompatiblePatchError:
             return False
 
     def to_networkx(self):
