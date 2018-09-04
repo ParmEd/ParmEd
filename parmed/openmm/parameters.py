@@ -23,7 +23,7 @@ from ..utils.io import genopen
 from ..utils.six import add_metaclass, string_types, iteritems
 from ..utils.six.moves import range
 import warnings
-from ..exceptions import ParameterWarning
+from ..exceptions import ParameterWarning 
 from itertools import product
 from ..topologyobjects import (DihedralType, ImproperType)
 
