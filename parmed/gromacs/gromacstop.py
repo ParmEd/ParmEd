@@ -1485,15 +1485,17 @@ class GromacsTopologyFile(Structure):
             # Nonbonded parameters
             if not itp and self.has_NBFIX():
                 typemap = dict(self.parameterset.nbfix_types)
+                types_in_system = self.parameterset.atom_types.keys()
                 dest.write('[ nonbond_params ]\n')
                 eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
                 for key, val in typemap.items():
-                    eps = val[0] # kcal
-                    sig = val[1] # Angstrom
-                    eps *= eps_conversion
-                    sig *= 0.1
-                    dest.write('{0} {1} 1 {2} {3}\n'.format(
-                        key[0], key[1], sig/2**(1/6), eps))
+                    if key[0] in types_in_system and key[1] in types_in_system:
+                        eps = val[0] # kcal
+                        sig = val[1] # Angstrom
+                        eps *= eps_conversion
+                        sig *= 0.1
+                        dest.write('{0} {1} 1 {2} {3}\n'.format(
+                            key[0], key[1], sig/2**(1/6), eps))
             # Print all parameter types unless we asked for inline
             if not itp and parameters != 'inline':
                 if params.bond_types:
