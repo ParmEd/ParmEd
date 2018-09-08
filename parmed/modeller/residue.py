@@ -11,7 +11,7 @@ from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
 from parmed.structure import Structure
 from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
 from parmed.utils.six import iteritems
-from parmed.exceptions import IncompatiblePatchError
+from parmed.exceptions import IncompatiblePatchError, MoleculeError
 import warnings
 
 __all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
@@ -463,8 +463,8 @@ class ResidueTemplate(object):
             try:
                 residue.delete_atom(atom_name)
                 modifications_made = True
-            except KeyError as e:
-                raise IncompatiblePatchError(str(e))
+            except (KeyError, MoleculeError) as e:
+                raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
@@ -486,8 +486,8 @@ class ResidueTemplate(object):
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)
                 modifications_made = True
-            except IndexError as e:
-                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s' % (atom1_name, atom2_name, list(residue._map.keys())))
+            except (IndexError, MoleculeError) as e:
+                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s (exception: %s)' % (atom1_name, atom2_name, list(residue._map.keys()), str(e)))
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
@@ -511,6 +511,29 @@ class ResidueTemplate(object):
             raise IncompatiblePatchError('Patch did not modify residue.')
 
         return residue
+
+    def patch_is_compatible(self, patch):
+        """Determine whether a specified patch is compatible with this residue.
+
+        Compatibility is determined by whether Residue.Template.apply_patch(patch) raises as
+        exception or not.
+
+        Parameters
+        ----------
+        patch : PatchTemplate
+            The patch to be applied to this residue.
+
+        Returns
+        -------
+        is_compatible : bool
+            True if patch is compatible with the residue; False if not.
+
+        """
+        try:
+            self.apply_patch(patch)
+            return True
+        except IncompatiblePatchError:
+            return False
 
     def to_networkx(self):
         """ Create a NetworkX graph of atoms and bonds
