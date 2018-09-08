@@ -560,11 +560,11 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 2178)
+        self.assertEqual(len(ffxml.readlines()), 2179)
         ffxml = StringIO()
         params.write(ffxml, write_unused=False)
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 1646)
+        self.assertEqual(len(ffxml.readlines()), 1647)
         ffxml.seek(0)
         forcefield = app.ForceField(ffxml)
 
@@ -574,7 +574,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         )
         ffxml = StringIO()
         warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
-        params.write(ffxml)
+        params.write(ffxml, write_unused=True)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 222)
         ffxml = StringIO()
@@ -582,7 +582,12 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 57)
         ffxml.seek(0)
+
         forcefield = app.ForceField(ffxml)
+
+        # Load TIP3P water box to ensure there are no duplicate ion parameters
+        pdbfile = app.PDBFile(get_fn('ionsjc.pdb'))
+        system = forcefield.createSystem(pdbfile.topology)
 
     def test_write_xml_small_amber(self):
         """ Test writing small XML modifications """
@@ -597,22 +602,26 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         """Test that no identical residues are written to XML, using the templhasher function."""
         # TODO add testing for multiatomic residues when support for those added
         params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
+                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
+                  os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
+        )
         new_residues = OrderedDict()
         for name in ('K', 'K+', 'NA', 'Na+', 'CL', 'Cl-'):
             new_residues[name] = params.residues[name]
         params.residues = new_residues
         ffxml = StringIO()
         params.write(ffxml)
+        # TODO: Overhaul tests with lxml (xpath?) queries to eliminate dependence on file order
         ffxml.seek(0)
-        self.assertEqual(len(ffxml.readlines()), 16)
+        nlines = len(ffxml.readlines())
+        self.assertEqual(nlines, 39, 'File contents:\n{}\nActual length: {} lines.'.format(ffxml.getvalue(), nlines))
 
     def test_override_level(self):
         """Test correct support for the override_level attribute of ResidueTemplates and correct writing to XML tag"""
         params = openmm.OpenMMParameterSet.from_parameterset(
-                 pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'))
-                 )
+                  pmd.amber.AmberParameterSet(get_fn('atomic_ions.lib'),
+                  os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
+        )
         new_residues = OrderedDict()
         new_residues['K'] = params.residues['K']
         new_residues['NA'] = params.residues['NA']
@@ -621,11 +630,12 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         ffxml = StringIO()
         params.write(ffxml)
         ffxml.seek(0)
+        # TODO: Overhaul tests with lxml (xpath?) queries to eliminate dependence on file order
         output_lines = ffxml.readlines()
         control_line1 = '  <Residue name="K" override="1">\n'
         control_line2 = '  <Residue name="NA">\n'
-        self.assertEqual(output_lines[5].strip(), control_line1.strip())
-        self.assertEqual(output_lines[8].strip(), control_line2.strip())
+        self.assertEqual(output_lines[16].strip(), control_line1.strip(), 'File contents:\n{}'.format(ffxml.getvalue()))
+        self.assertEqual(output_lines[19].strip(), control_line2.strip(), 'File contents:\n{}'.format(ffxml.getvalue()))
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 @unittest.skipUnless(has_lxml, 'Cannot test without lxml')

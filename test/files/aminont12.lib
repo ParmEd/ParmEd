@@ -24,17 +24,17 @@
  "NTYR"
  "NVAL"
 !entry.ACE.unit.atoms table  str name  str type  int typex  int resx  int flags  int seq  int elmnt  dbl chg
- "HH31" "HC" 0 1 131072 1 1 0.112300
+ "H1" "HC" 0 1 131072 1 1 0.112300
  "CH3" "CT" 0 1 131072 2 6 -0.366200
- "HH32" "HC" 0 1 131072 3 1 0.112300
- "HH33" "HC" 0 1 131072 4 1 0.112300
+ "H2" "HC" 0 1 131072 3 1 0.112300
+ "H3" "HC" 0 1 131072 4 1 0.112300
  "C" "C" 0 1 131072 5 6 0.597200
  "O" "O" 0 1 131072 6 8 -0.567900
 !entry.ACE.unit.atomspertinfo table  str pname  str ptype  int ptypex  int pelmnt  dbl pchg
- "HH31" "HC" 0 -1 0.0
+ "H1" "HC" 0 -1 0.0
  "CH3" "CT" 0 -1 0.0
- "HH32" "HC" 0 -1 0.0
- "HH33" "HC" 0 -1 0.0
+ "H2" "HC" 0 -1 0.0
+ "H3" "HC" 0 -1 0.0
  "C" "C" 0 -1 0.0
  "O" "O" 0 -1 0.0
 !entry.ACE.unit.boundbox array dbl
