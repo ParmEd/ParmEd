@@ -23,7 +23,7 @@ from ..utils.io import genopen
 from ..utils.six import add_metaclass, string_types, iteritems
 from ..utils.six.moves import range
 import warnings
-from ..exceptions import ParameterWarning, IncompatiblePatchError
+from ..exceptions import ParameterWarning 
 from itertools import product
 from ..topologyobjects import (DihedralType, ImproperType)
 
@@ -114,6 +114,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         residue : :class:`parmed.modeller.Residue`
             The residue to remediate
 
+        Returns
+        -------
+        missing_parameters : bool
+            If True, the residue template is missing some parameters
+
         """
         # Populate atomic numbers in residue template
         # TODO: This can be removed if the parameter readers are guaranteed to populate this correctly
@@ -198,15 +203,21 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         if hasattr(params, '_improper_key_map'):
             new_params._improper_key_map = new_params._improper_key_map
 
-        # Add only ResidueTemplate instances (no ResidueTemplateContainers)
-        # Maintain original residue ordering
-        remediated_residues = list()
-        for name, residue in iteritems(params.residues):
-            if isinstance(residue, ResidueTemplate):
-                if (not remediate_residues) or cls._remediate_residue_template(new_params, residue):
+        if remediate_residues:
+            # Add only ResidueTemplate instances (no ResidueTemplateContainers)
+            # Maintain original residue ordering
+            remediated_residues = list()
+            for name, residue in iteritems(params.residues):
+                if isinstance(residue, ResidueTemplate):
+                    # Don't discard the residue, but fix it if we need to
+                    cls._remediate_residue_template(new_params, residue)
                     remediated_residues.append(residue)
-        for residue in remediated_residues:
-            new_params.residues[residue.name] = residue
+            for residue in remediated_residues:
+                new_params.residues[residue.name] = residue
+        else:
+            # Don't remediate residues; just copy
+            for name, residue in iteritems(params.residues):
+                new_params.residues[residue.name] = residue
 
         # Only add unique patches
         unique_patches = OrderedDict()
@@ -461,7 +472,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         hash_info = tuple()
         # Sort tuples of atom properties by atom name
         if len(residue.atoms) > 0:
-            hash_info += tuple(sorted( [(atom.name, atom.type, str(atom.charge)) for atom in residue.atoms] ))
+            hash_info += tuple(sorted( [(atom.type, str(atom.charge)) for atom in residue.atoms] ))
         # Sort list of deleted atoms by atom name
         if hasattr(residue, 'delete_atoms') and len(residue.delete_atoms) > 0:
             hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
@@ -599,19 +610,16 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         for residue in self.residues.values():
             valid_patches_for_residue[residue.name] = list()
 
-        for patch in self.patches.values():
-            for residue in self.residues.values():
-                if residue in skip_residues: continue
-                # Attempt to patch the residue.
-                try:
-                    residue.apply_patch(patch)
-                except IncompatiblePatchError as e:
-                    # Patching failed; continue to next patch
-                    LOGGER.debug('%8s x %8s : %s', patch.name, residue.name, e)
-                    continue
+        # Create list of residues to check compatibility against
+        residues = [ residue for residue in self.residues.values() if (residue not in skip_residues) ]
 
-                valid_residues_for_patch[patch.name].append(residue.name)
-                valid_patches_for_residue[residue.name].append(patch.name)
+        # Check patch compatibilities
+        for patch in self.patches.values():
+            residue_compatibilities = [ residue.patch_is_compatible(patch) for residue in residues ]
+            for (residue, is_compatible) in zip(residues, residue_compatibilities):
+                if is_compatible:
+                    valid_residues_for_patch[patch.name].append(residue.name)
+                    valid_patches_for_residue[residue.name].append(patch.name)
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 

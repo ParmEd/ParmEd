@@ -1163,13 +1163,13 @@ quit
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
     def test_amber_amino_termini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
-        offlib1 = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
-        offlib2 = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
-        AmberOFFLibrary.write(offlib1, 'testct.lib')
-        AmberOFFLibrary.write(offlib2, 'testnt.lib')
+        offlib_nter = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
+        offlib_cter = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
+        AmberOFFLibrary.write(offlib_nter, 'testnt.lib')
+        AmberOFFLibrary.write(offlib_cter, 'testct.lib')
         # Test all pairs a random set of 10 pairs
-        keys1 = [random.choice(list(offlib1.keys())) for i in range(10)]
-        keys2 = [random.choice(list(offlib2.keys())) for i in range(10)]
+        keys1 = [random.choice(list(offlib_nter.keys())) for i in range(10)]
+        keys2 = [random.choice(list(offlib_cter.keys())) for i in range(10)]
         for key1, key2 in zip(keys1, keys2):
             f = open('tleap_orig.in', 'w')
             f.write("""\
@@ -1210,7 +1210,7 @@ quit
         self.assertEqual(len(parm1.atoms), len(parm2.atoms))
         self.assertEqual(len(parm1.bonds), len(parm2.bonds))
         for a1, a2 in zip(pdb1.atoms, pdb2.atoms):
-            self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.name, a2.name, 'pdb1 atoms:\n{}\npdb2 atoms:\n{}\n'.format(pdb1.atoms, pdb2.atoms))
             self.assertEqual(a1.atomic_number, a2.atomic_number)
         for a1, a2 in zip(parm1.atoms, parm2.atoms):
             # Check EVERYTHING
