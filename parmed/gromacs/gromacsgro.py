@@ -205,8 +205,7 @@ class GromacsGroFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, precision=3, nobox=False, match_topology=False,
-              combine=False):
+    def write(struct, dest, precision=3, nobox=False, combine=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -222,16 +221,12 @@ class GromacsGroFile(object):
             is True, no box will be written. If False, the periodic box will be
             defined to enclose the solute with 0.5 nm clearance on all sides. If
             periodic box dimensions *are* defined, this variable has no effect.
-        match_topology : bool, optional
-            If this option is True the order of atoms written may be changed
-            so as to match those in a Gromacs topology file according to the
-            value of the combine argument. Default is False.
         combine : 'all', None, or list of iterables, optional
             Equivalent to the combine argument of the GromacsTopologyFile.write
-            method. If None, and match_topolgy is True, system atom order may
-            be changed to meet the need for contiguously bonded groups of atoms
-            to be part of a single moleculetype. All other values leave the
-            atom order unchanged. Default is None.
+            method. If None, system atom order may be changed to meet the need
+            for contiguously bonded groups of atoms to be part of a single
+            moleculetype. All other values leave the atom order unchanged.
+            Default is None.
         """
 
         def _write_atom_line(atom, atid, resid, has_vels, dest, precision):
@@ -259,13 +254,21 @@ class GromacsGroFile(object):
         dest.write('GROningen MAchine for Chemical Simulation\n')
         dest.write('%5d\n' % len(struct.atoms))
         has_vels = all(hasattr(a, 'vx') for a in struct.atoms)
-        if match_topology and combine != 'all':
+        if combine != 'all':
             resid, atid = 0, 0
-            for i, (molecule, original_resids) in enumerate(struct.split()):
-                for residue in molecule.residues:
-                    for j in range(len(original_resids)):
+            # use struct.split to get residue order as per topology file
+            for molecule, original_resids in struct.split():
+                # loop over the residues in each molecule and the number
+                # of copies of that molecule
+                for i in range(len(original_resids)):
+                    for residue in molecule.residues:
                         resid += 1
-                        for atom in struct.residues[residue.number+j].atoms:
+                        # recover residue object from the original structure
+                        # as this contains the correct positions
+                        original_residue = [
+                            res for res in struct.residues
+                            if res.number == residue.number+i][0]
+                        for atom in original_residue.atoms:
                             atid += 1
                             _write_atom_line(
                                 atom, atid % 100000, resid % 100000,
