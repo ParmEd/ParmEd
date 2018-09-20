@@ -8,18 +8,18 @@ from contextlib import closing
 import io
 import ftplib
 import numpy as np
-from parmed.exceptions import PDBError, PDBWarning
-from parmed.formats.pdbx import PdbxReader, PdbxWriter, containers
-from parmed.formats.registry import FileFormatType
-from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
-from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
-from parmed.modeller import StandardBiomolecularResidues
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom, ExtraPoint, Bond
-from parmed.symmetry import Symmetry
-from parmed.utils.io import genopen
-from parmed.utils.six import iteritems, string_types, add_metaclass, PY3
-from parmed.utils.six.moves import range
+from ..exceptions import PDBError, PDBWarning
+from ..formats.pdbx import PdbxReader, PdbxWriter, containers
+from ..formats.registry import FileFormatType
+from ..periodic_table import AtomicNum, Mass, Element, element_by_name
+from ..residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
+from ..modeller import StandardBiomolecularResidues
+from ..structure import Structure
+from ..topologyobjects import Atom, ExtraPoint, Bond
+from ..symmetry import Symmetry
+from ..utils.io import genopen
+from ..utils.six import iteritems, string_types, add_metaclass, PY3
+from ..utils.six.moves import range
 import re
 import warnings
 

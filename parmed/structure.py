@@ -206,6 +206,8 @@ class Structure(object):
         match the coordinates present on the atoms.
     symmetry : :class:`Symmetry`
         if no symmetry is set, this is set to None.
+    links : :class:`TrackedList` (:class:`Link`)
+        The list of Link definitions for this Structure
 
     Notes
     -----
@@ -279,6 +281,7 @@ class Structure(object):
         self.stretch_bend_types = TrackedList()
         self.torsion_torsion_types = TrackedList()
         self.adjust_types = TrackedList()
+        self.links = TrackedList()
 
         self._box = None
         self._coordinates = None
@@ -411,8 +414,7 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy(atom)
-            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code,
-                       res.segid)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code, res.segid)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(copy(bt))
