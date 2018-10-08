@@ -1298,17 +1298,19 @@ class TestGromacsGro(FileIOTestCase):
             top = GromacsTopologyFile()
             top.read(top_file, parametrize=False)
             gro = GromacsGroFile.parse(gro_file, skip_bonds=True)
-
-            # make sure atom order matches
             for top_at, gro_at in zip(top.atoms, gro.atoms):
                 assert top_at.name == gro_at.name
 
-        # Build a very simple 4 atom structure with 4 residues
+            return top, gro
+
+        # Build a very simple 7 atom structure
+        # Bonds will be added between 'A' and 'D' atoms later
         struct = Structure()
-        for i, letter in enumerate('ABCD'):
+        for i, (letter, chain) in enumerate(zip('ABCDABD', 'ABCDEFG')):
             atom = Atom(name=letter, type=letter)
-            atom.xx, atom.xy, atom.xz = 0., 0., 0.
-            struct.add_atom(atom, resname=letter, resnum=i, chain=letter)
+            # coordinate info needed to create gro file
+            atom.xx, atom.xy, atom.xz = float(i), 0., 0.
+            struct.add_atom(atom, resname=letter, resnum=i, chain=chain)
 
         # test the possible combinations of the combine argument
         # in a system that IS NOT reordered when writing the topology
@@ -1316,12 +1318,16 @@ class TestGromacsGro(FileIOTestCase):
         for combine in combine_values:
             compare_top_gro_atom_order(struct, combine=combine)
 
-        # add a bond between the first and fourth atom, now when
-        # making the topology the order of atoms will be changed
-        # unless combine='all'1
-        bond = Bond(struct.atoms[0], struct.atoms[3])
-        struct.bonds.append(bond)
+        # adding bonds will trigger atom reordering when combine=None
+        struct.bonds.append(Bond(struct.atoms[0], struct.atoms[6]))
+        struct.bonds.append(Bond(struct.atoms[4], struct.atoms[3]))
 
-        # repeat check for all combine values
         for combine in combine_values:
-            compare_top_gro_atom_order(struct, combine=combine)
+            top, gro = compare_top_gro_atom_order(struct, combine=combine)
+            if combine is None:
+                # check that each 'A' particle has been paired with the correct
+                # 'D' particle by checking the unique xx coordinate
+                self.assertEqual(gro.atoms[0].xx, 0.)
+                self.assertEqual(gro.atoms[1].xx, 6.)
+                self.assertEqual(gro.atoms[4].xx, 3.)
+                self.assertEqual(gro.atoms[5].xx, 4.)

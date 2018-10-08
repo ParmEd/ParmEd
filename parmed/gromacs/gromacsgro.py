@@ -257,22 +257,32 @@ class GromacsGroFile(object):
         if combine != 'all':
             resid, atid = 0, 0
             # use struct.split to get residue order as per topology file
-            for molecule, original_resids in struct.split():
-                # loop over the residues in each molecule and the number
-                # of copies of that molecule
-                for i in range(len(original_resids)):
-                    for residue in molecule.residues:
-                        resid += 1
-                        # recover residue object from the original structure
-                        # as this contains the correct positions
-                        original_residue = [
-                            res for res in struct.residues
-                            if res.number == residue.number+i][0]
-                        for atom in original_residue.atoms:
-                            atid += 1
-                            _write_atom_line(
-                                atom, atid % 100000, resid % 100000,
-                                has_vels, dest, precision)
+            split_struct = struct.split()
+            n_mols = sum(len(mol[1]) for mol in split_struct)
+            used_atoms = []
+            for molid in range(n_mols):
+                # loop through molids so we can get the correct molecule
+                # according to the order they appear
+                molecule = [
+                    mol[0] for mol in split_struct if molid in mol[1]][0]
+                for residue in molecule.residues:
+                    resid += 1
+                    for atom in residue:
+                        # for each atom in split topology get the first
+                        # matching occurence in the original structure
+                        for original_atom in struct.atoms:
+                            if atom.type == original_atom.type and \
+                               atom.name == original_atom.name and \
+                               atom.residue.name == original_atom.residue.name \
+                               and original_atom not in used_atoms:
+                                atid += 1
+                                _write_atom_line(
+                                    atom, atid % 100000, resid % 100000,
+                                    has_vels, dest, precision)
+                                used_atoms.append(original_atom)
+                                break
+                        else:
+                            raise Exception("Could not find %s" % atom)
         else:
             for atom in struct.atoms:
                 resid = (atom.residue.idx + 1) % 100000
