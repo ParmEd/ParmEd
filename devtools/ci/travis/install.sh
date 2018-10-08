@@ -4,12 +4,12 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     export PYENV_ROOT="${HOME}/.pyenv"
     export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
-    pyenv install pypy-4.0.1
-    pyenv global pypy-4.0.1
+    pyenv install pypy2.7-6.0.0
+    pyenv global pypy2.7-6.0.0
 
     pypy -m pip install nose pyflakes==1.0.0 nose-timer lxml
     which pyflakes
-    pypy -m pip install --user git+https://bitbucket.org/pypy/numpy.git@pypy-4.0.1
+    pypy -m pip install numpy
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-MacOSX-x86_64.sh -O miniconda.sh;
@@ -38,7 +38,7 @@ else # Otherwise, CPython... go through conda
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
         conda install -y -n myenv nglview -c bioconda
-       #conda install -y -n myenv ambertools=17.0 -c http://ambermd.org/downloads/ambertools/conda/
+        conda install -y -n myenv ambertools=18 -c http://ambermd.org/downloads/ambertools/conda/
         conda install -y -n myenv networkx
         conda install -y -n myenv lxml
     else
@@ -48,9 +48,9 @@ else # Otherwise, CPython... go through conda
     fi
     source activate myenv
     pip install pyflakes==1.0.0
-   #if [ -z "$MINIMAL_PACKAGES" ]; then
-   #    pip uninstall parmed -y # from ambertools
-   #fi
+    if [ -z "$MINIMAL_PACKAGES" ]; then
+        pip uninstall parmed -y # from ambertools
+    fi
 
     # DEBUG
     conda list

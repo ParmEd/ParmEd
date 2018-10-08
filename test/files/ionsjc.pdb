@@ -1,0 +1,12 @@
+REMARK   1 Test ions from frcmod.ionsjc_tip3p with complete parameters
+CRYST1   22.771   23.117   23.235  90.00  90.00  90.00 P 1           1
+HETATM    1 BR    BR A   1      10.569  16.024  -1.115  1.00  0.00          Br
+HETATM    2 CL    CL A   2       8.569   0.024   7.885  1.00  0.00          Cl
+HETATM    3 CS    CS A   3       2.275  20.986  22.847  1.00  0.00          Cs
+HETATM    4  F     F A   4      -0.725  20.986  18.847  1.00  0.00           F
+HETATM    5  I   IOD A   5      18.711  21.460  16.321  1.00  0.00           I
+HETATM    6  K     K A   6      20.711   6.460  14.321  1.00  0.00           K
+HETATM    7 LI    PI A   7      -4.599  21.150  18.011  1.00  0.00          Li
+HETATM    8 NA    NA A   8      -0.599   8.150   4.011  1.00  0.00          Na
+HETATM    9 RB    RB A   9      23.768   5.391  15.252  1.00  0.00          Rb
+END
