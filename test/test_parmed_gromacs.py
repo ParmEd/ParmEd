@@ -1331,3 +1331,17 @@ class TestGromacsGro(FileIOTestCase):
                 self.assertEqual(gro.atoms[1].xx, 6.)
                 self.assertEqual(gro.atoms[4].xx, 3.)
                 self.assertEqual(gro.atoms[5].xx, 4.)
+
+        # add some extra bonds that change reordering behaviour
+        struct.bonds.append(Bond(struct.atoms[0], struct.atoms[1]))
+        struct.bonds.append(Bond(struct.atoms[4], struct.atoms[5]))
+
+        for combine in combine_values:
+            top, gro = compare_top_gro_atom_order(struct, combine=combine)
+            if combine is None:
+                # check that each 'A' particle has been paired with the correct
+                # 'D' particle by checking the unique xx coordinate
+                self.assertEqual(gro.atoms[0].xx, 0.)
+                self.assertEqual(gro.atoms[2].xx, 6.)
+                self.assertEqual(gro.atoms[4].xx, 3.)
+                self.assertEqual(gro.atoms[5].xx, 4.)

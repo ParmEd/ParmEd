@@ -259,27 +259,45 @@ class GromacsGroFile(object):
             # use struct.split to get residue order as per topology file
             split_struct = struct.split()
             n_mols = sum(len(mol[1]) for mol in split_struct)
-            used_atoms = []
+            unused_atoms = list(struct.atoms)
             for molid in range(n_mols):
                 # loop through molids so we can get the correct molecule
                 # according to the order they appear
                 molecule = [
                     mol[0] for mol in split_struct if molid in mol[1]][0]
+                new_molecule = set()  # track atoms added
+                last_found_atom = None  # track when gro and top diverge
+
                 for residue in molecule.residues:
                     resid += 1
-                    for atom in residue:
+                    for atom in residue.atoms:
                         # for each atom in split topology get the first
-                        # matching occurence in the original structure
-                        for original_atom in struct.atoms:
+                        # matching occurrence in the original structure
+                        for original_atom in unused_atoms:
                             if atom.type == original_atom.type and \
                                atom.name == original_atom.name and \
-                               atom.residue.name == original_atom.residue.name \
-                               and original_atom not in used_atoms:
+                               atom.residue.name == original_atom.residue.name:
+
+                                if last_found_atom is not None and \
+                                   original_atom.idx != last_found_atom.idx + 1:
+                                    # a rearrangement has occurred! Need to do
+                                    # extra check that we've found the correct
+                                    # original_atom
+                                    if len(new_molecule.intersection(
+                                            original_atom.bond_partners)) == 0:
+                                        # original_atom must be bonded to at
+                                        # least one atom in the molecule we
+                                        # are currently writing otherwise find
+                                        # next candidate
+                                        continue
+
                                 atid += 1
                                 _write_atom_line(
-                                    atom, atid % 100000, resid % 100000,
-                                    has_vels, dest, precision)
-                                used_atoms.append(original_atom)
+                                    original_atom, atid % 100000,
+                                    resid % 100000, has_vels, dest, precision)
+                                new_molecule.add(original_atom)
+                                last_found_atom = original_atom
+                                unused_atoms.remove(original_atom)
                                 break
                         else:
                             raise Exception("Could not find %s" % atom)
