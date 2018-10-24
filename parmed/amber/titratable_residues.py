@@ -124,13 +124,12 @@ class TitratableResidue(object):
     the Constant pH MD method implemented in sander
     """
 
-    def __init__(self, resname, atom_list, pka, typ):
+    def __init__(self, resname, atom_list, typ):
         self.resname = resname
         self.atom_list = list(atom_list) # list of atom names
         self.states = []
         self.first_state = -1
         self.first_charge = -1
-        self.pKa = pka
         self.typ = typ
 
     def _str_refenes(self, solvent=False, igb=2, dielc=1.0):
@@ -160,12 +159,12 @@ class TitratableResidue(object):
 
     def __str__(self):
         if (self.typ=="ph"):
-            ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
+            ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
                        ''.join(['%12s' % ('STATE %d' % i) for i in
                                range(len(self.states))]) + '\n'
             )
         elif (self.typ=="redox"):
-            ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.pKa, 'ATOM') +
+            ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
                        ''.join(['%12s' % ('STATE %d' % i) for i in
                                range(len(self.states))]) + '\n'
             )
@@ -482,7 +481,7 @@ refene2_old.set_pKa(4.0, deprotonated=False)
 
 AS4 = TitratableResidue('AS4', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'OD1', 'OD2', 'HD21', 'C', 'O', 'HD22', 'HD11', 'HD12'],
-                        pka=4.0, typ="ph")
+                        typ="ph")
 AS4.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.1783, -0.0122,
               -0.0122, 0.7994, -0.8014, -0.8014, 0.0, 0.5973, -0.5679, 0.0, 0.0,
@@ -521,7 +520,7 @@ refene2_old.set_pKa(4.4, deprotonated=False)
 
 GL4 = TitratableResidue('GL4', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'HG2', 'HG3', 'CD', 'OE1', 'OE2', 'HE21', 'C', 'O',
-                        'HE22', 'HE11', 'HE12'], pka=4.4, typ="ph")
+                        'HE22', 'HE11', 'HE12'], typ="ph")
 GL4.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
               charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0398, -0.0173,
               -0.0173, 0.0136, -0.0425, -0.0425, 0.8054, -0.8188, -0.8188, 0.0,
@@ -562,7 +561,7 @@ refene2_old.set_pKa(9.6, deprotonated=True)
 
 TYR = TitratableResidue('TYR', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'CD1', 'HD1', 'CE1', 'HE1', 'CZ', 'OH', 'HH', 'CE2',
-                        'HE2', 'CD2', 'HD2', 'C', 'O'], pka=9.6, typ="ph")
+                        'HE2', 'CD2', 'HD2', 'C', 'O'], typ="ph")
 TYR.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.6, # protonated
               charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.0152, 0.0295,
               0.0295, -0.0011, -0.1906, 0.1699, -0.2341, 0.1656, 0.3226,
@@ -606,7 +605,7 @@ refene3_old.set_pKa(7.1, deprotonated=True)
 
 HIP = TitratableResidue('HIP', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'ND1', 'HD1', 'CE1', 'HE1', 'NE2', 'HE2', 'CD2', 'HD2',
-                        'C', 'O'], pka=6.6, typ="ph")
+                        'C', 'O'], typ="ph")
 HIP.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=7.1, # HIP
               charges=[-0.3479, 0.2747, -0.1354, 0.1212, -0.0414, 0.0810,
               0.0810, -0.0012, -0.1513, 0.3866, -0.0170, 0.2681, -0.1718,
@@ -639,7 +638,7 @@ refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 LYS = TitratableResidue('LYS', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
                         'HG2', 'HG3', 'CD', 'HD2', 'HD3', 'CE', 'HE2' ,'HE3',
-                        'NZ', 'HZ1', 'HZ2', 'HZ3', 'C', 'O'], pka=10.4, typ="ph")
+                        'NZ', 'HZ1', 'HZ2', 'HZ3', 'C', 'O'], typ="ph")
 LYS.add_state(protcnt=3, refene=refene1, refene_old=refene1_old, pka_corr=10.4, # protonated
               charges=[-0.3479, 0.2747, -0.2400, 0.1426, -0.0094, 0.0362,
               0.0362, 0.0187, 0.0103, 0.0103, -0.0479, 0.0621, 0.0621, -0.0143,
@@ -668,7 +667,7 @@ refene2.dielc2_energies(igb2=0, igb5=0, igb8=0)
 refene2.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
 
 CYS = TitratableResidue('CYS', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'SG',
-                        'HG', 'C', 'O'], pka=8.5, typ="ph")
+                        'HG', 'C', 'O'], typ="ph")
 CYS.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=8.5, # protonated
               charges=[-0.4157, 0.2719, 0.0213, 0.1124, -0.1231, 0.1112, 0.1112,
                        -0.3119, 0.1933, 0.5973, -0.5679])
@@ -697,7 +696,7 @@ DAP = TitratableResidue('DAP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                         "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                         'N7', 'C5', 'C6', 'N6', 'H61', 'H62', 'N1', 'C2', 'H2',
                         'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'",
-                        'H1'], pka=3.9, typ="ph")
+                        'H1'], typ="ph")
 DAP.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=0.0, # deprotonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, 0.0431, 0.1838, -0.0268, 0.1607,
@@ -732,7 +731,7 @@ DCP = TitratableResidue('DCP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                         "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                         'C5', 'H5', 'C4', 'N4', 'H41', 'H42', 'N3', 'C2', 'O2',
                         "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'", 'H3'],
-                        pka=4.3, typ="ph")
+                        typ="ph")
 DCP.add_state(protcnt=1, refene=refene1, refene_old=refene1_old, pka_corr=0.0, # deprotonated
               charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
               0.0754, 0.1629, 0.1176, -0.3691, -0.0116, 0.1963, -0.0339,
@@ -767,7 +766,7 @@ DG = TitratableResidue('DG', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                        'N7', 'C5', 'C6', 'O6', 'N1', 'H1', 'C2', 'N2', 'H21',
                        'H22', 'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "H2'2",
-                       "O3'"], pka=9.2, typ="ph")
+                       "O3'"], typ="ph")
 DG.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.0358, 0.1746, 0.0577, 0.0736,
@@ -802,7 +801,7 @@ DT = TitratableResidue('DT', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                        'C5', 'C7', 'H71', 'H72', 'H73', 'C4', 'O4', 'N3', 'H3',
                        'C2', 'O2', "C3'", "H3'", "C2'", "H2'1", "H2'2", "O3'"],
-                       pka=9.7, typ="ph")
+                       typ="ph")
 DT.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.7, # protonated
              charges=[1.1659, -0.7761, -0.7761, -0.4954, -0.0069, 0.0754,
              0.0754, 0.1629, 0.1176, -0.3691, 0.068, 0.1804, -0.0239, -0.2209,
@@ -839,7 +838,7 @@ AP = TitratableResidue('AP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8',
                        'N7', 'C5', 'C6', 'N6', 'H61', 'H62', 'N1', 'C2', 'H2',
                        'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2",
-                       "O3'", 'H1'], pka=3.9, typ="ph")
+                       "O3'", 'H1'], typ="ph")
 AP.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0394, 0.2007, -0.0251, 0.2006, 0.1553,
@@ -874,7 +873,7 @@ CP = TitratableResidue('CP', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                        "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6',
                        'C5', 'H5', 'C4', 'N4', 'H41', 'H42', 'N3', 'C2', 'O2',
                        "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2", "O3'", 'H3'],
-                       pka=4.3, typ="ph")
+                       typ="ph")
 CP.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
              charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
              0.1065, 0.1174, -0.3548, 0.0066, 0.2029, -0.0484, 0.0053, 0.1958,
@@ -909,7 +908,7 @@ G = TitratableResidue('G', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                       "C4'", "H4'", "O4'", "C1'", "H1'", 'N9', 'C8', 'H8', 'N7',
                       'C5', 'C6', 'O6', 'N1', 'H1', 'C2', 'N2', 'H21', 'H22',
                       'N3', 'C4', "C3'", "H3'", "C2'", "H2'1", "O2'", "HO'2",
-                      "O3'"], pka=9.2, typ="ph")
+                      "O3'"], typ="ph")
 G.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0191, 0.2006, 0.0492, 0.1374, 0.164,
@@ -943,7 +942,7 @@ refene2_old.set_pKa(9.2, deprotonated=True)
 U = TitratableResidue('U', ['P', 'O1P', 'O2P', "O5'", "C5'", "H5'1", "H5'2",
                       "C4'", "H4'", "O4'", "C1'", "H1'", 'N1', 'C6', 'H6', 'C5',
                       'H5', 'C4', 'O4', 'N3', 'H3', 'C2', 'O2', "C3'", "H3'",
-                      "C2'", "H2'1", "O2'", "HO'2", "O3'"], pka=9.3, typ="ph")
+                      "C2'", "H2'1", "O2'", "HO'2", "O3'"], typ="ph")
 U.add_state(protcnt=1, refene=refene1, refene_old=refene1, pka_corr=9.2, # protonated
             charges=[1.1662, -0.776, -0.776, -0.4989, 0.0558, 0.0679, 0.0679,
             0.1065, 0.1174, -0.3548, 0.0674, 0.1824, 0.0418, -0.1126, 0.2188,
@@ -982,7 +981,7 @@ HEH = TitratableResidue('HEH', ['FE', 'NA', 'C1A', 'C2A', 'C3A', 'CMA', 'HMA1', 
                                 'HE11', 'NE21', 'CD21', 'HD21', 'CBB2', 'HB2B', 'HB3B', 'SGB2', 'CB2',
                                 'HB22', 'HB32', 'CG2', 'ND12', 'HD12', 'CE12', 'HE12', 'NE22', 'CD22',
                                 'HD22'],
-                        pka=-0.203, typ="redox")
+                        typ="redox")
 # pka = EO (standard redox potential, given in Volts) for HEH residue
 HEH.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=0.0, # FE3+ (oxidized state) 
               charges=[ 0.6660, -0.1530, -0.0956,  0.1274,  0.1624, -0.2600,  0.0743,  0.0743,  0.0743, 
@@ -1028,7 +1027,7 @@ refene2_old.set_pKa(4.85, deprotonated=False)
 
 PRN = TitratableResidue('PRN',
                         ['CA', 'HA1', 'HA2', 'CB', 'HB1', 'HB2', 'CG',
-                        'O1', 'O2', 'H11', 'H12', 'H21', 'H22'], pka=4.85, typ="ph")
+                        'O1', 'O2', 'H11', 'H12', 'H21', 'H22'], typ="ph")
 
 PRN.add_state(protcnt=0, refene=refene1, refene_old=refene1, pka_corr=0.0, # deprotonated
               charges=[-0.0508, -0.0173,
