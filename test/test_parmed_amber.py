@@ -2719,6 +2719,20 @@ class TestAmberTitratableResidues(FileIOTestCase):
                        absolute_error=1e-6, spacechar='=,')
         )
 
+    def test_cpein_creation(self):
+        """ Test cpein creation """
+        import cpeinutil
+        parm = get_fn('tyx.prmtop')
+        output = get_fn('tyx.cpein', written=True)
+        opt = cpeinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm, '-o', output]
+        )
+        cpeinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('tyx.cpein'), get_fn('tyx.cpein', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
+
     def test_titratable_residue(self):
         """ Tests the TitratableResidue object """
         as4 = titratable_residues.AS4

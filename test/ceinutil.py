@@ -79,7 +79,7 @@ def print_residues(resnames,mode):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
         if not getattr(residues, resname).typ == "redox" and mode == 1:
-            print ('%s is not a Redox Potential titratable residue\n' % resname)
+            print ('%s is not a redox-active titratable residue\n' % resname)
             sys.exit(0)
         if getattr(residues, resname).typ == "redox":
             print (str(getattr(residues, resname)) + '\n')
@@ -152,7 +152,7 @@ def main(opt):
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
             elif not getattr(residues, resname).typ == "redox":
-                raise AmberError('%s is not a Redox Potential titratable residue!' % resname)
+                raise AmberError('%s is not a redox-active titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
