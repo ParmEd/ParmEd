@@ -600,7 +600,7 @@ Input file for AMOEBA simulations.
 """
 
 AS4_TITR_OUTPUT = """\
-AS4 	pKa =   4.0
+AS4 
     ATOM     STATE 0     STATE 1     STATE 2     STATE 3     STATE 4
        N     -0.4157     -0.4157     -0.4157     -0.4157     -0.4157
        H      0.2719      0.2719      0.2719      0.2719      0.2719

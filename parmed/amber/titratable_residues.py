@@ -158,16 +158,10 @@ class TitratableResidue(object):
         return ret_str
 
     def __str__(self):
-        if (self.typ=="ph"):
-            ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
-                       ''.join(['%12s' % ('STATE %d' % i) for i in
-                               range(len(self.states))]) + '\n'
-            )
-        elif (self.typ=="redox"):
-            ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
-                       ''.join(['%12s' % ('STATE %d' % i) for i in
-                               range(len(self.states))]) + '\n'
-            )
+        ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
+                   ''.join(['%12s' % ('STATE %d' % i) for i in
+                           range(len(self.states))]) + '\n'
+        )
         for i, atom in enumerate(self.atom_list):
             ret_str += ('%8s' % atom +
                         ''.join(['%12.4f' % (state.charges[i])
