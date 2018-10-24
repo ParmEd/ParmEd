@@ -178,6 +178,8 @@ class TitratableResidue(object):
             ret_str += ('%8s' % 'pKa Corr' +
                         ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
                         '\n')
+        if (self.typ=="phredox"):
+            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
         if (self.typ=="redox" or self.typ=="phredox"):
             ret_str += ('%8s' % 'Elec Cnt' +
                         ''.join(['%12d' % state.eleccnt for state in self.states]) +
@@ -418,6 +420,7 @@ class TitratableResidueList(list):
             buf.add_word(' PROTCNT=')
             for protcnt in protcnts:
                 buf.add_word('%d,' % protcnt)
+        buf.flush()
         if (typ=="redox" or typ=="phredox"):
             buf.add_word(' ELECCNT=')
             for eleccnt in eleccnts:
@@ -459,6 +462,7 @@ class TitratableResidueList(list):
                 buf.add_word(' PKA_CORR=')
                 for pka_corr in pka_corrs:
                     buf.add_word('%.4f,' % pka_corr)
+            buf.flush()
             if (typ=="redox" or typ=="phredox"):
                 buf.add_word(' EO_CORR=')
                 for eo_corr in eo_corrs:
