@@ -6,7 +6,7 @@ titratable residue treated.
 from __future__ import print_function, division
 
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
-                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN']
+                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN', 'TYX']
 
 from parmed.exceptions import AmberWarning, AmberError
 from parmed.utils.six.moves import range
