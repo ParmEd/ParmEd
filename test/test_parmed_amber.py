@@ -2728,11 +2728,11 @@ class TestAmberTitratableResidues(FileIOTestCase):
                 'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], "ph"
         )
         self.assertRaises(AmberError, lambda:
-                newres.add_state(3, [10.0, 20.0], 10.0, 10.0, 7.0)
+                newres.add_state([10.0, 20.0], 10.0, 10.0, 3, 7.0)
         )
         self.assertRaises(AmberError, lambda:
-                newres.add_states([3, 2, 1], [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,
-                    5, 6, 7]], [10, 20, 30], [10, 20, 30], [7.0, 0.0, 0.0])
+                newres.add_states([[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,5, 6, 7]],
+                                  [10, 20, 30], [10, 20, 30], [3, 2, 1], [7.0, 0.0, 0.0])
         )
         self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
         newres.set_first_state(0)

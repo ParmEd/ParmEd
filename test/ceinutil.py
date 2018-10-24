@@ -202,6 +202,7 @@ def main(opt):
                 break
     main_reslist = TitratableResidueList(system_name=opt.system,
                         solvated=solvated, first_solvent=first_solvent)
+    trescnt = 0
     for resnum in resnums:
         resname = parm.parm_data['RESIDUE_LABEL'][resnum-1]
         if not resname in titratable_residues: continue
@@ -218,6 +219,14 @@ def main(opt):
         # If we have gotten this far, add it to the list.
         main_reslist.add_residue(res, resnum,
                                  parm.parm_data['RESIDUE_POINTER'][resnum-1])
+        trescnt += 1
+
+    # Prints a warning if the number of titratable residues is larger than 50
+    if trescnt > 50: sys.stderr.write('Warning: Your CEIN file has more than 50 titratable residues! pmemd and sander have a\n'
+                                      '         default limit of 50 titrable residues, thus this CEIN file can only be used\n'
+                                      '         if the definitions for this limit are modified at the top of\n'
+                                      '         $AMBERHOME/src/pmemd/src/constante.F90 or $AMBERHOME/AmberTools/src/sander/constante.F90.\n'
+                                      '         AMBER needs to be recompilied after these files are modified.\n')
 
     # Set the states if requested
     if resstates is not None:
