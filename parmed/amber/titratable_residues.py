@@ -170,7 +170,7 @@ class TitratableResidue(object):
                                 for state in self.states]) + '\n'
             )
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        if (self.typ=="ph"):
+        if (self.typ=="ph" or self.typ=="phredox"):
             ret_str += ('%8s' % 'Prot Cnt' +
                         ''.join(['%12d' % state.protcnt for state in self.states]) +
                         '\n')
@@ -178,7 +178,7 @@ class TitratableResidue(object):
             ret_str += ('%8s' % 'pKa Corr' +
                         ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
                         '\n')
-        elif (self.typ=="redox"):
+        if (self.typ=="redox" or self.typ=="phredox"):
             ret_str += ('%8s' % 'Elec Cnt' +
                         ''.join(['%12d' % state.eleccnt for state in self.states]) +
                         '\n')
@@ -265,9 +265,9 @@ class TitratableResidue(object):
     def check(self):
         """ Checks that the charges are consistent w/ the protonation states """
         sum_charges = [sum(state.charges) for state in self.states]
-        if (self.typ=="ph"):
+        if (self.typ=="ph" or self.typ=="phredox"):
             protcnts = [state.protcnt for state in self.states]
-        elif (self.typ=="redox"):
+        if (self.typ=="redox" or self.typ=="phredox"):
             eleccnts = [state.eleccnt for state in self.states]
         # All we have to do is make sure that the charges/proton counts are
         # consistent between the first state and every other state
@@ -277,6 +277,8 @@ class TitratableResidue(object):
                 diff = protcnts[i] - protcnts[0]
             elif (self.typ=="redox"):
                 diff = eleccnts[0] - eleccnts[i]
+            elif (self.typ=="phredox"):
+                diff = protcnts[i] - protcnts[0] + eleccnts[0] - eleccnts[i]
             if abs(charge_diff - diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
                               'in %s' % self.resname, AmberWarning)
@@ -359,6 +361,8 @@ class TitratableResidueList(list):
             buf.add_word('&CNSTPH')
         elif (typ=="redox"):
             buf.add_word('&CNSTE')
+        elif (typ=="phredox"):
+            buf.add_word('&CNSTPHE')
         buf.flush()
         buf.add_word(' CHRGDAT=')
         charges, energies, protcnts, pka_corrs, eleccnts, eo_corrs, pointers = [], [], [], [], [], [], []
@@ -386,12 +390,12 @@ class TitratableResidueList(list):
                         energies.append(getattr(refene.solvent, 'igb%d' % igb))
                     else:
                         energies.append(getattr(refene, 'igb%d' % igb))
-                    if (typ=="ph"):
+                    if (typ=="ph" or typ=="phredox"):
                         # Add protonation count of this state
                         protcnts.append(state.protcnt)
                         # Add pka reference of this state
                         pka_corrs.append(state.pka_corr)
-                    elif (typ=="redox"):
+                    if (typ=="redox" or typ=="phredox"):
                         # Add electron count of this state
                         eleccnts.append(state.eleccnt)
                         # Add Eo reference of this state
@@ -410,11 +414,11 @@ class TitratableResidueList(list):
             buf.add_word('%s,' % charge)
         buf.flush()
         # Print the protcnts
-        if (typ=="ph"):
+        if (typ=="ph" or typ=="phredox"):
             buf.add_word(' PROTCNT=')
             for protcnt in protcnts:
                 buf.add_word('%d,' % protcnt)
-        elif (typ=="redox"):
+        if (typ=="redox" or typ=="phredox"):
             buf.add_word(' ELECCNT=')
             for eleccnt in eleccnts:
                 buf.add_word('%d,' % eleccnt)
@@ -451,11 +455,11 @@ class TitratableResidueList(list):
         buf.flush()
         # Print the pKa or Eo reference
         if (not oldfmt):
-            if (typ=="ph"):
+            if (typ=="ph" or typ=="phredox"):
                 buf.add_word(' PKA_CORR=')
                 for pka_corr in pka_corrs:
                     buf.add_word('%.4f,' % pka_corr)
-            elif (typ=="redox"):
+            if (typ=="redox" or typ=="phredox"):
                 buf.add_word(' EO_CORR=')
                 for eo_corr in eo_corrs:
                     buf.add_word('%.4f,' % eo_corr)
@@ -468,6 +472,9 @@ class TitratableResidueList(list):
                             (self.first_sol, igb, intdiel))
             elif (typ=="redox"):
                 buf.add_word('CEFIRST_SOL=%d, CE_IGB=%d, CE_INTDIEL=%s, ' %
+                            (self.first_sol, igb, intdiel))
+            elif (typ=="phredox"):
+                buf.add_word('CPHEFIRST_SOL=%d, CPHE_IGB=%d, CPHE_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
             buf.flush()
             # Now scan through all of the waters
@@ -1063,3 +1070,48 @@ PRN.add_state(protcnt=1, refene=refene2, refene_old=refene2_old, pka_corr=4.85, 
               0.0, 0.0, 0.4641])
 
 PRN.check()
+
+# Tyrosine, pH and redox active
+refene1 = _ReferenceEnergy(igb2=0, igb5=0, igb8=0)
+refene1.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene1.dielc2_energies(igb2=0, igb5=0, igb8=0)
+refene1.dielc2.solvent_energies(igb1=0, igb2=0, igb5=0, igb7=0, igb8=0)
+refene2 = _ReferenceEnergy() # Implicit
+refene2.solvent_energies(igb2=5.210075) # Explicit
+refene2.dielc2_energies()
+refene2.dielc2.solvent_energies()
+refene3 = _ReferenceEnergy() # Implicit
+refene3.solvent_energies(igb2=-52.185005) # Explicit
+refene3.dielc2_energies()
+refene3.dielc2.solvent_energies()
+refene4 = _ReferenceEnergy() # Implicit
+refene4.solvent_energies(igb2=24.224913) # Explicit
+refene4.dielc2_energies()
+refene4.dielc2.solvent_energies()
+
+TYX = TitratableResidue('TYX', ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG',
+                        'CD1', 'HD1', 'CE1', 'HE1', 'CZ', 'OH', 'HH', 'CE2',
+                        'HE2', 'CD2', 'HD2', 'C', 'O'], typ="phredox")
+# Note: pka_corr differences only make sense between states with the same number of electrons
+# Note: eo_corr differences only make sense between states with the same number of protons
+TYX.add_state(protcnt=1, eleccnt=1, refene=refene1, pka_corr=9.6, eo_corr=1.4, # tyrOH
+              charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.1163, 0.0548,
+                       0.0548, -0.0139, -0.1142, 0.1615, -0.3410, 0.1911,
+                       0.4198, -0.5278, 0.3621, -0.3410, 0.1911, -0.1142,
+                       0.1615, 0.5973, -0.5679])
+TYX.add_state(protcnt=1, eleccnt=0, refene=refene2, pka_corr=-2.0, eo_corr=0.0, # tyrOH+
+              charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.2911, 0.1123,
+                       0.1123, 0.4479, -0.1923, 0.2177, -0.1736, 0.2109,
+                       0.5560, -0.4376, 0.4031, -0.1736, 0.2109, -0.1923,
+                       0.2177, 0.5973, -0.5679])
+TYX.add_state(protcnt=0, eleccnt=1, refene=refene3, pka_corr=0.0, eo_corr=0.71, # tyrO-
+              charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.0500, 0.0300,
+                       0.0300, -0.1786, -0.1545, 0.1418, -0.4793, 0.1318,
+                       0.7197, -0.8026, 0.0000, -0.4793, 0.1318, -0.1545,
+                       0.1418, 0.5974, -0.5678])
+TYX.add_state(protcnt=0, eleccnt=0, refene=refene4, pka_corr=0.0, eo_corr=0.0, # tyrO
+              charges=[-0.4157, 0.2719, -0.0014, 0.0876, -0.1941, 0.0931,
+                       0.0931, 0.0538, -0.1216, 0.1629, -0.3224, 0.1643,
+                       0.6679, -0.4519, 0.0000, -0.3224, 0.1643, -0.1216,
+                       0.1629, 0.5973, -0.5679])
+TYX.check()
