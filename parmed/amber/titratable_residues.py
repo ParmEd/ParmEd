@@ -20,12 +20,14 @@ class _State(object):
     """ A protonation state """
     sort_by_resnum = True
 
-    def __init__(self, protcnt, charges, refene, refene_old, pka_corr):
+    def __init__(self, charges, refene, refene_old=None, protcnt=None, pka_corr=None, eleccnt=None, eo_corr=None):
         self.charges = charges
         self.refene = refene
         self.refene_old = refene_old
         self.protcnt = protcnt
         self.pka_corr = pka_corr
+        self.eleccnt = eleccnt
+        self.eo_corr = eo_corr
 
 class _ReferenceEnergy(object):
     """ Reference energies for various solvent models """
@@ -178,11 +180,11 @@ class TitratableResidue(object):
                         '\n')
         elif (self.typ=="redox"):
             ret_str += ('%8s' % 'Elec Cnt' +
-                        ''.join(['%12d' % state.protcnt for state in self.states]) +
+                        ''.join(['%12d' % state.eleccnt for state in self.states]) +
                         '\n')
             ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
             ret_str += ('%8s' % 'Eo Corr' +
-                        ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
+                        ''.join(['%12.4f' % state.eo_corr for state in self.states]) +
                         '\n')
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
         ret_str += ('Reference Energies (ES = Explicit solvent, IS = Implicit '
@@ -211,20 +213,22 @@ class TitratableResidue(object):
         ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8, 2) + '\n'
         return ret_str
 
-    def add_state(self, protcnt, charges, refene, refene_old, pka_corr):
+    def add_state(self, charges, refene, refene_old=None, protcnt=None, pka_corr=None, eleccnt=None, eo_corr=None):
         """ Add a single titratable state for this titratable residue """
-        new_state = _State(protcnt, charges, refene, refene_old, pka_corr)
+        new_state = _State(charges, refene, refene_old=refene_old, protcnt=protcnt, pka_corr=pka_corr, eleccnt=eleccnt, eo_corr=eo_corr)
         if len(new_state.charges) != len(self.atom_list):
             raise AmberError('Wrong number of charges for new state')
         self.states.append(new_state)
 
-    def add_states(self, protcnts, charges, refenes, refenes_old, pka_corrs):
+    def add_states(self, charges, refenes, refenes_old=None, protcnts=None, pka_corrs=None, eleccnts=None, eo_corrs=None):
         """ Add multiple titratable states for this titratable residue """
-        if len(protcnts) != len(charges) or len(protcnts) != len(refenes) or len(protcnts) != len(refenes_old) or len(protcnts) != len(pka_corrs):
+        if len(charges) != len(refenes) or (len(charges) != len(refenes_old) and refenes_old) or (len(charges) != len(protcnts) and protcnts) \
+           or (len(charges) != len(pka_corrs) and pka_corrs) or (len(charges) != len(eleccnts) and eleccnts) \
+           or (len(charges) != len(eo_corrs) and eo_corrs):
             raise AmberError('Inconsistent list of parameters for '
                              'TitratableResidue.add_states')
-        for i in range(len(protcnts)):
-            self.add_state(protcnts[i], charges[i], refenes[i], refenes_old[i], pka_corrs[i])
+        for i in range(len(charges)):
+            self.add_state(charges[i], refenes[i], refenes_old[i], protcnts[i], pka_corrs[i], eleccnts[i], eo_corrs[i])
 
     def cpin_pointers(self, first_atom):
         """ Sets and returns the cpin info """
@@ -261,24 +265,31 @@ class TitratableResidue(object):
     def check(self):
         """ Checks that the charges are consistent w/ the protonation states """
         sum_charges = [sum(state.charges) for state in self.states]
-        protcnts = [state.protcnt for state in self.states]
+        if (self.typ=="ph"):
+            protcnts = [state.protcnt for state in self.states]
+        elif (self.typ=="redox"):
+            eleccnts = [state.eleccnt for state in self.states]
         # All we have to do is make sure that the charges/proton counts are
         # consistent between the first state and every other state
         for i in range(1, len(sum_charges)):
             charge_diff = sum_charges[i] - sum_charges[0]
             if (self.typ=="ph"):
-                prot_diff = protcnts[i] - protcnts[0]
+                diff = protcnts[i] - protcnts[0]
             elif (self.typ=="redox"):
-                prot_diff = protcnts[0] - protcnts[i]
-            if abs(charge_diff - prot_diff) >= 0.0001:
+                diff = eleccnts[0] - eleccnts[i]
+            if abs(charge_diff - diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
                               'in %s' % self.resname, AmberWarning)
         # Check all of the reference energies to make sure that the pKa was set
         # for all but one of them
         notset = 0
+        valid = True
         for state in self.states:
+            if (not state.refene_old):
+                valid = False
+                break
             notset += int(state.refene_old.pKa_is_set)
-        if notset != len(self.states) - 1:
+        if (notset != len(self.states) - 1 and valid):
             warnings.warn('Not enough states are pKa-adjusted in %s' %
                           self.resname)
 
@@ -350,7 +361,7 @@ class TitratableResidueList(list):
             buf.add_word('&CNSTE')
         buf.flush()
         buf.add_word(' CHRGDAT=')
-        charges, energies, protcnts, pka_corrs, pointers = [], [], [], [], []
+        charges, energies, protcnts, pka_corrs, eleccnts, eo_corrs, pointers = [], [], [], [], [], [], []
         first_charge = 0
         first_state = 0
         for i, res in enumerate(self):
@@ -375,10 +386,16 @@ class TitratableResidueList(list):
                         energies.append(getattr(refene.solvent, 'igb%d' % igb))
                     else:
                         energies.append(getattr(refene, 'igb%d' % igb))
-                    # Add protonation count of this state
-                    protcnts.append(state.protcnt)
-                    # Add pka reference of this state
-                    pka_corrs.append(state.pka_corr)
+                    if (typ=="ph"):
+                        # Add protonation count of this state
+                        protcnts.append(state.protcnt)
+                        # Add pka reference of this state
+                        pka_corrs.append(state.pka_corr)
+                    elif (typ=="redox"):
+                        # Add electron count of this state
+                        eleccnts.append(state.eleccnt)
+                        # Add Eo reference of this state
+                        eo_corrs.append(state.eo_corr)
 
                 first_state += len(res.states)
                 new_charges = []
@@ -395,10 +412,12 @@ class TitratableResidueList(list):
         # Print the protcnts
         if (typ=="ph"):
             buf.add_word(' PROTCNT=')
+            for protcnt in protcnts:
+                buf.add_word('%d,' % protcnt)
         elif (typ=="redox"):
             buf.add_word(' ELECCNT=')
-        for protcnt in protcnts:
-            buf.add_word('%d,' % protcnt)
+            for eleccnt in eleccnts:
+                buf.add_word('%d,' % eleccnt)
         buf.flush()
         # Print the residue names
         buf.add_word(" RESNAME='System: %s'," % self.system_name)
@@ -430,14 +449,16 @@ class TitratableResidueList(list):
                                  "igb = %d" % (i, igb))
             buf.add_word('%.6f,' % energy)
         buf.flush()
-        # Print the pKa reference
+        # Print the pKa or Eo reference
         if (not oldfmt):
             if (typ=="ph"):
                 buf.add_word(' PKA_CORR=')
+                for pka_corr in pka_corrs:
+                    buf.add_word('%.4f,' % pka_corr)
             elif (typ=="redox"):
                 buf.add_word(' EO_CORR=')
-            for pka_corr in pka_corrs:
-                buf.add_word('%.4f,' % pka_corr)
+                for eo_corr in eo_corrs:
+                    buf.add_word('%.4f,' % eo_corr)
             buf.flush()
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))
@@ -958,12 +979,6 @@ refene2 = _ReferenceEnergy(igb2=-15.493731, igb5=-16.349152, igb7=-16.509509, ig
 refene2.solvent_energies(igb2=-15.209270, igb5=-15.840853, igb7=-15.495868) # Explicit
 refene2.dielc2_energies()
 refene2.dielc2.solvent_energies()
-# Copying the reference energy to be printted on the old CEIN format
-refene2_old = _ReferenceEnergy(igb2=-15.493731, igb5=-16.349152, igb7=-16.509509, igb8=-22.025653) # Implicit
-refene2_old.solvent_energies(igb2=-15.209270, igb5=-15.840853, igb7=-15.495868) # Explicit
-refene2_old.dielc2_energies()
-refene2_old.dielc2.solvent_energies()
-refene2_old.set_pKa(-0.203, deprotonated=False)
 
 HEH = TitratableResidue('HEH', ['FE', 'NA', 'C1A', 'C2A', 'C3A', 'CMA', 'HMA1', 'HMA2', 'HMA3', 'C4A',
                                 'CHB', 'HHB', 'C1B', 'NB', 'C2B', 'CMB', 'HMB1', 'HMB2', 'HMB3', 'C3B',
@@ -976,8 +991,7 @@ HEH = TitratableResidue('HEH', ['FE', 'NA', 'C1A', 'C2A', 'C3A', 'CMA', 'HMA1', 
                                 'HB22', 'HB32', 'CG2', 'ND12', 'HD12', 'CE12', 'HE12', 'NE22', 'CD22',
                                 'HD22'],
                         typ="redox")
-# pka = EO (standard redox potential, given in Volts) for HEH residue
-HEH.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=0.0, # FE3+ (oxidized state) 
+HEH.add_state(eleccnt=2, refene=refene1, eo_corr=0.0, # FE3+ (oxidized state) 
               charges=[ 0.6660, -0.1530, -0.0956,  0.1274,  0.1624, -0.2600,  0.0743,  0.0743,  0.0743, 
                        -0.0766, -0.0586,  0.1300, -0.0206, -0.2560,  0.1394, -0.2240,  0.0663,  0.0663, 
                         0.0663,  0.0734, -0.0935,  0.1765, -0.4035,  0.1375,  0.1375,  0.1375,  0.0504, 
@@ -989,7 +1003,7 @@ HEH.add_state(protcnt=2, refene=refene1, refene_old=refene1, pka_corr=0.0, # FE3
                        -0.3349,  0.1297,  0.1297, -0.1760, -0.0803,  0.0269,  0.0269,  0.1990, -0.2930, 
                         0.3650,  0.0120,  0.1180, -0.0400, -0.2020,  0.1790]
               )
-HEH.add_state(protcnt=3, refene=refene2, refene_old=refene2_old, pka_corr=-0.203, # FE2+ (reduced state)
+HEH.add_state(eleccnt=3, refene=refene2, eo_corr=-0.203, # FE2+ (reduced state)
               charges=[ 0.4800, -0.1337, -0.1455,  0.1285,  0.1325, -0.2545,  0.0608,  0.0608,  0.0608, 
                        -0.0865, -0.0815,  0.1220, -0.0425, -0.2490,  0.1605, -0.1935,  0.0422,  0.0422, 
                         0.0422, -0.0025, -0.0390,  0.1720, -0.4255,  0.1348,  0.1348,  0.1348,  0.0405, 
