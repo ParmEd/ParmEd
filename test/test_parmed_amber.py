@@ -2732,6 +2732,16 @@ class TestAmberTitratableResidues(FileIOTestCase):
             diff_files(get_saved_fn('tyx.cpein'), get_fn('tyx.cpein', written=True),
                        absolute_error=1e-6, spacechar='=,')
         )
+        parm = get_fn('mp8.prmtop')
+        output = get_fn('mp8.cpein', written=True)
+        opt = cpeinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm, '-o', output]
+        )
+        cpeinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('mp8.cpein'), get_fn('mp8.cpein', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
 
     def test_titratable_residue(self):
         """ Tests the TitratableResidue object """
