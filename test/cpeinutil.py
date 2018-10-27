@@ -78,19 +78,14 @@ def print_residues(resnames,mode):
         if not hasattr(residues, resname):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
-        if not getattr(residues, resname).typ == "phredox" and mode == 1:
-            print ('%s is not a pH/redox-active titratable residue\n' % resname)
-            sys.exit(0)
-        if getattr(residues, resname).typ == "phredox":
-            print (str(getattr(residues, resname)) + '\n')
+        print (str(getattr(residues, resname)) + '\n')
 
 def list_residues():
     """ Lists all titratable residues defined in residues.py """
     line = LineBuffer(sys.stdout)
     strarray = []
     for resname in residues.titratable_residues:
-        if getattr(residues, resname).typ == "phredox":
-            strarray.append(resname)
+        strarray.append(resname)
     line.add_words(', '.join(strarray).split(),
                    space_delimited=True)
     line.flush()
@@ -151,13 +146,10 @@ def main(opt):
         for resname in resnames:
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
-            elif not getattr(residues, resname).typ == "redox":
-                raise AmberError('%s is not a pH/redox-active titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
-            if getattr(residues, resname).typ == "phredox":
-                titratable_residues.append(resname)
+            titratable_residues.append(resname)
 
     solvent_ions = ['WAT', 'Na+', 'Br-', 'Cl-', 'Cs+', 'F-', 'I-', 'K+', 'Li+',
                     'Mg+', 'Rb+', 'CIO', 'IB', 'MG2']

@@ -394,14 +394,26 @@ class TitratableResidueList(list):
                         energies.append(getattr(refene, 'igb%d' % igb))
                     if (typ=="ph" or typ=="phredox"):
                         # Add protonation count of this state
-                        protcnts.append(state.protcnt)
+                        if (state.protcnt):
+                            protcnts.append(state.protcnt)
+                        else:
+                            protcnts.append(0)
                         # Add pka reference of this state
-                        pka_corrs.append(state.pka_corr)
+                        if (state.pka_corr):
+                            pka_corrs.append(state.pka_corr)
+                        else:
+                            pka_corrs.append(0.0)
                     if (typ=="redox" or typ=="phredox"):
                         # Add electron count of this state
-                        eleccnts.append(state.eleccnt)
+                        if (state.eleccnt):
+                            eleccnts.append(state.eleccnt)
+                        else:
+                            eleccnts.append(0)
                         # Add Eo reference of this state
-                        eo_corrs.append(state.eo_corr)
+                        if (state.eo_corr):
+                            eo_corrs.append(state.eo_corr)
+                        else:
+                            eo_corrs.append(0.0)
 
                 first_state += len(res.states)
                 new_charges = []
