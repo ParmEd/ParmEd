@@ -170,7 +170,7 @@ class TitratableResidue(object):
                                 for state in self.states]) + '\n'
             )
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        if (self.typ=="ph" or self.typ=="phredox"):
+        if (self.typ == "ph" or self.typ == "phredox"):
             ret_str += ('%8s' % 'Prot Cnt' +
                         ''.join(['%12d' % state.protcnt for state in self.states]) +
                         '\n')
@@ -178,9 +178,9 @@ class TitratableResidue(object):
             ret_str += ('%8s' % 'pKa Corr' +
                         ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
                         '\n')
-        if (self.typ=="phredox"):
+        if (self.typ == "phredox"):
             ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        if (self.typ=="redox" or self.typ=="phredox"):
+        if (self.typ == "redox" or self.typ == "phredox"):
             ret_str += ('%8s' % 'Elec Cnt' +
                         ''.join(['%12d' % state.eleccnt for state in self.states]) +
                         '\n')
@@ -267,19 +267,19 @@ class TitratableResidue(object):
     def check(self):
         """ Checks that the charges are consistent w/ the protonation states """
         sum_charges = [sum(state.charges) for state in self.states]
-        if (self.typ=="ph" or self.typ=="phredox"):
+        if (self.typ == "ph" or self.typ == "phredox"):
             protcnts = [state.protcnt for state in self.states]
-        if (self.typ=="redox" or self.typ=="phredox"):
+        if (self.typ == "redox" or self.typ == "phredox"):
             eleccnts = [state.eleccnt for state in self.states]
         # All we have to do is make sure that the charges/proton counts are
         # consistent between the first state and every other state
         for i in range(1, len(sum_charges)):
             charge_diff = sum_charges[i] - sum_charges[0]
-            if (self.typ=="ph"):
+            if (self.typ == "ph"):
                 diff = protcnts[i] - protcnts[0]
-            elif (self.typ=="redox"):
+            elif (self.typ == "redox"):
                 diff = eleccnts[0] - eleccnts[i]
-            elif (self.typ=="phredox"):
+            elif (self.typ == "phredox"):
                 diff = protcnts[i] - protcnts[0] + eleccnts[0] - eleccnts[i]
             if abs(charge_diff - diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
@@ -359,11 +359,11 @@ class TitratableResidueList(list):
         # Sort our residue list
         self.sort()
         buf = _LineBuffer(output)
-        if (typ=="ph"):
+        if (typ == "ph"):
             buf.add_word('&CNSTPH')
-        elif (typ=="redox"):
+        elif (typ == "redox"):
             buf.add_word('&CNSTE')
-        elif (typ=="phredox"):
+        elif (typ == "phredox"):
             buf.add_word('&CNSTPHE')
         buf.flush()
         buf.add_word(' CHRGDAT=')
@@ -392,7 +392,7 @@ class TitratableResidueList(list):
                         energies.append(getattr(refene.solvent, 'igb%d' % igb))
                     else:
                         energies.append(getattr(refene, 'igb%d' % igb))
-                    if (typ=="ph" or typ=="phredox"):
+                    if (typ == "ph" or typ == "phredox"):
                         # Add protonation count of this state
                         if (state.protcnt):
                             protcnts.append(state.protcnt)
@@ -403,7 +403,7 @@ class TitratableResidueList(list):
                             pka_corrs.append(state.pka_corr)
                         else:
                             pka_corrs.append(0.0)
-                    if (typ=="redox" or typ=="phredox"):
+                    if (typ == "redox" or typ == "phredox"):
                         # Add electron count of this state
                         if (state.eleccnt):
                             eleccnts.append(state.eleccnt)
@@ -428,12 +428,12 @@ class TitratableResidueList(list):
             buf.add_word('%s,' % charge)
         buf.flush()
         # Print the protcnts
-        if (typ=="ph" or typ=="phredox"):
+        if (typ == "ph" or typ == "phredox"):
             buf.add_word(' PROTCNT=')
             for protcnt in protcnts:
                 buf.add_word('%d,' % protcnt)
         buf.flush()
-        if (typ=="redox" or typ=="phredox"):
+        if (typ == "redox" or typ == "phredox"):
             buf.add_word(' ELECCNT=')
             for eleccnt in eleccnts:
                 buf.add_word('%d,' % eleccnt)
@@ -470,12 +470,12 @@ class TitratableResidueList(list):
         buf.flush()
         # Print the pKa or Eo reference
         if (not oldfmt):
-            if (typ=="ph" or typ=="phredox"):
+            if (typ == "ph" or typ == "phredox"):
                 buf.add_word(' PKA_CORR=')
                 for pka_corr in pka_corrs:
                     buf.add_word('%.4f,' % pka_corr)
             buf.flush()
-            if (typ=="redox" or typ=="phredox"):
+            if (typ == "redox" or typ == "phredox"):
                 buf.add_word(' EO_CORR=')
                 for eo_corr in eo_corrs:
                     buf.add_word('%.4f,' % eo_corr)
@@ -483,13 +483,13 @@ class TitratableResidueList(list):
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))
         if self.solvated:
-            if (typ=="ph"):
+            if (typ == "ph"):
                 buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
-            elif (typ=="redox"):
+            elif (typ == "redox"):
                 buf.add_word('CEFIRST_SOL=%d, CE_IGB=%d, CE_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
-            elif (typ=="phredox"):
+            elif (typ == "phredox"):
                 buf.add_word('CPHEFIRST_SOL=%d, CPHE_IGB=%d, CPHE_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
             buf.flush()
