@@ -159,12 +159,12 @@ class TitratableResidue(object):
         return ret_str
 
     def __str__(self):
-        if (self.typ=="ph"):
+        if (self.typ == "ph"):
             ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
                        ''.join(['%12s' % ('STATE %d' % i) for i in
                                range(len(self.states))]) + '\n'
             )
-        elif (self.typ=="redox"):
+        elif (self.typ == "redox"):
             ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.pKa, 'ATOM') +
                        ''.join(['%12s' % ('STATE %d' % i) for i in
                                range(len(self.states))]) + '\n'
@@ -175,7 +175,7 @@ class TitratableResidue(object):
                                 for state in self.states]) + '\n'
             )
         ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        if (self.typ=="ph"):
+        if (self.typ == "ph"):
             ret_str += ('%8s' % 'Prot Cnt' +
                         ''.join(['%12d' % state.protcnt for state in self.states]) +
                         '\n')
@@ -183,7 +183,7 @@ class TitratableResidue(object):
             ret_str += ('%8s' % 'pKa Corr' +
                         ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
                         '\n')
-        elif (self.typ=="redox"):
+        elif (self.typ == "redox"):
             ret_str += ('%8s' % 'Elec Cnt' +
                         ''.join(['%12d' % state.protcnt for state in self.states]) +
                         '\n')
@@ -273,9 +273,9 @@ class TitratableResidue(object):
         # consistent between the first state and every other state
         for i in range(1, len(sum_charges)):
             charge_diff = sum_charges[i] - sum_charges[0]
-            if (self.typ=="ph"):
+            if (self.typ == "ph"):
                 prot_diff = protcnts[i] - protcnts[0]
-            elif (self.typ=="redox"):
+            elif (self.typ == "redox"):
                 prot_diff = protcnts[0] - protcnts[i]
             if abs(charge_diff - prot_diff) >= 0.0001:
                 warnings.warn('Inconsistencies detected in charge definitions '
@@ -351,9 +351,9 @@ class TitratableResidueList(list):
         # Sort our residue list
         self.sort()
         buf = _LineBuffer(output)
-        if (typ=="ph"):
+        if (typ == "ph"):
             buf.add_word('&CNSTPH')
-        elif (typ=="redox"):
+        elif (typ == "redox"):
             buf.add_word('&CNSTE')
         buf.flush()
         buf.add_word(' CHRGDAT=')
@@ -400,9 +400,9 @@ class TitratableResidueList(list):
             buf.add_word('%s,' % charge)
         buf.flush()
         # Print the protcnts
-        if (typ=="ph"):
+        if (typ == "ph"):
             buf.add_word(' PROTCNT=')
-        elif (typ=="redox"):
+        elif (typ == "redox"):
             buf.add_word(' ELECCNT=')
         for protcnt in protcnts:
             buf.add_word('%d,' % protcnt)
@@ -439,9 +439,9 @@ class TitratableResidueList(list):
         buf.flush()
         # Print the pKa reference
         if (not oldfmt):
-            if (typ=="ph"):
+            if (typ == "ph"):
                 buf.add_word(' PKA_CORR=')
-            elif (typ=="redox"):
+            elif (typ == "redox"):
                 buf.add_word(' EO_CORR=')
             for pka_corr in pka_corrs:
                 buf.add_word('%.4f,' % pka_corr)
@@ -449,10 +449,10 @@ class TitratableResidueList(list):
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))
         if self.solvated:
-            if (typ=="ph"):
+            if (typ == "ph"):
                 buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
-            elif (typ=="redox"):
+            elif (typ == "redox"):
                 buf.add_word('CEFIRST_SOL=%d, CE_IGB=%d, CE_INTDIEL=%s, ' %
                             (self.first_sol, igb, intdiel))
             buf.flush()
