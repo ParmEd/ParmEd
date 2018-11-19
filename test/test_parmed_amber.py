@@ -2749,7 +2749,7 @@ class TestAmberTitratableResidues(FileIOTestCase):
         self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
         # Test error handling for TitratableResidue
         newres = titratable_residues.TitratableResidue(
-                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0, "ph"
+                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], "ph", 7.0,
         )
         self.assertEqual(newres.pKa, 7.0)
         self.assertRaises(AmberError, lambda:
