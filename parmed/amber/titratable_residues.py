@@ -126,14 +126,15 @@ class TitratableResidue(object):
     the Constant pH MD method implemented in sander
     """
 
-    def __init__(self, resname, atom_list, pka, typ):
+    def __init__(self, resname, atom_list, typ, pka=None, eo=None):
         self.resname = resname
         self.atom_list = list(atom_list) # list of atom names
         self.states = []
         self.first_state = -1
         self.first_charge = -1
-        self.pKa = pka
         self.typ = typ
+        self.pKa = pka
+        self.Eo = eo
 
     def _str_refenes(self, solvent=False, igb=2, dielc=1.0):
         """
@@ -167,7 +168,7 @@ class TitratableResidue(object):
                                range(len(self.states))]) + '\n'
             )
         elif (self.typ=="redox"):
-            ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.pKa, 'ATOM') +
+            ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.Eo, 'ATOM') +
                        ''.join(['%12s' % ('STATE %d' % i) for i in
                                range(len(self.states))]) + '\n'
             )
@@ -1025,7 +1026,7 @@ HEH = TitratableResidue('HEH', ['FE', 'NA', 'C1A', 'C2A', 'C3A', 'CMA', 'HMA1', 
                                 'HE11', 'NE21', 'CD21', 'HD21', 'CBB2', 'HB2B', 'HB3B', 'SGB2', 'CB2',
                                 'HB22', 'HB32', 'CG2', 'ND12', 'HD12', 'CE12', 'HE12', 'NE22', 'CD22',
                                 'HD22'],
-                        pka=-0.203, typ="redox")
+                        eo=-0.203, typ="redox")
 HEH.add_state(eleccnt=2, refene=refene1, eo_corr=0.0, # FE3+ (oxidized state)
               charges=[ 0.6660, -0.1530, -0.0956,  0.1274,  0.1624, -0.2600,  0.0743,  0.0743,  0.0743,
                        -0.0766, -0.0586,  0.1300, -0.0206, -0.2560,  0.1394, -0.2240,  0.0663,  0.0663,
