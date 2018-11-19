@@ -69,6 +69,12 @@ group.add_argument('-resnums', dest='resnums', metavar='NUM',
                    default=None)
 group.add_argument('-notresnums', dest='notresnums', nargs='*', metavar='NUM',
                  help='Residue numbers to exclude from CPIN file', default=None)
+group.add_argument('-minpKa', dest='minpka', metavar='pKa', type=float,
+                   help='Minimum reference pKa to include in CPIN file',
+                   default=-999999)
+group.add_argument('-maxpKa', dest='maxpka', metavar='pKa', type=float,
+                   help='Maximum reference pKa to include in CPIN file',
+                   default=9999999)
 group = parser.add_argument_group('System Information')
 group.add_argument('-states', dest='resstates', metavar='NUM', nargs='*',
                  help='List of default states to assign to titratable residues')
@@ -138,6 +144,8 @@ def main(opt):
     notresnums = process_arglist(opt.notresnums, int)
     resnames = process_arglist(opt.resnames, str)
     notresnames = process_arglist(opt.notresnames, str)
+    minpka = opt.minpka
+    maxpka = opt.maxpka
 
     if not opt.igb in (1, 2, 5, 7, 8):
         raise AmberError('-igb must be 1, 2, 5, 7, or 8!')
@@ -176,6 +184,15 @@ def main(opt):
 
     solvent_ions = ['WAT', 'Na+', 'Br-', 'Cl-', 'Cs+', 'F-', 'I-', 'K+', 'Li+',
                     'Mg+', 'Rb+', 'CIO', 'IB', 'MG2']
+
+    # Filter titratable residues based on min and max pKa
+    new_reslist = []
+    for res in titratable_residues:
+        if getattr(residues, res).pKa < minpka: continue
+        if getattr(residues, res).pKa > maxpka: continue
+        new_reslist.append(res)
+    titratable_residues = new_reslist
+    del new_reslist
 
     # Make sure we still have a couple residues
     if len(titratable_residues) == 0:

@@ -1294,7 +1294,7 @@ class changeProtState(Action):
         dummyrefene1_old.set_pKa(1.0)
         dummyrefene2 = residues._ReferenceEnergy()
         atomnames = ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG', 'OD1', 'OD2', 'HD21', 'C', 'O']
-        ash = residues.TitratableResidue('ASH', atomnames, typ="ph")
+        ash = residues.TitratableResidue('ASH', atomnames, pka=4.0, typ="ph")
         ash.add_state(protcnt=0, refene=dummyrefene1, refene_old=dummyrefene1_old, pka_corr=0.0,
                       charges=[-0.4157, 0.2719, 0.0341, 0.0864, -0.1783, -0.0122, -0.0122, 0.7994,
                                -0.8014, -0.8014, 0.0, 0.5973, -0.5679]
@@ -1307,7 +1307,7 @@ class changeProtState(Action):
 
         atomnames = ['N', 'H', 'CA', 'HA', 'CB', 'HB2', 'HB3', 'CG', 'HG2', 'HG3', 'CD', 'OE1',
                      'OE2', 'HE21', 'C', 'O']
-        glh = residues.TitratableResidue('GLH', atomnames, typ="ph")
+        glh = residues.TitratableResidue('GLH', atomnames, pka=4.4, typ="ph")
         glh.add_state(protcnt=0, refene=dummyrefene1, refene_old=dummyrefene1_old, pka_corr=0.0,
                       charges=[-0.4157, 0.2719, 0.0145, 0.0779, -0.0398, -0.0173, -0.0173, 0.0136,
                                -0.0425, -0.0425, 0.8054, -0.8188, -0.8188, 0.0, 0.5973, -0.5679]
