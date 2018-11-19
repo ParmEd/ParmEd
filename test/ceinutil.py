@@ -59,10 +59,10 @@ group.add_argument('-resnums', dest='resnums', metavar='NUM',
                    default=None)
 group.add_argument('-notresnums', dest='notresnums', nargs='*', metavar='NUM',
                  help='Residue numbers to exclude from CEIN file', default=None)
-group.add_argument('-mineo', dest='minpka', metavar='Eo', type=float,
+group.add_argument('-mineo', dest='mineo', metavar='Eo', type=float,
                    help='Minimum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=-999999)
-group.add_argument('-maxeo', dest='maxpka', metavar='Eo', type=float,
+group.add_argument('-maxeo', dest='maxeo', metavar='Eo', type=float,
                    help='Maximum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=9999999)
 group = parser.add_argument_group('System Information')
@@ -134,8 +134,8 @@ def main(opt):
     notresnums = process_arglist(opt.notresnums, int)
     resnames = process_arglist(opt.resnames, str)
     notresnames = process_arglist(opt.notresnames, str)
-    minpka = opt.minpka
-    maxpka = opt.maxpka
+    mineo = opt.mineo
+    maxeo = opt.maxeo
 
     if not opt.igb in (1, 2, 5, 7, 8):
         raise AmberError('-igb must be 1, 2, 5, 7, or 8!')
@@ -173,8 +173,8 @@ def main(opt):
     # Filter titratable residues based on min and max pKa
     new_reslist = []
     for res in titratable_residues:
-        if getattr(residues, res).pKa < minpka: continue
-        if getattr(residues, res).pKa > maxpka: continue
+        if getattr(residues, res).Eo < mineo: continue
+        if getattr(residues, res).Eo > maxeo: continue
         new_reslist.append(res)
     titratable_residues = new_reslist
     del new_reslist
