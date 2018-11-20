@@ -35,7 +35,7 @@ parser.add_argument('-d', '--debug', dest='debug', action='store_const',
                     help='Enable verbose tracebacks to debug this program',
                     const=True, default=False)
 parser.add_argument('-oldfmt', '--old-format', dest='oldfmt', action='store_const',
-                   help='''Print output file in a format compatible with AMBER 16
+                   help='''Print output file in a format compatible with Amber 16
                    and older versions''',
                    const=True, default=False)
 group = parser.add_argument_group('Output files')
@@ -95,7 +95,7 @@ def print_residues(resnames,mode):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
         if not getattr(residues, resname).typ == "ph" and mode == 1:
-            print ('%s is not a pH titratable residue\n' % resname)
+            print ('%s is not a pH-active titratable residue\n' % resname)
             sys.exit(0)
         if getattr(residues, resname).typ == "ph":
             print (str(getattr(residues, resname)) + '\n')
@@ -158,7 +158,7 @@ def main(opt):
 
     if opt.intdiel != 1 and opt.intdiel != 2:
         raise AmberError('-intdiel must be either 1 or 2 currently')
-    
+
     # Print warning about old format
     if opt.oldfmt:
         sys.stderr.write('Warning: The old format of the CPIN file can only be used for simulations with temp0=300.0!\n'
@@ -175,7 +175,7 @@ def main(opt):
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
             elif not getattr(residues, resname).typ == "ph":
-                raise AmberError('%s is not a pH titratable residue!' % resname)
+                raise AmberError('%s is not a pH-active titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
@@ -234,6 +234,7 @@ def main(opt):
                 break
     main_reslist = TitratableResidueList(system_name=opt.system,
                         solvated=solvated, first_solvent=first_solvent)
+    trescnt = 0
     for resnum in resnums:
         resname = parm.parm_data['RESIDUE_LABEL'][resnum-1]
         if not resname in titratable_residues: continue
@@ -250,6 +251,14 @@ def main(opt):
         # If we have gotten this far, add it to the list.
         main_reslist.add_residue(res, resnum,
                                  parm.parm_data['RESIDUE_POINTER'][resnum-1])
+        trescnt += 1
+
+    # Prints a warning if the number of titratable residues is larger than 50
+    if trescnt > 50: sys.stderr.write('Warning: Your CPIN file has more than 50 titratable residues! pmemd and sander have a\n'
+                                      '         default limit of 50 titrable residues, thus this CPIN file can only be used\n'
+                                      '         if the definitions for this limit are modified at the top of\n'
+                                      '         $AMBERHOME/src/pmemd/src/constantph.F90 or $AMBERHOME/AmberTools/src/sander/constantph.F90.\n'
+                                      '         AMBER needs to be recompilied after these files are modified.\n')
 
     # Set the states if requested
     if resstates is not None:
@@ -277,7 +286,7 @@ def main(opt):
                 sys.stderr.write(
                         'Warning: Carboxylate residues in explicit solvent '
                         'simulations require a modified topology file!\n'
-                        'Use the -op flag to print one.\n'
+                        '         Use the -op flag to print one.\n'
                 )
         else:
             changeRadii(parm, 'mbondi2').execute()
