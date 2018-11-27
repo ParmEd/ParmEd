@@ -2719,21 +2719,45 @@ class TestAmberTitratableResidues(FileIOTestCase):
                        absolute_error=1e-6, spacechar='=,')
         )
 
+    def test_cpein_creation(self):
+        """ Test cpein creation """
+        import cpeinutil
+        parm = get_fn('tyx.prmtop')
+        output = get_fn('tyx.cpein', written=True)
+        opt = cpeinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm, '-o', output]
+        )
+        cpeinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('tyx.cpein'), get_fn('tyx.cpein', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
+        parm = get_fn('mp8.prmtop')
+        output = get_fn('mp8.cpein', written=True)
+        opt = cpeinutil.parser.parse_args(
+            ['-igb', '2', '-p', parm, '-o', output]
+        )
+        cpeinutil.main(opt)
+        self.assertTrue(
+            diff_files(get_saved_fn('mp8.cpein'), get_fn('mp8.cpein', written=True),
+                       absolute_error=1e-6, spacechar='=,')
+        )
+
     def test_titratable_residue(self):
         """ Tests the TitratableResidue object """
         as4 = titratable_residues.AS4
         self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
         # Test error handling for TitratableResidue
         newres = titratable_residues.TitratableResidue(
-                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], 7.0, "ph"
+                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], "ph", 7.0,
         )
         self.assertEqual(newres.pKa, 7.0)
         self.assertRaises(AmberError, lambda:
-                newres.add_state(3, [10.0, 20.0], 10.0, 10.0, 7.0)
+                newres.add_state([10.0, 20.0], 10.0, 10.0, 3, 7.0)
         )
         self.assertRaises(AmberError, lambda:
-                newres.add_states([3, 2, 1], [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,
-                    5, 6, 7]], [10, 20, 30], [10, 20, 30], [7.0, 0.0, 0.0])
+                newres.add_states([[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,5, 6, 7]],
+                                  [10, 20, 30], [10, 20, 30], [3, 2, 1], [7.0, 0.0, 0.0])
         )
         self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
         newres.set_first_state(0)
