@@ -27,7 +27,7 @@ else:
     LineBuffer = residues._LineBuffer
 
 parser = ArgumentParser(epilog='''This program will read a topology file and
-                        generate a cein file for constant Redox Potential simulations with
+                        generate a cpein file for constant pH and Redox Potential simulations with
                         sander or pmemd''', usage='%(prog)s [Options]')
 parser.add_argument('-v', '--version', action='version', version='%s: %s' %
                     (parser.prog, __version__))
@@ -39,7 +39,7 @@ group.add_argument('-o', '--output', dest='output', metavar='FILE',
                    help='Output file. Defaults to standard output')
 group = parser.add_argument_group('Required Arguments')
 group.add_argument('-p', dest='prmtop', metavar='FILE', required=False,
-                   help='Topology file to be used in constant Redox Potential simulation',
+                   help='Topology file to be used in constant pH and Redox Potential simulation',
                    type=str, default='prmtop')
 group = parser.add_argument_group('Simulation Options')
 group.add_argument('-igb', dest='igb', metavar='IGB', required=False, type=int,
@@ -51,20 +51,14 @@ group.add_argument('-intdiel', dest='intdiel', metavar='DIEL', type=float,
                    the evaluation of the GB potential. Default %(default)s.''')
 group = parser.add_argument_group('Residue Selection Options')
 group.add_argument('-resnames', dest='resnames', metavar='RES', nargs='*',
-                   help='Residue names to include in CEIN file', default=None)
+                   help='Residue names to include in CPEIN file', default=None)
 group.add_argument('-notresnames', dest='notresnames', metavar='RES', nargs='*',
-                   help='Residue names to exclude from CEIN file', default=None)
+                   help='Residue names to exclude from CPEIN file', default=None)
 group.add_argument('-resnums', dest='resnums', metavar='NUM',
-                   nargs='*', help='Residue numbers to include in CEIN file',
+                   nargs='*', help='Residue numbers to include in CPEIN file',
                    default=None)
 group.add_argument('-notresnums', dest='notresnums', nargs='*', metavar='NUM',
-                 help='Residue numbers to exclude from CEIN file', default=None)
-group.add_argument('-mineo', dest='mineo', metavar='Eo', type=float,
-                   help='Minimum reference standard Redox Potential (given in Volts) to include in CEIN file',
-                   default=-999999)
-group.add_argument('-maxeo', dest='maxeo', metavar='Eo', type=float,
-                   help='Maximum reference standard Redox Potential (given in Volts) to include in CEIN file',
-                   default=9999999)
+                 help='Residue numbers to exclude from CPEIN file', default=None)
 group = parser.add_argument_group('System Information')
 group.add_argument('-states', dest='resstates', metavar='NUM', nargs='*',
                  help='List of default states to assign to titratable residues')
@@ -72,7 +66,7 @@ group.add_argument('-system', dest='system', metavar='<system name>',
                    help='Name of system to titrate. No effect on simulation.',
                    default='Unknown')
 group = parser.add_argument_group('Residue Information', '''If any options here
-              are used, no CEIN file will be written. These arguments take
+              are used, no CPEIN file will be written. These arguments take
               precedence and are mutually exclusive with each other.''')
 group.add_argument('--describe', dest='descres', metavar='RESNAME', nargs='*',
                    help='Print out the details of given residues', default=None)
@@ -84,19 +78,14 @@ def print_residues(resnames,mode):
         if not hasattr(residues, resname):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
-        if not getattr(residues, resname).typ == "redox" and mode == 1:
-            print ('%s is not a redox-active titratable residue\n' % resname)
-            sys.exit(0)
-        if getattr(residues, resname).typ == "redox":
-            print (str(getattr(residues, resname)) + '\n')
+        print (str(getattr(residues, resname)) + '\n')
 
 def list_residues():
     """ Lists all titratable residues defined in residues.py """
     line = LineBuffer(sys.stdout)
     strarray = []
     for resname in residues.titratable_residues:
-        if getattr(residues, resname).typ == "redox":
-            strarray.append(resname)
+        strarray.append(resname)
     line.add_words(', '.join(strarray).split(),
                    space_delimited=True)
     line.flush()
@@ -134,8 +123,6 @@ def main(opt):
     notresnums = process_arglist(opt.notresnums, int)
     resnames = process_arglist(opt.resnames, str)
     notresnames = process_arglist(opt.notresnames, str)
-    mineo = opt.mineo
-    maxeo = opt.maxeo
 
     if not opt.igb in (1, 2, 5, 7, 8):
         raise AmberError('-igb must be 1, 2, 5, 7, or 8!')
@@ -159,25 +146,13 @@ def main(opt):
         for resname in resnames:
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
-            elif not getattr(residues, resname).typ == "redox":
-                raise AmberError('%s is not a redox-active titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
-            if getattr(residues, resname).typ == "redox":
-                titratable_residues.append(resname)
+            titratable_residues.append(resname)
 
     solvent_ions = ['WAT', 'Na+', 'Br-', 'Cl-', 'Cs+', 'F-', 'I-', 'K+', 'Li+',
                     'Mg+', 'Rb+', 'CIO', 'IB', 'MG2']
-
-    # Filter titratable residues based on min and max pKa
-    new_reslist = []
-    for res in titratable_residues:
-        if getattr(residues, res).Eo < mineo: continue
-        if getattr(residues, res).Eo > maxeo: continue
-        new_reslist.append(res)
-    titratable_residues = new_reslist
-    del new_reslist
 
     # Make sure we still have a couple residues
     if len(titratable_residues) == 0:
@@ -239,10 +214,10 @@ def main(opt):
         trescnt += 1
 
     # Prints a warning if the number of titratable residues is larger than 50
-    if trescnt > 50: sys.stderr.write('Warning: Your CEIN file has more than 50 titratable residues! pmemd and sander have a\n'
-                                      '         default limit of 50 titrable residues, thus this CEIN file can only be used\n'
+    if trescnt > 50: sys.stderr.write('Warning: Your CPEIN file has more than 50 titratable residues! pmemd and sander have a\n'
+                                      '         default limit of 50 titrable residues, thus this CPEIN file can only be used\n'
                                       '         if the definitions for this limit are modified at the top of\n'
-                                      '         $AMBERHOME/src/pmemd/src/constante.F90 or $AMBERHOME/AmberTools/src/sander/constante.F90.\n'
+                                      '         $AMBERHOME/src/pmemd/src/constante.F90 or $AMBERHOME/AmberTools/src/sander/constantphe.F90.\n'
                                       '         AMBER needs to be recompilied after these files are modified.\n')
 
     # Set the states if requested
@@ -255,12 +230,12 @@ def main(opt):
     else:
         output = open(opt.output, 'w')
 
-    main_reslist.write_cpin(output, opt.igb, opt.intdiel, False, "redox")
+    main_reslist.write_cpin(output, opt.igb, opt.intdiel, False, "phredox")
 
     if opt.output is not None:
         output.close()
 
-    sys.stderr.write('CEIN generation complete!\n')
+    sys.stderr.write('CPEIN generation complete!\n')
 
 if __name__ == '__main__':
     opt = parser.parse_args()
@@ -280,7 +255,7 @@ if __name__ == '__main__':
             print_residues(opt.descres,1)
         sys.exit(0)
 
-    # Go ahead and make the CEIN file.
+    # Go ahead and make the CPEIN file.
     try:
         main(opt)
     except ParmedError as e:
