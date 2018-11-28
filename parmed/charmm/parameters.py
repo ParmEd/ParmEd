@@ -394,7 +394,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 for i, word in enumerate(words):
                     if word.upper() == 'E14FAC':
                         try:
-                            scee = float(words[i+1])
+                            scee = 1 / float(words[i+1])
                         except (ValueError, IndexError):
                             raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
                                               'from NONBONDED card')
@@ -407,7 +407,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 if diff > TINY:
                                     raise CharmmError('Inconsistent 1-4 scalings')
                         else:
-                            scee = 1 / scee
                             for key, dtl in iteritems(self.dihedral_types):
                                 for dt in dtl:
                                     dt.scee = scee
@@ -661,7 +660,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     for i, word in enumerate(words):
                         if word.upper() == 'E14FAC':
                             try:
-                                scee = float(words[i+1])
+                                scee = 1 / float(words[i+1])
                             except (ValueError, IndexError):
                                 raise CharmmError('Could not parse electrostatic scaling constant')
                             if self._declared_nbrules:
@@ -672,7 +671,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 if diff > TINY:
                                     raise CharmmError('Inconsistent 1-4 scalings')
                             else:
-                                scee = 1 / scee
                                 for key, dtl in iteritems(self.dihedral_types):
                                     for dt in dtl:
                                         dt.scee = scee
