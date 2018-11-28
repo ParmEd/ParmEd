@@ -826,7 +826,7 @@ class TestGromacsTop(FileIOTestCase):
         self.assertRaises(ValueError, lambda: setter(3, -1))
         self.assertRaises(ValueError, lambda: setter(4, -1))
         self.assertRaises(IndexError, lambda: setter(5, 0))
-
+        
     _equal_atoms = utils.equal_atoms
 
 @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without Gromacs")
@@ -1274,3 +1274,74 @@ class TestGromacsGro(FileIOTestCase):
             self.assertEqual(a3.xy, a2.xy)
             self.assertEqual(a1.xz, a2.xz)
             self.assertEqual(a3.xz, a2.xz)
+
+    def test_write_gro_matching_topology(self):
+        """Tests the usage of the match_topology and combine keyword arguments
+        to GromacsGroFile.write that can be used to write a Gro file with atom
+        ordering that always matches a GromacsTopologyFile written from the
+        same structure.
+        """
+        def compare_top_gro_atom_order(struct, combine):
+            """From a given Structure write a Gro and topology file and check
+            that the atom order is the same regardless of the value of combine
+            """
+            # write out files into StringIO's to trigger atom reordering
+            topology = GromacsTopologyFile.from_structure(struct)
+            top_file = StringIO()
+            topology.write(top_file, combine=combine)
+            gro_file = StringIO()
+            GromacsGroFile.write(struct, gro_file, combine=combine)
+
+            # parse StringIO's back into parmed objects
+            top_file.seek(0)
+            gro_file.seek(0)
+            top = GromacsTopologyFile()
+            top.read(top_file, parametrize=False)
+            gro = GromacsGroFile.parse(gro_file, skip_bonds=True)
+            for top_at, gro_at in zip(top.atoms, gro.atoms):
+                assert top_at.name == gro_at.name
+
+            return top, gro
+
+        # Build a very simple 7 atom structure
+        # Bonds will be added between 'A' and 'D' atoms later
+        struct = Structure()
+        for i, (letter, chain) in enumerate(zip('ABCDABD', 'ABCDEFG')):
+            atom = Atom(name=letter, type=letter)
+            # coordinate info needed to create gro file
+            atom.xx, atom.xy, atom.xz = float(i), 0., 0.
+            struct.add_atom(atom, resname=letter, resnum=i, chain=chain)
+
+        # test the possible combinations of the combine argument
+        # in a system that IS NOT reordered when writing the topology
+        combine_values = None, 'all', [(0, 1)]
+        for combine in combine_values:
+            compare_top_gro_atom_order(struct, combine=combine)
+
+        # adding bonds will trigger atom reordering when combine=None
+        struct.bonds.append(Bond(struct.atoms[0], struct.atoms[6]))
+        struct.bonds.append(Bond(struct.atoms[4], struct.atoms[3]))
+
+        for combine in combine_values:
+            top, gro = compare_top_gro_atom_order(struct, combine=combine)
+            if combine is None:
+                # check that each 'A' particle has been paired with the correct
+                # 'D' particle by checking the unique xx coordinate
+                self.assertEqual(gro.atoms[0].xx, 0.)
+                self.assertEqual(gro.atoms[1].xx, 6.)
+                self.assertEqual(gro.atoms[4].xx, 3.)
+                self.assertEqual(gro.atoms[5].xx, 4.)
+
+        # add some extra bonds that change reordering behaviour
+        struct.bonds.append(Bond(struct.atoms[0], struct.atoms[1]))
+        struct.bonds.append(Bond(struct.atoms[4], struct.atoms[5]))
+
+        for combine in combine_values:
+            top, gro = compare_top_gro_atom_order(struct, combine=combine)
+            if combine is None:
+                # check that each 'A' particle has been paired with the correct
+                # 'D' particle by checking the unique xx coordinate
+                self.assertEqual(gro.atoms[0].xx, 0.)
+                self.assertEqual(gro.atoms[2].xx, 6.)
+                self.assertEqual(gro.atoms[4].xx, 3.)
+                self.assertEqual(gro.atoms[5].xx, 4.)
