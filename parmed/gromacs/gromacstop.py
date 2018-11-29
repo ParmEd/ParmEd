@@ -1490,8 +1490,8 @@ class GromacsTopologyFile(Structure):
                 eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
                 for key, val in typemap.items():
                     if key[0] in types_in_system and key[1] in types_in_system:
-                        eps = val[0] # kcal
-                        sig = val[1] # Angstrom
+                        sig = val[0] # Angstrom
+                        eps = val[1] # kcal
                         eps *= eps_conversion
                         sig *= 0.1
                         dest.write('{0} {1} 1 {2} {3}\n'.format(
