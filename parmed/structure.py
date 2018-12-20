@@ -24,7 +24,7 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
                               TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
-                              UreyBradley)
+                              UreyBradley, Link)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .utils.six import integer_types, iteritems, string_types
@@ -607,6 +607,11 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
+        for l in self.links:
+            c.links.append(
+                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length,
+                     l.symmetry_op1, l.symmetry_op2)
+            )
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule

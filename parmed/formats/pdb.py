@@ -15,7 +15,7 @@ from ..periodic_table import AtomicNum, Mass, Element, element_by_name
 from ..residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
 from ..modeller import StandardBiomolecularResidues
 from ..structure import Structure
-from ..topologyobjects import Atom, ExtraPoint, Bond
+from ..topologyobjects import Atom, ExtraPoint, Bond, Link
 from ..symmetry import Symmetry
 from ..utils.io import genopen
 from ..utils.six import iteritems, string_types, add_metaclass, PY3
@@ -338,6 +338,8 @@ class PDBFile(object):
         ZEROSET = set('0')
         altloc_ids = set()
         _symmetry_lines = []
+        link_lines = []
+        link_atom_lookup = dict()
 
         try:
             for line in fileobj:
@@ -494,6 +496,8 @@ class PDBFile(object):
                     if modelno == 1:
                         struct.add_atom(atom, resname, resid, chain,
                                         inscode, segid)
+                        key = (atom.name, atom.altloc, resname, chain, resid, inscode)
+                        link_atom_lookup[key] = atom
                     else:
                         try:
                             last_atom = orig_atom = struct.atoms[atomno-1]
@@ -676,6 +680,8 @@ class PDBFile(object):
                                           'existent destination atom %d ' % i, PDBWarning)
                         elif partner not in origin.bond_partners:
                             struct.bonds.append(Bond(origin, partner))
+                elif rec == 'LINK  ':
+                    link_lines.append(line)
         finally:
             # Make sure our file is closed if we opened it
             if own_handle: fileobj.close()
@@ -703,6 +709,50 @@ class PDBFile(object):
                     data.append(line.split()[4:])
             tensor = np.asarray(data, dtype='f8')
             struct.symmetry = Symmetry(tensor)
+        # process link records
+        if link_lines:
+            for line in link_lines:
+                a1_name = line[12:16].strip()
+                a1_altloc = line[16].strip()
+                a1_resname = line[17:20].strip()
+                a1_chainid = line[21].strip()
+                a1_inscode = line[26].strip()
+                try:
+                    a1_resnum = int(line[22:26])
+                except ValueError:
+                    warnings.warn('Corrupt link line: %s' % line, PDBWarning)
+                    continue
+
+                a2_name = line[42:46].strip()
+                a2_altloc = line[46].strip()
+                a2_resname = line[47:50].strip()
+                a2_chainid = line[51].strip()
+                a2_inscode = line[56].strip()
+                try:
+                    a2_resnum = int(line[52:56])
+                except ValueError:
+                    warnings.warn('Corrupt link line: %s' % line, PDBWarning)
+                    continue
+
+                symop1 = line[59:65].strip()
+                symop2 = line[66:72].strip()
+                try:
+                    length = float(line[73:78])
+                except ValueError:
+                    warnings.warn('Malformed LINK line (bad distance): %s' % line, PDBWarning)
+                    continue
+
+                key1 = (a1_name, a1_altloc, a1_resname, a1_chainid, a1_resnum, a1_inscode)
+                key2 = (a2_name, a2_altloc, a2_resname, a2_chainid, a2_resnum, a2_inscode)
+                try:
+                    a1 = link_atom_lookup[key1]
+                    a2 = link_atom_lookup[key2]
+                except KeyError:
+                    warnings.warn('Could not find atoms %r and %r; skipping link' % (key1, key2),
+                                  PDBWarning)
+                else:
+                    struct.links.append(Link(a1, a2, length, symop1, symop2))
+
         return struct
 
     #===================================================
@@ -710,7 +760,7 @@ class PDBFile(object):
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
               write_anisou=False, charmm=False, use_hetatoms=True,
-              standard_resnames=False, increase_tercount=True):
+              standard_resnames=False, increase_tercount=True, write_links=False):
         """ Write a PDB file from a Structure instance
 
         Parameters
@@ -761,6 +811,10 @@ class PDBFile(object):
         increase_tercount : bool, optional, default True
             If True, the TER atom number field increased by one compared to
             atom card preceding it; this conforms to PDB standard.
+        write_links : bool, optional, default False
+            If True, any LINK records stored in the Structure will be written to
+            the LINK records near the top of the PDB file. If this is True, then
+            renumber *must* be False or a ValueError will be thrown
 
         Notes
         -----
@@ -774,6 +828,9 @@ class PDBFile(object):
         no_atom_numbers_assigned = {a.number for a in struct.atoms} == {-1}
         no_residue_numbers_assigned = {r.number for r in struct.residues} == {-1}
         renumber = renumber or (no_atom_numbers_assigned and no_residue_numbers_assigned)
+        if renumber and write_links:
+            raise ValueError('write_links requires renumber=False AND original (not implied) '
+                             'numbers to be assigned')
         if altlocs.lower() == 'all'[:len(altlocs)]:
             altlocs = 'all'
         elif altlocs.lower() == 'first'[:len(altlocs)]:
@@ -801,6 +858,8 @@ class PDBFile(object):
                          '      %2s%-2s\n')
             terrec = ('TER   %5d      %-3s %1s%4d\n')
             reslen = 3
+        linkrec = ('LINK        %-4s%1s%-3s %1s%4d%1s               '
+                   '%-4s%1s%-3s %1s%4d%1s  %6s %6s %5.2f\n')
         hetatomrec = atomrec.replace('ATOM  ', 'HETATM') if use_hetatoms else atomrec
         if struct.box is not None:
             dest.write('CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4s\n' % (
@@ -847,6 +906,28 @@ class PDBFile(object):
             standardize = lambda x: (x[:reslen], _is_hetatm(x))
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
+        if write_links:
+            for link in struct.links:
+                rec = (
+                    _format_atom_name_for_pdb(link.atom1),
+                    link.atom1.altloc,
+                    link.atom1.residue.name,
+                    link.atom1.residue.chain,
+                    link.atom1.residue.number,
+                    link.atom1.residue.insertion_code,
+
+                    _format_atom_name_for_pdb(link.atom2),
+                    link.atom2.altloc,
+                    link.atom2.residue.name,
+                    link.atom2.residue.chain,
+                    link.atom2.residue.number,
+                    link.atom2.residue.insertion_code,
+
+                    link.symmetry_op1,
+                    link.symmetry_op2,
+                    link.length,
+                )
+                dest.write(linkrec % rec)
         for model, coord in enumerate(coords):
             if coords.shape[0] > 1:
                 dest.write('MODEL      %5d\n' % (model+1))
@@ -870,10 +951,7 @@ class PDBFile(object):
                         rnum = _number_truncated_to_n_digits(res.number, 4)
                     last_number = anum
                     # Do any necessary name munging to respect the PDB spec
-                    if len(pa.name) < 4 and len(Element[pa.atomic_number]) != 2:
-                        aname = ' %-3s' % pa.name
-                    else:
-                        aname = pa.name[:4]
+                    aname = _format_atom_name_for_pdb(pa)
                     resname, hetatom = standardize(res.name)
                     if hetatom:
                         rec = hetatomrec
@@ -900,11 +978,7 @@ class PDBFile(object):
                             anum = oatom.number or last_number + 1
                         anum = anum - anum // 100000 * 100000
                         last_number = anum
-                        if (len(oatom.name) < 4 and
-                                len(Element[oatom.atomic_number]) != 2):
-                            aname = ' %-3s' % oatom.name
-                        else:
-                            aname = oatom.name[:4]
+                        aname = _format_atom_name_for_pdb(oatom)
                         dest.write(rec % (anum, aname, key, resname,
                                    res.chain[:1], rnum, res.insertion_code[:1],
                                    x, y, z, oatom.occupancy, oatom.bfactor, segid,
@@ -1659,3 +1733,8 @@ def _needs_ter_card(res):
         # Heuristic -- add a TER if it's bonded to the previous residue, which
         # indicates it's polymeric. Otherwise don't.
         return my_res_idx - 1 in residxs
+
+def _format_atom_name_for_pdb(atom):
+    if len(atom.name) < 4 and len(Element[atom.atomic_number]) != 2:
+        return ' %-3s' % atom.name
+    return atom.name[:4]

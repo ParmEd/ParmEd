@@ -1192,6 +1192,40 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
         self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
 
+    def test_link(self):
+        """ Tests proper handling and processing of LINK records in PDB files """
+        parm = pmd.load_file(get_fn('5qk8.pdb'))
+        # This PDB file has 47 LINK records, all have symmetry operations 1555
+        self.assertEqual(len(parm.links), 47) # 47 LINK records in this PDB file
+        # Here are the first few lines of those LINK records:
+        # LINK         O   ALA A  96                MG    MG A 301     1555   1555  2.09  
+        # LINK         OE2 GLU A 112                MG    MG A 302     1555   1555  2.06  
+        # Check these by hand
+        link1, link2 = parm.links[:2]
+        self.assertEqual(link1.atom1.name, 'O')
+        self.assertEqual(link1.atom2.name, 'MG')
+        self.assertEqual(link1.atom1.residue.name, 'ALA')
+        self.assertEqual(link1.atom1.residue.number, 96)
+        self.assertEqual(link1.atom2.residue.name, 'MG')
+        self.assertEqual(link1.atom2.residue.number, 301)
+        self.assertEqual(link1.symmetry_op1, '1555')
+        self.assertEqual(link1.symmetry_op2, '1555')
+
+        self.assertEqual(link2.atom1.name, 'OE2')
+        self.assertEqual(link2.atom2.name, 'MG')
+        self.assertEqual(link2.atom1.residue.name, 'GLU')
+        self.assertEqual(link2.atom1.residue.number, 112)
+        self.assertEqual(link2.atom2.residue.name, 'MG')
+        self.assertEqual(link2.atom2.residue.number, 302)
+        self.assertEqual(link2.symmetry_op1, '1555')
+        self.assertEqual(link2.symmetry_op2, '1555')
+
+        # Now test writing
+        written_file = get_fn('link.pdb', written=True)
+        parm.write_pdb(written_file, write_links=True, renumber=False)
+        parm2 = pmd.load_file(written_file)
+        self.assertEqual(len(parm2.links), 47)
+
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
                                 altloc_option='all'):
