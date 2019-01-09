@@ -3,21 +3,23 @@
 from math import sqrt
 from parmed.constants import NTYPES
 from parmed.utils.six.moves import range
+from parmed.tools.exceptions import ParmedAddLJTypeError
 
 def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     """ Adds a new Lennard Jones type to a topology file """
     # Set the new atom type
-    old_type = None
-    for i in range(len(sel_atms)):
-        if sel_atms[i] == 1:
-            if old_type is None:
-                old_type = parm.parm_data['ATOM_TYPE_INDEX'][i]
-            parm.parm_data['ATOM_TYPE_INDEX'][i] = parm.ptr('ntypes') + 1
+    if sel_atms is not None:
+        old_type = None
+        for i in range(len(sel_atms)):
+            if sel_atms[i] == 1:
+                if old_type is None:
+                    old_type = parm.parm_data['ATOM_TYPE_INDEX'][i]
+                parm.parm_data['ATOM_TYPE_INDEX'][i] = parm.ptr('ntypes') + 1
 
     # Now increment NTYPES
     parm.parm_data['POINTERS'][NTYPES] += 1
     parm.pointers['NTYPES'] += 1
-   
+
     # Now create a whole new array for NONBONDED_PARM_INDEX
     start_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
     current_idx = max(parm.parm_data['NONBONDED_PARM_INDEX']) + 1
@@ -49,7 +51,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
             depth = sqrt(parm.LJ_14_depth[i] * epsilon14)
             parm.parm_data['LENNARD_JONES_14_ACOEF'].append(depth * rad**12)
             parm.parm_data['LENNARD_JONES_14_BCOEF'].append(2 * depth * rad**6)
-   
+
     # Now add the last type interacting with itself, and add it to the
     # LJ_radius/depth arrays
     depth = epsilon
@@ -71,7 +73,10 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     # If our prmtop had a C-coefficient array, just copy the terms from the old
     # atom type to the new atom type, as defined by the type of the first atom
     # that got assigned the "new" type.
-    if 'LENNARD_JONES_CCOEF' in parm.parm_data:
+    if 'LENNARD_JONES_CCOEF' in parm.parm_data and sel_atms is None:
+        raise ParmedAddLJTypeError('The addLJType function requires an atomic selection when'
+                                   'LENNARD_JONES_CCOEF is present in the prmtop file.')
+    elif 'LENNARD_JONES_CCOEF' in parm.parm_data:
         ccoeffs = parm.parm_data['LENNARD_JONES_CCOEF']
         for i in range(old_ntypes):
             nbi = parm.ptr('ntypes')*(old_type-1) + i
