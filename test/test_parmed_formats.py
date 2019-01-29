@@ -19,7 +19,7 @@ import random
 import os
 import sys
 import unittest
-from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
+from utils import (get_fn, diff_files, get_saved_fn, run_all_tests, is_jenkins,
                    HAS_GROMACS, FileIOTestCase, create_random_structure)
 import warnings
 
@@ -251,19 +251,12 @@ class TestFileLoader(FileIOTestCase):
 
     def test_negative_residue_number(self):
         """ Tests automatic detection of PDB file with negative residue #s """
-        pdb = download_PDB('1kx5', saveto=get_fn('1kx5.pdb', written=True))
-        pdb2 = formats.load_file(get_fn('1kx5.pdb', written=True))
-        self.assertEqual(len(pdb.atoms), len(pdb2.atoms))
-        for a1, a2 in zip(pdb.atoms, pdb2.atoms):
-            self.assertEqual(a1.name, a2.name)
-            self.assertEqual(a1.residue.name, a2.residue.name)
-        np.testing.assert_allclose(pdb.coordinates, pdb2.coordinates)
+        pdb = formats.load_file(get_fn('1kx5.pdb'))
+        self.assertTrue(any(res.number < 0 for res in pdb.residues))
 
     def test_dbref_keyword(self):
         """ Tests automatic detection of PDB file with DBREF record(s) """
-        fn = get_fn('3p49.pdb', written=True)
-        download_PDB('3p49', saveto=fn)
-        formats.load_file(fn)
+        self.assertTrue(formats.PDBFile.id_format(get_fn('3p49.pdb')))
 
     def test_natom_hasbox_keywords(self):
         """ Tests that the hasbox/natom arguments are special-cased in load_file """
@@ -323,7 +316,7 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_pdb_anisou_inscode(self):
         """ Tests that PDB files with ANISOU records on inscodes work """
-        download_PDB('1gdu')
+        formats.PDBFile.parse(get_fn('1gdu'))
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -378,6 +371,7 @@ class TestPDBStructure(FileIOTestCase):
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
@@ -385,6 +379,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
         self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
         fname = get_fn('downloaded.pdb', written=True)
@@ -879,7 +874,7 @@ class TestPDBStructure(FileIOTestCase):
         with open(fn, 'r') as f:
             self.assertEqual(sum([l.startswith('TER') for l in f]), 5)
         # Make sure TER cards *don't* get added for water
-        pdbfile = download_PDB('4lzt')
+        pdbfile = read_PDB(get_fn('4lzt.pdb'))
         pdbfile.write_pdb(fn)
         with open(fn, 'r') as f:
             for line in f:
@@ -1106,7 +1101,7 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
     def test_pdb_multimodel_parsing_bug_820(self):
         """ Test model failing in parsing due to bug #820 in GitHub """
         # Just make sure it does not raise an exception
-        self.assertEqual(len(download_PDB('1aaf').atoms), 893)
+        self.assertEqual(len(read_PDB(get_fn('1aaf.pdb')).atoms), 893)
 
     def test_pdb_write_symmetry_data(self):
         """ Tests writing PDB file with symmetry data """
@@ -1129,7 +1124,7 @@ REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
         assert_remark_290(parm, remark_290_lines)
 
         # 2idg
-        parm = pmd.download_PDB('2igd')
+        parm = read_PDB(get_fn('2igd.pdb'))
         remark_290_lines = """
 REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
 REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
@@ -1694,6 +1689,7 @@ class TestCIFStructure(FileIOTestCase):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
         self._check4lzt(read_CIF(self.lzt))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Test CIF downloading on 4LZT """
         fn = get_fn('4lzt.cif', written=True)
@@ -1704,7 +1700,7 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_cif_symmetry(self):
         """ Tests that symmetry is parsed from mmCIF files correctly """
-        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+        self.assertEqual(read_CIF(get_fn('1aki.cif')).space_group, 'P 21 21 21')
 
     def test_cif_space_group_written_from_structure(self):
         """ Tests CIF file writing with space groups """
@@ -1717,7 +1713,7 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
-        cif = download_CIF('2koc')
+        cif = read_CIF(get_fn('2koc.cif'))
         self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(cif.atoms), 451)
         output = StringIO()
