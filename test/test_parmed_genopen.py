@@ -8,7 +8,7 @@ import gzip
 from contextlib import closing
 from parmed.utils.io import genopen
 import unittest
-from utils import get_fn, FileIOTestCase
+from utils import get_fn, FileIOTestCase, is_jenkins
 
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz\n'
 
@@ -71,6 +71,7 @@ class TestGenopen(FileIOTestCase):
         with closing(genopen(url, 'r')) as f:
             self.assertEqual(f.read(), genopen(get_fn('4lzt.pdb.gz')).read())
 
+    @unittest.skipUnless(is_jenkins(), 'Cannot download files from PDB with Travis')
     def test_read_ftp_URL(self):
         """ Tests genopen reading a ftp remote file """
         url = 'ftp://ftp.wwpdb.org/pub/pdb/data/structures/divided/mmCIF/05/205l.cif.gz'

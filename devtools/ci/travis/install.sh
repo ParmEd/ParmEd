@@ -9,7 +9,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
 
     pypy -m pip install nose pyflakes==1.0.0 nose-timer lxml
     which pyflakes
-    pypy -m pip install numpy
+    pypy -m pip install numpy==1.15.4 # pin 1.15.4, since the latest version doesn't work on pypy2
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         wget http://repo.continuum.io/miniconda/Miniconda-3.7.0-MacOSX-x86_64.sh -O miniconda.sh;
