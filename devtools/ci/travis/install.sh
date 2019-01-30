@@ -33,7 +33,7 @@ else # Otherwise, CPython... go through conda
         # Install all prerequisites
         conda create -y -n myenv python=$PYTHON_VERSION \
             numpy scipy pandas nose openmm coverage nose-timer \
-            python-coveralls netCDF4
+            netCDF4
         conda update -y -n myenv --all
         conda install -y -n myenv rdkit==2015.09.1 -c omnia
         conda install -y -n myenv boost==1.59.0 -c omnia
@@ -44,7 +44,7 @@ else # Otherwise, CPython... go through conda
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose coverage \
-            nose-timer python-coveralls
+            nose-timer
     fi
     source activate myenv
     pip install pyflakes==1.0.0
