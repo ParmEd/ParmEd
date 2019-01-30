@@ -1,7 +1,9 @@
 """ Tests the Vec3 object """
-from unittest import TestCase
+from unittest import TestCase, skipIf
 from parmed import Vec3
+from utils import has_old_vec3
 
+@skipIf(has_old_vec3(), 'Vec3 is taken from OpenMM with an old implementation. Tests will fail')
 class TestVec3(TestCase):
     """ Tests the Vec3 type """
 

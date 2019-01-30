@@ -232,7 +232,7 @@ class TestFileLoader(FileIOTestCase):
 
     def test_misdetect_pqr(self):
         """ Check that PQR autodetection does not identify a PDB file """
-        pdb = formats.PDBFile.download('3p4a')
+        pdb = read_PDB(get_fn('3p4a.pdb'))
         fname = get_fn('3p4a_chainA.pdb', written=True)
         pdb['A',:,:].save(fname)
         self.assertFalse(formats.PQRFile.id_format(fname))
@@ -316,7 +316,7 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_pdb_anisou_inscode(self):
         """ Tests that PDB files with ANISOU records on inscodes work """
-        formats.PDBFile.parse(get_fn('1gdu'))
+        formats.PDBFile.parse(get_fn('1gdu.pdb'))
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
