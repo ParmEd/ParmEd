@@ -119,8 +119,8 @@ class PdbxReaderTests(unittest.TestCase):
         self.assertEqual(icount, 18508)
 
     def test_space_group(self):
-        parm_from_cif = pmd.download_CIF('2igd')
-        parm_from_pdb = pmd.download_PDB('2igd')
+        parm_from_cif = pmd.load_file(get_fn('2igd.cif'))
+        parm_from_pdb = pmd.load_file(get_fn('2igd.pdb'))
         self.assertEqual(parm_from_cif.space_group, 'P 21 21 21')
         self.assertEqual(parm_from_pdb.space_group, 'P 21 21 21')
 

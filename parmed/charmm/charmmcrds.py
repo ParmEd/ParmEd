@@ -11,13 +11,13 @@ from __future__ import print_function, division, absolute_import
 
 from contextlib import closing
 import numpy as np
-from parmed.utils import io
-from parmed.formats.registry import FileFormatType
-from parmed.exceptions import CharmmError
-from parmed import unit as u
-from parmed.utils.six import add_metaclass, string_types
-from parmed.utils.six.moves import range
-from parmed.vec3 import Vec3
+from ..utils import io
+from ..formats.registry import FileFormatType
+from ..exceptions import CharmmError
+from .. import unit as u
+from ..utils.six import add_metaclass, string_types
+from ..utils.six.moves import range
+from ..vec3 import Vec3
 
 CHARMLEN = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds

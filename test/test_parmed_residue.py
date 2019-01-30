@@ -130,6 +130,7 @@ class TestNucleicAcidResidues(unittest.TestCase):
         self.assertTrue(residue.DNAResidue.has('DG3'))
         self.assertFalse(residue.RNAResidue.has('G4'))
 
+    @unittest.skipUnless(utils.is_jenkins(), 'PDB blocks Travis from downloading PDB files')
     def test_modified_dna_rna(self):
         """ Tests that modified DNA/RNA residue names are properly recognized"""
         def count_nures(parm):

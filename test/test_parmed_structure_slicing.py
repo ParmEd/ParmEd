@@ -258,7 +258,7 @@ class TestStructureSlicing(unittest.TestCase):
         parm = pmd.load_file(get_fn('4lzt.pdb'))
         assert_correctly_copy(parm)
         # pdb from rcsb
-        parm = pmd.download_PDB('2igd')
+        parm = pmd.load_file(get_fn('2igd.pdb'))
         assert_correctly_copy(parm)
         # cif
         parm = pmd.load_file(get_fn('sample.cif'))

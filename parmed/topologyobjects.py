@@ -29,7 +29,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Chiral
            'NonbondedExceptionType', 'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group',
            'AtomType', 'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'RBTorsionType',
-           'UnassignedAtomType']
+           'UnassignedAtomType', 'Link']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
@@ -5185,6 +5185,35 @@ class Group(object):
     @_exception_to_notimplemented
     def __eq__(self, other):
         return (self.atom is other.atom and self.type == other.type and self.move == other.move)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class Link(object):
+    """ An intra-residue "Link" as defined by the PDB standard:
+
+    See http://www.wwpdb.org/documentation/file-format-content/format33/sect6.html#LINK for more
+    information
+
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
+        The first Atom involved in the Link
+    atom2 : :class:`Atom`
+        The other atom to which ``atom1`` is bonded in this link
+    length : float
+        The length of the link
+    symmetry_op1 : str, optional
+        The first symmetry operator for the link
+    symmetry_op2 : str, optional
+        The second symmetry operator for the link
+    """
+
+    def __init__(self, atom1, atom2, length, symmetry_op1='1555', symmetry_op2='1555'):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.length = length
+        self.symmetry_op1 = symmetry_op1
+        self.symmetry_op2 = symmetry_op2
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

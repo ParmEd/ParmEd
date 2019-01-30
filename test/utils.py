@@ -557,3 +557,17 @@ def equal_atoms(tester, a1, a2):
                 tester.assertEqual(getattr(a1, key), getattr(a2, key))
         else:
             tester.assertFalse(hasattr(a1, key))
+
+def is_jenkins():
+    return 'JENKINS_URL' in os.environ
+
+def has_old_vec3():
+    from parmed.vec3 import Vec3
+    v1 = Vec3(1, 2, 3)
+    if not hasattr(v1, 'x') or v1.x != 1:
+        return True
+    try:
+        v2 = -v1
+    except TypeError:
+        return True
+    return False
