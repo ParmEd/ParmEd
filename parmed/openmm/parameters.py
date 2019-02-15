@@ -23,7 +23,7 @@ from ..utils.io import genopen
 from ..utils.six import add_metaclass, string_types, iteritems
 from ..utils.six.moves import range
 import warnings
-from ..exceptions import ParameterWarning 
+from ..exceptions import ParameterWarning
 from itertools import product
 from ..topologyobjects import (DihedralType, ImproperType)
 
@@ -239,7 +239,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         return new_params
 
     @needs_lxml
-    def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
+    def write(self, dest, provenance=None, write_unused=True, skip_duplicates=True,
+              separate_ljforce=False,
               improper_dihedrals_ordering='default', charmm_imp=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
@@ -274,6 +275,14 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             templates remaining and parameters including those atom types will
             not be written. A ParameterWarning is issued if any such residues are
             found in a).
+        skip_duplicates : bool
+            If True: residues which appear identical to an existing residue will
+            not be written. This is usually the best choice. The most common
+            reason for setting skip_duplicates to false is if you have different
+            parametrizations for stereoisomers. Note that since OpenMM's residue
+            hashing is not aware of chirality, if you wish to use the results in
+            simulations you will need to explicitly provide the template names
+            for affected residues.
         separate_ljforce : bool
             If True will use a separate LennardJonesForce to create a
             CostumNonbondedForce to compute L-J interactions. It will set sigma
@@ -330,7 +339,9 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         root = etree.Element('ForceField')
         self._write_omm_provenance(root, provenance)
         self._write_omm_atom_types(root, skip_types)
-        self._write_omm_residues(root, skip_residues, valid_patches_for_residue)
+        self._write_omm_residues(root, skip_residues,
+            valid_patches_for_residue=valid_patches_for_residue,
+            skip_duplicates=skip_duplicates)
         self._write_omm_patches(root, valid_residues_for_patch)
         self._write_omm_bonds(root, skip_types)
         self._write_omm_angles(root, skip_types)
@@ -531,7 +542,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 etree.SubElement(xml_section, 'Type', element=str(element), **properties)
 
     @needs_lxml
-    def _write_omm_residues(self, xml_root, skip_residues, valid_patches_for_residue=None):
+    def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates=False, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
             valid_patches_for_residue = OrderedDict()
@@ -542,8 +553,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             templhash = OpenMMParameterSet._templhasher(residue)
             if templhash in written_residues:
                 residue_collision = written_residues[templhash]
-                warnings.warn('Skipping writing of residue {} because OpenMM considers it identical to {}'.format(residue, residue_collision))
-                continue
+                if skip_duplicates:
+                    warnings.warn('Skipping writing of residue {} because OpenMM considers it identical to {}'.format(residue, residue_collision))
+                    continue
+                else:
+                    warnings.warn('Residue {} will be considered by OpenMM to be identical to {}.'.format(residue, residue_collision))
             written_residues[templhash] = residue
             # Write residue
             if residue.override_level == 0:
