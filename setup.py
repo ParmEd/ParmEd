@@ -25,6 +25,24 @@ except ImportError:
 
 from distutils.command.clean import clean as Clean
 
+def prepare_env_for_osx():
+    """ Prepares the environment for OS X building """
+    darwin_major_to_osx_map = {
+        '11': '10.7',
+        '12': '10.8',
+        '13': '10.9',
+        '14': '10.10',
+        '15': '10.11',
+        '16': '10.12',
+        '17': '10.13',
+        '18': '10.14',
+    }
+    os.environ['CXX'] = 'clang++'
+    os.environ['CC'] = 'clang'
+    darwin_major = os.uname()[2].split('.')[0]
+    if darwin_major in darwin_major_to_osx_map:
+        os.environ['MACOSX_DEPLOYMENT_TARGET'] = darwin_major_to_osx_map[darwin_major]
+
 class CleanCommand(Clean):
     """python setup.py clean
     """
@@ -56,8 +74,7 @@ if sys.platform == 'darwin' and not is_pypy:
     # Anaconda does annoying stuff that breaks this, since their distutils
     # automatically tries to use "gcc", which would conflict with the MacPorts
     # gcc... sigh.
-    os.environ['CXX'] = 'clang++'
-    os.environ['CC'] = 'clang'
+    prepare_env_for_osx()
 elif os.environ.get('CC', '').endswith('pgcc'):
     # PGI compilers don't play nicely with Python extensions. So force GCC
     sys.stderr.write('PGI compilers do not work with Python extensions generally. '
