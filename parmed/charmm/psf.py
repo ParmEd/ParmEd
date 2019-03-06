@@ -144,7 +144,7 @@ class CharmmPsfFile(Structure):
         else:
             pointers = tuple([conv(w, int, 'pointer') for w in words])
         line = psf.readline().strip()
-        if not line and title.startswith('NNB'):
+        if not line and pointers != 0 and title.startswith('NNB'):
             # This will correctly handle the NNB section (which has a spurious
             # blank line) as well as any sections that have 0 members.
             line = psf.readline().strip()
