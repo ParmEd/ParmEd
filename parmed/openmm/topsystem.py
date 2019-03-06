@@ -90,7 +90,11 @@ def load_topology(topology, system=None, xyz=None, box=None):
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
                 else:
-                    atype = a.id if not isinstance(a.id, integer_types) else ''
+                    try:
+                        aid = int(a.id)
+                    except ValueError:
+                        aid = a.id
+                    atype = aid if not isinstance(aid, integer_types) else ''
                     atom = Atom(atomic_number=a.element.atomic_number,
                                 name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
@@ -444,6 +448,5 @@ def _process_nonbonded(struct, force):
     for ai, exceptions in iteritems(bond_graph_exceptions):
         if exceptions - explicit_exceptions[ai]:
             struct.unknown_functional = True
-            warnings.warn('Detected incomplete exceptions. Not supported.',
-                          OpenMMWarning)
+            warnings.warn('Detected incomplete exceptions. Not supported.', OpenMMWarning)
             break

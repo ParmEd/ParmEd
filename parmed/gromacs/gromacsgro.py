@@ -300,7 +300,7 @@ class GromacsGroFile(object):
                                 unused_atoms.remove(original_atom)
                                 break
                         else:
-                            raise Exception("Could not find %s" % atom)
+                            raise RuntimeError("Could not find %s" % atom)
         else:
             for atom in struct.atoms:
                 resid = (atom.residue.idx + 1) % 100000
