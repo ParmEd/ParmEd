@@ -26,8 +26,6 @@ else # Otherwise, CPython... go through conda
     conda config --add channels omnia --add channels conda-forge
     # Use of conda-forge requires update
     conda update --yes conda
-    # Add OpenMM dev channel
-    conda config --add channels omnia/label/dev
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         # Install all prerequisites
@@ -35,10 +33,10 @@ else # Otherwise, CPython... go through conda
             numpy scipy pandas nose openmm coverage nose-timer \
             netCDF4
         conda update -y -n myenv --all
-        conda install -y -n myenv rdkit==2015.09.1 -c omnia
-        conda install -y -n myenv boost==1.59.0 -c omnia
-        conda install -y -n myenv nglview -c bioconda
-        conda install -y -n myenv ambertools=18 -c http://ambermd.org/downloads/ambertools/conda/
+        conda install -y -n myenv rdkit==2018.09.1
+        conda install -y -n myenv boost==1.69.0
+        conda install -y -n myenv nglview
+        conda install -y -n myenv ambertools=18 -c ambermd
         conda install -y -n myenv networkx
         conda install -y -n myenv lxml
     else
@@ -51,7 +49,6 @@ else # Otherwise, CPython... go through conda
     if [ -z "$MINIMAL_PACKAGES" ]; then
         pip uninstall parmed -y # from ambertools
     fi
-
     # DEBUG
     conda list
 fi # CPython
