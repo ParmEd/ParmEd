@@ -32,12 +32,16 @@ from parmed.utils.decorators import deprecated as _deprecated
 load_file = formats.load_file
 read_PDB = formats.PDBFile.parse
 read_CIF = formats.CIFFile.parse
+read_pdb = read_PDB
+read_cif = read_CIF
 write_PDB = _deprecated(formats.PDBFile.write)
 write_CIF = _deprecated(formats.CIFFile.write)
 load_rosetta = rosetta.RosettaPose.load
 
 download_PDB = formats.PDBFile.download
 download_CIF = formats.CIFFile.download
+download_pdb = download_PDB
+download_cif = download_CIF
 
 # The tools package depends on *everything*, so import this at the end to avoid
 # circular imports.
