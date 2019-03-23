@@ -616,6 +616,9 @@ class PDBFile(object):
         if current_atom is not None and atom_parts['alternate_location'] in ascii_letters:
             if self._current_model_number == 1:
                 current_atom.other_locations[atom_parts['alternate_location']] = atom
+                # altloc atoms should be reachable in the all_attributes map
+                self._atom_map_from_all_attributes[all_attribute_key] = atom
+                return
             elif not current_atom in self._model1_atoms_in_structure:
                 # This is if the atom is not in the structure, but in the alternate locations. We
                 # don't currently store coordinates for those atoms beyond the first frame. Note
@@ -733,7 +736,7 @@ class PDBFile(object):
             try:
                 self._atom_map_from_all_attributes[key].anisou = anisou_tensor
             except KeyError:
-                warnings.warn('Could not find atom belonging to anisou tensor with key %s' % key,
+                warnings.warn('Could not find atom belonging to anisou tensor with key %s' % (key,),
                               PDBWarning)
 
     def _postprocess_metadata(self):
