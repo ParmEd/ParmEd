@@ -751,8 +751,8 @@ class PDBFile(object):
             return next(reversed(self._atom_map_from_attributes.values()))
         return None
 
-    @classmethod
-    def write(cls, struct, dest, renumber=True, coordinates=None, altlocs='all',
+    @staticmethod
+    def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
               write_anisou=False, charmm=False, use_hetatoms=True,
               standard_resnames=False, increase_tercount=True, write_links=False):
         """ Write a PDB file from a Structure instance
@@ -841,15 +841,13 @@ class PDBFile(object):
         if charmm:
             atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                        '%6.2f      %-4s%2s%-2s\n')
-            anisourec = ('ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                         '      %2s%-2s\n')
-            terrec = ('TER   %5d      %-4s%1s%4d\n')
+            anisourec = 'ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d      %2s%-2s\n'
+            terrec = 'TER   %5d      %-4s%1s%4d\n'
             reslen = 4
         else:
             atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                        '%6.2f      %-4s%2s%-2s\n')
-            anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                         '      %2s%-2s\n')
+            anisourec = 'ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d      %2s%-2s\n'
             terrec = ('TER   %5d      %-3s %1s%4d\n')
             reslen = 3
         linkrec = ('LINK        %-4s%1s%-3s %1s%4d%1s               '
