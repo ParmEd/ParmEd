@@ -402,8 +402,8 @@ class PDBFile(object):
             'CONECT': self._parse_connect_record,
             'LINK': self._parse_links,
             'CRYST1': self._parse_cryst1,
-            'MODEL': self._parse_model,
-            'ENDMDL': self._parse_end_of_model,
+            'MODEL': self._new_model,
+            'ENDMDL': self._end_model,
         }
 
         for line in self.fileobj:
@@ -648,17 +648,19 @@ class PDBFile(object):
         if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
             self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
 
-    def _parse_model(self, line):
+    def _new_model(self, line):
         if self._current_model_number == 1 and len(self.struct.atoms) == 0:
             return # MODEL 1
         if self._model_open:
-            raise PDBError('%s begun before last model ended' % (line.strip()))
+            warnings.warn('%s begun before last model ended. Assuming it is ending' % line.strip(),
+                          PDBWarning)
+            self._end_model(line)
         self._coordinates.append([])
         self._model_atom_counts.append(0)
         self._model_open = True
         self._current_model_number += 1
 
-    def _parse_end_of_model(self, line):
+    def _end_model(self, line):
         """
         Ends the current model and validates the processed model is the same size as the models
         that came before this one
