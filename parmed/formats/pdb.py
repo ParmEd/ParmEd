@@ -200,6 +200,7 @@ class PDBFile(object):
         self._model_atom_counts = [0]
         self._anisou_records = dict()
         self._atom_map_from_atom_number = dict()
+        self._atom_map_to_parent = dict()
         self._model1_atoms_in_structure = set()
         self._model_open = True
         self._insertion_codes = set() # Only permitted for compliant PDB files
@@ -616,6 +617,9 @@ class PDBFile(object):
         if current_atom is not None and atom_parts['alternate_location'] in ascii_letters:
             if self._current_model_number == 1:
                 current_atom.other_locations[atom_parts['alternate_location']] = atom
+                self._atom_map_to_parent[atom] = current_atom
+                if atom_number not in self._atom_map_from_atom_number:
+                    self._atom_map_from_atom_number[atom_number] = atom
                 # altloc atoms should be reachable in the all_attributes map
                 self._atom_map_from_all_attributes[all_attribute_key] = atom
                 return
@@ -695,7 +699,9 @@ class PDBFile(object):
             warnings.warn('CONECT record - could not find atoms %d and/or %d to connect' %
                           (origin_index, index_1), PDBWarning)
             return
+        origin_atom = self._atom_map_to_parent.get(origin_atom, origin_atom)
         for partner in (atom_1, atom_2, atom_3, atom_4):
+            partner = self._atom_map_to_parent.get(partner, partner)
             if partner is None or partner in origin_atom.bond_partners:
                 continue
             self.struct.bonds.append(Bond(origin_atom, partner))
