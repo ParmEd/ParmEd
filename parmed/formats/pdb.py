@@ -200,6 +200,7 @@ class PDBFile(object):
         self._model_atom_counts = [0]
         self._anisou_records = dict()
         self._atom_map_from_atom_number = dict()
+        self._model1_atoms_in_structure = set()
         self._model_open = True
         self._insertion_codes = set() # Only permitted for compliant PDB files
         # Some writers use insertion code to hold an extra digit for the residue number if it
@@ -437,7 +438,7 @@ class PDBFile(object):
         self.struct.keywords += '%s,' % line[10:].strip()
 
     def _parse_ter_record(self, *args):
-        next(reversed(self._atom_map_from_attributes)).residue.ter = True
+        self._find_last_atom_read().residue.ter = True
 
     def _parse_experimental(self, line):
         if self.struct.experimental:
@@ -509,12 +510,13 @@ class PDBFile(object):
         # Make sure the space is at the end
         elem = elem[1] + ' ' if elem[0] == ' ' else elem
         try:
-            atomic_number = AtomicNum[(elem[0].upper() + elem[1].lower()).strip()]
+            elem = (elem[0].upper() + elem[1].lower()).strip()
+            atomic_number = AtomicNum[elem]
         except KeyError:
             elem = element_by_name(parts['name'])
             atomic_number = AtomicNum[elem]
         parts['atomic_number'] = atomic_number
-        parts['mass'] = Mass[atomic_number]
+        parts['mass'] = Mass[elem]
         parts['bfactor'] = try_convert(parts['bfactor'], float, 0.0)
         parts['occupancy'] = try_convert(parts['occupancy'], float, 0.0)
         parts['charge'] = try_convert(parts['charge'], float, 0.0)
@@ -522,7 +524,11 @@ class PDBFile(object):
         return parts
 
     def _determine_residue_number(self, residue_number, line):
-        last_atom = next(reversed(self._atom_map_from_attributes.values()))
+        last_atom = self._find_last_atom_read()
+        if last_atom is not None:
+            last_residue_number = last_atom.residue.number
+        else:
+            last_residue_number = 0
         if self._residue_indices_overflow:
             if self._residue_number_field_extended:
                 try:
@@ -533,20 +539,20 @@ class PDBFile(object):
                     pass
             else:
                 if residue_number == self._last_residue_number_label:
-                    return last_atom.residue.number
+                    return last_residue_number
                 else:
                     self._last_residue_number_label = residue_number
-                    return last_atom.residue.number + 1
-        elif last_atom.residue.number >= 9999 and residue_number == '1000' and line[26] == '0':
+                    return last_residue_number + 1
+        elif last_residue_number >= 9999 and residue_number == '1000' and line[26] == '0':
             self._residue_indices_overflow = True
             self._residue_number_field_extended = True
             self._last_residue_number_label = '10000'
             return 10000
-        elif last_atom.residue.number == 9999 and residue_number != '9999':
+        elif last_residue_number == 9999 and residue_number != '9999':
             # This is the first time we notice residue indices overflowing
             self._residue_indices_overflow = True
             self._last_residue_number_label = residue_number
-            return last_atom.residue.number + 1
+            return last_residue_number + 1
         else:
             self._last_residue_number_label = residue_number
             return int(residue_number)
@@ -567,14 +573,15 @@ class PDBFile(object):
             self._anisou_records[self._make_atom_key_from_parts(parts, all_parts=True)] = anisou
 
     def _determine_atom_number(self, atom_number):
-        last_atom = next(reversed(self._atom_map_from_attributes.values()))
-        self._atom_indices_overflow = self._atom_indices_overflow or last_atom.number >= 99999
-        if self._atom_indices_overflow:
+        last_atom = self._find_last_atom_read()
+        if last_atom is not None:
+            self._atom_indices_overflow = self._atom_indices_overflow or last_atom.number >= 99999
+        if self._atom_indices_overflow and last_atom is not None:
             return last_atom.number + 1
         try:
             return int(atom_number)
         except ValueError:
-            return last_atom.number + 1
+            return last_atom.number + 1 if last_atom is not None else 1
 
     @staticmethod
     def _make_atom_key_from_parts(atom_parts, all_parts=False):
@@ -609,7 +616,14 @@ class PDBFile(object):
         if current_atom is not None and atom_parts['alternate_location'] in ascii_letters:
             if self._current_model_number == 1:
                 current_atom.other_locations[atom_parts['alternate_location']] = atom
-            return
+            elif not current_atom in self._model1_atoms_in_structure:
+                # This is if the atom is not in the structure, but in the alternate locations. We
+                # don't currently store coordinates for those atoms beyond the first frame. Note
+                # that this should be incredibly rare, since alt-locs are common in static structure
+                # determination, like X-Ray crystallography. Ensemble methods like NMR won't have
+                # alternate locations in addition to multiple frames, so this is not expected to be
+                # an impactful limitation
+                return
         current_atom_index = self._model_atom_counts[-1]
         self._model_atom_counts[-1] += 1
         if self._current_model_number == 1:
@@ -619,6 +633,7 @@ class PDBFile(object):
             self.struct.add_atom(atom, atom_parts['residue_name'], residue_number,
                                  atom_parts['chain'], atom_parts['insertion_code'],
                                  atom_parts['segment_id'])
+            self._model1_atoms_in_structure.add(atom)
         else:
             try:
                 atom_from_first_model = self.struct.atoms[current_atom_index]
@@ -627,7 +642,8 @@ class PDBFile(object):
             if (atom_from_first_model.residue.name != atom_parts['residue_name'] or
                 atom_from_first_model.name != atom_parts['name']):
                 raise PDBError('Atom/residue name mismatch in different models!')
-        self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
+        if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
+            self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
 
     def _parse_model(self, line):
         if self._current_model_number == 1 and len(self.struct.atoms) == 0:
@@ -724,6 +740,11 @@ class PDBFile(object):
         self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
         self.struct.journal = self.struct.journal.strip()
         self.struct.title = self.struct.title.strip()
+
+    def _find_last_atom_read(self):
+        if self.struct.atoms:
+            return next(reversed(self._atom_map_from_attributes.values()))
+        return None
 
     @classmethod
     def write(cls, struct, dest, renumber=True, coordinates=None, altlocs='all',
