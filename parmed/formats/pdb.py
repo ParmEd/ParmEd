@@ -594,6 +594,7 @@ class PDBFile(object):
             atom_parts['residue_number'],
             atom_parts['chain'],
             atom_parts['insertion_code'],
+            atom_parts.get('segment_id', ''),
             atom_parts['alternate_location'] if all_parts else None,
         )
 
@@ -614,7 +615,8 @@ class PDBFile(object):
         attribute_key = self._make_atom_key_from_parts(atom_parts)
         all_attribute_key = self._make_atom_key_from_parts(atom_parts, all_parts=True)
         current_atom = self._atom_map_from_attributes.get(attribute_key, None)
-        if current_atom is not None and atom_parts['alternate_location'] in ascii_letters:
+        if (current_atom is not None and atom_parts['alternate_location'] in ascii_letters and
+            not self._atom_indices_overflow and not self._residue_indices_overflow):
             if self._current_model_number == 1:
                 current_atom.other_locations[atom_parts['alternate_location']] = atom
                 self._atom_map_to_parent[atom] = current_atom
