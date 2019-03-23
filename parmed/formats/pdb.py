@@ -532,8 +532,8 @@ class PDBFile(object):
         if self._residue_indices_overflow:
             if self._residue_number_field_extended:
                 try:
-                    residue_number = int(residue_number + line[26])
                     self._last_residue_number_label = residue_number + line[26]
+                    residue_number = int(residue_number + line[26])
                     return residue_number
                 except ValueError:
                     pass
@@ -693,7 +693,7 @@ class PDBFile(object):
         atom_4 = self._atom_map_from_atom_number.get(index_4, None)
         if origin_atom is None or atom_1 is None:
             warnings.warn('CONECT record - could not find atoms %d and/or %d to connect' %
-                          (origin_atom, atom_1), PDBWarning)
+                          (origin_index, index_1), PDBWarning)
             return
         for partner in (atom_1, atom_2, atom_3, atom_4):
             if partner is None or partner in origin_atom.bond_partners:
