@@ -4,7 +4,7 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from contextlib import closing
 try:
     from string import ascii_letters
@@ -29,6 +29,8 @@ import re
 import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+_ascii_letters_set = set(ascii_letters)
 
 def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid, inscode):
     """
@@ -104,6 +106,11 @@ def _number_truncated_to_n_digits(num, digits):
 class PDBFile(object):
     """ Standard PDB file format parser and writer """
     #===================================================
+
+    AtomLookupKey = namedtuple(
+        'AtomLookupKey', ('name', 'number', 'residue_name', 'residue_number', 'chain',
+                          'insertion_code', 'segment_id', 'alternate_location')
+    )
 
     @staticmethod
     def id_format(filename):
@@ -205,6 +212,7 @@ class PDBFile(object):
         self._model_open = True
         self._insertion_codes = set() # Only permitted for compliant PDB files
         self._last_atom = None
+        self._last_residue = None
         # Some writers use additional fields to hold extra digits for the residue number if it goes
         # more than 4 digits
         self._residue_number_field_extended_by = 0
@@ -595,18 +603,18 @@ class PDBFile(object):
         except ValueError:
             return self._last_atom.number + 1 if self._last_atom is not None else 1
 
-    @staticmethod
-    def _make_atom_key_from_parts(atom_parts, all_parts=False):
+    @classmethod
+    def _make_atom_key_from_parts(cls, atom_parts, all_parts=False):
         """ If all_parts is False, only key from the values that determine alternate locations """
-        return (
-            atom_parts['name'],
-            atom_parts['number'] if all_parts else None,
-            atom_parts['residue_name'],
-            atom_parts['residue_number'],
-            atom_parts['chain'],
-            atom_parts['insertion_code'],
-            atom_parts.get('segment_id', ''),
-            atom_parts['alternate_location'] if all_parts else None,
+        return cls.AtomLookupKey(
+            name=atom_parts['name'],
+            number=atom_parts['number'] if all_parts else None,
+            residue_name=atom_parts['residue_name'],
+            residue_number=atom_parts['residue_number'],
+            chain=atom_parts['chain'],
+            insertion_code=atom_parts['insertion_code'],
+            segment_id=atom_parts.get('segment_id', ''),
+            alternate_location=atom_parts['alternate_location'] if all_parts else None,
         )
 
     def _parse_atom_record(self, line):
@@ -626,7 +634,7 @@ class PDBFile(object):
         attribute_key = self._make_atom_key_from_parts(atom_parts)
         all_attribute_key = self._make_atom_key_from_parts(atom_parts, all_parts=True)
         current_atom = self._atom_map_from_attributes.get(attribute_key, None)
-        if (current_atom is not None and atom_parts['alternate_location'] in ascii_letters and
+        if (current_atom is not None and atom_parts['alternate_location'] in _ascii_letters_set and
             not self._atom_indices_overflow and not self._residue_indices_overflow):
             if self._current_model_number == 1:
                 current_atom.other_locations[atom_parts['alternate_location']] = atom

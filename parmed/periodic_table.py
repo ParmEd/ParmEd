@@ -93,8 +93,7 @@ Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
          'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     ,
          'Cn' : 285.     , 'Uut': 284.     , 'Uuq': 289.     ,
          'Uup': 288.     , 'Uuh': 292.     , 'Uus': 291.     ,
-         'Uuo': 294.     , 'EP' : 0.000000 , 'Ep' : 0.000000 ,
-         'LP' : 0.000000 , 'Lp' : 0.000000}
+         'Uuo': 294.     , 'EP' : 0.000000 }
 
 Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Be' : 'Beryllium'    ,'B'  : 'Boron'        ,'C'  : 'Carbon'       ,
@@ -300,3 +299,8 @@ def element_by_name(name):
             atomic_number = 0 # give up
 
     return Element[atomic_number]
+
+# Add some mass aliases here. We need to do it *after* _sorted_masses is created above, since
+# the element_by_mass routine which uses the _sorted_masses assumes that the masses are all
+# monotonically strictly increasing
+Mass.update(dict(Ep=0.0, LP=0.0, Lp=0.0))
