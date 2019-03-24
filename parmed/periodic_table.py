@@ -93,7 +93,8 @@ Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
          'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     ,
          'Cn' : 285.     , 'Uut': 284.     , 'Uuq': 289.     ,
          'Uup': 288.     , 'Uuh': 292.     , 'Uus': 291.     ,
-         'Uuo': 294.     , 'EP' : 0.000000 }
+         'Uuo': 294.     , 'EP' : 0.000000 , 'Ep' : 0.000000 ,
+         'LP' : 0.000000 , 'Lp' : 0.000000}
 
 Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Be' : 'Beryllium'    ,'B'  : 'Boron'        ,'C'  : 'Carbon'       ,
