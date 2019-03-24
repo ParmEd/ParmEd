@@ -204,9 +204,10 @@ class PDBFile(object):
         self._model1_atoms_in_structure = set()
         self._model_open = True
         self._insertion_codes = set() # Only permitted for compliant PDB files
-        # Some writers use insertion code to hold an extra digit for the residue number if it
-        # goes more than 4 digits
-        self._residue_number_field_extended = False
+        self._last_atom = None
+        # Some writers use additional fields to hold extra digits for the residue number if it goes
+        # more than 4 digits
+        self._residue_number_field_extended_by = 0
         # Fallback if parser fails to process residue numbers
         self._last_residue_number_label = None
 
@@ -386,6 +387,14 @@ class PDBFile(object):
         inst._process_structure_symmetry()
         inst._process_link_records()
         inst._assign_anisou_to_atoms()
+        if inst._residue_indices_overflow:
+            # If we have overflows in our residue numbers, wipe out all insertion codes. CHARMM
+            # abuses the PDB format and usurps the insertion code (and later fields) to extend the
+            # residue number. I don't feel bad discarding insertion code information when the PDB
+            # format is abused like this. It's really never used for overflowing PDBs in my
+            # experience anyway
+            for residue in inst.struct.residues:
+                residue.insertion_code = ''
 
         return inst.struct
 
@@ -439,7 +448,8 @@ class PDBFile(object):
         self.struct.keywords += '%s,' % line[10:].strip()
 
     def _parse_ter_record(self, *args):
-        self._find_last_atom_read().residue.ter = True
+        if self._current_model_number == 1:
+            self._last_atom.residue.ter = True
 
     def _parse_experimental(self, line):
         if self.struct.experimental:
@@ -492,8 +502,8 @@ class PDBFile(object):
     def _parse_atom_parts_1(line):
         return dict(
             number=line[6:11], name=line[12:16].strip(), alternate_location=line[16].strip(),
-            residue_name=line[17:20].strip(), chain=line[21].strip(), residue_number=line[22:26],
-            insertion_code=line[26].strip(), 
+            residue_name=line[17:21].strip(), chain=line[21].strip(),
+            residue_number=line[22:26].strip(), insertion_code=line[26].strip(),
         )
 
     @classmethod
@@ -525,16 +535,16 @@ class PDBFile(object):
         return parts
 
     def _determine_residue_number(self, residue_number, line):
-        last_atom = self._find_last_atom_read()
-        if last_atom is not None:
-            last_residue_number = last_atom.residue.number
+        if self._last_atom is not None:
+            last_residue_number = self._last_atom.residue.number
         else:
             last_residue_number = 0
+        extended_by = self._residue_number_field_extended_by
         if self._residue_indices_overflow:
-            if self._residue_number_field_extended:
+            if extended_by:
                 try:
-                    self._last_residue_number_label = residue_number + line[26]
-                    residue_number = int(residue_number + line[26])
+                    self._last_residue_number_label = residue_number + line[26:26+extended_by]
+                    residue_number = int(residue_number + line[26:26+extended_by])
                     return residue_number
                 except ValueError:
                     pass
@@ -544,11 +554,12 @@ class PDBFile(object):
                 else:
                     self._last_residue_number_label = residue_number
                     return last_residue_number + 1
-        elif last_residue_number >= 9999 and residue_number == '1000' and line[26] == '0':
+        if last_residue_number >= 9999 and residue_number == '1000' + '0' * extended_by and \
+                line[26+extended_by] == '0':
             self._residue_indices_overflow = True
-            self._residue_number_field_extended = True
-            self._last_residue_number_label = '10000'
-            return 10000
+            self._residue_number_field_extended_by += 1
+            self._last_residue_number_label = '1000' + '0' * self._residue_number_field_extended_by
+            return int(self._last_residue_number_label)
         elif last_residue_number == 9999 and residue_number != '9999':
             # This is the first time we notice residue indices overflowing
             self._residue_indices_overflow = True
@@ -574,15 +585,15 @@ class PDBFile(object):
             self._anisou_records[self._make_atom_key_from_parts(parts, all_parts=True)] = anisou
 
     def _determine_atom_number(self, atom_number):
-        last_atom = self._find_last_atom_read()
-        if last_atom is not None:
-            self._atom_indices_overflow = self._atom_indices_overflow or last_atom.number >= 99999
-        if self._atom_indices_overflow and last_atom is not None:
-            return last_atom.number + 1
+        if self._last_atom is not None:
+            self._atom_indices_overflow = (self._atom_indices_overflow or
+                                           self._last_atom.number >= 99999)
+        if self._atom_indices_overflow and self._last_atom is not None:
+            return self._last_atom.number + 1
         try:
             return int(atom_number)
         except ValueError:
-            return last_atom.number + 1 if last_atom is not None else 1
+            return self._last_atom.number + 1 if self._last_atom is not None else 1
 
     @staticmethod
     def _make_atom_key_from_parts(atom_parts, all_parts=False):
@@ -643,6 +654,7 @@ class PDBFile(object):
                                  atom_parts['chain'], atom_parts['insertion_code'],
                                  atom_parts['segment_id'])
             self._model1_atoms_in_structure.add(atom)
+            self._last_atom = atom
         else:
             try:
                 atom_from_first_model = self.struct.atoms[current_atom_index]
@@ -753,11 +765,6 @@ class PDBFile(object):
         self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
         self.struct.journal = self.struct.journal.strip()
         self.struct.title = self.struct.title.strip()
-
-    def _find_last_atom_read(self):
-        if self.struct.atoms:
-            return next(reversed(self._atom_map_from_attributes.values()))
-        return None
 
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
