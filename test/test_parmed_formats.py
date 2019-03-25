@@ -441,13 +441,16 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb.residues[0].number, 9999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb.residues[1].number, 10000)
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 10003)
-        self.assertEqual(pdb.residues[5].number, 65535)
-        self.assertEqual(pdb.residues[6].number, 65536) # inferred
-        # Now check error raised if the overflow is not just ****
+        self.assertEqual(pdb.residues[5].number, 10004)
+        self.assertEqual(pdb.residues[6].number, 10005)
+        # Non-numerical residue numbers are only checked for uniqueness to compare with previous
+        # residue to see if a new one should be created
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
@@ -458,7 +461,9 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'CA', ' ', 'RE6', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
                  7, 'CA', ' ', 'RE7', 'A', '>:-O', '', 1, 1, 1, 1, 1, '', '')
             )
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
         # Now check if the residue sequence field is simply expanded
         with open(fn, 'w') as f:
             f.write(pdbtext %
@@ -479,8 +484,8 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 99999)
-        self.assertEqual(pdb.residues[5].number, 100000)
-        self.assertEqual(pdb.residues[6].number, 100001)
+        self.assertEqual(pdb.residues[5].number, 10000)
+        self.assertEqual(pdb.residues[6].number, 10000)
 
         # Check proper residue distinguishing for overflowed case. NR marks
         # atoms that *should* be turned into a new residue because there's a
@@ -495,11 +500,13 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'XX', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '', # NR
                  7, 'EP', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
+        # In the above, the PDB parser should recognize at the very least that there are at least
+        # 5 distinct residues. Atoms 4 and 5 have the same residue name *and* atom name (and the
+        # same residue number) so it's reasonable to treat them as the same or different residues
         pdb = formats.PDBFile.parse(fn)
-        self.assertEqual(len(pdb.residues), 6)
-        self.assertEqual([len(r) for r in pdb.residues], [1, 1, 1, 1, 1, 2])
-        self.assertIsInstance(pdb[6], topologyobjects.ExtraPoint)
+        self.assertGreaterEqual(len(pdb.residues), 5)
+        self.assertEqual([len(r) for r in pdb.residues[:3]], [1, 1, 1])
+        self.assertIsInstance(pdb.atoms[6], topologyobjects.ExtraPoint)
 
     def test_atom_number_overflow(self):
         """ Tests PDB file where residue number overflows """
@@ -520,12 +527,14 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb[0].number, 99999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb[1].number, 100000)
         self.assertEqual(pdb[2].number, 100001)
         self.assertEqual(pdb[3].number, 100002)
         self.assertEqual(pdb[4].number, 100003)
-        self.assertEqual(pdb[5].number, 1048575)
-        self.assertEqual(pdb[6].number, 1048576)
+        self.assertEqual(pdb[5].number, 100004)
+        self.assertEqual(pdb[6].number, 100005)
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (99999, 'CA', ' ', 'RE1', 'A', 1, '', 1, 1, 1, 1, 1, '', '',
@@ -536,8 +545,12 @@ class TestPDBStructure(FileIOTestCase):
                  'fffff', 'CA', ' ', 'RE6', 'A', 6, '', 1, 1, 1, 1, 1, '', '',
                  '*a***', 'CA', ' ', 'RE7', 'A', 7, '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        # Check the parsing. PDB file no longer cares if atom number is not numeric
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb.atoms[-1].name, 'CA')
+        self.assertEqual(pdb.atoms[-1].residue.name, 'RE7')
 
     def test_pdb_with_models(self):
         """ Test parsing of PDB files with multiple models """

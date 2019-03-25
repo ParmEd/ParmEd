@@ -299,3 +299,8 @@ def element_by_name(name):
             atomic_number = 0 # give up
 
     return Element[atomic_number]
+
+# Add some mass aliases here. We need to do it *after* _sorted_masses is created above, since
+# the element_by_mass routine which uses the _sorted_masses assumes that the masses are all
+# monotonically strictly increasing
+Mass.update(dict(Ep=0.0, LP=0.0, Lp=0.0))

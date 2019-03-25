@@ -1713,8 +1713,9 @@ class Bond(object):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise MoleculeError('Cannot bond atom to itself! '
-                                'Atoms are: %s %s' % (atom1, atom2))
+            raise MoleculeError('Cannot bond atom to itself! Atoms are: %s %s' % (atom1, atom2))
+        if isinstance(atom1, ExtraPoint) and isinstance(atom2, ExtraPoint):
+            raise MoleculeError('Cannot bond two virtual sites/extra points together')
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2

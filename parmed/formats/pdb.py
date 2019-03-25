@@ -4,7 +4,12 @@ PDBx/mmCIF files.
 """
 from __future__ import division, print_function, absolute_import
 
+from collections import OrderedDict, namedtuple
 from contextlib import closing
+try:
+    from string import ascii_letters
+except ImportError:
+    from string import letters as ascii_letters # Python 2
 import io
 import ftplib
 import numpy as np
@@ -24,6 +29,8 @@ import re
 import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+_ascii_letters_set = set(ascii_letters)
 
 def _compare_atoms(old_atom, new_atom, resname, resid, chain, segid, inscode):
     """
@@ -99,6 +106,11 @@ def _number_truncated_to_n_digits(num, digits):
 class PDBFile(object):
     """ Standard PDB file format parser and writer """
     #===================================================
+
+    AtomLookupKey = namedtuple(
+        'AtomLookupKey', ('name', 'number', 'residue_name', 'residue_number', 'chain',
+                          'insertion_code', 'segment_id', 'alternate_location')
+    )
 
     @staticmethod
     def id_format(filename):
@@ -179,6 +191,36 @@ class PDBFile(object):
 
     #===================================================
 
+    def __init__(self, fileobj):
+        # Open file object that we are parsing
+        self.fileobj = fileobj
+
+        self._atom_map_from_attributes = OrderedDict()
+        self._atom_map_from_all_attributes = OrderedDict()
+        self._current_model_number = 1
+        self._residue_indices_overflow = False
+        self._atom_indices_overflow = False
+        self.struct = Structure()
+        self._symmetry_lines = []
+        self._link_lines = []
+        self._coordinates = [[]]
+        self._model_atom_counts = [0]
+        self._anisou_records = dict()
+        self._atom_map_from_atom_number = dict()
+        self._atom_map_to_parent = dict()
+        self._model1_atoms_in_structure = set()
+        self._model_open = True
+        self._insertion_codes = set() # Only permitted for compliant PDB files
+        self._last_atom = None
+        self._last_residue = None
+        # Some writers use additional fields to hold extra digits for the residue number if it goes
+        # more than 4 digits
+        self._residue_number_field_extended_by = 0
+        # Fallback if parser fails to process residue numbers
+        self._last_residue_number_label = None
+
+    #===================================================
+
     @staticmethod
     def download(pdb_id, timeout=10, saveto=None):
         """
@@ -225,9 +267,8 @@ class PDBFile(object):
         ftp.login()
         fileobj = io.BytesIO()
         try:
-            ftp.retrbinary('RETR /pub/pdb/data/structures/divided/pdb/'
-                           '%s/pdb%s.ent.gz' % (pdb_id[1:3], pdb_id),
-                           fileobj.write)
+            ftp_loc = '/pub/pdb/data/structures/divided/pdb/%s/pdb%s.ent.gz' % (pdb_id[1:3], pdb_id)
+            ftp.retrbinary('RETR %s' % ftp_loc , fileobj.write)
         except ftplib.all_errors as err:
             raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
         finally:
@@ -248,8 +289,22 @@ class PDBFile(object):
 
     _relatere = re.compile(r'RELATED ID: *(\w+) *RELATED DB: *(\w+)', re.I)
 
-    @staticmethod
-    def parse(filename, skip_bonds=False):
+    def _add_metadata_fields(self):
+        self.struct.experimental = ''
+        self.struct.journal = ''
+        self.struct.authors = ''
+        self.struct.keywords = ''
+        self.struct.doi = ''
+        self.struct.pmid = ''
+        self.struct.journal_authors = ''
+        self.struct.volume_page = ''
+        self.struct.title = ''
+        self.struct.year = None
+        self.struct.resolution = None
+        self.struct.related_entries = []
+
+    @classmethod
+    def parse(cls, filename, skip_bonds=False):
         """ Read a PDB file and return a populated `Structure` class
 
         Parameters
@@ -313,449 +368,411 @@ class PDBFile(object):
             own_handle = False
             fileobj = filename
 
-        struct = Structure()
-        # Add metadata fields
-        struct.experimental = struct.journal = struct.authors = ''
-        struct.keywords = struct.doi = struct.pmid = ''
-        struct.journal_authors = struct.volume_page = struct.title = ''
-        struct.year = struct.resolution = None
-        struct.related_entries = []
-        modelno = 1 # For PDB files with multiple MODELs
-        atomno = 0
-        coordinates = []
-        all_coordinates = []
+        inst = cls(fileobj)
+        inst._add_metadata_fields()
 
         # Support hexadecimal numbering like that printed by VMD
-        last_atom = Atom()
-        last_atom_added = None
-        last_resid = 1
-        resend = 26
-        res_hex = False
-        res_other = False
-        atom_hex = False
-        atom_other = False
-        atom_overflow = False
-        ZEROSET = set('0')
-        altloc_ids = set()
-        _symmetry_lines = []
-        link_lines = []
-        link_atom_lookup = dict()
-
         try:
-            for line in fileobj:
-                if 'REMARK 290   SMTRY' in line:
-                    _symmetry_lines.append(line)
-                rec = line[:6]
-                if rec == 'ATOM  ' or rec == 'HETATM':
-                    atomno += 1
-                    atnum, atname, altloc = line[6:11], line[12:16], line[16]
-                    resname, chain = line[17:20], line[21]
-                    resid, inscode = line[22:resend], line[26]
-                    x, y, z = line[30:38], line[38:46], line[46:54]
-                    occupancy, bfactor = line[54:60], line[60:66]
-                    elem, chg = line[76:78], line[78:80]
-                    segid = line[72:76].strip() # CHARMM-specific
-                    atname = atname.strip()
-                    altloc = altloc.strip()
-                    resname = resname.strip()
-                    chain = chain.strip()
-                    inscode = inscode.strip()
-
-                    elem = '%-2s' % elem # Make sure we have at least 2 chars
-                    if elem[0] == ' ': elem = elem[1] + ' '
-                    try:
-                        atsym = (elem[0] + elem[1].lower()).strip()
-                        atomic_number = AtomicNum[atsym]
-                        mass = Mass[atsym]
-                    except KeyError:
-                        # Now try based on the atom name... but don't try too
-                        # hard (e.g., don't try to differentiate b/w Ca and C)
-                        elem = element_by_name(atname)
-                        atomic_number = AtomicNum[elem]
-                        mass = Mass[elem]
-                    try:
-                        bfactor = float(bfactor)
-                    except ValueError:
-                        bfactor = 0.0
-                    try:
-                        occupancy = float(occupancy)
-                    except ValueError:
-                        occupancy = 0.0
-                    # Figure out what my residue number is and see if the PDB is
-                    # outputting residue numbers in hexadecimal (e.g., VMD)
-                    if last_resid >= 9999 and resend == 26:
-                        if not res_hex and resid == '9999':
-                            resid = 9999
-                        elif not res_hex:
-                            try:
-                                res_hex = int(resid, 16) == 10000
-                            except ValueError:
-                                res_other = True
-                        # So now we know if we use hexadecimal or not. If we do,
-                        # convert. Otherwise, stay put
-                        if res_hex:
-                            try:
-                                resid = int(resid, 16)
-                            except ValueError:
-                                if resid == '****':
-                                    resid = None # Figure out by unique atoms
-                                else:
-                                    raise
-                        elif resid == '1000' and line[26] == '0':
-                            resend += 1
-                            resid = 10000
-                        elif res_other:
-                            resid = last_resid + 1
-                        else:
-                            resid = int(resid)
-                    elif resend > 26:
-                        # VMD extends the field now... ugh.
-                        if resid[0] == '1' and set(resid[1:]) == ZEROSET:
-                            if line[resend] == '0':
-                                resid = int(resid) * 10
-                                resend += 1
-                            else:
-                                resid = int(resid)
-                        else:
-                            resid = int(resid)
-                    else:
-                        resid = int(resid)
-                    # If the number has cycled, it too may be hexadecimal
-                    if atom_hex:
-                        try:
-                            atnum = int(atnum, 16)
-                        except ValueError:
-                            if set(atnum) == set('*'):
-                                atom_overflow = True
-                                atnum = last_atom_added.number + 1
-                            else:
-                                raise
-                    elif atom_overflow or atom_other:
-                        atnum = last_atom_added.number + 1
-                    else:
-                        try:
-                            atnum = int(atnum)
-                        except ValueError:
-                            if set(atnum) == set('*'):
-                                atom_overflow = True
-                                atnum = last_atom_added.number + 1
-                            else:
-                                try:
-                                    atnum = int(atnum, 16)
-                                except ValueError:
-                                    atnum = last_atom_added.number + 1
-                                    atom_other = True
-                                else:
-                                    if atnum == last_atom_added.number + 1:
-                                        # Assume VMD numbers continuously
-                                        atom_hex = True
-                                    else:
-                                        atom_other = True
-                                        atnum = last_atom_added.number + 1
-                    # It's possible that the residue number has cycled so much
-                    # that it is now filled with ****'s. In that case, start a
-                    # new residue if the current residue repeats the same atom
-                    # name as # the 'last' residue.
-                    if resid is None:
-                        # If the last residue is number 0xffff, then this is the
-                        # first residue that has overridden, so make it a new
-                        # residue
-                        if struct.residues[-1].number == 0xffff:
-                            resid = struct.residues[-1].number + 1
-                        else:
-                            for atom in struct.residues[-1]:
-                                if atom.name == atname:
-                                    resid = last_resid + 1
-                                    break
-                    if resid is None:
-                        # Still part of the last residue
-                        resid = last_resid
-                    last_resid = resid
-                    try:
-                        chg = float(chg)
-                    except ValueError:
-                        chg = 0.0
-                    if atname in ('EP', 'LP'): # lone pair
-                        atom = ExtraPoint(atomic_number=atomic_number,
-                                name=atname, charge=chg, mass=mass,
-                                occupancy=occupancy, bfactor=bfactor,
-                                altloc=altloc, number=atnum)
-                    else:
-                        atom = Atom(atomic_number=atomic_number, name=atname,
-                                charge=chg, mass=mass, occupancy=occupancy,
-                                bfactor=bfactor, altloc=altloc, number=atnum)
-                    atom.xx, atom.xy, atom.xz = float(x), float(y), float(z)
-                    if (_compare_atoms(last_atom, atom, resname, resid, chain,
-                                       segid, inscode) and altloc):
-                        atom.residue = last_atom.residue
-                        last_atom.other_locations[altloc] = atom
-                        altloc_ids.add(atom.number)
-                        last_atom_added = atom
-                        continue
-                    last_atom = last_atom_added = atom
-                    if modelno == 1:
-                        struct.add_atom(atom, resname, resid, chain,
-                                        inscode, segid)
-                        key = (atom.name, atom.altloc, resname, chain, resid, inscode)
-                        link_atom_lookup[key] = atom
-                    else:
-                        try:
-                            last_atom = orig_atom = struct.atoms[atomno-1]
-                        except IndexError:
-                            raise PDBError('Extra atom in MODEL %d' % modelno)
-                        if (orig_atom.residue.name != resname.strip()
-                                or orig_atom.name != atname.strip()):
-                            raise PDBError('Atom %d differs in MODEL %d [%s %s '
-                                           'vs. %s %s]' % (atomno, modelno,
-                                           orig_atom.residue.name,
-                                           orig_atom.name, resname, atname))
-                    coordinates.extend([atom.xx, atom.xy, atom.xz])
-                elif rec == 'ANISOU':
-                    try:
-                        atnum = int(line[6:11])
-                    except ValueError:
-                        warnings.warn('Problem parsing atom number from ANISOU '
-                                      'record', PDBWarning)
-                        continue # Skip the rest of this record
-                    aname = line[12:16].strip()
-                    altloc = line[16].strip()
-                    rname = line[17:21].strip()
-                    chain = line[21].strip()
-                    try:
-                        resid = int(line[22:26])
-                    except ValueError:
-                        warnings.warn('Problem parsing residue number from '
-                                      'ANISOU record', PDBWarning)
-                        continue # Skip the rest of this record
-                    icode = line[26].strip()
-                    try:
-                        u11 = int(line[28:35])
-                        u22 = int(line[35:42])
-                        u33 = int(line[42:49])
-                        u12 = int(line[49:56])
-                        u13 = int(line[56:63])
-                        u23 = int(line[63:70])
-                    except ValueError:
-                        warnings.warn('Problem parsing anisotropic factors '
-                                      'from ANISOU record', PDBWarning)
-                        continue
-                    if last_atom_added is None:
-                        warnings.warn('Orphaned ANISOU record. Poorly '
-                                      'formatted PDB file', PDBWarning)
-                        continue
-                    la = last_atom_added
-                    if (la.name != aname or la.number != atnum or
-                            la.altloc != altloc or la.residue.name != rname or
-                            la.residue.chain != chain or
-                            la.residue.insertion_code != icode):
-                        warnings.warn('ANISOU record does not match previous '
-                                      'atom', PDBWarning)
-                        continue
-                    la.anisou = np.array([u11/1e4, u22/1e4, u33/1e4,
-                                          u12/1e4, u13/1e4, u23/1e4])
-                elif rec.strip() == 'TER':
-                    if modelno == 1: last_atom.residue.ter = True
-                elif rec == 'ENDMDL':
-                    # End the current model
-                    if len(struct.atoms) == 0:
-                        raise PDBError('MODEL ended before any atoms read in')
-                    modelno += 1
-                    if len(struct.atoms)*3 != len(coordinates):
-                        raise PDBError(
-                                'Inconsistent atom numbers in some PDB models')
-                    all_coordinates.append(coordinates)
-                    atomno = 0
-                    coordinates = []
-                    resend = 26
-                    atom_overflow = False
-                elif rec == 'MODEL ':
-                    if modelno == 1 and len(struct.atoms) == 0: continue
-                    if len(coordinates) > 0:
-                        if len(struct.atoms)*3 != len(coordinates):
-                            raise PDBError('Inconsistent atom numbers in '
-                                           'some PDB models')
-                        warnings.warn('MODEL not explicitly ended', PDBWarning)
-                        all_coordinates.append(coordinates)
-                        coordinates = []
-                    modelno += 1
-                    atomno = 0
-                    resend = 26
-                    atom_overflow = False
-                elif rec == 'CRYST1':
-                    a = float(line[6:15])
-                    b = float(line[15:24])
-                    c = float(line[24:33])
-                    try:
-                        A = float(line[33:40])
-                        B = float(line[40:47])
-                        C = float(line[47:54])
-                    except (IndexError, ValueError):
-                        A = B = C = 90.0
-                    struct.box = [a, b, c, A, B, C]
-                    struct.space_group = line[55:66].strip()
-                elif rec == 'EXPDTA':
-                    struct.experimental = line[6:].strip()
-                elif rec == 'AUTHOR':
-                    struct.authors += line[10:].strip()
-                elif rec == 'JRNL  ':
-                    part = line[12:16]
-                    if part == 'AUTH':
-                        struct.journal_authors += line[19:].strip()
-                    elif part == 'TITL':
-                        struct.title += ' %s' % line[19:].strip()
-                    elif part == 'REF ':
-                        struct.journal += ' %s' % line[19:47].strip()
-                        if not line[16:18].strip():
-                            struct.volume = line[51:55].strip()
-                            struct.page = line[56:61].strip()
-                            try:
-                                struct.year = int(line[62:66])
-                            except ValueError:
-                                # Shouldn't happen, but don't throw a fit
-                                pass
-                    elif part == 'PMID':
-                        struct.pmid = line[19:].strip()
-                    elif part == 'DOI ':
-                        struct.doi = line[19:].strip()
-                elif rec == 'KEYWDS':
-                    struct.keywords += '%s,' % line[10:]
-                elif rec == 'REMARK':
-                    if line[6:10] == ' 900':
-                        # Related entries
-                        rematch = PDBFile._relatere.match(line[11:])
-                        if rematch:
-                            struct.related_entries.append(rematch.groups())
-                    elif line[6:10] == '   2':
-                        # Resolution
-                        if not line[11:22].strip(): continue
-                        if struct.resolution is not None:
-                            # Skip over comments
-                            continue
-                        if line[11:22] !=  'RESOLUTION.':
-                            warnings.warn('Unrecognized RESOLUTION record in '
-                                          'PDB file: %s' % line.strip())
-                            continue
-                        if line[23:38] == 'NOT APPLICABLE.':
-                            # Not a diffraction experiment
-                            continue
-                        try:
-                            struct.resolution = float(line[23:30])
-                        except ValueError:
-                            warnings.warn('Trouble converting resolution (%s) '
-                                          'to float' % line[23:30])
-                elif rec == 'CONECT' and not skip_bonds:
-                    b = int(line[6:11])
-                    try:
-                        i = int(line[11:16])
-                    except ValueError:
-                        warnings.warn('Corrupt CONECT record', PDBWarning)
-                        continue
-                    # last 3 integers are optional and may not exist
-                    j = line[16:21].strip()
-                    k = line[21:26].strip()
-                    l = line[26:31].strip()
-                    if b in altloc_ids:
-                        continue # Do not handle altloc bonds yet.
-                    origin = _find_atom_index(struct, b)
-                    if origin is None:
-                        warnings.warn('CONECT record references non-existent '
-                                      'origin atom %d' % b, PDBWarning)
-                        continue # pragma: no cover
-                    if i not in altloc_ids:
-                        partner = _find_atom_index(struct, i)
-                        if partner is None:
-                            warnings.warn('CONECT record references non-existent '
-                                          'destination atom %d' % i, PDBWarning)
-                        elif partner not in origin.bond_partners:
-                            struct.bonds.append(Bond(origin, partner))
-                    # Other atoms are optional, so loop through the
-                    # possibilities and bond them if they're set
-                    for i in (j, k, l):
-                        if not i: continue
-                        i = int(i)
-                        if i in altloc_ids: continue
-                        partner = _find_atom_index(struct, i)
-                        if partner is None:
-                            warnings.warn('CONECT record references non-'
-                                          'existent destination atom %d ' % i, PDBWarning)
-                        elif partner not in origin.bond_partners:
-                            struct.bonds.append(Bond(origin, partner))
-                elif rec == 'LINK  ':
-                    link_lines.append(line)
+            inst._parse_open_file(fileobj)
         finally:
-            # Make sure our file is closed if we opened it
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         # Assign bonds based on standard templates and simple distances
         if not skip_bonds:
-            struct.assign_bonds()
+            inst.struct.assign_bonds()
 
-        # Post-process some of the metadata to make it more reader-friendly
-        struct.keywords = [s.strip() for s in struct.keywords.split(',') if s.strip()]
-        struct.journal = struct.journal.strip()
-        struct.title = struct.title.strip()
+        inst._postprocess_metadata()
+        inst.struct.unchange()
 
-        struct.unchange()
-        if coordinates:
-            if len(coordinates) != 3*len(struct.atoms):
-                raise PDBError('bad number of atoms in some PDB models')
-            all_coordinates.append(coordinates)
-        struct._coordinates = np.array(all_coordinates).reshape((-1, len(struct.atoms), 3))
-        # process symmetry lines
-        if _symmetry_lines:
+        try:
+            inst.struct.coordinates = inst._coordinates
+        except ValueError:
+            raise PDBError('Coordinate shape mismatch. Probably caused by different atom counts in '
+                           'some of the PDB models')
+
+        # Postprocess features of the PDB file we couldn't resolve until the end
+        inst._process_structure_symmetry()
+        inst._process_link_records()
+        inst._assign_anisou_to_atoms()
+        if inst._residue_indices_overflow:
+            # If we have overflows in our residue numbers, wipe out all insertion codes. CHARMM
+            # abuses the PDB format and usurps the insertion code (and later fields) to extend the
+            # residue number. I don't feel bad discarding insertion code information when the PDB
+            # format is abused like this. It's really never used for overflowing PDBs in my
+            # experience anyway
+            for residue in inst.struct.residues:
+                residue.insertion_code = ''
+
+        return inst.struct
+
+    def _parse_open_file(self, fileobj):
+        method_dispatch = {
+            'REMARK': self._parse_remarks,
+            'ATOM': self._parse_atom_record,
+            'ANISOU': self._parse_anisou_record,
+            'TER': self._parse_ter_record,
+            'HETATM': self._parse_atom_record,
+            'EXPDTA': self._parse_experimental,
+            'AUTHOR': self._parse_author,
+            'JRNL': self._parse_journal,
+            'KEYWDS': self._parse_keywords,
+            'CONECT': self._parse_connect_record,
+            'LINK': self._parse_links,
+            'CRYST1': self._parse_cryst1,
+            'MODEL': self._new_model,
+            'ENDMDL': self._end_model,
+        }
+
+        for line in self.fileobj:
+            rec = line[:6].strip()
+            if rec in method_dispatch:
+                method_dispatch[rec](line)
+
+    def _parse_remarks(self, line):
+        """ Parse the various remarks, which may contain various metadata """
+        if line[6:10] == ' 290':
+            self._symmetry_lines.append(line)
+        elif line[6:10] == ' 900':
+            rematch = self._relatere.match(line[11:])
+            if rematch:
+                self.struct.related_entries.append(rematch.groups())
+        elif line[6:10] == '   2': # Resolution
+            if (not line[11:22].strip() or self.struct.resolution is not None
+                or line[23:38] == 'NOT APPLICABLE.'):
+                return
+            elif line[11:22] !=  'RESOLUTION.':
+                warnings.warn('Unrecognized RESOLUTION record in PDB file: %s' % line.strip())
+            else:
+                try:
+                    self.struct.resolution = float(line[23:30])
+                except ValueError:
+                    warnings.warn('Trouble converting resolution (%s) to float' % line[23:30])
+
+    def _parse_links(self, line):
+        self._link_lines.append(line)
+
+    def _parse_keywords(self, line):
+        self.struct.keywords += '%s,' % line[10:].strip()
+
+    def _parse_ter_record(self, *args):
+        if self._current_model_number == 1:
+            self._last_atom.residue.ter = True
+
+    def _parse_experimental(self, line):
+        if self.struct.experimental:
+            self.struct.experimental += ' %s' % line[6:].strip()
+        else:
+            self.struct.experimental += line[6:].strip()
+
+    def _parse_author(self, line):
+        if self.struct.authors:
+            self.struct.authors += ' %s' % line[10:].strip()
+        else:
+            self.struct.authors = line[10:].strip()
+
+    def _parse_journal(self, line):
+        part = line[12:16]
+        if part == 'AUTH':
+            self.struct.journal_authors += line[19:].strip()
+        elif part == 'TITL':
+            self.struct.title += ' %s' % line[19:].strip()
+        elif part == 'REF ':
+            self.struct.journal += ' %s' % line[19:47].strip()
+            if not line[16:18].strip():
+                self.struct.volume = line[51:55].strip()
+                self.struct.page = line[56:61].strip()
+                try:
+                    self.struct.year = int(line[62:66])
+                except ValueError:
+                    # Shouldn't happen, but don't throw a fit
+                    pass
+        elif part == 'PMID':
+            self.struct.pmid = line[19:].strip()
+        elif part == 'DOI ':
+            self.struct.doi = line[19:].strip()
+
+    def _parse_cryst1(self, line):
+        """ Parses unit cell information from the CRYST1 record """
+        a = float(line[6:15])
+        b = float(line[15:24])
+        c = float(line[24:33])
+        try:
+            A = float(line[33:40])
+            B = float(line[40:47])
+            C = float(line[47:54])
+        except (IndexError, ValueError):
+            A = B = C = 90.0
+        self.struct.box = [a, b, c, A, B, C]
+        self.struct.space_group = line[55:66].strip()
+
+    @staticmethod
+    def _parse_atom_parts_1(line):
+        return dict(
+            number=line[6:11], name=line[12:16].strip(), alternate_location=line[16].strip(),
+            residue_name=line[17:21].strip(), chain=line[21].strip(),
+            residue_number=line[22:26].strip(), insertion_code=line[26].strip(),
+        )
+
+    @classmethod
+    def _parse_atom_parts(cls, line):
+        """ Pulls out atom attributes from the line and packs it into a dict """
+        # segment_id is CHARMM-specific
+        parts = cls._parse_atom_parts_1(line)
+        parts.update(dict(
+            x=float(line[30:38]), y=float(line[38:46]), z=float(line[46:54]),
+            occupancy=line[54:60], bfactor=line[60:66], element=line[76:78],
+            charge=line[78:80], segment_id=line[72:76].strip(),
+        ))
+
+        elem = '%-2s' % parts['element']
+        # Make sure the space is at the end
+        elem = elem[1] + ' ' if elem[0] == ' ' else elem
+        try:
+            elem = (elem[0].upper() + elem[1].lower()).strip()
+            atomic_number = AtomicNum[elem]
+        except KeyError:
+            elem = element_by_name(parts['name'])
+            atomic_number = AtomicNum[elem]
+        parts['atomic_number'] = atomic_number
+        parts['mass'] = Mass[elem]
+        parts['bfactor'] = try_convert(parts['bfactor'], float, 0.0)
+        parts['occupancy'] = try_convert(parts['occupancy'], float, 0.0)
+        parts['charge'] = try_convert(parts['charge'], float, 0.0)
+
+        return parts
+
+    def _determine_residue_number(self, residue_number, line):
+        if self._last_atom is not None:
+            last_residue_number = self._last_atom.residue.number
+        else:
+            last_residue_number = 0
+        extended_by = self._residue_number_field_extended_by
+        if self._residue_indices_overflow:
+            if extended_by:
+                try:
+                    self._last_residue_number_label = residue_number + line[26:26+extended_by]
+                    residue_number = int(residue_number + line[26:26+extended_by])
+                    return residue_number
+                except ValueError:
+                    pass
+            else:
+                if residue_number == self._last_residue_number_label:
+                    return last_residue_number
+                else:
+                    self._last_residue_number_label = residue_number
+                    return last_residue_number + 1
+        if last_residue_number >= 9999 and residue_number == '1000' + '0' * extended_by and \
+                line[26+extended_by] == '0':
+            self._residue_indices_overflow = True
+            self._residue_number_field_extended_by += 1
+            self._last_residue_number_label = '1000' + '0' * self._residue_number_field_extended_by
+            return int(self._last_residue_number_label)
+        elif last_residue_number == 9999 and residue_number != '9999':
+            # This is the first time we notice residue indices overflowing
+            self._residue_indices_overflow = True
+            self._last_residue_number_label = residue_number
+            return last_residue_number + 1
+        else:
+            self._last_residue_number_label = residue_number
+            return int(residue_number)
+
+    def _parse_anisou_record(self, line):
+        parts = self._parse_atom_parts_1(line)
+        try:
+            u11 = int(line[28:35])
+            u22 = int(line[35:42])
+            u33 = int(line[42:49])
+            u12 = int(line[49:56])
+            u13 = int(line[56:63])
+            u23 = int(line[63:70])
+        except ValueError:
+            warnings.warn('Problem parsing anisotropic factors from ANISOU record', PDBWarning)
+        else:
+            anisou = np.array([u11/1e4, u22/1e4, u33/1e4, u12/1e4, u13/1e4, u23/1e4])
+            self._anisou_records[self._make_atom_key_from_parts(parts, all_parts=True)] = anisou
+
+    def _determine_atom_number(self, atom_number):
+        if self._last_atom is not None:
+            self._atom_indices_overflow = (self._atom_indices_overflow or
+                                           self._last_atom.number >= 99999)
+        if self._atom_indices_overflow and self._last_atom is not None:
+            return self._last_atom.number + 1
+        try:
+            return int(atom_number)
+        except ValueError:
+            return self._last_atom.number + 1 if self._last_atom is not None else 1
+
+    @classmethod
+    def _make_atom_key_from_parts(cls, atom_parts, all_parts=False):
+        """ If all_parts is False, only key from the values that determine alternate locations """
+        return cls.AtomLookupKey(
+            name=atom_parts['name'],
+            number=atom_parts['number'] if all_parts else None,
+            residue_name=atom_parts['residue_name'],
+            residue_number=atom_parts['residue_number'],
+            chain=atom_parts['chain'],
+            insertion_code=atom_parts['insertion_code'],
+            segment_id=atom_parts.get('segment_id', ''),
+            alternate_location=atom_parts['alternate_location'] if all_parts else None,
+        )
+
+    def _parse_atom_record(self, line):
+        """ Parses an atom record from a PDB file """
+        atom_parts = self._parse_atom_parts(line)
+        residue_number = self._determine_residue_number(atom_parts['residue_number'], line)
+        atom_number = self._determine_atom_number(atom_parts['number'])
+
+        AtomClass = ExtraPoint if atom_parts['name'] in ('EP', 'LP') else Atom
+        atom = AtomClass(atomic_number=atom_parts['atomic_number'], name=atom_parts['name'],
+                         charge=atom_parts['charge'], mass=atom_parts['mass'],
+                         occupancy=atom_parts['occupancy'], bfactor=atom_parts['bfactor'],
+                         altloc=atom_parts['alternate_location'], number=atom_number)
+        atom.xx = atom_parts['x']
+        atom.xy = atom_parts['y']
+        atom.xz = atom_parts['z']
+        attribute_key = self._make_atom_key_from_parts(atom_parts)
+        all_attribute_key = self._make_atom_key_from_parts(atom_parts, all_parts=True)
+        current_atom = self._atom_map_from_attributes.get(attribute_key, None)
+        if (current_atom is not None and atom_parts['alternate_location'] in _ascii_letters_set and
+            not self._atom_indices_overflow and not self._residue_indices_overflow):
+            if self._current_model_number == 1:
+                current_atom.other_locations[atom_parts['alternate_location']] = atom
+                self._atom_map_to_parent[atom] = current_atom
+                if atom_number not in self._atom_map_from_atom_number:
+                    self._atom_map_from_atom_number[atom_number] = atom
+                # altloc atoms should be reachable in the all_attributes map
+                self._atom_map_from_all_attributes[all_attribute_key] = atom
+                return
+            elif not current_atom in self._model1_atoms_in_structure:
+                # This is if the atom is not in the structure, but in the alternate locations. We
+                # don't currently store coordinates for those atoms beyond the first frame. Note
+                # that this should be incredibly rare, since alt-locs are common in static structure
+                # determination, like X-Ray crystallography. Ensemble methods like NMR won't have
+                # alternate locations in addition to multiple frames, so this is not expected to be
+                # an impactful limitation
+                return
+        current_atom_index = self._model_atom_counts[-1]
+        self._model_atom_counts[-1] += 1
+        if self._current_model_number == 1:
+            self._atom_map_from_all_attributes[all_attribute_key] = atom
+            self._atom_map_from_attributes[attribute_key] = atom
+            self._atom_map_from_atom_number[atom_number] = atom
+            self.struct.add_atom(atom, atom_parts['residue_name'], residue_number,
+                                 atom_parts['chain'], atom_parts['insertion_code'],
+                                 atom_parts['segment_id'])
+            self._model1_atoms_in_structure.add(atom)
+            self._last_atom = atom
+        else:
+            try:
+                atom_from_first_model = self.struct.atoms[current_atom_index]
+            except IndexError:
+                raise PDBError('Atom number mismatch between models')
+            if (atom_from_first_model.residue.name != atom_parts['residue_name'] or
+                atom_from_first_model.name != atom_parts['name']):
+                raise PDBError('Atom/residue name mismatch in different models!')
+        if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
+            self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
+
+    def _new_model(self, line):
+        if self._current_model_number == 1 and len(self.struct.atoms) == 0:
+            return # MODEL 1
+        if self._model_open:
+            warnings.warn('%s begun before last model ended. Assuming it is ending' % line.strip(),
+                          PDBWarning)
+            self._end_model(line)
+        self._coordinates.append([])
+        self._model_atom_counts.append(0)
+        self._model_open = True
+        self._current_model_number += 1
+
+    def _end_model(self, line):
+        """
+        Ends the current model and validates the processed model is the same size as the models
+        that came before this one
+        """
+        if not self._model_open:
+            raise PDBError('No model was begun before ENDMDL was encountered')
+        self._model_open = False
+        if len(self._atom_map_from_attributes) == 0:
+            raise PDBError('No atoms found in model')
+        if len(self._coordinates[-1]) != 3 * len(self._atom_map_from_attributes):
+            raise PDBError('Coordinate mismatch in model %d' % self._current_model_number)
+
+    def _parse_connect_record(self, line):
+        """
+        Parses the CONECT records and creates the bond. According to the format spec, the first two
+        atom indexes are required. The final 3 are optional.
+        """
+        origin_index = try_convert(line[6:11], int)
+        index_1 = try_convert(line[11:16], int)
+        index_2 = try_convert(line[16:21], int)
+        index_3 = try_convert(line[21:26], int)
+        index_4 = try_convert(line[26:31], int)
+        if origin_index is None or index_1 is None:
+            warnings.warn('Bad CONECT record -- not enough atom indexes', PDBWarning)
+            return
+        origin_atom = self._atom_map_from_atom_number.get(origin_index, None)
+        atom_1 = self._atom_map_from_atom_number.get(index_1, None)
+        atom_2 = self._atom_map_from_atom_number.get(index_2, None)
+        atom_3 = self._atom_map_from_atom_number.get(index_3, None)
+        atom_4 = self._atom_map_from_atom_number.get(index_4, None)
+        if origin_atom is None or atom_1 is None:
+            warnings.warn('CONECT record - could not find atoms %d and/or %d to connect' %
+                          (origin_index, index_1), PDBWarning)
+            return
+        origin_atom = self._atom_map_to_parent.get(origin_atom, origin_atom)
+        for partner in (atom_1, atom_2, atom_3, atom_4):
+            partner = self._atom_map_to_parent.get(partner, partner)
+            if partner is None or partner in origin_atom.bond_partners:
+                continue
+            self.struct.bonds.append(Bond(origin_atom, partner))
+
+    def _process_structure_symmetry(self):
+        if self._symmetry_lines:
             data = []
-            for line in _symmetry_lines:
+            for line in self._symmetry_lines:
                 if line.strip().startswith('REMARK 290   SMTRY'):
                     data.append(line.split()[4:])
             tensor = np.asarray(data, dtype='f8')
-            struct.symmetry = Symmetry(tensor)
-        # process link records
-        if link_lines:
-            for line in link_lines:
-                a1_name = line[12:16].strip()
-                a1_altloc = line[16].strip()
-                a1_resname = line[17:20].strip()
-                a1_chainid = line[21].strip()
-                a1_inscode = line[26].strip()
-                try:
-                    a1_resnum = int(line[22:26])
-                except ValueError:
-                    warnings.warn('Corrupt link line: %s' % line, PDBWarning)
-                    continue
+            self.struct.symmetry = Symmetry(tensor)
 
-                a2_name = line[42:46].strip()
-                a2_altloc = line[46].strip()
-                a2_resname = line[47:50].strip()
-                a2_chainid = line[51].strip()
-                a2_inscode = line[56].strip()
-                try:
-                    a2_resnum = int(line[52:56])
-                except ValueError:
-                    warnings.warn('Corrupt link line: %s' % line, PDBWarning)
-                    continue
+    def _process_link_records(self):
+        for line in self._link_lines:
+            atom_1_parts = self._parse_atom_parts_1(line)
+            atom_2_parts = self._parse_atom_parts_1(line[30:])
 
-                symop1 = line[59:65].strip()
-                symop2 = line[66:72].strip()
-                try:
-                    length = float(line[73:78])
-                except ValueError:
-                    warnings.warn('Malformed LINK line (bad distance): %s' % line, PDBWarning)
-                    continue
+            symop1 = line[59:65].strip()
+            symop2 = line[66:72].strip()
+            try:
+                length = float(line[73:78])
+            except ValueError:
+                warnings.warn('Malformed LINK line (bad distance): %s' % line, PDBWarning)
+                continue
 
-                key1 = (a1_name, a1_altloc, a1_resname, a1_chainid, a1_resnum, a1_inscode)
-                key2 = (a2_name, a2_altloc, a2_resname, a2_chainid, a2_resnum, a2_inscode)
-                try:
-                    a1 = link_atom_lookup[key1]
-                    a2 = link_atom_lookup[key2]
-                except KeyError:
-                    warnings.warn('Could not find atoms %r and %r; skipping link' % (key1, key2),
-                                  PDBWarning)
-                else:
-                    struct.links.append(Link(a1, a2, length, symop1, symop2))
+            key1 = self._make_atom_key_from_parts(atom_1_parts)
+            key2 = self._make_atom_key_from_parts(atom_2_parts)
+            try:
+                a1 = self._atom_map_from_attributes[key1]
+                a2 = self._atom_map_from_attributes[key2]
+            except KeyError:
+                warnings.warn('Could not find link atoms %s and %s' % (key1, key2), PDBWarning)
+            else:
+                self.struct.links.append(Link(a1, a2, length, symop1, symop2))
 
-        return struct
+    def _assign_anisou_to_atoms(self):
+        """ Assigns the ANISOU tensors to the atoms they belong to """
+        for key, anisou_tensor in iteritems(self._anisou_records):
+            try:
+                self._atom_map_from_all_attributes[key].anisou = anisou_tensor
+            except KeyError:
+                warnings.warn('Could not find atom belonging to anisou tensor with key %s' % (key,),
+                              PDBWarning)
 
-    #===================================================
+    def _postprocess_metadata(self):
+        self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
+        self.struct.journal = self.struct.journal.strip()
+        self.struct.title = self.struct.title.strip()
 
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
@@ -847,15 +864,13 @@ class PDBFile(object):
         if charmm:
             atomrec = ('ATOM  %5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                        '%6.2f      %-4s%2s%-2s\n')
-            anisourec = ('ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                         '      %2s%-2s\n')
-            terrec = ('TER   %5d      %-4s%1s%4d\n')
+            anisourec = 'ANISOU%5d %-4s%1s%-4s%1s%4d%1s %7d%7d%7d%7d%7d%7d      %2s%-2s\n'
+            terrec = 'TER   %5d      %-4s%1s%4d\n'
             reslen = 4
         else:
             atomrec = ('ATOM  %5d %-4s%1s%-3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f'
                        '%6.2f      %-4s%2s%-2s\n')
-            anisourec = ('ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d'
-                         '      %2s%-2s\n')
+            anisourec = 'ANISOU%5d %-4s%1s%-3s %1s%4d%1s %7d%7d%7d%7d%7d%7d      %2s%-2s\n'
             terrec = ('TER   %5d      %-3s %1s%4d\n')
             reslen = 3
         linkrec = ('LINK        %-4s%1s%-3s %1s%4d%1s               '
@@ -1738,3 +1753,9 @@ def _format_atom_name_for_pdb(atom):
     if len(atom.name) < 4 and len(Element[atom.atomic_number]) != 2:
         return ' %-3s' % atom.name
     return atom.name[:4]
+
+def try_convert(value, cast_type, default=None):
+    try:
+        return cast_type(value)
+    except ValueError:
+        return default

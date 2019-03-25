@@ -1741,8 +1741,7 @@ class Structure(object):
             coords = None
         else:
             coords = np.array(coords)
-        # Wipe out our existing coordinates if we think anything might have
-        # changed
+        # Wipe out our existing coordinates if we think anything might have changed
         if self._coordinates is not None:
             if coords is None:
                 self._coordinates = None

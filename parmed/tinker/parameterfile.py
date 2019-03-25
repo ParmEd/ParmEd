@@ -55,7 +55,7 @@ class _ParamType(object):
 
     def __init__(self, *args, **kwargs):
         """ Instantiates the parameter type """
-        raise NotImplemented('virtual method')
+        raise NotImplementedError('virtual method')
 
     @classmethod
     def register(cls, obj, key):
