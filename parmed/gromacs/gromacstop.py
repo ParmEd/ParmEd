@@ -483,7 +483,7 @@ class GromacsTopologyFile(Structure):
                 atomic_number = attype.atomic_number
             else:
                 atomic_number = AtomicNum[element_by_mass(mass)]
-        charge = float(words[6]) if len(words) < 7 else None
+        charge = float(words[6]) if len(words) > 6 else None
         if atomic_number == 0:
             atom = ExtraPoint(name=words[4], type=words[1], charge=charge)
         else:
@@ -534,11 +534,8 @@ class GromacsTopologyFile(Structure):
             if (sig, eps) in exc_types:
                 nbe.type = exc_types[(sig, eps)]
             else:
-                nbet = NonbondedExceptionType(
-                        sig*u.nanometers,
-                        eps*u.kilojoules_per_mole,
-                        self.defaults.fudgeQQ,
-                )
+                nbet = NonbondedExceptionType(sig*u.nanometers, eps*u.kilojoules_per_mole,
+                                              self.defaults.fudgeQQ)
                 exc_types[(sig, eps)] = nbe.type = nbet
         return nbe, nbet
 
