@@ -774,6 +774,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         tpatches = OrderedDict()
         line = next(f)
         line_index = 0
+        skip_adding_residue = False
         try:
             while line:
                 line = line.strip()
@@ -821,8 +822,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     words = line.split()
                     resname = words[1].upper()
                     if resname in self.residues:
-                        warnings.warn('Replacing residue {}'.format(resname)
-                                      , ParameterWarning)
+                        warnings.warn('Replacing residue {}'.format(resname), ParameterWarning)
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
@@ -836,6 +836,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                         res = PatchTemplate(resname)
                     else:
                         assert False, 'restype != RESI or PRES'
+                    skip_adding_residue = False
                     line = next(f)
                     group = []
                     ictable = []
@@ -862,7 +863,8 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             elif entity_type == 'IMPR':
                                 res.delete_impropers.append(words[2:5])
                             else:
-                                warnings.warn('WARNING: Ignoring "%s" because entity type %s not used.' % (line.strip(), entity_type))
+                                warnings.warn('WARNING: Ignoring "%s" because entity type %s not '
+                                              'used.' % (line.strip(), entity_type))
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
@@ -898,10 +900,13 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             # TODO: This currently doesn't handle some formats, like Note 3 in the above URL
                             words = line.split()
                             lptype_keyword = words[1][0:4].upper()
-                            if lptype_keyword not in ['BISE', 'RELA']:
-                                raise CharmmError('LONEPAIR type {} not supported; only BISEctor and RELAtive supported.'.format(words[1]))
+                            if not skip_adding_residue and lptype_keyword not in ['BISE', 'RELA']:
+                                warnings.warn('LONEPAIR type %s not supported; only BISEctor and '
+                                              'RELAtive supported' % words[1])
+                                skip_adding_residue = True
                             a1, a2, a3, a4 = words[2:6]
-                            keywords = { words[index][0:4].upper() : float(words[index+1]) for index in range(6,len(words),2) }
+                            keywords = {words[index][0:4].upper() : float(words[index+1])
+                                        for index in range(6,len(words),2) }
                             r = keywords['DIST'] # angstrom
                             theta = keywords['ANGL'] # degrees
                             phi = keywords['DIHE'] # degrees
@@ -934,7 +939,10 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                         line = next(f)
                     if group: res.groups.append(group)
                     _fit_IC_table(res, ictable)
-                    if restype == 'RESI':
+                    if skip_adding_residue:
+                        # Do not add this residue to the lookup library
+                        continue
+                    elif restype == 'RESI':
                         residues[resname] = res
                     elif restype == 'PRES':
                         patches[resname] = res
