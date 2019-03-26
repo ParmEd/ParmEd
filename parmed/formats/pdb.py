@@ -587,10 +587,12 @@ class PDBFile(object):
             u13 = int(line[56:63])
             u23 = int(line[63:70])
         except ValueError:
-            warnings.warn('Problem parsing anisotropic factors from ANISOU record', PDBWarning)
+            warnings.warn('Problem parsing anisotropic factors from ANISOU record from: ' + line,
+                          PDBWarning)
         else:
             anisou = np.array([u11/1e4, u22/1e4, u33/1e4, u12/1e4, u13/1e4, u23/1e4])
-            self._anisou_records[self._make_atom_key_from_parts(parts, all_parts=True)] = anisou
+            key = self._make_atom_key_from_parts(parts, all_parts=True)
+            self._anisou_records[key] = (anisou, line)
 
     def _determine_atom_number(self, atom_number):
         if self._last_atom is not None:
@@ -710,7 +712,8 @@ class PDBFile(object):
         index_3 = try_convert(line[21:26], int)
         index_4 = try_convert(line[26:31], int)
         if origin_index is None or index_1 is None:
-            warnings.warn('Bad CONECT record -- not enough atom indexes', PDBWarning)
+            warnings.warn('Bad CONECT record -- not enough atom indexes in line: %s' % line,
+                          PDBWarning)
             return
         origin_atom = self._atom_map_from_atom_number.get(origin_index, None)
         atom_1 = self._atom_map_from_atom_number.get(index_1, None)
@@ -718,8 +721,8 @@ class PDBFile(object):
         atom_3 = self._atom_map_from_atom_number.get(index_3, None)
         atom_4 = self._atom_map_from_atom_number.get(index_4, None)
         if origin_atom is None or atom_1 is None:
-            warnings.warn('CONECT record - could not find atoms %d and/or %d to connect' %
-                          (origin_index, index_1), PDBWarning)
+            warnings.warn('CONECT record - could not find atoms %d and/or %d to connect. Line: %s' %
+                          (origin_index, index_1, line), PDBWarning)
             return
         origin_atom = self._atom_map_to_parent.get(origin_atom, origin_atom)
         for partner in (atom_1, atom_2, atom_3, atom_4):
@@ -762,12 +765,12 @@ class PDBFile(object):
 
     def _assign_anisou_to_atoms(self):
         """ Assigns the ANISOU tensors to the atoms they belong to """
-        for key, anisou_tensor in iteritems(self._anisou_records):
+        for key, (anisou_tensor, line) in iteritems(self._anisou_records):
             try:
                 self._atom_map_from_all_attributes[key].anisou = anisou_tensor
             except KeyError:
-                warnings.warn('Could not find atom belonging to anisou tensor with key %s' % (key,),
-                              PDBWarning)
+                warnings.warn('Could not find atom belonging to anisou tensor with key %s. '
+                              'Line: %s' % (key, line), PDBWarning)
 
     def _postprocess_metadata(self):
         self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
@@ -1230,8 +1233,7 @@ class CIFFile(object):
                     try:
                         struct.resolution = float(res)
                     except ValueError:
-                        warnings.warn('Could not convert resolution (%s) to '
-                                      'float' % res)
+                        warnings.warn('Could not convert resolution (%s) to float' % res)
             cite = cont.getObj('citation_author')
             if cite is not None:
                 nameidx = cite.getAttributeIndex('name')
