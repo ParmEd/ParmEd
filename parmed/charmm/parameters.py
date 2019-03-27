@@ -904,6 +904,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 warnings.warn('LONEPAIR type %s not supported; only BISEctor and '
                                               'RELAtive supported' % words[1])
                                 skip_adding_residue = True
+                                break
                             a1, a2, a3, a4 = words[2:6]
                             keywords = {words[index][0:4].upper() : float(words[index+1])
                                         for index in range(6,len(words),2) }
