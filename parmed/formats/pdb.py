@@ -297,7 +297,7 @@ class PDBFile(object):
         self.struct.doi = ''
         self.struct.pmid = ''
         self.struct.journal_authors = ''
-        self.struct.volume_page = ''
+        self.struct.volume = ''
         self.struct.title = ''
         self.struct.year = None
         self.struct.resolution = None
@@ -1212,7 +1212,7 @@ class CIFFile(object):
             # Add metadata fields
             struct.experimental = struct.journal = struct.authors = ''
             struct.keywords = struct.doi = struct.pmid = ''
-            struct.journal_authors = struct.volume_page = struct.title = ''
+            struct.journal_authors = struct.volume = struct.title = ''
             struct.year = struct.resolution = None
             struct.related_entries = []
 
