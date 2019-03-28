@@ -123,11 +123,9 @@ class TestParmedSerialization(unittest.TestCase):
         amber = pmd.load_file(utils.get_fn('cSPCE.mdl'))
         unpickled = pickle.loads(pickle.dumps(amber))
 
-        self.assertEqual(set(amber.parm_data.keys()),
-                         set(unpickled.parm_data.keys()))
+        self.assertEqual(set(amber.parm_data.keys()), set(unpickled.parm_data.keys()))
         self.assertEqual(amber.flag_list, unpickled.flag_list)
-        self.assertEqual(set(amber.formats.keys()),
-                         set(unpickled.formats.keys()))
+        self.assertEqual(set(amber.formats.keys()), set(unpickled.formats.keys()))
         for k1 in amber.parm_data.keys():
             self.assertEqual(amber.parm_data[k1], unpickled.parm_data[k1])
             self.assertEqual(amber.formats[k1], unpickled.formats[k1])
@@ -145,11 +143,9 @@ class TestParmedSerialization(unittest.TestCase):
 
         self._compare_structures(unpickled, structure)
 
-        self.assertEqual(set(structure.parm_data.keys()),
-                         set(unpickled.parm_data.keys()))
+        self.assertEqual(set(structure.parm_data.keys()), set(unpickled.parm_data.keys()))
         self.assertEqual(structure.flag_list, unpickled.flag_list)
-        self.assertEqual(set(structure.formats.keys()),
-                         set(unpickled.formats.keys()))
+        self.assertEqual(set(structure.formats.keys()), set(unpickled.formats.keys()))
         for k1 in structure.parm_data.keys():
             self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
             self.assertEqual(structure.formats[k1], unpickled.formats[k1])
@@ -163,8 +159,7 @@ class TestParmedSerialization(unittest.TestCase):
             self.assertEqual(hasattr(structure, key),
                              hasattr(unpickled, key))
             if hasattr(structure, key):
-                self.assertEqual(getattr(structure, key),
-                                 getattr(unpickled, key))
+                self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
         # Now check that unknown_functional gets properly deserialized
         structure.unknown_functional = True
@@ -178,11 +173,9 @@ class TestParmedSerialization(unittest.TestCase):
 
         self._compare_structures(unpickled, structure)
 
-        self.assertEqual(set(structure.parm_data.keys()),
-                         set(unpickled.parm_data.keys()))
+        self.assertEqual(set(structure.parm_data.keys()), set(unpickled.parm_data.keys()))
         self.assertEqual(structure.flag_list, unpickled.flag_list)
-        self.assertEqual(set(structure.formats.keys()),
-                         set(unpickled.formats.keys()))
+        self.assertEqual(set(structure.formats.keys()), set(unpickled.formats.keys()))
         for k1 in structure.parm_data.keys():
             self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
             self.assertEqual(structure.formats[k1], unpickled.formats[k1])
@@ -200,11 +193,9 @@ class TestParmedSerialization(unittest.TestCase):
 
         self._compare_structures(unpickled, structure)
 
-        self.assertEqual(set(structure.parm_data.keys()),
-                         set(unpickled.parm_data.keys()))
+        self.assertEqual(set(structure.parm_data.keys()), set(unpickled.parm_data.keys()))
         self.assertEqual(structure.flag_list, unpickled.flag_list)
-        self.assertEqual(set(structure.formats.keys()),
-                         set(unpickled.formats.keys()))
+        self.assertEqual(set(structure.formats.keys()), set(unpickled.formats.keys()))
         for k1 in structure.parm_data.keys():
             self.assertEqual(structure.parm_data[k1], unpickled.parm_data[k1])
             self.assertEqual(structure.formats[k1], unpickled.formats[k1])
@@ -223,7 +214,7 @@ class TestParmedSerialization(unittest.TestCase):
 
         # Check metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries', 'space_group'):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
@@ -236,7 +227,7 @@ class TestParmedSerialization(unittest.TestCase):
 
         # Check metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries'):
             self.assertEqual(getattr(structure, key), getattr(unpickled, key))
 
@@ -244,24 +235,19 @@ class TestParmedSerialization(unittest.TestCase):
 
     def test_parm_velocities_serialization(self):
         """ Tests the serialization of a Structure with velocities """
-        structure = pmd.load_file(utils.get_fn('tip4p.parm7'),
-                                  utils.get_fn('tip4p.rst7'))
+        structure = pmd.load_file(utils.get_fn('tip4p.parm7'), utils.get_fn('tip4p.rst7'))
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
 
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacstop_serialization(self):
         """ Tests the serialization of a GromacsTopologyFile """
-        structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'),
-                                               'topol.top'),
-                                  xyz=os.path.join(utils.get_fn('03.AlaGlu'),
-                                                   'conf.gro'),
-        )
+        structure = pmd.load_file(os.path.join(utils.get_fn('03.AlaGlu'), 'topol.top'),
+                                  xyz=os.path.join(utils.get_fn('03.AlaGlu'), 'conf.gro'))
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
         self.assertEqual(structure.defaults, unpickled.defaults)
-        self._compare_parametersets(structure.parameterset,
-                                    unpickled.parameterset)
+        self._compare_parametersets(structure.parameterset, unpickled.parameterset)
 
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromacscharmm_serialization(self):
@@ -270,8 +256,7 @@ class TestParmedSerialization(unittest.TestCase):
         unpickled = pickle.loads(pickle.dumps(structure))
         self._compare_structures(unpickled, structure)
         self.assertEqual(structure.defaults, unpickled.defaults)
-        self._compare_parametersets(structure.parameterset,
-                                    unpickled.parameterset)
+        self._compare_parametersets(structure.parameterset, unpickled.parameterset)
 
     def test_charmmpsf_serialization(self):
         """ Tests the serialization of a CHARMM PSF file """
@@ -310,8 +295,7 @@ class TestParmedSerialization(unittest.TestCase):
         if structure.get_coordinates() is None:
             self.assertIs(unpickled.get_coordinates(), None)
         else:
-            np.testing.assert_equal(structure.get_coordinates(),
-                                    unpickled.get_coordinates())
+            np.testing.assert_equal(structure.get_coordinates(), unpickled.get_coordinates())
         # Check unit cell
         if structure.box is None:
             self.assertIs(unpickled.box, None)
@@ -343,13 +327,10 @@ class TestParmedSerialization(unittest.TestCase):
         cmp_type_arrays(structure.urey_bradley_types, unpickled.urey_bradley_types)
         cmp_type_arrays(structure.rb_torsion_types, unpickled.rb_torsion_types)
         cmp_type_arrays(structure.cmap_types, unpickled.cmap_types)
-        cmp_type_arrays(structure.trigonal_angle_types,
-                        unpickled.trigonal_angle_types)
-        cmp_type_arrays(structure.out_of_plane_bend_types,
-                        unpickled.out_of_plane_bend_types)
+        cmp_type_arrays(structure.trigonal_angle_types, unpickled.trigonal_angle_types)
+        cmp_type_arrays(structure.out_of_plane_bend_types, unpickled.out_of_plane_bend_types)
         cmp_type_arrays(structure.stretch_bend_types, unpickled.stretch_bend_types)
-        cmp_type_arrays(structure.torsion_torsion_types,
-                        unpickled.torsion_torsion_types)
+        cmp_type_arrays(structure.torsion_torsion_types, unpickled.torsion_torsion_types)
         cmp_type_arrays(structure.pi_torsion_types, unpickled.pi_torsion_types)
         cmp_type_arrays(structure.adjust_types, unpickled.adjust_types)
 
@@ -389,8 +370,7 @@ class TestParmedSerialization(unittest.TestCase):
             for k in l1:
                 self.assertEqual(l1[k], l2[k])
                 if reversible:
-                    if (pmd.NoUreyBradley is l1[k] or
-                            pmd.NoUreyBradley is l2[k]):
+                    if pmd.NoUreyBradley is l1[k] or pmd.NoUreyBradley is l2[k]:
                         self.assertIs(l1[k], pmd.NoUreyBradley)
                         self.assertIs(l2[k], pmd.NoUreyBradley)
                     self.assertIs(l1[k], l1[tuple(reversed(k))])

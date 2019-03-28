@@ -297,7 +297,7 @@ class PDBFile(object):
         self.struct.doi = ''
         self.struct.pmid = ''
         self.struct.journal_authors = ''
-        self.struct.volume_page = ''
+        self.struct.volume = ''
         self.struct.title = ''
         self.struct.year = None
         self.struct.resolution = None
@@ -672,7 +672,8 @@ class PDBFile(object):
                 raise PDBError('Atom number mismatch between models')
             if (atom_from_first_model.residue.name != atom_parts['residue_name'] or
                 atom_from_first_model.name != atom_parts['name']):
-                raise PDBError('Atom/residue name mismatch in different models!')
+                raise PDBError('Atom/residue name mismatch in different models in model %d [%s]!' %
+                               (self._current_model_number, line.strip()))
         if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
             self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
 
@@ -1212,7 +1213,7 @@ class CIFFile(object):
             # Add metadata fields
             struct.experimental = struct.journal = struct.authors = ''
             struct.keywords = struct.doi = struct.pmid = ''
-            struct.journal_authors = struct.volume_page = struct.title = ''
+            struct.journal_authors = struct.volume = struct.title = ''
             struct.year = struct.resolution = None
             struct.related_entries = []
 
