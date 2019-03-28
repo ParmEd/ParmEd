@@ -3622,7 +3622,7 @@ class Structure(object):
 
         # Now the metadata stuff, if applicable
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries'):
             try:
                 retdict[key] = getattr(self, key)
@@ -3643,7 +3643,7 @@ class Structure(object):
             getattr(self, attr).claim()
         # Assign the possible metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries', '_coordinates', '_box',
                     'nrexcl', '_combining_rule', 'unknown_functional',
                     'space_group'):
