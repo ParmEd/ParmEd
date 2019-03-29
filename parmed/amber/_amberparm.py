@@ -26,7 +26,7 @@ from ..residue import ALLION_NAMES, SOLVENT_NAMES
 from ..structure import Structure, needs_openmm
 from ..topologyobjects import (Angle, AngleType, Atom, AtomList, AtomType,
                                Bond, BondType, Dihedral, DihedralType,
-                               DihedralTypeList, ExtraPoint)
+                               DihedralTypeList, ExtraPoint, Cmap, CmapType)
 from ..utils.six import iteritems, string_types
 from ..utils.six.moves import range, zip
 from ..vec3 import Vec3
@@ -142,6 +142,9 @@ class AmberParm(AmberFormat, Structure):
         not have correction maps (unique to CHARMM force field and chamber
         topologies)
     """
+
+    _cmap_prefix = ""
+
     #===================================================
 
     def __init__(self, prm_name=None, xyz=None, box=None, rst7_name=None):
@@ -992,8 +995,8 @@ class AmberParm(AmberFormat, Structure):
         """
         if not self.atoms: return None
         nonbfrc = super(AmberParm, self).omm_nonbonded_force(
-                nonbondedMethod, nonbondedCutoff, switchDistance,
-                ewaldErrorTolerance, reactionFieldDielectric
+            nonbondedMethod, nonbondedCutoff, switchDistance,
+            ewaldErrorTolerance, reactionFieldDielectric
         )
         has1012 = self.has_1012()
         hasnbfix = self.has_NBFIX()
@@ -1090,13 +1093,10 @@ class AmberParm(AmberFormat, Structure):
                         bcoef[ii] = parm_bcoef[idx] * bfac
                         if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
-            force.addTabulatedFunction('acoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, acoef))
-            force.addTabulatedFunction('bcoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+            force.addTabulatedFunction('acoef', mm.Discrete2DFunction(ntypes, ntypes, acoef))
+            force.addTabulatedFunction('bcoef', mm.Discrete2DFunction(ntypes, ntypes, bcoef))
             if has1264:
-                force.addTabulatedFunction('ccoef',
-                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                force.addTabulatedFunction('ccoef', mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Our CustomNonbondedForce is taking care of the LJ part of our
             # potential, so we need to go through nonbfrc and zero-out the
             # Lennard-Jones parameters, but keep the charge parameters in place.
@@ -1553,15 +1553,13 @@ class AmberParm(AmberFormat, Structure):
         data['BONDS_INC_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_inc_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3, bond.type.idx+1])
         data['POINTERS'][NBONH] = len(bond_list)
         self.pointers['NBONH'] = len(bond_list)
         data['BONDS_WITHOUT_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_without_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3, bond.type.idx+1])
         data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = len(bond_list)
         self.pointers['MBONA'] = self.pointers['NBONA'] = len(bond_list)
 
@@ -1580,8 +1578,7 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
-                                        for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
@@ -1614,18 +1611,13 @@ class AmberParm(AmberFormat, Structure):
         for dihed in self.dihedrals:
             dihed.type.used = True
         self.dihedral_types.prune_unused()
-        data['DIHEDRAL_FORCE_CONSTANT'] = \
-                    [type.phi_k for type in self.dihedral_types]
-        data['DIHEDRAL_PERIODICITY'] = \
-                    [type.per for type in self.dihedral_types]
-        data['DIHEDRAL_PHASE'] = \
-                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
+        data['DIHEDRAL_FORCE_CONSTANT'] = [type.phi_k for type in self.dihedral_types]
+        data['DIHEDRAL_PERIODICITY'] = [type.per for type in self.dihedral_types]
+        data['DIHEDRAL_PHASE'] = [type.phase*DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
-            data['SCEE_SCALE_FACTOR'] = \
-                    [type.scee for type in self.dihedral_types]
+            data['SCEE_SCALE_FACTOR'] = [type.scee for type in self.dihedral_types]
         if 'SCNB_SCALE_FACTOR' in data:
-            data['SCNB_SCALE_FACTOR'] = \
-                    [type.scnb for type in self.dihedral_types]
+            data['SCNB_SCALE_FACTOR'] = [type.scnb for type in self.dihedral_types]
         data['POINTERS'][NPTRA] = len(self.dihedral_types)
         self.pointers['NPTRA'] = len(self.dihedral_types)
         # Now do the dihedral arrays
@@ -1636,13 +1628,11 @@ class AmberParm(AmberFormat, Structure):
             end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*end_sign,
-                                    dihed.atom1.idx*3*imp_sign,
+                                    dihed.atom2.idx*3*end_sign, dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*end_sign,
-                                    dihed.atom4.idx*3*imp_sign,
+                                    dihed.atom3.idx*3*end_sign, dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIH] = len(dihed_list)
         self.pointers['NPHIH'] = len(dihed_list)
@@ -1653,13 +1643,11 @@ class AmberParm(AmberFormat, Structure):
             end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*end_sign,
-                                    dihed.atom1.idx*3*imp_sign,
+                                    dihed.atom2.idx*3*end_sign, dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*end_sign,
-                                    dihed.atom4.idx*3*imp_sign,
+                                    dihed.atom3.idx*3*end_sign, dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = len(dihed_list)
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = len(dihed_list)
@@ -1735,8 +1723,7 @@ class AmberParm(AmberFormat, Structure):
         idx = 0
         for i in range(ntypes):
             for j in range(ntypes):
-                self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
-                            holder[ntypes*i+j]
+                self.parm_data['NONBONDED_PARM_INDEX'][idx] = holder[ntypes*i+j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
@@ -1790,8 +1777,7 @@ class AmberParm(AmberFormat, Structure):
                     customforce.addExclusion(i, j)
                 continue
             # Figure out what the 1-4 scaling parameters were for this pair...
-            unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
-                               self.atoms[j].epsilon_14) * ene_conv
+            unscaled_ee = sqrt(self.atoms[i].epsilon_14 * self.atoms[j].epsilon_14) * ene_conv
             try:
                 one_scnb = ee.value_in_unit(u.kilojoules_per_mole) / unscaled_ee
             except ZeroDivisionError:
@@ -1982,9 +1968,8 @@ class AmberParm(AmberFormat, Structure):
             zero_angle.list = self.angle_types
         if n14: # See if there is some ambiguity here
             if not self.adjusts and len(scalings) > 1:
-                warn('Multiple 1-4 scaling factors detected. Using the '
-                     'most-used values scee=%f scnb=%f' % (scee, scnb),
-                     AmberWarning)
+                warn('Multiple 1-4 scaling factors detected. Using the most-used values scee=%f '
+                     'scnb=%f' % (scee, scnb), AmberWarning)
         return n13, n14
 
     #===================================================
