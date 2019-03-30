@@ -26,7 +26,7 @@ from ..residue import ALLION_NAMES, SOLVENT_NAMES
 from ..structure import Structure, needs_openmm
 from ..topologyobjects import (Angle, AngleType, Atom, AtomList, AtomType,
                                Bond, BondType, Dihedral, DihedralType,
-                               DihedralTypeList, ExtraPoint)
+                               DihedralTypeList, ExtraPoint, Cmap, CmapType)
 from ..utils.six import iteritems, string_types
 from ..utils.six.moves import range, zip
 from ..vec3 import Vec3
@@ -142,6 +142,9 @@ class AmberParm(AmberFormat, Structure):
         not have correction maps (unique to CHARMM force field and chamber
         topologies)
     """
+
+    _cmap_prefix = ""
+
     #===================================================
 
     def __init__(self, prm_name=None, xyz=None, box=None, rst7_name=None):
@@ -481,6 +484,10 @@ class AmberParm(AmberFormat, Structure):
             self.pointers["NCOPY"] = self.parm_data["POINTERS"][NCOPY]
         except:
             pass
+        # If CMAP is not present, don't load the pointers
+        if self.has_cmap:
+            self.pointers['CMAP'] = self.parm_data[self._cmap_prefix + 'CMAP_COUNT'][0]
+            self.pointers['CMAP_TYPES'] = self.parm_data[self._cmap_prefix + 'CMAP_COUNT'][1]
 
     #===================================================
 
@@ -496,6 +503,7 @@ class AmberParm(AmberFormat, Structure):
         self._load_bond_info()
         self._load_angle_info()
         self._load_dihedral_info()
+        self._load_cmap_info()
         self._load_extra_exclusions()
         super(AmberParm, self).unchange()
 
@@ -641,13 +649,12 @@ class AmberParm(AmberFormat, Structure):
 
     def write_parm(self, name):
         """
-        Writes the current data in parm_data into a new topology file with a
-        given name.
+        Writes the current data in parm_data into a new topology file with a given name.
 
         Parameters
         ----------
-        name : str
-            The name of the file to write the prmtop to
+        name : str or file-like
+            The name of the file to write the prmtop to or the file object to write to
         """
         self.remake_parm()
         AmberFormat.write_parm(self, name)
@@ -670,6 +677,7 @@ class AmberParm(AmberFormat, Structure):
         self._xfer_bond_info()
         self._xfer_angle_info()
         self._xfer_dihedral_info()
+        self._xfer_cmap_properties()
         self._set_ifbox()
         # Load the pointers dict
         self.load_pointers()
@@ -992,8 +1000,8 @@ class AmberParm(AmberFormat, Structure):
         """
         if not self.atoms: return None
         nonbfrc = super(AmberParm, self).omm_nonbonded_force(
-                nonbondedMethod, nonbondedCutoff, switchDistance,
-                ewaldErrorTolerance, reactionFieldDielectric
+            nonbondedMethod, nonbondedCutoff, switchDistance,
+            ewaldErrorTolerance, reactionFieldDielectric
         )
         has1012 = self.has_1012()
         hasnbfix = self.has_NBFIX()
@@ -1090,13 +1098,10 @@ class AmberParm(AmberFormat, Structure):
                         bcoef[ii] = parm_bcoef[idx] * bfac
                         if has1264:
                             ccoef[ii] = parm_ccoef[idx] * cfac
-            force.addTabulatedFunction('acoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, acoef))
-            force.addTabulatedFunction('bcoef',
-                    mm.Discrete2DFunction(ntypes, ntypes, bcoef))
+            force.addTabulatedFunction('acoef', mm.Discrete2DFunction(ntypes, ntypes, acoef))
+            force.addTabulatedFunction('bcoef', mm.Discrete2DFunction(ntypes, ntypes, bcoef))
             if has1264:
-                force.addTabulatedFunction('ccoef',
-                        mm.Discrete2DFunction(ntypes, ntypes, ccoef))
+                force.addTabulatedFunction('ccoef', mm.Discrete2DFunction(ntypes, ntypes, ccoef))
             # Our CustomNonbondedForce is taking care of the LJ part of our
             # potential, so we need to go through nonbfrc and zero-out the
             # Lennard-Jones parameters, but keep the charge parameters in place.
@@ -1224,13 +1229,35 @@ class AmberParm(AmberFormat, Structure):
     @property
     def has_cmap(self):
         """ Whether this instance has correction map terms or not """
-        return False
+        return len(self.cmaps) > 0 or (self._cmap_prefix + 'CMAP_COUNT') in self.parm_data
+
 
     #===========  PRIVATE INSTANCE METHODS  ============
 
     def _truncate_array(self, section, length):
         """ Truncates an array to get the given length """
         self.parm_data[section] = self.parm_data[section][:length]
+
+    #===================================================
+
+    def _load_cmap_info(self):
+        """ Loads the CHARMM CMAP types and array """
+        if not self.has_cmap: return
+        del self.cmaps[:]
+        del self.cmap_types[:]
+        resolution_key = self._cmap_prefix + 'CMAP_RESOLUTION'
+        parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
+        for i in range(self.pointers['CMAP_TYPES']):
+            resolution = self.parm_data[resolution_key][i]
+            grid = self.parm_data[parameter_key % (i+1)]
+            cmts = self.parm_comments[parameter_key % (i+1)]
+            self.cmap_types.append(CmapType(resolution, grid, cmts, list=self.cmap_types))
+        it = iter(self.parm_data[self._cmap_prefix + 'CMAP_INDEX'])
+        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
+            self.cmaps.append(
+                Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                     self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
+            )
 
     #===================================================
 
@@ -1295,6 +1322,14 @@ class AmberParm(AmberFormat, Structure):
         check_length('SOLVENT_POINTERS', 3, False)
         if 'SOLVENT_POINTERS' in self.parm_data:
             check_length('ATOMS_PER_MOLECULE', self.parm_data['SOLVENT_POINTERS'][1], False)
+        if self.has_cmap:
+            check_length(self._cmap_prefix + 'CMAP_COUNT', 2)
+            check_length(self._cmap_prefix + 'CMAP_RESOLUTION', self.pointers['CMAP_TYPES'])
+            resolution_key = self._cmap_prefix + 'CMAP_RESOLUTION'
+            parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
+            for i in range(self.pointers['CMAP_TYPES']):
+                res = self.parm_data[resolution_key][i]
+                check_length(parameter_key % (i+1), res*res)
 
     #===================================================
 
@@ -1553,15 +1588,13 @@ class AmberParm(AmberFormat, Structure):
         data['BONDS_INC_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_inc_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3, bond.type.idx+1])
         data['POINTERS'][NBONH] = len(bond_list)
         self.pointers['NBONH'] = len(bond_list)
         data['BONDS_WITHOUT_HYDROGEN'] = bond_array = []
         bond_list = list(self.bonds_without_h)
         for bond in bond_list:
-            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx*3, bond.atom2.idx*3, bond.type.idx+1])
         data['POINTERS'][MBONA] = data['POINTERS'][NBONA] = len(bond_list)
         self.pointers['MBONA'] = self.pointers['NBONA'] = len(bond_list)
 
@@ -1580,8 +1613,7 @@ class AmberParm(AmberFormat, Structure):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
-        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD
-                                        for type in self.angle_types]
+        data['ANGLE_EQUIL_VALUE'] = [type.theteq*DEG_TO_RAD for type in self.angle_types]
         data['POINTERS'][NUMANG] = len(self.angle_types)
         self.pointers['NUMANG'] = len(self.angle_types)
         # Now do the angle arrays
@@ -1614,18 +1646,13 @@ class AmberParm(AmberFormat, Structure):
         for dihed in self.dihedrals:
             dihed.type.used = True
         self.dihedral_types.prune_unused()
-        data['DIHEDRAL_FORCE_CONSTANT'] = \
-                    [type.phi_k for type in self.dihedral_types]
-        data['DIHEDRAL_PERIODICITY'] = \
-                    [type.per for type in self.dihedral_types]
-        data['DIHEDRAL_PHASE'] = \
-                    [type.phase*DEG_TO_RAD for type in self.dihedral_types]
+        data['DIHEDRAL_FORCE_CONSTANT'] = [type.phi_k for type in self.dihedral_types]
+        data['DIHEDRAL_PERIODICITY'] = [type.per for type in self.dihedral_types]
+        data['DIHEDRAL_PHASE'] = [type.phase*DEG_TO_RAD for type in self.dihedral_types]
         if 'SCEE_SCALE_FACTOR' in data:
-            data['SCEE_SCALE_FACTOR'] = \
-                    [type.scee for type in self.dihedral_types]
+            data['SCEE_SCALE_FACTOR'] = [type.scee for type in self.dihedral_types]
         if 'SCNB_SCALE_FACTOR' in data:
-            data['SCNB_SCALE_FACTOR'] = \
-                    [type.scnb for type in self.dihedral_types]
+            data['SCNB_SCALE_FACTOR'] = [type.scnb for type in self.dihedral_types]
         data['POINTERS'][NPTRA] = len(self.dihedral_types)
         self.pointers['NPTRA'] = len(self.dihedral_types)
         # Now do the dihedral arrays
@@ -1636,13 +1663,11 @@ class AmberParm(AmberFormat, Structure):
             end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*end_sign,
-                                    dihed.atom1.idx*3*imp_sign,
+                                    dihed.atom2.idx*3*end_sign, dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*end_sign,
-                                    dihed.atom4.idx*3*imp_sign,
+                                    dihed.atom3.idx*3*end_sign, dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIH] = len(dihed_list)
         self.pointers['NPHIH'] = len(dihed_list)
@@ -1653,16 +1678,73 @@ class AmberParm(AmberFormat, Structure):
             end_sign = -1 if dihed.ignore_end else 1
             if dihed.atom3.idx == 0 or dihed.atom4.idx == 0:
                 dihed_array.extend([dihed.atom4.idx*3, dihed.atom3.idx*3,
-                                    dihed.atom2.idx*3*end_sign,
-                                    dihed.atom1.idx*3*imp_sign,
+                                    dihed.atom2.idx*3*end_sign, dihed.atom1.idx*3*imp_sign,
                                     dihed.type.idx+1])
             else:
                 dihed_array.extend([dihed.atom1.idx*3, dihed.atom2.idx*3,
-                                    dihed.atom3.idx*3*end_sign,
-                                    dihed.atom4.idx*3*imp_sign,
+                                    dihed.atom3.idx*3*end_sign, dihed.atom4.idx*3*imp_sign,
                                     dihed.type.idx+1])
         data['POINTERS'][NPHIA] = data['POINTERS'][MPHIA] = len(dihed_list)
         self.pointers['NPHIA'] = self.pointers['MPHIA'] = len(dihed_list)
+
+    #===================================================
+
+    def _xfer_cmap_properties(self):
+        """ Sets the topology file section data from the cmap arrays """
+        # If we have no cmaps, delete all remnants of the CMAP terms in the
+        # prmtop and bail out
+        if len(self.cmaps) == 0:
+            # We have deleted all cmaps. Get rid of them from the parm file and
+            # bail out. This is probably pretty unlikely, though...
+            flag_prefix = self._cmap_prefix + 'CMAP'
+            flags_to_delete = [flag for flag in self.flag_list if flag.startswith(flag_prefix)]
+            for flag in flags_to_delete:
+                self.delete_flag(flag)
+            if 'CMAP' in self.pointers:
+                del self.pointers['CMAP']
+            if 'CMAP_TYPES' in self.pointers:
+                del self.pointers['CMAP_TYPES']
+            return
+        # Time to transfer our CMAP types
+        data = self.parm_data
+        for ct in self.cmap_types:
+            ct.used = False
+        for cmap in self.cmaps:
+            cmap.type.used = True
+        self.cmap_types.prune_unused()
+        # All of our CMAP types are in different topology file sections. We need
+        # to delete all of the CMAP_PARAMETER_XX sections and then
+        # recreate them with the correct size and comments.  The comments have
+        # been stored in the CMAP types themselves to prevent them from being
+        # lost. We will also assume that the Fortran format we're going to use
+        # is the same for all CMAP types, so just pull it from
+        # CMAP_PARAMETER_01 (or fall back to 8(F9.5))
+        parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
+        try:
+            fmt = str(self.formats[parameter_key % 1])
+        except KeyError:
+            fmt = '8(F9.5)'
+        flags_to_delete = []
+        for flag in self.flag_list:
+            if 'CMAP_PARAMETER' in flag:
+                flags_to_delete.append(flag)
+        for flag in flags_to_delete:
+            self.delete_flag(flag)
+        # Now add them back
+        after = self._cmap_prefix + 'CMAP_RESOLUTION'
+        for i, ct in enumerate(self.cmap_types):
+            newflag = self._cmap_prefix + 'CMAP_PARAMETER_%02d' % (i+1)
+            self.add_flag(newflag, fmt, data=ct.grid, comments=ct.comments, after=after)
+            after = newflag
+        # Now do the CMAP_INDEX section
+        data[self._cmap_prefix + 'CMAP_INDEX'] = cmap_array = []
+        for cm in self.cmaps:
+            cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1, cm.atom3.idx+1, cm.atom4.idx+1,
+                               cm.atom5.idx+1, cm.type.idx+1])
+        data[self._cmap_prefix + 'CMAP_COUNT'] = [len(self.cmaps), len(self.cmap_types)]
+        data[self._cmap_prefix + 'CMAP_RESOLUTION'] = [ct.resolution for ct in self.cmap_types]
+        self.pointers['CMAP'] = len(self.cmaps)
+        self.pointers['CMAP_TYPES'] = len(self.cmap_types)
 
     #===================================================
 
@@ -1707,6 +1789,15 @@ class AmberParm(AmberFormat, Structure):
         self.add_flag('TREE_CHAIN_CLASSIFICATION', '20a4', num_items=0)
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
+        if self.has_cmap:
+            self.add_flag(self._cmap_prefix + 'CMAP_COUNT', '2I8', num_items=2,
+                          comments=['Number of CMAP terms, number of unique CMAP parameters'])
+            self.add_flag(self._cmap_prefix + 'CMAP_RESOLUTION', '20I4', num_items=0,
+                          comments=['Number of steps along each phi/psi CMAP axis',
+                                    'for each CMAP_PARAMETER grid'])
+            self.add_flag(self._cmap_prefix + 'CMAP_INDEX', '6I8', num_items=0,
+                          comments=['Atom index i,j,k,l,m of the cross term',
+                                    'and then pointer to CMAP_PARAMETER_n'])
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
@@ -1735,8 +1826,7 @@ class AmberParm(AmberFormat, Structure):
         idx = 0
         for i in range(ntypes):
             for j in range(ntypes):
-                self.parm_data['NONBONDED_PARM_INDEX'][idx] = \
-                            holder[ntypes*i+j]
+                self.parm_data['NONBONDED_PARM_INDEX'][idx] = holder[ntypes*i+j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
@@ -1790,8 +1880,7 @@ class AmberParm(AmberFormat, Structure):
                     customforce.addExclusion(i, j)
                 continue
             # Figure out what the 1-4 scaling parameters were for this pair...
-            unscaled_ee = sqrt(self.atoms[i].epsilon_14 *
-                               self.atoms[j].epsilon_14) * ene_conv
+            unscaled_ee = sqrt(self.atoms[i].epsilon_14 * self.atoms[j].epsilon_14) * ene_conv
             try:
                 one_scnb = ee.value_in_unit(u.kilojoules_per_mole) / unscaled_ee
             except ZeroDivisionError:
@@ -1982,9 +2071,8 @@ class AmberParm(AmberFormat, Structure):
             zero_angle.list = self.angle_types
         if n14: # See if there is some ambiguity here
             if not self.adjusts and len(scalings) > 1:
-                warn('Multiple 1-4 scaling factors detected. Using the '
-                     'most-used values scee=%f scnb=%f' % (scee, scnb),
-                     AmberWarning)
+                warn('Multiple 1-4 scaling factors detected. Using the most-used values scee=%f '
+                     'scnb=%f' % (scee, scnb), AmberWarning)
         return n13, n14
 
     #===================================================

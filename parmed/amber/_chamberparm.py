@@ -28,8 +28,7 @@ from math import pi, sqrt
 
 from ..constants import DEG_TO_RAD, IFBOX, NATOM, NATYP, NTYPES, RAD_TO_DEG, SMALL, TINY
 from ..exceptions import AmberError, AmberWarning
-from ..topologyobjects import (BondType, Cmap, CmapType, ExtraPoint, Improper,
-                               ImproperType, UreyBradley)
+from ..topologyobjects import BondType, ExtraPoint, Improper, ImproperType, UreyBradley
 from ..utils.six.moves import range, zip
 from ._amberparm import AmberParm
 
@@ -92,6 +91,8 @@ class ChamberParm(AmberParm):
     instances
     """
 
+    _cmap_prefix = "CHARMM_"
+
     #===================================================
 
     def initialize_topology(self, xyz=None, box=None):
@@ -129,10 +130,6 @@ class ChamberParm(AmberParm):
         self.pointers['NUBTYPES'] = nubtypes
         self.pointers['NIMPHI'] = self.parm_data['CHARMM_NUM_IMPROPERS'][0]
         self.pointers['NIMPRTYPES'] = self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
-        # If CMAP is not present, don't load the pointers
-        if self.has_cmap:
-            self.pointers['CMAP'] = self.parm_data['CHARMM_CMAP_COUNT'][0]
-            self.pointers['CMAP_TYPES'] = self.parm_data['CHARMM_CMAP_COUNT'][1]
 
     #===================================================
 
@@ -145,7 +142,6 @@ class ChamberParm(AmberParm):
         super(ChamberParm, self).load_structure()
         self._load_urey_brad_info()
         self._load_improper_info()
-        self._load_cmap_info()
         # All of our angles are urey-bradley types
         for angle in self.angles: angle.funct = 5
         super(ChamberParm, self).unchange()
@@ -332,10 +328,6 @@ class ChamberParm(AmberParm):
     def amoeba(self):
         return False
 
-    @property
-    def has_cmap(self):
-        return len(self.cmaps) > 0 or 'CHARMM_CMAP_COUNT' in self.parm_data
-
     #===========  PRIVATE INSTANCE METHODS  ============
 
     def _load_urey_brad_info(self):
@@ -386,27 +378,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _load_cmap_info(self):
-        """ Loads the CHARMM CMAP types and array """
-        if not self.has_cmap: return
-        del self.cmaps[:]
-        del self.cmap_types[:]
-        for i in range(self.pointers['CMAP_TYPES']):
-            resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-            grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            self.cmap_types.append(
-                    CmapType(resolution, grid, cmts, list=self.cmap_types)
-            )
-        it = iter(self.parm_data['CHARMM_CMAP_INDEX'])
-        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
-            self.cmaps.append(
-                    Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
-                         self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
-            )
-
-    #===================================================
-
     def _check_section_lengths(self):
         """ Make sure each section has the necessary number of entries """
         super(ChamberParm, self)._check_section_lengths()
@@ -433,12 +404,6 @@ class ChamberParm(AmberParm):
         ntypes = self.pointers['NTYPES']
         check_length('LENNARD_JONES_14_ACOEF', ntypes*(ntypes+1)//2)
         check_length('LENNARD_JONES_14_BCOEF', ntypes*(ntypes+1)//2)
-        if self.has_cmap:
-            check_length('CHARMM_CMAP_COUNT', 2)
-            check_length('CHARMM_CMAP_RESOLUTION', self.pointers['CMAP_TYPES'])
-            for i in range(self.pointers['CMAP_TYPES']):
-                res = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-                check_length('CHARMM_CMAP_PARAMETER_%02d' % (i+1), res*res)
 
     #===================================================
 
@@ -492,64 +457,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _xfer_cmap_properties(self):
-        """ Sets the topology file section data from the cmap arrays """
-        # If we have no cmaps, delete all remnants of the CMAP terms in the
-        # prmtop and bail out
-        if len(self.cmaps) == 0:
-            # We have deleted all cmaps. Get rid of them from the parm file and
-            # bail out. This is probably pretty unlikely, though...
-            flags_to_delete = [flag for flag in self.flag_list if flag.startswith('CHARMM_CMAP')]
-            for flag in flags_to_delete:
-                self.delete_flag(flag)
-            if 'CMAP' in self.pointers:
-                del self.pointers['CMAP']
-            if 'CMAP_TYPES' in self.pointers:
-                del self.pointers['CMAP_TYPES']
-            return
-        # Time to transfer our CMAP types
-        data = self.parm_data
-        for ct in self.cmap_types:
-            ct.used = False
-        for cmap in self.cmaps:
-            cmap.type.used = True
-        self.cmap_types.prune_unused()
-        # All of our CMAP types are in different topology file sections. We need
-        # to delete all of the CHARMM_CMAP_PARAMETER_XX sections and then
-        # recreate them with the correct size and comments.  The comments have
-        # been stored in the CMAP types themselves to prevent them from being
-        # lost. We will also assume that the Fortran format we're going to use
-        # is the same for all CMAP types, so just pull it from
-        # CHARMM_CMAP_PARAMETER_01 (or fall back to 8(F9.5))
-        try:
-            fmt = str(self.formats['CHARMM_CMAP_PARAMETER_01'])
-        except KeyError:
-            fmt = '8(F9.5)'
-        flags_to_delete = []
-        for flag in self.flag_list:
-            if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                flags_to_delete.append(flag)
-        for flag in flags_to_delete:
-            self.delete_flag(flag)
-        # Now add them back
-        after = 'CHARMM_CMAP_RESOLUTION'
-        for i, ct in enumerate(self.cmap_types):
-            newflag = 'CHARMM_CMAP_PARAMETER_%02d' % (i+1)
-            self.add_flag(newflag, fmt, data=ct.grid, comments=ct.comments,
-                          after=after)
-            after = newflag
-        # Now do the CMAP_INDEX section
-        data['CHARMM_CMAP_INDEX'] = cmap_array = []
-        for cm in self.cmaps:
-            cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1, cm.atom3.idx+1, cm.atom4.idx+1,
-                               cm.atom5.idx+1, cm.type.idx+1])
-        data['CHARMM_CMAP_COUNT'] = [len(self.cmaps), len(self.cmap_types)]
-        data['CHARMM_CMAP_RESOLUTION'] = [ct.resolution for ct in self.cmap_types]
-        self.pointers['CMAP'] = len(self.cmaps)
-        self.pointers['CMAP_TYPES'] = len(self.cmap_types)
-
-    #===================================================
-
     def _add_standard_flags(self):
         """ Adds all of the standard flags to the parm_data array """
         self.set_version()
@@ -558,8 +465,7 @@ class ChamberParm(AmberParm):
         self.add_flag('FORCE_FIELD_TYPE', 'i2,a78', num_items=0)
         self.add_flag('ATOM_NAME', '20a4', num_items=0)
         self.add_flag('CHARGE', '3E24.16', num_items=0,
-                comments=['Atomic charge multiplied by sqrt(332.0716D0) '
-                         '(CCELEC)'])
+                      comments=['Atomic charge multiplied by sqrt(332.0716D0) (CCELEC)'])
         self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
         self.add_flag('MASS', '5E16.8', num_items=0)
         self.add_flag('ATOM_TYPE_INDEX', '10I8', num_items=0)
@@ -600,8 +506,7 @@ class ChamberParm(AmberParm):
                                 'quadratic four atom improper energy term'])
         self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0,
                       comments=['K_psi: kcal/mole/rad**2'])
-        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0,
-                      comments=['psi: radians'])
+        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0, comments=['psi: radians'])
         natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
         self.add_flag('SOLTY', '5E16.8', num_items=natyp)
         self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
@@ -623,14 +528,14 @@ class ChamberParm(AmberParm):
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
         if self.has_cmap:
-            self.add_flag('CHARMM_CMAP_COUNT', '2I8', num_items=2,
+            self.add_flag(self._cmap_prefix + 'CMAP_COUNT', '2I8', num_items=2,
                           comments=['Number of CMAP terms, number of unique CMAP parameters'])
-            self.add_flag('CHARMM_CMAP_RESOLUTION', '20I4', num_items=0,
+            self.add_flag(self._cmap_prefix + 'CMAP_RESOLUTION', '20I4', num_items=0,
                           comments=['Number of steps along each phi/psi CMAP axis',
                                     'for each CMAP_PARAMETER grid'])
-            self.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=0,
+            self.add_flag(self._cmap_prefix + 'CMAP_INDEX', '6I8', num_items=0,
                           comments=['Atom index i,j,k,l,m of the cross term',
-                                    'and then pointer to CHARMM_CMAP_PARAMETER_n'])
+                                    'and then pointer to CMAP_PARAMETER_n'])
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
@@ -643,9 +548,7 @@ class ChamberParm(AmberParm):
     #===================================================
 
     def _set_nonbonded_tables(self, nbfixes=None):
-        """
-        Sets the tables of Lennard-Jones nonbonded interaction pairs
-        """
+        """ Sets the tables of Lennard-Jones nonbonded interaction pairs """
         from parmed.tools.actions import addLJType
         data = self.parm_data
         ntypes = data['POINTERS'][NTYPES]
