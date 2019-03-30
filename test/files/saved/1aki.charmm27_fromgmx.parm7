@@ -15571,7 +15571,7 @@ BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA BLA
  -0.53491  0.25810  0.32918 -0.12616 -0.94026 -1.31924 -0.99085 -0.89670
 %FLAG CHARMM_CMAP_INDEX
 %COMMENT Atom index i,j,k,l,m of the cross term
-%COMMENT and then pointer to CHARMM_CMAP_PARAMETER_n
+%COMMENT and then pointer to CMAP_PARAMETER_n
 %FORMAT(6I8)
       23      25      27      39      41       1
       39      41      43      59      61       1
