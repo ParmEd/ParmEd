@@ -131,10 +131,6 @@ class ChamberParm(AmberParm):
         self.pointers['NUBTYPES'] = nubtypes
         self.pointers['NIMPHI'] = self.parm_data['CHARMM_NUM_IMPROPERS'][0]
         self.pointers['NIMPRTYPES'] = self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
-        # If CMAP is not present, don't load the pointers
-        if self.has_cmap:
-            self.pointers['CMAP'] = self.parm_data[self._cmap_prefix + 'CMAP_COUNT'][0]
-            self.pointers['CMAP_TYPES'] = self.parm_data[self._cmap_prefix + 'CMAP_COUNT'][1]
 
     #===================================================
 
@@ -147,7 +143,6 @@ class ChamberParm(AmberParm):
         super(ChamberParm, self).load_structure()
         self._load_urey_brad_info()
         self._load_improper_info()
-        self._load_cmap_info()
         # All of our angles are urey-bradley types
         for angle in self.angles: angle.funct = 5
         super(ChamberParm, self).unchange()
@@ -334,10 +329,6 @@ class ChamberParm(AmberParm):
     def amoeba(self):
         return False
 
-    @property
-    def has_cmap(self):
-        return len(self.cmaps) > 0 or (self._cmap_prefix + 'CMAP_COUNT') in self.parm_data
-
     #===========  PRIVATE INSTANCE METHODS  ============
 
     def _load_urey_brad_info(self):
@@ -388,27 +379,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _load_cmap_info(self):
-        """ Loads the CHARMM CMAP types and array """
-        if not self.has_cmap: return
-        del self.cmaps[:]
-        del self.cmap_types[:]
-        resolution_key = self._cmap_prefix + 'CMAP_RESOLUTION'
-        parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
-        for i in range(self.pointers['CMAP_TYPES']):
-            resolution = self.parm_data[resolution_key][i]
-            grid = self.parm_data[parameter_key % (i+1)]
-            cmts = self.parm_comments[parameter_key % (i+1)]
-            self.cmap_types.append(CmapType(resolution, grid, cmts, list=self.cmap_types))
-        it = iter(self.parm_data[self._cmap_prefix + 'CMAP_INDEX'])
-        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
-            self.cmaps.append(
-                Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
-                     self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
-            )
-
-    #===================================================
-
     def _check_section_lengths(self):
         """ Make sure each section has the necessary number of entries """
         super(ChamberParm, self)._check_section_lengths()
@@ -435,14 +405,6 @@ class ChamberParm(AmberParm):
         ntypes = self.pointers['NTYPES']
         check_length('LENNARD_JONES_14_ACOEF', ntypes*(ntypes+1)//2)
         check_length('LENNARD_JONES_14_BCOEF', ntypes*(ntypes+1)//2)
-        if self.has_cmap:
-            check_length(self._cmap_prefix + 'CMAP_COUNT', 2)
-            check_length(self._cmap_prefix + 'CMAP_RESOLUTION', self.pointers['CMAP_TYPES'])
-            resolution_key = self._cmap_prefix + 'CMAP_RESOLUTION'
-            parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
-            for i in range(self.pointers['CMAP_TYPES']):
-                res = self.parm_data[resolution_key][i]
-                check_length(parameter_key % (i+1), res*res)
 
     #===================================================
 
@@ -493,65 +455,6 @@ class ChamberParm(AmberParm):
         data['CHARMM_NUM_IMPR_TYPES'] = [len(self.improper_types)]
         self.pointers['NIMPHI'] = len(improper_array)
         self.pointers['NIMPRTYPES'] = len(self.improper_types)
-
-    #===================================================
-
-    def _xfer_cmap_properties(self):
-        """ Sets the topology file section data from the cmap arrays """
-        # If we have no cmaps, delete all remnants of the CMAP terms in the
-        # prmtop and bail out
-        if len(self.cmaps) == 0:
-            # We have deleted all cmaps. Get rid of them from the parm file and
-            # bail out. This is probably pretty unlikely, though...
-            flag_prefix = self._cmap_prefix + 'CMAP'
-            flags_to_delete = [flag for flag in self.flag_list if flag.startswith(flag_prefix)]
-            for flag in flags_to_delete:
-                self.delete_flag(flag)
-            if 'CMAP' in self.pointers:
-                del self.pointers['CMAP']
-            if 'CMAP_TYPES' in self.pointers:
-                del self.pointers['CMAP_TYPES']
-            return
-        # Time to transfer our CMAP types
-        data = self.parm_data
-        for ct in self.cmap_types:
-            ct.used = False
-        for cmap in self.cmaps:
-            cmap.type.used = True
-        self.cmap_types.prune_unused()
-        # All of our CMAP types are in different topology file sections. We need
-        # to delete all of the CMAP_PARAMETER_XX sections and then
-        # recreate them with the correct size and comments.  The comments have
-        # been stored in the CMAP types themselves to prevent them from being
-        # lost. We will also assume that the Fortran format we're going to use
-        # is the same for all CMAP types, so just pull it from
-        # CMAP_PARAMETER_01 (or fall back to 8(F9.5))
-        parameter_key = self._cmap_prefix + 'CMAP_PARAMETER_%02d'
-        try:
-            fmt = str(self.formats[parameter_key % 1])
-        except KeyError:
-            fmt = '8(F9.5)'
-        flags_to_delete = []
-        for flag in self.flag_list:
-            if 'CMAP_PARAMETER' in flag:
-                flags_to_delete.append(flag)
-        for flag in flags_to_delete:
-            self.delete_flag(flag)
-        # Now add them back
-        after = self._cmap_prefix + 'CMAP_RESOLUTION'
-        for i, ct in enumerate(self.cmap_types):
-            newflag = self._cmap_prefix + 'CMAP_PARAMETER_%02d' % (i+1)
-            self.add_flag(newflag, fmt, data=ct.grid, comments=ct.comments, after=after)
-            after = newflag
-        # Now do the CMAP_INDEX section
-        data[self._cmap_prefix + 'CMAP_INDEX'] = cmap_array = []
-        for cm in self.cmaps:
-            cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1, cm.atom3.idx+1, cm.atom4.idx+1,
-                               cm.atom5.idx+1, cm.type.idx+1])
-        data[self._cmap_prefix + 'CMAP_COUNT'] = [len(self.cmaps), len(self.cmap_types)]
-        data[self._cmap_prefix + 'CMAP_RESOLUTION'] = [ct.resolution for ct in self.cmap_types]
-        self.pointers['CMAP'] = len(self.cmaps)
-        self.pointers['CMAP_TYPES'] = len(self.cmap_types)
 
     #===================================================
 
