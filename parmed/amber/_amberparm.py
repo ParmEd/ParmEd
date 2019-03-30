@@ -649,13 +649,12 @@ class AmberParm(AmberFormat, Structure):
 
     def write_parm(self, name):
         """
-        Writes the current data in parm_data into a new topology file with a
-        given name.
+        Writes the current data in parm_data into a new topology file with a given name.
 
         Parameters
         ----------
-        name : str
-            The name of the file to write the prmtop to
+        name : str or file-like
+            The name of the file to write the prmtop to or the file object to write to
         """
         self.remake_parm()
         AmberFormat.write_parm(self, name)
