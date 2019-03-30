@@ -28,8 +28,7 @@ from math import pi, sqrt
 
 from ..constants import DEG_TO_RAD, IFBOX, NATOM, NATYP, NTYPES, RAD_TO_DEG, SMALL, TINY
 from ..exceptions import AmberError, AmberWarning
-from ..topologyobjects import (BondType, Cmap, CmapType, ExtraPoint, Improper,
-                               ImproperType, UreyBradley)
+from ..topologyobjects import BondType, ExtraPoint, Improper, ImproperType, UreyBradley
 from ..utils.six.moves import range, zip
 from ._amberparm import AmberParm
 
