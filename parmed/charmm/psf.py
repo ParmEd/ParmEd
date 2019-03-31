@@ -187,8 +187,7 @@ class CharmmPsfFile(Structure):
             self.name = psf_name if isinstance(psf_name, string_types) else ''
             line = fileobj.readline()
             if not line.startswith('PSF'):
-                raise CharmmError('Unrecognized PSF file. First line is %s' %
-                                  line.strip())
+                raise CharmmError('Unrecognized PSF file. First line is %s' % line.strip())
             # Store the flags
             psf_flags = line.split()[1:]
             # Now get all of the sections and store them in a dict
@@ -214,8 +213,7 @@ class CharmmPsfFile(Structure):
                 segid = words[1]
                 rematch = _resre.match(words[2])
                 if not rematch:
-                    raise CharmmError('Could not interpret residue number %s' % # pragma: no cover
-                                      words[2])
+                    raise CharmmError('Could not interpret residue number %s' % words[2])
                 resid, inscode = rematch.groups()
                 resid = conv(resid, int, 'residue number')
                 resname = words[3]
@@ -231,8 +229,7 @@ class CharmmPsfFile(Structure):
                 props = words[8:]
                 atom = Atom(name=name, type=attype, charge=charge, mass=mass)
                 atom.props = props
-                self.add_atom(atom, resname, resid, chain=segid,
-                              inscode=inscode, segid=segid)
+                self.add_atom(atom, resname, resid, chain=segid, inscode=inscode, segid=segid)
             # Now get the number of bonds
             nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
             if len(psfsections['NBOND'][1]) != nbond * 2:
@@ -248,9 +245,7 @@ class CharmmPsfFile(Structure):
                                   (len(psfsections['NTHETA'][1]), ntheta))
             it = iter(psfsections['NTHETA'][1])
             for i, j, k in zip(it, it, it):
-                self.angles.append(
-                        Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1])
-                )
+                self.angles.append(Angle(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1]))
                 self.angles[-1].funct = 5 # urey-bradley
             # Now get the number of torsions and the torsion list
             nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
@@ -260,8 +255,7 @@ class CharmmPsfFile(Structure):
             it = iter(psfsections['NPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.dihedrals.append(
-                        Dihedral(self.atoms[i-1], self.atoms[j-1],
-                                 self.atoms[k-1], self.atoms[l-1])
+                    Dihedral(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1], self.atoms[l-1])
                 )
             self.dihedrals.split = False
             # Now get the number of improper torsions
@@ -272,8 +266,7 @@ class CharmmPsfFile(Structure):
             it = iter(psfsections['NIMPHI'][1])
             for i, j, k, l in zip(it, it, it, it):
                 self.impropers.append(
-                        Improper(self.atoms[i-1], self.atoms[j-1],
-                                 self.atoms[k-1], self.atoms[l-1])
+                    Improper(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1], self.atoms[l-1])
                 )
             # Now handle the donors (what is this used for??)
             ndon = conv(psfsections['NDON'][0], int, 'number of donors')
@@ -282,9 +275,7 @@ class CharmmPsfFile(Structure):
                                   (len(psfsections['NDON'][1]), ndon))
             it = iter(psfsections['NDON'][1])
             for i, j in zip(it, it):
-                self.donors.append(
-                        AcceptorDonor(self.atoms[i-1], self.atoms[j-1])
-                )
+                self.donors.append(AcceptorDonor(self.atoms[i-1], self.atoms[j-1]))
             # Now handle the acceptors (what is this used for??)
             nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
             if len(psfsections['NACC'][1]) != nacc * 2:
@@ -292,20 +283,17 @@ class CharmmPsfFile(Structure):
                                   (len(psfsections['NACC'][1]), nacc))
             it = iter(psfsections['NACC'][1])
             for i, j in zip(it, it):
-                self.acceptors.append(
-                        AcceptorDonor(self.atoms[i-1], self.atoms[j-1])
-                )
+                self.acceptors.append(AcceptorDonor(self.atoms[i-1], self.atoms[j-1]))
             # Now get the group sections
             try:
                 ngrp, nst2 = psfsections['NGRP NST2'][0]
             except ValueError: # pragma: no cover
-                raise CharmmError('Could not unpack GROUP pointers') # pragma: no cover
+                raise CharmmError('Could not unpack GROUP pointers')
             tmp = psfsections['NGRP NST2'][1]
             self.groups.nst2 = nst2
             # Now handle the groups
             if len(psfsections['NGRP NST2'][1]) != ngrp * 3:
-                raise CharmmError('Got %d indexes for %d groups' % # pragma: no cover
-                                     (len(tmp), ngrp))
+                raise CharmmError('Got %d indexes for %d groups' % (len(tmp), ngrp))
             it = iter(psfsections['NGRP NST2'][1])
             for i, j, k in zip(it, it, it):
                 self.groups.append(Group(self.atoms[i], j, k))
@@ -314,15 +302,11 @@ class CharmmPsfFile(Structure):
             set_molecules(self.atoms)
             molecule_list = [a.marked for a in self.atoms]
             if len(tmp) == len(self.atoms):
-                if molecule_list != tmp:
-                    warnings.warn('Detected PSF molecule section that is WRONG. '
-                                  'Resetting molecularity.', CharmmWarning)
                 # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
                 numlp, numlph = psfsections['NUMLP NUMLPH'][0]
                 if numlp != 0 or numlph != 0:
-                    raise NotImplementedError('Cannot currently handle PSFs with '
-                                              'lone pairs defined in the NUMLP/'
-                                              'NUMLPH section.')
+                    raise NotImplementedError('Cannot currently handle PSFs with lone pairs '
+                                              'defined in the NUMLP/NUMLPH section.')
             # Now do the CMAPs
             ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
             if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
@@ -331,10 +315,9 @@ class CharmmPsfFile(Structure):
             it = iter(psfsections['NCRTERM'][1])
             for i, j, k, l, m, n, o, p in zip(it, it, it, it, it, it, it, it):
                 self.cmaps.append(
-                        Cmap.extended(self.atoms[i-1], self.atoms[j-1],
-                                      self.atoms[k-1], self.atoms[l-1],
-                                      self.atoms[m-1], self.atoms[n-1],
-                                      self.atoms[o-1], self.atoms[p-1])
+                    Cmap.extended(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
+                                  self.atoms[l-1], self.atoms[m-1], self.atoms[n-1],
+                                  self.atoms[o-1], self.atoms[p-1])
                 )
             self.unchange()
             self.flags = psf_flags
@@ -373,7 +356,7 @@ class CharmmPsfFile(Structure):
         If copy is False, the original object may have its atom type names
         changed if any of them have lower-case letters
         """
-        from parmed.charmm.parameters import _typeconv as typeconv
+        from .parameters import _typeconv as typeconv
         if (struct.rb_torsions or struct.trigonal_angles or
                 struct.out_of_plane_bends or struct.pi_torsions or
                 struct.stretch_bends or struct.torsion_torsions or

@@ -700,7 +700,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     rmin14 = conv(words[6], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
                 except IndexError:
                     eps14 = rmin14 = None
-                nonbonded_types[atype] = [epsilon, rmin, eps14, rmin14]
+                nonbonded_types[atype] = [abs(epsilon), rmin, abs(eps14), rmin14]
                 continue
             if section.upper() == 'NBFIX':
                 words = line.split()
