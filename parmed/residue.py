@@ -269,14 +269,14 @@ class RNAResidue(DNAResidue):
 DG = DNAResidue('Guanine', 'DG', ['GUA', 'DG5', 'DG3', 'DGN'])
 DC = DNAResidue('Cytosine', 'DC', ['CYT', 'DC5', 'DC3', 'DCN', 'DCP'])
 DA = DNAResidue('Adenine', 'DA', ['ADE', 'DA5', 'DA3', 'DAN', 'DAP'])
-DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
+DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3', 'DTN'])
 G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN', 'RG', 'RG3', 'RG5',
                                 'RGN', 'GF2', 'M2G', 'YYG', '7MG', 'OMG',
                                 '2MG',])
 C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN', 'RC', 'RC5',
                                  'RC3', 'RCN', 'CFZ', '5MC', 'OMC',])
 A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
-                                'RA', 'RA3', 'RA5', 'AF2', '1MA'])
+                                'RA', 'RA3', 'RA5', 'RAN', 'AF2', '1MA'])
 U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5',
                                'RUN', 'UFT', '5MU', 'H2U', 'PSU',])
 T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN',
