@@ -7,7 +7,12 @@ Date: Aug. 11, 2015
 """
 from __future__ import division, print_function
 
-from collections import defaultdict, Sequence
+import six
+if six.PY2:
+    from collections import Sequence
+else:
+    from collections.abc import Sequence
+from collections import defaultdict
 from contextlib import closing
 import math
 import os
