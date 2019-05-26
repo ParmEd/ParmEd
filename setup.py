@@ -181,9 +181,6 @@ if __name__ == '__main__':
           url='https://parmed.github.io/ParmEd/html/index.html',
           license='LGPL (or GPL if released with AmberTools)',
           packages=packages,
-          install_requires=[
-              'six',
-          ],
           ext_modules=extensions,
           cmdclass=cmdclass,
           test_suite='nose.collector',
