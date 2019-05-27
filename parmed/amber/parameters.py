@@ -7,10 +7,12 @@ Date: Aug. 11, 2015
 """
 from __future__ import division, print_function
 
-from collections import defaultdict, Sequence
+from collections import defaultdict
 from contextlib import closing
 import math
 import os
+import re
+import warnings
 from parmed.amber.offlib import AmberOFFLibrary
 from parmed.constants import TINY
 from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
@@ -22,10 +24,12 @@ from parmed.periodic_table import Mass, element_by_mass, AtomicNum
 from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
                                     DihedralTypeList)
 from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
+from parmed.utils.six import add_metaclass, string_types, iteritems, PY2
 from parmed.utils.six.moves import map
-import re
-import warnings
+if PY2:
+    from collections import Sequence
+else:
+    from collections.abc import Sequence
 
 # parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',
