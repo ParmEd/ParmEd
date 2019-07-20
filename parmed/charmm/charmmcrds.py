@@ -88,7 +88,6 @@ class CharmmCrdFile(object):
                     float(line[4])
                     float(line[5])
                     float(line[6])
-                    int(line[8])
                     float(line[9])
             except (IndexError, ValueError):
                 return False
@@ -158,7 +157,7 @@ class CharmmCrdFile(object):
                     self.coords.append(float(line[5]))
                     self.coords.append(float(line[6]))
                     self.segid.append(line[7])
-                    self.resid.append(int(line[8]))
+                    self.resid.append(line[8])
                     self.weighting.append(float(line[9]))
 
                 assert 3*self.natom == len(self.coords), '# atom mismatch'
