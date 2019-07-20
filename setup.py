@@ -179,7 +179,7 @@ if __name__ == '__main__':
           author='Jason Swails',
           author_email='jason.swails@gmail.com',
           url='https://parmed.github.io/ParmEd/html/index.html',
-          license='LGPL (or GPL if released with AmberTools)',
+          license='LGPL',
           packages=packages,
           ext_modules=extensions,
           cmdclass=cmdclass,
