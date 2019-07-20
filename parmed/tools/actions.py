@@ -3194,7 +3194,7 @@ class addPDB(Action):
         if self.pdbpresent: return
         pdb = read_PDB(self.pdbfile)
         resnums = [0 for res in self.parm.residues]
-        chainids = ['*' for res in self.parm.residues]
+        chainids = ['Z' for res in self.parm.residues]
         icodes = ['' for res in self.parm.residues]
         tempfac = [0.0 for atom in self.parm.atoms]
         occupancies = [0.0 for atom in self.parm.atoms]
