@@ -20,12 +20,10 @@ else # Otherwise, CPython... go through conda
     bash miniconda.sh -b
 
     export PATH=$HOME/miniconda/bin:$PATH
-    conda update conda -y
+    conda update -y --all
     conda install --yes conda-build jinja2 anaconda-client pip
     # Omnia requires conda-forge
     conda config --add channels omnia --add channels conda-forge
-    # Use of conda-forge requires update
-    conda update --yes conda
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         # Install all prerequisites
