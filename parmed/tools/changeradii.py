@@ -79,7 +79,7 @@ def amber6(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
@@ -126,7 +126,7 @@ def mbondi(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
@@ -170,7 +170,7 @@ def mbondi2(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
