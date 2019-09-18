@@ -1371,7 +1371,7 @@ class Structure(object):
             if not is_duplicate:
                 if len(involved_residues) == 1:
                     # Cache single-residue molecules
-                    res_molecules[oneres_key] = len(structs) - 1
+                    res_molecules[oneres_key] = len(structs)
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
                 structs.append(mol)
                 counts.append(set([i]))
