@@ -12,14 +12,13 @@ from copy import copy as _copy
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
                                UnassignedAtomType)
-from ..exceptions import CharmmError, CharmmWarning, ParameterError
+from ..exceptions import CharmmError, ParameterError
 from ..structure import needs_openmm, Structure
 from ..utils.io import genopen
 from ..utils.six import wraps
 from ..utils.six.moves import zip, range
 from ..utils.six import string_types
 import re
-import warnings
 
 def _catchindexerror(func):
     """
@@ -299,8 +298,6 @@ class CharmmPsfFile(Structure):
                 self.groups.append(Group(self.atoms[i], j, k))
             # Assign all of the atoms to molecules recursively
             tmp = psfsections['MOLNT'][1]
-            set_molecules(self.atoms)
-            molecule_list = [a.marked for a in self.atoms]
             if len(tmp) == len(self.atoms):
                 # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
                 numlp, numlph = psfsections['NUMLP NUMLPH'][0]
