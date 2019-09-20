@@ -1350,14 +1350,10 @@ class Structure(object):
                 charges = tuple('%.6f' % a.charge for a in res)
                 rmins = tuple('%.6f' % a.rmin for a in res)
                 epsilons = tuple('%.6f' % a.epsilon for a in res)
-                if (res.name, len(res), names, charges,
-                    rmins, epsilons) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names,
-                                          charges, rmins, epsilons)]].add(i)
+                oneres_key = (res.name, len(res), names, charges, rmins, epsilons)
+                if oneres_key in res_molecules:
+                    counts[res_molecules[oneres_key]].add(i)
                     continue
-                else:
-                    res_molecules[(res.name, len(res), names,
-                                   charges, rmins, epsilons)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
@@ -1373,6 +1369,9 @@ class Structure(object):
                         is_duplicate = True
                         break
             if not is_duplicate:
+                if len(involved_residues) == 1:
+                    # Cache single-residue molecules
+                    res_molecules[oneres_key] = len(structs)
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
                 structs.append(mol)
                 counts.append(set([i]))

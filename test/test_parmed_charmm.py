@@ -563,6 +563,10 @@ class TestCharmmPsf(utils.FileIOTestCase):
         self.assertNotEqual(top.dihedrals[0].type, param22.dihedral_types[('X', top.atoms[4].type, top.atoms[6].type,
                                                                            'X')])
 
+    def test_psf_with_no_nnb_section(self):
+        """ Tests parsing of a PSF file with a truncated NNB section """
+        top = psf.CharmmPsfFile(get_fn('nonnb.psf'))
+        self.assertEqual(len(top.atoms), 10740)
 
 class TestCharmmParameters(utils.FileIOTestCase):
     """ Test CHARMM Parameter file parsing """
