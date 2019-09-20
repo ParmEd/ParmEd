@@ -139,7 +139,6 @@ class CharmmPsfFile(Structure):
         data : list
             A list of all data in the parsed section converted to integers
         """
-        conv = cls._convert
         line = psf.readline()
         while not line.strip():
             if not line:
@@ -188,7 +187,6 @@ class CharmmPsfFile(Structure):
         # Bail out if we don't have a filename
         if psf_name is None:
             return
-        conv = CharmmPsfFile._convert
         # Open the PSF and read the first line. It must start with "PSF"
         if isinstance(psf_name, string_types):
             fileobj = genopen(psf_name, 'r')
