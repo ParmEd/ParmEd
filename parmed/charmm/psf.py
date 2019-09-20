@@ -102,8 +102,23 @@ class CharmmPsfFile(Structure):
 
     #===================================================
 
-    @staticmethod
-    def _parse_psf_section(psf):
+    @classmethod
+    def _parse_psf_title_line(cls, line):
+        words = line[:line.index('!')].split()
+        title = line[line.index('!')+1:].strip().upper()
+        # Strip out description
+        if ':' in title:
+            title = title[:title.index(':')]
+        if len(words) == 1:
+            pointers = cls._convert(words[0], int, 'pointer')
+        else:
+            pointers = tuple([cls._convert(w, int, 'pointer') for w in words])
+        return title, pointers
+
+    #===================================================
+
+    @classmethod
+    def _parse_psf_section(cls, psf):
         """
         This method parses a section of the PSF file
 
@@ -124,7 +139,7 @@ class CharmmPsfFile(Structure):
         data : list
             A list of all data in the parsed section converted to integers
         """
-        conv = CharmmPsfFile._convert
+        conv = cls._convert
         line = psf.readline()
         while not line.strip():
             if not line:
@@ -132,22 +147,20 @@ class CharmmPsfFile(Structure):
             else:
                 line = psf.readline()
         if '!' in line:
-            words = line[:line.index('!')].split()
-            title = line[line.index('!')+1:].strip().upper()
-            # Strip out description
-            if ':' in title:
-                title = title[:title.index(':')]
+            title, pointers = cls._parse_psf_title_line(line)
         else:
             raise CharmmError('Could not determine section title') # pragma: no cover
-        if len(words) == 1:
-            pointers = conv(words[0], int, 'pointer')
-        else:
-            pointers = tuple([conv(w, int, 'pointer') for w in words])
         line = psf.readline().strip()
-        if not line and pointers != 0 and title.startswith('NNB'):
+        if not line and title.startswith('NNB'):
             # This will correctly handle the NNB section (which has a spurious
             # blank line) as well as any sections that have 0 members.
             line = psf.readline().strip()
+            # If this line has a title in it, then it's one of those weird PSF files that
+            # has basically no NNB section. Just skip over NNB and take the next section
+            # instead
+            if '!' in line:
+                title, pointers = cls._parse_psf_title_line(line)
+                line = psf.readline().strip()
         data = []
         if title == 'NATOM' or title == 'NTITLE':
             # Store these two sections as strings (ATOM section we will parse
@@ -158,7 +171,7 @@ class CharmmPsfFile(Structure):
         else:
             while line:
                 words = line.split()
-                data.extend([conv(w, int, 'PSF data') for w in words])
+                data.extend([cls._convert(w, int, 'PSF data') for w in words])
                 line = psf.readline().strip()
         return title, pointers, data
 
@@ -187,8 +200,7 @@ class CharmmPsfFile(Structure):
             self.name = psf_name if isinstance(psf_name, string_types) else ''
             line = fileobj.readline()
             if not line.startswith('PSF'):
-                raise CharmmError('Unrecognized PSF file. First line is %s' %
-                                  line.strip())
+                raise CharmmError('Unrecognized PSF file. First line is %s' % line.strip())
             # Store the flags
             psf_flags = line.split()[1:]
             # Now get all of the sections and store them in a dict
@@ -204,7 +216,7 @@ class CharmmPsfFile(Structure):
             # store the title
             self.title = psfsections['NTITLE'][1]
             # Next is the number of atoms
-            natom = conv(psfsections['NATOM'][0], int, 'natom')
+            natom = self._convert(psfsections['NATOM'][0], int, 'natom')
             # Parse all of the atoms
             for i in range(natom):
                 words = psfsections['NATOM'][1][i].split()
@@ -217,7 +229,7 @@ class CharmmPsfFile(Structure):
                     raise CharmmError('Could not interpret residue number %s' % # pragma: no cover
                                       words[2])
                 resid, inscode = rematch.groups()
-                resid = conv(resid, int, 'residue number')
+                resid = self._convert(resid, int, 'residue number')
                 resname = words[3]
                 name = words[4]
                 attype = words[5]
@@ -226,15 +238,15 @@ class CharmmPsfFile(Structure):
                     attype = int(attype)
                 except ValueError:
                     pass
-                charge = conv(words[6], float, 'partial charge')
-                mass = conv(words[7], float, 'atomic mass')
+                charge = self._convert(words[6], float, 'partial charge')
+                mass = self._convert(words[7], float, 'atomic mass')
                 props = words[8:]
                 atom = Atom(name=name, type=attype, charge=charge, mass=mass)
                 atom.props = props
                 self.add_atom(atom, resname, resid, chain=segid,
                               inscode=inscode, segid=segid)
             # Now get the number of bonds
-            nbond = conv(psfsections['NBOND'][0], int, 'number of bonds')
+            nbond = self._convert(psfsections['NBOND'][0], int, 'number of bonds')
             if len(psfsections['NBOND'][1]) != nbond * 2:
                 raise CharmmError('Got %d indexes for %d bonds' % # pragma: no cover
                                   (len(psfsections['NBOND'][1]), nbond))
@@ -242,7 +254,7 @@ class CharmmPsfFile(Structure):
             for i, j in zip(it, it):
                 self.bonds.append(Bond(self.atoms[i-1], self.atoms[j-1]))
             # Now get the number of angles and the angle list
-            ntheta = conv(psfsections['NTHETA'][0], int, 'number of angles')
+            ntheta = self._convert(psfsections['NTHETA'][0], int, 'number of angles')
             if len(psfsections['NTHETA'][1]) != ntheta * 3:
                 raise CharmmError('Got %d indexes for %d angles' % # pragma: no cover
                                   (len(psfsections['NTHETA'][1]), ntheta))
@@ -253,7 +265,7 @@ class CharmmPsfFile(Structure):
                 )
                 self.angles[-1].funct = 5 # urey-bradley
             # Now get the number of torsions and the torsion list
-            nphi = conv(psfsections['NPHI'][0], int, 'number of torsions')
+            nphi = self._convert(psfsections['NPHI'][0], int, 'number of torsions')
             if len(psfsections['NPHI'][1]) != nphi * 4:
                 raise CharmmError('Got %d indexes for %d torsions' % # pragma: no cover
                                   (len(psfsections['NPHI']), nphi))
@@ -265,7 +277,7 @@ class CharmmPsfFile(Structure):
                 )
             self.dihedrals.split = False
             # Now get the number of improper torsions
-            nimphi = conv(psfsections['NIMPHI'][0], int, 'number of impropers')
+            nimphi = self._convert(psfsections['NIMPHI'][0], int, 'number of impropers')
             if len(psfsections['NIMPHI'][1]) != nimphi * 4:
                 raise CharmmError('Got %d indexes for %d impropers' % # pragma: no cover
                                   (len(psfsections['NIMPHI'][1]), nimphi))
@@ -276,7 +288,7 @@ class CharmmPsfFile(Structure):
                                  self.atoms[k-1], self.atoms[l-1])
                 )
             # Now handle the donors (what is this used for??)
-            ndon = conv(psfsections['NDON'][0], int, 'number of donors')
+            ndon = self._convert(psfsections['NDON'][0], int, 'number of donors')
             if len(psfsections['NDON'][1]) != ndon * 2:
                 raise CharmmError('Got %d indexes for %d donors' % # pragma: no cover
                                   (len(psfsections['NDON'][1]), ndon))
@@ -286,7 +298,7 @@ class CharmmPsfFile(Structure):
                         AcceptorDonor(self.atoms[i-1], self.atoms[j-1])
                 )
             # Now handle the acceptors (what is this used for??)
-            nacc = conv(psfsections['NACC'][0], int, 'number of acceptors')
+            nacc = self._convert(psfsections['NACC'][0], int, 'number of acceptors')
             if len(psfsections['NACC'][1]) != nacc * 2:
                 raise CharmmError('Got %d indexes for %d acceptors' % # pragma: no cover
                                   (len(psfsections['NACC'][1]), nacc))
@@ -324,7 +336,7 @@ class CharmmPsfFile(Structure):
                                               'lone pairs defined in the NUMLP/'
                                               'NUMLPH section.')
             # Now do the CMAPs
-            ncrterm = conv(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
+            ncrterm = self._convert(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
             if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
                 raise CharmmError('Got %d CMAP indexes for %d cmap terms' % # pragma: no cover
                                   (len(psfsections['NCRTERM']), ncrterm))
