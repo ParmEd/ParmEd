@@ -30,10 +30,25 @@ from ..topologyobjects import (DihedralType, ImproperType)
 
 from collections import OrderedDict
 
+_have_lxml = False
 try:
     from lxml import etree
+    _have_lxml = True
 except ImportError:
-    etree = None
+    from xml.etree import ElementTree as etree
+
+def _pretty_print_lxml(tree):
+    return etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
+
+def _pretty_print_xml_stdlib(tree):
+    from xml.dom import minidom
+    xml = etree.tostring(tree.getroot(), encoding=DEFAULT_ENCODING).decode('utf-8')
+    return minidom.parseString(xml).toprettyxml(indent="  ")
+
+if _have_lxml:
+    pretty_print = _pretty_print_lxml
+else:
+    pretty_print = _pretty_print_xml_stdlib
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -355,7 +370,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         tree = etree.ElementTree(root)
 
-        xml = etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
+        xml = pretty_print(tree)
 
         if isinstance(dest, string_types):
             with closing(genopen(dest, 'w')) as f:
