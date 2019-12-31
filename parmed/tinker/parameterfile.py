@@ -325,11 +325,12 @@ class _AtomType(object):
 
 class _Atom(object):
     """ An atom in a parameter set """
-
-    def __init__(self, typeindex, name, descrip, atomic_number, mass, val):
+    AtomList=dict()
+    def __init__(self, index,typeindex, name, descrip, atomic_number, mass, val):
         self.name = name
         self.description = descrip
         self.type = get_atom_type(typeindex, atomic_number, mass, val)
+        _Atom.AtomList[index] = self # cache this type
 
     # Allow _Atom instances to access (but not modify) type properties
     def _typeindex(self): return self.type.index
@@ -360,6 +361,7 @@ class _Atom(object):
         if hasattr(self, 'polarizability'):
             retstr += '; dipole pol=%s; thole=%s; connected atoms=%r' % (
                         self.polarizability, self.thole, self.connected_types)
+        return retstr+'>'
 
     @classmethod
     def reset(cls):
@@ -447,7 +449,7 @@ class AmoebaParameterSet(object):
         while line.lstrip()[:5].lower() == 'atom ':
             rematch = self.atomre.match(line)
             num, typenum, name, descrip, anum, mass, val = rematch.groups()
-            self.atoms[int(num)] = _Atom(typenum, name, descrip,
+            self.atoms[int(num)] = _Atom(int(num),typenum, name, descrip,
                                                  anum, mass, val)
             line = f.readline().replace('\t', ' ')
         # Now parse out the van der waals terms
