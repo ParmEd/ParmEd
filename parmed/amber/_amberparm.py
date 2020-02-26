@@ -812,7 +812,7 @@ class AmberParm(AmberFormat, Structure):
 
         for i in range(ntypes):
             lj_index = pd["NONBONDED_PARM_INDEX"][ntypes*i+i] - 1
-            if lj_index < 0 or pd["LENNARD_JONES_ACOEF"][lj_index] < 1.0e-10:
+            if lj_index < 0 or acoef[lj_index] < 1.0e-10 or bcoef[lj_index] < 1.0e-10:
                 self.LJ_radius.append(0)
                 self.LJ_depth.append(0)
             else:
