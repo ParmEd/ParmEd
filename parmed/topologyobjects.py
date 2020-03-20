@@ -29,7 +29,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Chiral
            'NonbondedExceptionType', 'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group',
            'AtomType', 'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'RBTorsionType',
-           'UnassignedAtomType', 'Link']
+           'UnassignedAtomType', 'Link', 'DrudeAtom', 'DrudeAnisotropy']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
@@ -4133,6 +4133,75 @@ class MultipoleFrame(object):
 
     def __contains__(self, thing):
         return self.atom is thing
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class DrudeAtom(Atom):
+    """
+    An Atom that has a Drude particle attached to it.  This is a subclass of
+    Atom, so it also has all the properties defined for regular Atoms.
+
+    Parameters
+    ----------
+    alpha : ``float``
+        the atomic polarizability
+    thole : ``float``
+        the Thole damping facior
+    drude_type : ``str``
+        the atom type to use for the Drude particle.
+
+    Other Attributes
+    ----------------
+    anisotropy : :class:`DrudeAnisotropy`
+        describes how this atom is anisotropically polarizable.  For isotropic
+        atoms, this is None.
+    """
+    #===================================================
+
+    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', **kwargs):
+        Atom.__init__(self, **kwargs)
+        self.alpha = alpha
+        self.thole = thole
+        self.drude_type = drude_type
+        self.anisotropy = None
+
+    @property
+    def drude_charge(self):
+        sign = (-1 if self.alpha < 0 else 1)
+        alpha = abs(self.alpha)*u.angstrom**3/(138.935456*u.kilojoules_per_mole*u.nanometer)
+        return sign*math.sqrt(alpha*2*(500*u.kilocalories_per_mole/u.angstrom**2))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class DrudeAnisotropy(_FourAtomTerm):
+    """
+    A description of an anisotropically polarizable atom.
+
+    Atom 1 is a :class:`DrudeAtom` whose polarizability is anisotropic.  The
+    other three atoms define the coordinate frame.
+
+    Parameters
+    ----------
+    atom1 : :class:`DrudeAtom`
+        the polarizable atom
+    atom2 : :class:`Atom`
+        the second atom defining the coordinate frame
+    atom3 : :class:`Atom`
+        the third atom defining the coordinate frame
+    atom4 : :class:`Atom`
+        the fourth atom defining the coordinate frame
+    a11 : ``float``
+        the scale factor for the polarizability along the direction defined by
+        atom1 and atom2
+    a22 : ``float``
+        the scale factor for the polarizability along the direction defined by
+        atom3 and atom4
+    """
+
+    def __init__(self, atom1, atom2, atom3, atom4, a11, a22):
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
+        self.a11 = a11
+        self.a22 = a22
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
