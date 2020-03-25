@@ -256,6 +256,16 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         if (n_discarded_patches > 0):
             warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
 
+        # CHARMM Drude force field lists all lone pairs as being hydrogens???  Fix them.
+        lp_types = set()
+        for residue in new_params.residues.values():
+            types = dict((atom.name, atom.type) for atom in residue.atoms)
+            for lonepair in residue.lonepairs:
+                lp_atom = lonepair[1]
+                lp_types.add(types[lp_atom])
+        for t in lp_types:
+            new_params.atom_types[t].atomic_number = 0
+
         return new_params
 
     def _get_mm_atom_type(self, atom, residue, drude=False):
@@ -572,6 +582,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         xml_section = etree.SubElement(xml_root, "AtomTypes")
         if self.unique_atom_types:
             for residue in list(self.residues.values())+list(self.patches.values()):
+                if residue.name in skip_residues: continue
                 for atom in residue.atoms:
                     atom_type = self.atom_types[atom.type]
                     properties = { 'name' : self._get_mm_atom_type(atom, residue), 'class' : atom.type, 'mass' : str(atom_type.mass) }
