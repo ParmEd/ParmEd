@@ -143,6 +143,13 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 return False
             atom.atomic_number = params.atom_types_str[atom.type].atomic_number
 
+        # CHARMM Drude force field lists all lone pairs as being hydrogens???  Fix them.
+        types = dict((atom.name, atom.type) for atom in residue.atoms)
+        for lonepair in residue.lonepairs:
+            lp_atom = lonepair[1]
+            params.atom_types[types[lp_atom]].atomic_number = 0
+            atom.atomic_number = 0
+
         # Check waters
         if residue.empirical_chemical_formula == 'H2O':
             # Remove any H-H bonds if they are present
@@ -234,10 +241,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     remediated_residues.append(residue)
             for residue in remediated_residues:
                 new_params.residues[residue.name] = residue
+            for name, patch in iteritems(params.patches):
+                cls._remediate_residue_template(new_params, patch)
+                new_params.patches[patch.name] = patch
         else:
             # Don't remediate residues; just copy
             for name, residue in iteritems(params.residues):
                 new_params.residues[residue.name] = residue
+            for name, patch in iteritems(params.patches):
+                new_params.patches[patch.name] = patch
 
         # Only add unique patches
         unique_patches = OrderedDict()
@@ -255,16 +267,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         if (n_discarded_patches > 0):
             warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
-
-        # CHARMM Drude force field lists all lone pairs as being hydrogens???  Fix them.
-        lp_types = set()
-        for residue in new_params.residues.values():
-            types = dict((atom.name, atom.type) for atom in residue.atoms)
-            for lonepair in residue.lonepairs:
-                lp_atom = lonepair[1]
-                lp_types.add(types[lp_atom])
-        for t in lp_types:
-            new_params.atom_types[t].atomic_number = 0
 
         return new_params
 
@@ -1084,7 +1086,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
     def _write_omm_DrudeForce(self, xml_root, skip_types):
         # Find all atoms with Drude particles.
         drude_atoms = []
-        for residue in self.residues.values():
+        for residue in list(self.residues.values())+list(self.patches.values()):
             for atom in residue.atoms:
                 if isinstance(atom, DrudeAtom):
                     drude_atoms.append((atom, residue))
