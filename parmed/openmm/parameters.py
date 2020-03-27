@@ -737,59 +737,74 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             else:
                 patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name, override=str(patch.override_level))
 
-            # Construct an example patched residue
-            # TODO: We should also ensure that *all* compatible residues have the
-            # same added/changed atoms and deleted bonds, just to be safe.
-            residue_name = valid_residues_for_patch[name][0]
-            try:
-                residue = self.residues[residue_name]
-            except KeyError as e:
-                msg =  'Compatible residue not found in self.residues\n'
-                msg += '   patch name: %s\n' % name
-                msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
-                msg += '   residue name: %s\n' % residue_name
-                msg += str(e)
-                raise(msg)
-            patched_residue = residue.apply_patch(patch)
-            #patch_xml.append( etree.Comment('Using residue %s as reference template' % residue.name) )
+            # To generate the patch definition, we need to apply it to a residue and see exactly what
+            # changes.  We might get different definitions depending on which residue we pick, so try
+            # all possible residues to take the most common result.
 
-            for atom in patch.atoms:
-                if atom.name not in residue:
-                    command = 'AddAtom'
+            versions = {}
+            for residue_name in valid_residues_for_patch[name]:
+                try:
+                    residue = self.residues[residue_name]
+                except KeyError as e:
+                    msg =  'Compatible residue not found in self.residues\n'
+                    msg += '   patch name: %s\n' % name
+                    msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
+                    msg += '   residue name: %s\n' % residue_name
+                    msg += str(e)
+                    raise(msg)
+                patched_residue = residue.apply_patch(patch)
+
+                instructions = []
+                for atom in patch.atoms:
+                    if atom.name not in residue:
+                        command = 'AddAtom'
+                    else:
+                        command = 'ChangeAtom'
+                    if isinstance(atom, DrudeAtom):
+                        instructions.append((command, dict(name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge-atom.drude_charge))))
+                        instructions.append((command, dict(name='D'+atom.name, type=self._get_mm_atom_type(atom, patch, True), charge=str(atom.drude_charge))))
+                    else:
+                        instructions.append((command, dict(name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge))))
+
+                for atom_name in patch.delete_atoms:
+                    instructions.append(('RemoveAtom', dict(name=atom_name)))
+
+                for bond in patch.bonds:
+                    instructions.append(('RemoveBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+
+                for bond in patched_residue.bonds:
+                    if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
+                        instructions.append(('AddBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+                for bond in residue.bonds:
+                    if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
+                        instructions.append(('RemoveBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+
+                if (residue.head is not None) and (patched_residue.head is None):
+                    instructions.append(('RemoveExternalBond', dict(atomName=residue.head.name)))
+                if (residue.tail is not None) and (patched_residue.tail is None):
+                    instructions.append(('RemoveExternalBond', dict(atomName=residue.tail.name)))
+
+                if (residue.head is None) and (patched_residue.head is not None):
+                    instructions.append(('AddExternalBond', dict(atomName=patched_residue.head.name)))
+                if (residue.tail is None) and (patched_residue.tail is not None):
+                    instructions.append(('AddExternalBond', dict(atomName=patched_residue.tail.name)))
+
+                if write_apply_to_residue:
+                    for residue_name in valid_residues_for_patch[patch.name]:
+                        instructions.append(('ApplyToResidue', dict(name=residue_name)))
+
+                # Convert to hashable types
+                instructions = tuple((i[0], tuple(item for item in i[1].items())) for i in instructions)
+                if instructions in versions:
+                    versions[instructions] += 1
                 else:
-                    command = 'ChangeAtom'
-                if isinstance(atom, DrudeAtom):
-                    etree.SubElement(patch_xml, command, name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge-atom.drude_charge))
-                    etree.SubElement(patch_xml, command, name='D'+atom.name, type=self._get_mm_atom_type(atom, patch, True), charge=str(atom.drude_charge))
-                else:
-                    etree.SubElement(patch_xml, command, name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge))
+                    versions[instructions] = 1
 
-            for atom_name in patch.delete_atoms:
-                etree.SubElement(patch_xml, 'RemoveAtom', name=atom_name)
-
-            for bond in patch.bonds:
-                etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-
-            for bond in patched_residue.bonds:
-                if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
-                    etree.SubElement(patch_xml, 'AddBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-            for bond in residue.bonds:
-                if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
-                    etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-
-            if (residue.head is not None) and (patched_residue.head is None):
-                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.head.name)
-            if (residue.tail is not None) and (patched_residue.tail is None):
-                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.tail.name)
-
-            if (residue.head is None) and (patched_residue.head is not None):
-                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.head.name)
-            if (residue.tail is None) and (patched_residue.tail is not None):
-                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.tail.name)
-
-            if write_apply_to_residue:
-                for residue_name in valid_residues_for_patch[patch.name]:
-                    etree.SubElement(patch_xml, 'ApplyToResidue', name=residue_name)
+            # Write the consensus definition.
+            max_count = max(versions.values())
+            instructions = [key for key, value in versions.items() if value == max_count][0]
+            for command, attrib in instructions:
+                etree.SubElement(patch_xml, command, dict(attrib))
 
     @needs_lxml
     def _write_omm_bonds(self, xml_root, skip_types):
