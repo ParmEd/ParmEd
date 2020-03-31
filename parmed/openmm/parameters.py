@@ -253,7 +253,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         # Only add unique patches
         unique_patches = OrderedDict()
-        n_discarded_patches = 0
+        discarded_patches = []
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 templhash = OpenMMParameterSet._templhasher(patch)
@@ -263,10 +263,12 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 else:
                     patch_collision = unique_patches[templhash]
                     warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, patch_collision))
-                    n_discarded_patches += 1
+                    discarded_patches.append(patch)
 
-        if (n_discarded_patches > 0):
-            warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
+        if (len(discarded_patches) > 0):
+            warnings.warn('{} patches discarded, {} retained'.format(len(discarded_patches), len(new_params.patches)))
+        for patch in discarded_patches:
+            del new_params.patches[patch.name]
 
         return new_params
 
@@ -605,6 +607,26 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     element = Element[atom_type.atomic_number]
                     etree.SubElement(xml_section, 'Type', element=str(element), **properties)
 
+    def _get_lonepair_parameters(self, lonepair):
+        (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
+        if lptype == 'relative':
+            xweights = [-1.0, 0.0, 1.0]
+        elif lptype == 'bisector':
+            xweights = [-1.0, 0.5, 0.5]
+        else:
+            raise ValueError('Unknown lonepair type: '+lptype)
+        r /= 10.0 # convert to nanometers
+        theta *= math.pi / 180.0 # convert to radians
+        phi = (180 - phi) * math.pi / 180.0 # convert to radians
+        p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
+        p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
+        return dict(type="localCoords",
+            siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
+            wo1="1", wo2="0", wo3="0",
+            wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
+            wy1="0", wy2="-1", wy3="1",
+            p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
+
     @needs_lxml
     def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None):
         if not self.residues: return
@@ -637,25 +659,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     etree.SubElement(xml_residue, 'Atom', name=atom.name, type=self._get_mm_atom_type(atom, residue), charge=str(atom.charge))
             for bond in residue.bonds:
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-            for (index, lonepair) in enumerate(residue.lonepairs):
-                (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
-                if lptype == 'relative':
-                    xweights = [-1.0, 0.0, 1.0]
-                elif lptype == 'bisector':
-                    xweights = [-1.0, 0.5, 0.5]
-                else:
-                    raise ValueError('Unknown lonepair type: '+lptype)
-                r /= 10.0 # convert to nanometers
-                theta *= math.pi / 180.0 # convert to radians
-                phi = (180 - phi) * math.pi / 180.0 # convert to radians
-                p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
-                p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
-                etree.SubElement(xml_residue, 'VirtualSite', type="localCoords", index=str(index),
-                    siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
-                    wo1="1", wo2="0", wo3="0",
-                    wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
-                    wy1="0", wy2="-1", wy3="1",
-                    p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
+            for lonepair in residue.lonepairs:
+                etree.SubElement(xml_residue, 'VirtualSite', self._get_lonepair_parameters(lonepair))
             for atom in residue.connections:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.head is not None:
@@ -790,6 +795,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     instructions.append(('AddExternalBond', dict(atomName=patched_residue.head.name)))
                 if (residue.tail is None) and (patched_residue.tail is not None):
                     instructions.append(('AddExternalBond', dict(atomName=patched_residue.tail.name)))
+                for lonepair in patch.lonepairs:
+                    instructions.append(('VirtualSite', self._get_lonepair_parameters(lonepair)))
 
                 if write_apply_to_residue:
                     for residue_name in valid_residues_for_patch[patch.name]:
@@ -1098,7 +1105,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         alpha_scale = (1*u.angstrom/u.nanometers)**3
         for atom, residue in drude_atoms:
             attributes = { 'type1' : self._get_mm_atom_type(atom, residue, True), 'type2' : self._get_mm_atom_type(atom, residue),
-                           'charge' : str(atom.drude_charge), 'polarizability' : str(alpha_scale*atom.alpha),
+                           'charge' : str(atom.drude_charge), 'polarizability' : str(abs(alpha_scale*atom.alpha)),
                            'thole' : str(atom.thole) }
             if atom.anisotropy is not None:
                 aniso = atom.anisotropy
