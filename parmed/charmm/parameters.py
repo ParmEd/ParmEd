@@ -955,7 +955,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                         for index in range(5,len(words),2)}
                             a11 = float(keywords['A11'])
                             a22 = float(keywords['A22'])
-                            atoms[0].anisotropy = DrudeAnisotropy(*atoms, a11, a22)
+                            atoms[0].anisotropy = DrudeAnisotropy(*atoms, a11=a11, a22=a22)
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
                             # Back up a line and bail
                             break
