@@ -110,6 +110,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         super(OpenMMParameterSet, self).__init__()
         if filenames:
             raise NotImplementedError('Cannot yet read OpenMM Parameter sets')
+        self.unique_atom_types = False
 
     @classmethod
     def _remediate_residue_template(cls, params, residue):
