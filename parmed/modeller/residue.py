@@ -464,7 +464,11 @@ class ResidueTemplate(object):
                 residue.delete_atom(atom_name)
                 modifications_made = True
             except (KeyError, MoleculeError) as e:
-                raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
+                if atom_name.startswith('D') and atom_name[1:] in self and atom_name[1:] in patch.delete_atoms:
+                    # This is a Drude particle.  We're also deleting its parent atom, so don't report an error.
+                    pass
+                else:
+                    raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
