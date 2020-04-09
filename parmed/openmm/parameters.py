@@ -25,7 +25,7 @@ from ..utils.six.moves import range
 import warnings
 from ..exceptions import ParameterWarning
 from itertools import product
-from ..topologyobjects import (DihedralType, ImproperType)
+from ..topologyobjects import (DihedralType, ImproperType, DrudeAtom)
 
 
 from collections import OrderedDict
@@ -110,6 +110,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         super(OpenMMParameterSet, self).__init__()
         if filenames:
             raise NotImplementedError('Cannot yet read OpenMM Parameter sets')
+        self.unique_atom_types = False
 
     @classmethod
     def _remediate_residue_template(cls, params, residue):
@@ -143,6 +144,13 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 return False
             atom.atomic_number = params.atom_types_str[atom.type].atomic_number
 
+        # CHARMM Drude force field lists all lone pairs as being hydrogens???  Fix them.
+        types = dict((atom.name, atom.type) for atom in residue.atoms)
+        for lonepair in residue.lonepairs:
+            lp_atom = lonepair[1]
+            params.atom_types[types[lp_atom]].atomic_number = 0
+            atom.atomic_number = 0
+
         # Check waters
         if residue.empirical_chemical_formula == 'H2O':
             # Remove any H-H bonds if they are present
@@ -157,7 +165,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         return True
 
     @classmethod
-    def from_parameterset(cls, params, copy=False, remediate_residues=True):
+    def from_parameterset(cls, params, copy=False, remediate_residues=True, unique_atom_types=False):
         """
         Instantiates an OpenMMParameterSet from another ParameterSet (or
         subclass). The main thing this feature is responsible for is converting
@@ -184,6 +192,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         remediate_residues : bool, optional, default=True
             If True, will remove non-chemical bonds and drop Residue definitions
             that are missing parameters
+        unique_atom_types : bool
+            If True, a unique OpenMM atom type will be created for every atom of
+            every residue.  In this case, the :class:`AtomType` objects correspond
+            to atom classes rather than atom types (in the OpenMM terminology).
 
         Returns
         -------
@@ -213,6 +225,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         new_params._combining_rule = params.combining_rule
         new_params.default_scee = params.default_scee
         new_params.default_scnb = params.default_scnb
+        new_params.unique_atom_types = unique_atom_types
 
         # Copy CHARMM improper type map, if present, since this is needed for matching impropers
         if hasattr(params, '_improper_key_map'):
@@ -229,14 +242,19 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     remediated_residues.append(residue)
             for residue in remediated_residues:
                 new_params.residues[residue.name] = residue
+            for name, patch in iteritems(params.patches):
+                cls._remediate_residue_template(new_params, patch)
+                new_params.patches[patch.name] = patch
         else:
             # Don't remediate residues; just copy
             for name, residue in iteritems(params.residues):
                 new_params.residues[residue.name] = residue
+            for name, patch in iteritems(params.patches):
+                new_params.patches[patch.name] = patch
 
         # Only add unique patches
         unique_patches = OrderedDict()
-        n_discarded_patches = 0
+        discarded_patches = []
         for name, patch in iteritems(params.patches):
             if isinstance(patch, PatchTemplate):
                 templhash = OpenMMParameterSet._templhasher(patch)
@@ -246,12 +264,35 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 else:
                     patch_collision = unique_patches[templhash]
                     warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, patch_collision))
-                    n_discarded_patches += 1
+                    discarded_patches.append(patch)
 
-        if (n_discarded_patches > 0):
-            warnings.warn('{} patches discarded, {} retained'.format(n_discarded_patches, len(new_params.patches)))
+        if (len(discarded_patches) > 0):
+            warnings.warn('{} patches discarded, {} retained'.format(len(discarded_patches), len(new_params.patches)))
+        for patch in discarded_patches:
+            del new_params.patches[patch.name]
 
         return new_params
+
+    def _get_mm_atom_type(self, atom, residue, drude=False):
+        """Get the OpenMM atom type for an atom.
+
+        Parameters
+        ----------
+        atom : :class:`Atom`
+            the atom for which to get the type
+        residue : :class:`ResidueTemplate` or :class:`PatchTemplate`
+            the residue the atom belongs to
+        drude : bool
+            if True, get the atom type for the Drude particle attached to the
+            atom rather than the atom itself
+        """
+        if self.unique_atom_types:
+            if drude:
+                return 'Drude-%s-%s' % (residue.name, atom.name)
+            return '%s-%s' % (residue.name, atom.name)
+        if drude:
+            return atom.drude_type
+        return atom.type
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
@@ -353,7 +394,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         root = etree.Element('ForceField')
         self._write_omm_provenance(root, provenance)
-        self._write_omm_atom_types(root, skip_types)
+        self._write_omm_atom_types(root, skip_types, skip_residues)
         self._write_omm_residues(root, skip_residues, skip_duplicates,
             valid_patches_for_residue=valid_patches_for_residue)
         self._write_omm_patches(root, valid_residues_for_patch)
@@ -367,6 +408,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         self._write_omm_scripts(root, skip_types)
         self._write_omm_nonbonded(root, skip_types, separate_ljforce)
         self._write_omm_LennardJonesForce(root, skip_types, separate_ljforce)
+        self._write_omm_DrudeForce(root, skip_types)
 
         tree = etree.ElementTree(root)
 
@@ -397,14 +439,12 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         improper_harmonic = OrderedDict() # improper_harmonic[key] is the harmonic improper parameter for unique key `key`
         improper_periodic = OrderedDict() # improper_harmonic[key] is the periodic improper parameter for unique key `key`
+        C_types = [t for t in self.atom_types if self.atom_types[t].atomic_number == 6]
+        N_types = [t for t in self.atom_types if self.atom_types[t].atomic_number == 7]
 
         def get_types(residue, atomname):
             """Return list of atom type(s) that match the given atom name.
-            # TODO: Find a more general way to discover all the types that need to be expanded for +N and -C
             """
-            C_types = ['CC', 'CD', 'C'] # atom types associated with '-C'
-            N_types = ['NH1', 'NH2', 'NH3', 'N', 'NP'] # atom types associated with '+N'
-
             a_names = [a.name for a in residue.atoms]
             a_types = [a.type for a in residue.atoms]
 
@@ -542,18 +582,51 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     raise TypeError('Incorrect type of the %s element content' % tag)
 
     @needs_lxml
-    def _write_omm_atom_types(self, xml_root, skip_types):
+    def _write_omm_atom_types(self, xml_root, skip_types, skip_residues):
         if not self.atom_types: return
         xml_section = etree.SubElement(xml_root, "AtomTypes")
-        for name, atom_type in iteritems(self.atom_types):
-            if name in skip_types: continue
-            assert atom_type.atomic_number >= 0, 'Atomic number not set!'
-            properties = { 'name' : name, 'class' : name, 'mass' : str(atom_type.mass) }
-            if atom_type.atomic_number == 0:
-                etree.SubElement(xml_section, 'Type', **properties)
-            else:
-                element = Element[atom_type.atomic_number]
-                etree.SubElement(xml_section, 'Type', element=str(element), **properties)
+        if self.unique_atom_types:
+            for residue in list(self.residues.values())+list(self.patches.values()):
+                if residue.name in skip_residues: continue
+                for atom in residue.atoms:
+                    atom_type = self.atom_types[atom.type]
+                    properties = { 'name' : self._get_mm_atom_type(atom, residue), 'class' : atom.type, 'mass' : str(atom_type.mass) }
+                    if atom_type.atomic_number != 0:
+                        properties['element'] = str(Element[atom_type.atomic_number])
+                    etree.SubElement(xml_section, 'Type', **properties)
+                    if isinstance(atom, DrudeAtom):
+                        properties = { 'name' : self._get_mm_atom_type(atom, residue, True), 'class' : atom.drude_type, 'mass' : '0.0' }
+                        etree.SubElement(xml_section, 'Type', **properties)
+        else:
+            for name, atom_type in iteritems(self.atom_types):
+                if name in skip_types: continue
+                assert atom_type.atomic_number >= 0, 'Atomic number not set!'
+                properties = { 'name' : name, 'class' : name, 'mass' : str(atom_type.mass) }
+                if atom_type.atomic_number == 0:
+                    etree.SubElement(xml_section, 'Type', **properties)
+                else:
+                    element = Element[atom_type.atomic_number]
+                    etree.SubElement(xml_section, 'Type', element=str(element), **properties)
+
+    def _get_lonepair_parameters(self, lonepair):
+        (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
+        if lptype == 'relative':
+            xweights = [-1.0, 0.0, 1.0]
+        elif lptype == 'bisector':
+            xweights = [-1.0, 0.5, 0.5]
+        else:
+            raise ValueError('Unknown lonepair type: '+lptype)
+        r /= 10.0 # convert to nanometers
+        theta *= math.pi / 180.0 # convert to radians
+        phi = (180 - phi) * math.pi / 180.0 # convert to radians
+        p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
+        p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
+        return dict(type="localCoords",
+            siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
+            wo1="1", wo2="0", wo3="0",
+            wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
+            wy1="0", wy2="-1", wy3="1",
+            p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
 
     @needs_lxml
     def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None):
@@ -580,28 +653,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 xml_residue = etree.SubElement(xml_section, 'Residue', name=residue.name, override=str(residue.override_level))
             # Write residue contents
             for atom in residue.atoms:
-                etree.SubElement(xml_residue, 'Atom', name=atom.name, type=atom.type, charge=str(atom.charge))
+                if isinstance(atom, DrudeAtom):
+                    etree.SubElement(xml_residue, 'Atom', name=atom.name, type=self._get_mm_atom_type(atom, residue), charge=str(atom.charge-atom.drude_charge))
+                    etree.SubElement(xml_residue, 'Atom', name='D'+atom.name, type=self._get_mm_atom_type(atom, residue, True), charge=str(atom.drude_charge))
+                else:
+                    etree.SubElement(xml_residue, 'Atom', name=atom.name, type=self._get_mm_atom_type(atom, residue), charge=str(atom.charge))
             for bond in residue.bonds:
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-            for (index, lonepair) in enumerate(residue.lonepairs):
-                (lptype, a1, a2, a3, a4, r, theta, phi) = lonepair
-                if lptype == 'relative':
-                    xweights = [-1.0, 0.0, 1.0]
-                elif lptype == 'bisector':
-                    xweights = [-1.0, 0.5, 0.5]
-                else:
-                    raise ValueError('Unknown lonepair type: '+lptype)
-                r /= 10.0 # convert to nanometers
-                theta *= math.pi / 180.0 # convert to radians
-                phi = (180 - phi) * math.pi / 180.0 # convert to radians
-                p = [r*math.cos(theta), r*math.sin(theta)*math.cos(phi), r*math.sin(theta)*math.sin(phi)]
-                p = [x if abs(x) > 1e-10 else 0 for x in p] # Avoid tiny numbers caused by roundoff error
-                etree.SubElement(xml_residue, 'VirtualSite', type="localCoords", index=str(index),
-                    siteName=a1, atomName1=a2, atomName2=a3, atomName3=a4,
-                    wo1="1", wo2="0", wo3="0",
-                    wx1=str(xweights[0]), wx2=str(xweights[1]), wx3=str(xweights[2]),
-                    wy1="0", wy2="-1", wy3="1",
-                    p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
+            for lonepair in residue.lonepairs:
+                etree.SubElement(xml_residue, 'VirtualSite', self._get_lonepair_parameters(lonepair))
             for atom in residue.connections:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.head is not None:
@@ -685,54 +745,76 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             else:
                 patch_xml = etree.SubElement(xml_patches, 'Patch', name=patch.name, override=str(patch.override_level))
 
-            # Construct an example patched residue
-            # TODO: We should also ensure that *all* compatible residues have the
-            # same added/changed atoms and deleted bonds, just to be safe.
-            residue_name = valid_residues_for_patch[name][0]
-            try:
-                residue = self.residues[residue_name]
-            except KeyError as e:
-                msg =  'Compatible residue not found in self.residues\n'
-                msg += '   patch name: %s\n' % name
-                msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
-                msg += '   residue name: %s\n' % residue_name
-                msg += str(e)
-                raise(msg)
-            patched_residue = residue.apply_patch(patch)
-            #patch_xml.append( etree.Comment('Using residue %s as reference template' % residue.name) )
+            # To generate the patch definition, we need to apply it to a residue and see exactly what
+            # changes.  We might get different definitions depending on which residue we pick, so try
+            # all possible residues to take the most common result.
 
-            for atom in patch.atoms:
-                if atom.name not in residue:
-                    etree.SubElement(patch_xml, 'AddAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
+            versions = {}
+            for residue_name in valid_residues_for_patch[name]:
+                try:
+                    residue = self.residues[residue_name]
+                except KeyError as e:
+                    msg =  'Compatible residue not found in self.residues\n'
+                    msg += '   patch name: %s\n' % name
+                    msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
+                    msg += '   residue name: %s\n' % residue_name
+                    msg += str(e)
+                    raise(msg)
+                patched_residue = residue.apply_patch(patch)
+
+                instructions = []
+                for atom in patch.atoms:
+                    if atom.name not in residue:
+                        command = 'AddAtom'
+                    else:
+                        command = 'ChangeAtom'
+                    if isinstance(atom, DrudeAtom):
+                        instructions.append((command, dict(name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge-atom.drude_charge))))
+                        instructions.append((command, dict(name='D'+atom.name, type=self._get_mm_atom_type(atom, patch, True), charge=str(atom.drude_charge))))
+                    else:
+                        instructions.append((command, dict(name=atom.name, type=self._get_mm_atom_type(atom, patch), charge=str(atom.charge))))
+
+                for atom_name in patch.delete_atoms:
+                    instructions.append(('RemoveAtom', dict(name=atom_name)))
+
+                for bond in patch.bonds:
+                    instructions.append(('RemoveBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+
+                for bond in patched_residue.bonds:
+                    if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
+                        instructions.append(('AddBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+                for bond in residue.bonds:
+                    if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
+                        instructions.append(('RemoveBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+
+                if (residue.head is not None) and (patched_residue.head is None):
+                    instructions.append(('RemoveExternalBond', dict(atomName=residue.head.name)))
+                if (residue.tail is not None) and (patched_residue.tail is None):
+                    instructions.append(('RemoveExternalBond', dict(atomName=residue.tail.name)))
+
+                if (residue.head is None) and (patched_residue.head is not None):
+                    instructions.append(('AddExternalBond', dict(atomName=patched_residue.head.name)))
+                if (residue.tail is None) and (patched_residue.tail is not None):
+                    instructions.append(('AddExternalBond', dict(atomName=patched_residue.tail.name)))
+                for lonepair in patch.lonepairs:
+                    instructions.append(('VirtualSite', self._get_lonepair_parameters(lonepair)))
+
+                if write_apply_to_residue:
+                    for residue_name in valid_residues_for_patch[patch.name]:
+                        instructions.append(('ApplyToResidue', dict(name=residue_name)))
+
+                # Convert to hashable types
+                instructions = tuple((i[0], tuple(item for item in i[1].items())) for i in instructions)
+                if instructions in versions:
+                    versions[instructions] += 1
                 else:
-                    etree.SubElement(patch_xml, 'ChangeAtom', name=atom.name, type=atom.type, charge=str(atom.charge))
+                    versions[instructions] = 1
 
-            for atom_name in patch.delete_atoms:
-                etree.SubElement(patch_xml, 'RemoveAtom', name=atom_name)
-
-            for bond in patch.bonds:
-                etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-
-            for bond in patched_residue.bonds:
-                if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
-                    etree.SubElement(patch_xml, 'AddBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-            for bond in residue.bonds:
-                if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
-                    etree.SubElement(patch_xml, 'RemoveBond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
-
-            if (residue.head is not None) and (patched_residue.head is None):
-                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.head.name)
-            if (residue.tail is not None) and (patched_residue.tail is None):
-                etree.SubElement(patch_xml, 'RemoveExternalBond', atomName=residue.tail.name)
-
-            if (residue.head is None) and (patched_residue.head is not None):
-                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.head.name)
-            if (residue.tail is None) and (patched_residue.tail is not None):
-                etree.SubElement(patch_xml, 'AddExternalBond', atomName=patched_residue.tail.name)
-
-            if write_apply_to_residue:
-                for residue_name in valid_residues_for_patch[patch.name]:
-                    etree.SubElement(patch_xml, 'ApplyToResidue', name=residue_name)
+            # Write the consensus definition.
+            max_count = max(versions.values())
+            instructions = [key for key, value in versions.items() if value == max_count][0]
+            for command, attrib in instructions:
+                etree.SubElement(patch_xml, command, dict(attrib))
 
     @needs_lxml
     def _write_omm_bonds(self, xml_root, skip_types):
@@ -746,7 +828,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             if (a1, a2) in bonds_done: continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
-            etree.SubElement(xml_force, 'Bond', type1=a1, type2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
+            etree.SubElement(xml_force, 'Bond', class1=a1, class2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
 
     @needs_lxml
     def _write_omm_angles(self, xml_root, skip_types):
@@ -760,7 +842,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
             angles_done.add((a3, a2, a1))
-            etree.SubElement(xml_force, 'Angle', type1=a1, type2=a2, type3=a3, angle=str(angle.theteq*tconv), k=str(angle.k*kconv))
+            etree.SubElement(xml_force, 'Angle', class1=a1, class2=a2, class3=a3, angle=str(angle.theteq*tconv), k=str(angle.k*kconv))
 
     @needs_lxml
     def _write_omm_dihedrals(self, xml_root, skip_types, improper_dihedrals_ordering):
@@ -788,7 +870,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 terms['periodicity%d' % i] = str(term.per)
                 terms['phase%d' % i] = str(term.phase*pconv)
                 terms['k%d' % i] = str(term.phi_k*kconv)
-            etree.SubElement(xml_force, 'Proper', type1=nowild(a1), type2=a2, type3=a3, type4=nowild(a4), **terms)
+            etree.SubElement(xml_force, 'Proper', class1=nowild(a1), class2=a2, class3=a3, class4=nowild(a4), **terms)
         # Now do the periodic impropers. OpenMM expects the central atom to be
         # listed first. ParameterSet goes out of its way to list it third
         # (consistent with Amber) except in instances where order is random (as
@@ -805,7 +887,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             if a2 != 'X' and a3 == 'X':
                 # Single wild-card entries put the wild-card in position 2
                 a2, a3 = a3, a2
-            etree.SubElement(xml_force, 'Improper', type1=a1, type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+            etree.SubElement(xml_force, 'Improper', class1=a1, class2=nowild(a2), class3=nowild(a3), class4=nowild(a4),
                        periodicity1=str(improp.per), phase1=str(improp.phase*pconv), k1=str(improp.phi_k*kconv))
 
     @needs_lxml
@@ -820,7 +902,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             return name if name != 'X' else ''
         for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
-            etree.SubElement(xml_force, 'Improper', type1=nowild(a1), type2=nowild(a2), type3=nowild(a3), type4=nowild(a4),
+            etree.SubElement(xml_force, 'Improper', class1=nowild(a1), class2=nowild(a2), class3=nowild(a3), class4=nowild(a4),
                        k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
 
     @needs_lxml
@@ -837,7 +919,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             if any((a in skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
-            etree.SubElement(xml_force, 'UreyBradley', type1=a1, type2=a2, type3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
+            etree.SubElement(xml_force, 'UreyBradley', class1=a1, class2=a2, class3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
 
     @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
@@ -866,7 +948,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             used_torsions.add((a1, a2, a3, a4, a5))
             used_torsions.add((a5, a4, a3, a2, a1))
             etree.SubElement(xml_force, 'Torsion', map=str(maps[id(cmap)]),
-                       type1=a1, type2=a2, type3=a3, type4=a4, type5=a5)
+                       class1=a1, class2=a2, class3=a3, class4=a4, class5=a5)
 
     @needs_lxml
     def _write_omm_nonbonded(self, xml_root, skip_types, separate_ljforce):
@@ -933,7 +1015,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     raise ValueError("For atom type '%s', sigma = 0 but "
                                      "epsilon != 0." % name)
 
-            etree.SubElement(xml_force, 'Atom', type=name, sigma=str(sigma), epsilon=str(abs(epsilon)))
+            attributes = { 'class' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
+            etree.SubElement(xml_force, 'Atom', **attributes)
 
     @needs_lxml
     def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
@@ -992,7 +1075,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 sigma14 = None
                 epsilon14 = None
 
-            attributes = { 'type' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
+            attributes = { 'class' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
             if epsilon14 is not None:
                 attributes['epsilon14'] = str(abs(epsilon14))
             if sigma14 is not None:
@@ -1005,7 +1088,34 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             rmin = value[1] * length_conv
             # convert to sigma; note that NBFIX types are not rmin/2 but rmin
             sigma = rmin/(2**(1.0/6))
-            etree.SubElement(xml_force, 'NBFixPair', type1=atom_types[0], type2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
+            etree.SubElement(xml_force, 'NBFixPair', class1=atom_types[0], class2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
+
+    @needs_lxml
+    def _write_omm_DrudeForce(self, xml_root, skip_types):
+        # Find all atoms with Drude particles.
+        drude_atoms = []
+        for residue in list(self.residues.values())+list(self.patches.values()):
+            for atom in residue.atoms:
+                if isinstance(atom, DrudeAtom):
+                    drude_atoms.append((atom, residue))
+        if len(drude_atoms) == 0:
+            return
+        if not self.unique_atom_types:
+            raise ValueError('Drude particles require unique_atom_types')
+        xml_force = etree.SubElement(xml_root, 'DrudeForce')
+        alpha_scale = (1*u.angstrom/u.nanometers)**3
+        for atom, residue in drude_atoms:
+            attributes = { 'type1' : self._get_mm_atom_type(atom, residue, True), 'type2' : self._get_mm_atom_type(atom, residue),
+                           'charge' : str(atom.drude_charge), 'polarizability' : str(abs(alpha_scale*atom.alpha)),
+                           'thole' : str(atom.thole) }
+            if atom.anisotropy is not None:
+                aniso = atom.anisotropy
+                attributes['type3'] = self._get_mm_atom_type(aniso.atom2, residue)
+                attributes['type4'] = self._get_mm_atom_type(aniso.atom3, residue)
+                attributes['type5'] = self._get_mm_atom_type(aniso.atom4, residue)
+                attributes['aniso12'] = str(aniso.a11)
+                attributes['aniso34'] = str(aniso.a22)
+            etree.SubElement(xml_force, 'Particle', **attributes)
 
     def _write_omm_scripts(self, dest, skip_types):
         # Not currently implemented, so throw an exception if any unsupported

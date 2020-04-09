@@ -22,7 +22,7 @@ from ..parameters import ParameterSet
 from ..periodic_table import AtomicNum, element_by_mass
 from ..topologyobjects import (AngleType, Atom, AtomType, BondType, CmapType,
                                DihedralType, DihedralTypeList, ImproperType,
-                               NoUreyBradley)
+                               NoUreyBradley, DrudeAtom, DrudeAnisotropy)
 from ..utils.io import genopen
 from ..utils.six import integer_types, iteritems, string_types
 from ..utils.six.moves import zip
@@ -421,6 +421,9 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 section = 'NBFIX'
                 continue
             if line.upper().startswith('HBOND'):
+                section = None
+                continue
+            if line.upper().startswith('THOLE'):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
@@ -851,7 +854,18 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             name = words[1].upper()
                             type = words[2].upper()
                             charge = float(words[3])
-                            atom = Atom(name=name, type=type, charge=charge)
+                            if 'ALPHA' in words:
+                                # This is a polarizable atom.
+                                alpha = float(words[words.index('ALPHA')+1])
+                                thole = 1.3
+                                drude_type = 'DRUD'
+                                if 'THOLE' in words:
+                                    thole = float(words[words.index('THOLE')+1])
+                                if 'TYPE' in words:
+                                    drude_type = words[words.index('TYPE')+1]
+                                atom = DrudeAtom(name=name, type=type, charge=charge, alpha=alpha, thole=thole, drude_type=drude_type)
+                            else:
+                                atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
                         elif line[:6].upper() == 'DELETE':
@@ -934,6 +948,14 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 res._impr.append((a1, a2, a3, a4))
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
+                        elif line[:10].upper() == 'ANISOTROPY':
+                            words = line.split()
+                            atoms = [res[name] for name in words[1:5]]
+                            keywords = {words[index].upper() : float(words[index+1])
+                                        for index in range(5,len(words),2)}
+                            a11 = float(keywords['A11'])
+                            a22 = float(keywords['A22'])
+                            atoms[0].anisotropy = DrudeAnisotropy(*atoms, a11=a11, a22=a22)
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
                             # Back up a line and bail
                             break
