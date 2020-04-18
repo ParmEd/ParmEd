@@ -9,16 +9,17 @@ instances where the prequisites may not be installed.
 from __future__ import division, print_function, absolute_import
 
 from math import ceil
+from io import StringIO
 import numpy as np
-from parmed.formats.registry import FileFormatType
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass
-from parmed.utils.six.moves import range
-from parmed.utils.six import string_types
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom
-import parmed.unit as u
-from parmed.vec3 import Vec3
+from ..formats.registry import FileFormatType
+from ..utils.io import genopen
+from ..utils.six import add_metaclass
+from ..utils.six.moves import range
+from ..utils.six import string_types
+from ..structure import Structure
+from ..topologyobjects import Atom
+from .. import unit as u
+from ..vec3 import Vec3
 import warnings as _warnings
 
 VELSCALE = 20.455
@@ -209,6 +210,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._cell_angles_written = False
         self._vels_written = False
         self.time = float(time)
+        self._contents = StringIO()
         super(AmberAsciiRestart, self).__init__(fname, natom, hasbox,
                                                 mode, title)
 
@@ -342,15 +344,14 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         # set that now
         self.natom = len(stuff) // 3
         self._coordinates = stuff.reshape((-1, self.natom, 3))
-        self._file.write('%5d%15.7e\n' % (self.natom, self.time))
         numwrit = 0
         fmt = '%12.7f%12.7f%12.7f'
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
+            self._contents.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0: self._contents.write('\n')
+        if self.natom % 2 == 1: self._contents.write('\n')
         self._coords_written = True
 
     @property
@@ -380,13 +381,13 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         numwrit = 0
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3  ]*ONEVELSCALE,
+            self._contents.write(fmt % (stuff[i3  ]*ONEVELSCALE,
                                     stuff[i3+1]*ONEVELSCALE,
                                     stuff[i3+2]*ONEVELSCALE)
             )
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0: self._contents.write('\n')
+        if self.natom % 2 == 1: self._contents.write('\n')
         self._vels_written = self.hasvels = True
 
     @property
@@ -430,7 +431,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell lengths')
         self._cell_lengths = np.array(stuff, copy=False)
-        self._file.write('%12.7f%12.7f%12.7f' % (stuff[0], stuff[1], stuff[2]))
+        self._contents.write('%12.7f%12.7f%12.7f' % (stuff[0], stuff[1], stuff[2]))
         self._cell_lengths_written = True
 
     @cell_angles.setter
@@ -446,7 +447,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell angles')
         self._cell_angles = np.array(stuff, copy=False)
-        self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
+        self._contents.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
         self._cell_angles_written = True
 
     @box.setter
@@ -454,6 +455,21 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         """ Writes both the cell lengths and cell angles """
         self.cell_lengths = stuff[:3]
         self.cell_angles = stuff[3:]
+
+    def close(self):
+        """ Closes the file and flushes it to disk """
+        if self._status == 'new':
+            # If we have velocities, we must write the time. If we don't
+            # have velocities, we must *not* write the time. This is
+            # required to work around an assumption made in the VMD
+            # parsers
+            if self._vels_written:
+                self._file.write('%5d%15.7e\n' % (self.natom, self.time))
+            else:
+                self._file.write('%5d\n' % self.natom)
+            self._contents.seek(0)
+            self._file.write(self._contents.read())
+        super(AmberAsciiRestart, self).close()
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
