@@ -107,7 +107,7 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         assert num_unique_atom_types_uncondensed > num_unique_atom_types_condensed
 
         # This may change if this or a similar flag does a partial condensing, see PR #1087
-        assert num_unique_atom_types_uncondensed == len([*structure_uncondensed.atoms])
+        assert num_unique_atom_types_uncondensed == len(structure_uncondensed.atoms)
 
     def test_load_topology_use_atom_id_as_typename(self):
         """ Tests loading an OpenMM Topology and using Atom.id to name types """
