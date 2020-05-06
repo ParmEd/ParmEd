@@ -93,6 +93,22 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         self.assertEqual(len(parm.residues), len(structure.residues))
         self.assertEqual(len(parm.bonds), len(structure.bonds))
 
+    def test_load_topology_uncondensed_atom_types(self):
+        """ Tests condense_atom_types arg """
+        ommparm = app.AmberPrmtopFile(get_fn('complex.prmtop'))
+        parm = load_file(get_fn('complex.prmtop'))
+        system = ommparm.createSystem(implicitSolvent=app.OBC1)
+        structure_condensed = openmm.load_topology(ommparm.topology, system, condense_atom_types=True)
+        structure_uncondensed = openmm.load_topology(ommparm.topology, system, condense_atom_types=False)
+
+        num_unique_atom_types_condensed = len(set([a.atom_type for a in structure_condensed]))
+        num_unique_atom_types_uncondensed = len(set([a.atom_type for a in structure_uncondensed]))
+
+        assert num_unique_atom_types_uncondensed > num_unique_atom_types_condensed
+
+        # This may change if this or a similar flag does a partial condensing, see PR #1087
+        assert num_unique_atom_types_uncondensed == len([*structure_uncondensed.atoms])
+
     def test_load_topology_use_atom_id_as_typename(self):
         """ Tests loading an OpenMM Topology and using Atom.id to name types """
         ommparm = load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
