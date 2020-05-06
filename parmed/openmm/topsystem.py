@@ -27,7 +27,7 @@ __all__ = ['load_topology']
 
 
 @needs_openmm
-def load_topology(topology, system=None, xyz=None, box=None, unique_atom_types=True):
+def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types=True):
     """
     Creates a :class:`parmed.structure.Structure` instance from an OpenMM
     Topology, optionally filling in parameters from a System
@@ -47,10 +47,10 @@ def load_topology(topology, system=None, xyz=None, box=None, unique_atom_types=T
         information unless ``box`` (below) is also specified
     box : array of 6 floats
         Unit cell dimensions
-    unique_atom_Types : bool, default=True
-        If True, create unique atom types based on de-duplcating properties. If False,
+    condense_atom_types : bool, default=True
+        If True, create unique atom types based on de-duplicating properties. If False,
         create one atom type for each atom in the system, even if its properties match
-        an existin atom type.
+        an existing atom type.
 
     Returns
     -------
@@ -183,7 +183,7 @@ def load_topology(topology, system=None, xyz=None, box=None, unique_atom_types=T
         elif isinstance(force, mm.CMAPTorsionForce):
             _process_cmap(struct, force)
         elif isinstance(force, mm.NonbondedForce):
-            _process_nonbonded(struct, force, unique_atom_types)
+            _process_nonbonded(struct, force, condense_atom_types)
         elif isinstance(force, ignored_forces):
             continue
         else:
@@ -376,7 +376,7 @@ def _process_cmap(struct, force):
             struct.cmap_types.append(cmap_type)
     struct.cmap_types.claim()
 
-def _process_nonbonded(struct, force, unique_atom_types):
+def _process_nonbonded(struct, force, condense_atom_types):
     """ Adds nonbonded parameters to the structure """
     typemap = dict()
     element_typemap = defaultdict(int)
@@ -387,7 +387,7 @@ def _process_nonbonded(struct, force, unique_atom_types):
         atype_name = (atom.type if atom.type != ''
                       else Element[atom.atomic_number])
         key = (atype_name, sig._value, eps._value)
-        if key in typemap and unique_atom_types:
+        if key in typemap and condense_atom_types:
             atom_type = typemap[key]
         else:
             if atom.type == '':
