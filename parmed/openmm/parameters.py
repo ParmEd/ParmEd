@@ -463,7 +463,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 return [ a_types[a_names.index(atomname)] ]
 
         # Iterate over all residues
-        # TODO: Do we have to iterate over all patched residues too?
         for name, residue in chain(iteritems(self.residues), iteritems(self.patches)):
             for impr in residue._impr:
                 # Get the list of types involved in this improper
