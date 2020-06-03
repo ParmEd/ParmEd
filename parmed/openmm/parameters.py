@@ -166,7 +166,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
                 else:
-                    LOGGER.warn('keeping %s to %s %s' %(str(bond.atom1), str(bond.atom2), bond.atom2.element_name))
+                    LOGGER.debug('keeping %s to %s %s' %(str(bond.atom1), str(bond.atom2), bond.atom2.element_name))
         return True
 
     @classmethod
