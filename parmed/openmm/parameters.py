@@ -166,7 +166,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
                 else:
-                    LOGGER.debug('keeping %s to %s %s' %(str(bond.atom1), str(bond.atom2), bond.atom2.element_name))
+                    LOGGER.debug('keeping %s to %s %s' %(bond.atom1, bond.atom2, bond.atom2.element_name))
         return True
 
     @classmethod
@@ -468,7 +468,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 # Get the list of types involved in this improper
                 try:
                     types = [ get_types(residue, atomname) for atomname in impr ]
-                except:
+                except ValueError:
                     continue
                 improper_found = False
                 for key in product(*types):
