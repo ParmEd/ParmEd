@@ -152,6 +152,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             residue[lp_atom].atomic_number = 0
 
         # CHARMM Drude force field includes bonds to lone pairs.  Delete them.
+        # The call to list() makes a copy of the list, so we don't modify a list
+        # we're iterating over.
         for bond in list(residue.bonds):
             if (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
                 LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
