@@ -24,7 +24,7 @@ from ..utils.six import add_metaclass, string_types, iteritems
 from ..utils.six.moves import range
 import warnings
 from ..exceptions import ParameterWarning
-from itertools import product
+from itertools import product, chain
 from ..topologyobjects import (DihedralType, ImproperType, DrudeAtom)
 
 
@@ -149,7 +149,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         for lonepair in residue.lonepairs:
             lp_atom = lonepair[1]
             params.atom_types[types[lp_atom]].atomic_number = 0
-            atom.atomic_number = 0
+            residue[lp_atom].atomic_number = 0
+
+        # CHARMM Drude force field includes bonds to lone pairs.  Delete them.
+        # The call to list() makes a copy of the list, so we don't modify a list
+        # we're iterating over.
+        for bond in list(residue.bonds):
+            if (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
+                LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
+                residue.delete_bond(bond)
 
         # Check waters
         if residue.empirical_chemical_formula == 'H2O':
@@ -159,9 +167,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     # Remove nonphysical H-H bonds
                     LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
                     residue.delete_bond(bond)
-                elif (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
-                    LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
-                    residue.delete_bond(bond)
+                else:
+                    LOGGER.debug('keeping %s to %s %s' %(bond.atom1, bond.atom2, bond.atom2.element_name))
         return True
 
     @classmethod
@@ -458,11 +465,13 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 return [ a_types[a_names.index(atomname)] ]
 
         # Iterate over all residues
-        # TODO: Do we have to iterate over all patched residues too?
-        for name, residue in iteritems(self.residues):
+        for name, residue in chain(iteritems(self.residues), iteritems(self.patches)):
             for impr in residue._impr:
                 # Get the list of types involved in this improper
-                types = [ get_types(residue, atomname) for atomname in impr ]
+                try:
+                    types = [ get_types(residue, atomname) for atomname in impr ]
+                except ValueError:
+                    continue
                 improper_found = False
                 for key in product(*types):
                     # Search for an improper that matches these types
@@ -782,7 +791,8 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
                 for bond in patched_residue.bonds:
                     if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
-                        instructions.append(('AddBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
+                        if (bond.atom1.atomic_number != 0) or (bond.atom2.atomic_number != 0): # CHARMM adds bonds to lone pairs, which we need to omit.
+                            instructions.append(('AddBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
                 for bond in residue.bonds:
                     if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
                         instructions.append(('RemoveBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))

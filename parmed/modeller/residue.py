@@ -82,6 +82,7 @@ class ResidueTemplate(object):
         self.atoms = AtomList()
         self.bonds = TrackedList()
         self.lonepairs = list() # TODO: Should this be a TrackedList?
+        self.anisotropies = list()
         self.name = name
         self.head = None
         self.tail = None
@@ -506,7 +507,7 @@ class ResidueTemplate(object):
             raise IncompatiblePatchError('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
         # Ensure residue is connected
         import networkx as nx
-        G = residue.to_networkx()
+        G = residue.to_networkx(False)
         if not nx.is_connected(G):
             components = [ c for c in nx.connected_components(G) ]
             raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
@@ -539,8 +540,13 @@ class ResidueTemplate(object):
         except IncompatiblePatchError:
             return False
 
-    def to_networkx(self):
+    def to_networkx(self, include_extra_particles=True):
         """ Create a NetworkX graph of atoms and bonds
+
+        Parameters
+        ----------
+        include_extra_particles : bool
+            Whether to include "atoms" that actually represent extra particles (atomic_number == 0).
 
         Returns
         -------
@@ -551,9 +557,11 @@ class ResidueTemplate(object):
         import networkx
         G = networkx.Graph()
         for atom in self.atoms:
-            G.add_node(atom.name, charge=atom.charge, type=atom.type)
+            if atom.atomic_number != 0 or include_extra_particles:
+                G.add_node(atom.name, charge=atom.charge, type=atom.type)
         for bond in self.bonds:
-            G.add_edge(bond.atom1.name, bond.atom2.name)
+            if (bond.atom1.atomic_number != 0 and bond.atom2.atomic_number != 0) or include_extra_particles:
+                G.add_edge(bond.atom1.name, bond.atom2.name)
         return G
 
     def to_dataframe(self):
