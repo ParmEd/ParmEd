@@ -477,16 +477,18 @@ class AmoebaParameterSet(object):
                 raise
             line = f.readline().replace('\t', ' ')
             rematch = self.anglere.match(line)
-        # Now parse out the stretch-bend parameters
-        while line.lstrip()[:7].lower() != 'strbnd ':
+        # Now parse out the stretch-bend parameters. From here on out, some of
+        # the terms may not exist in all versions of the force field, so
+        # protect for EOF and make sure we rewind to avoid missing any terms.
+        f.mark()
+        while line.lstrip()[:7].lower() != 'strbnd ' and line:
             line = f.readline().replace('\t', ' ')
-        while line.lstrip()[:7].lower() == 'strbnd ':
+        while line.lstrip()[:7].lower() == 'strbnd ' and line:
+            f.mark()
             _StretchBendType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
-        # Get the Urey-Bradley term(s). From here on out, some of the terms may
-        # not exist in all versions of the force field, so protect for EOF and
-        # make sure we rewind to avoid missing any terms
-        f.mark()
+        # Get the Urey-Bradley term(s)
+        f.rewind(); line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9].lower() != 'ureybrad ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9].lower() == 'ureybrad ' and line:
