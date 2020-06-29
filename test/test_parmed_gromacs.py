@@ -766,6 +766,11 @@ class TestGromacsTop(FileIOTestCase):
         top_test = load_file(get_fn('test_nonbond_params.top'))
         self.assertTrue(top_test.has_NBFIX())
 
+        assert np.allclose(
+            top.parameterset.nbfix_types[('opls_136', 'opls_135')],
+            top_test.parameterset.nbfix_types[('opls_136', 'opls_135')],
+        )
+
     def test_private_functions(self):
         """ Tests private helper functions for GromacsTopologyFile """
         Defaults = gmx.gromacstop._Defaults
