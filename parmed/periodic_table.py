@@ -38,8 +38,8 @@ AtomicNum = { 'H'  :  1, 'He' :  2, 'Li' :  3, 'Be' :  4, 'B'  :  5, 'C'  :  6,
               'Pa' : 91, 'U'  : 92, 'Np' : 93, 'Pu' : 94, 'Am' : 95, 'Cm' : 96,
               'Bk' : 97, 'Cf' : 98, 'Es' : 99, 'Fm' :100, 'Md' :101, 'No' :102,
               'Lr' :103, 'Rf' :104, 'Db' :105, 'Sg' :106, 'Bh' :107, 'Hs' :108,
-              'Mt' :109, 'Ds' :110, 'Rg' :111, 'Cn' :112, 'Uut':113, 'Uuq':114,
-              'Uup':115, 'Uuh':116, 'Uus':117, 'Uuo':118, 'EP' : 0 , 'LP' :  0,
+              'Mt' :109, 'Ds' :110, 'Rg' :111, 'Cn' :112, 'Nh' :113, 'Fl' :114,
+              'Mc' :115, 'Lv' :116, 'Ts' :117, 'Og' :118, 'EP' : 0 , 'LP' :  0,
               'Lp' :  0, 'Ep' :  0}
 
 Element = [ 'EP',
@@ -52,7 +52,7 @@ Element = [ 'EP',
             'Ta','W' ,'Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po',
             'At','Rn','Fr','Ra','Ac','Th','Pa','U' ,'Np','Pu','Am','Cm',
             'Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs',
-            'Mt','Ds','Rg','Cn','Uut','Uuq','Uup','Uuh','Uus','Uuo' ]
+            'Mt','Ds','Rg','Cn','Nh','Fl','Mc','Lv','Ts','Og' ]
 
 Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
          'Be' :   9.0122 , 'B'  :  10.811  , 'C'  :  12.0107 ,
@@ -91,9 +91,9 @@ Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
          'Lr' : 262.     , 'Rf' : 261.     , 'Db' : 262.     ,
          'Sg' : 266.     , 'Bh' : 264.     , 'Hs' : 277.     ,
          'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     ,
-         'Cn' : 285.     , 'Uut': 284.     , 'Uuq': 289.     ,
-         'Uup': 288.     , 'Uuh': 292.     , 'Uus': 291.     ,
-         'Uuo': 294.     , 'EP' : 0.000000 }
+         'Cn' : 285.     , 'Nh' : 286.     , 'Fl' : 289.     ,
+         'Mc' : 289.     , 'Lv' : 293.     , 'Ts' : 294.     ,
+         'Og' : 294.     , 'EP' : 0.000000 }
 
 Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Be' : 'Beryllium'    ,'B'  : 'Boron'        ,'C'  : 'Carbon'       ,
@@ -132,9 +132,9 @@ Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Lr' : 'Lawrencium'   ,'Rf' : 'Rutherfordium','Db' : 'Dubnium'      ,
          'Sg' : 'Seaborgium'   ,'Bh' : 'Bohrium'      ,'Hs' : 'Hassium'      ,
          'Mt' : 'Meitnerium'   ,'Ds' : 'Darmstadtium' ,'Rg' : 'Roentgenium'  ,
-         'Cn' : 'Copernicium'  ,'Uut': 'Ununtrium'    ,'Uuq': 'Ununquadium'  ,
-         'Uup': 'Ununpentium'  ,'Uuh': 'Ununhexium'   ,'Uus': 'Ununseptium'  ,
-         'Uuo': 'Ununoctium'   ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
+         'Cn' : 'Copernicium'  ,'Nh' : 'Nihonium'     ,'Fl' : 'Flerovium'    ,
+         'Mc' : 'Moscovium'    ,'Lv' : 'Livermorium'  ,'Ts' : 'Tennessine'   ,
+         'Og' : 'Oganesson'    ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
          'Ep' : 'Extra Point'  ,'Lp' : 'Extra Point'}
 
 OriginName = {
@@ -175,9 +175,9 @@ OriginName = {
         'Lr' : 'Lawrencium' ,'Rf' : 'Rutherfordium','Db' : 'Dubnium'      ,
         'Sg' : 'Seaborgium' ,'Bh' : 'Bohrium'      ,'Hs' : 'Hassium'      ,
         'Mt' : 'Meitnerium' ,'Ds' : 'Darmstadtium' ,'Rg' : 'Roentgenium'  ,
-        'Cn' : 'Copernicium','Uut': 'Ununtrium'    ,'Uuq': 'Ununquadium'  ,
-        'Uup': 'Ununpentium','Uuh': 'Ununhexium'   ,'Uus': 'Ununseptium'  ,
-        'Uuo': 'Ununoctium' ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
+        'Cn' : 'Copernicium','Nh' : 'Nihonium'     ,'Fl' : 'Flerovium'    ,
+        'Mc' : 'Moscovium'  ,'Lv' : 'Livermorium'  ,'Ts' : 'Tennessine'   ,
+        'Og' : 'Oganesson'  ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
         'Ep' : 'Extra Point','Lp' : 'Extra Point'
 }
 
@@ -218,9 +218,9 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'Lr' : 'Solid'        ,'Rf' : 'Unknown'      ,'Db' : 'Unknown'      ,
           'Sg' : 'Unknown'      ,'Bh' : 'Unknown'      ,'Hs' : 'Unknown'      ,
           'Mt' : 'Unknown'      ,'Ds' : 'Unknown'      ,'Rg' : 'Unknown'      ,
-          'Cn' : 'Unknown'      ,'Uut': 'Unknown'      ,'Uuq': 'Unknown'      ,
-          'Uup': 'Unknown'      ,'Uuh': 'Unknown'      ,'Uus': 'Unknown'      ,
-          'Uuo': 'Unknown'      ,'EP' : 'N/A'          ,'Ep' : 'N/A'          ,
+          'Cn' : 'Unknown'      ,'Nh' : 'Unknown'      ,'Fl' : 'Unknown'      ,
+          'Mc' : 'Unknown'      ,'Lv' : 'Unknown'      ,'Ts' : 'Unknown'      ,
+          'Og' : 'Unknown'      ,'EP' : 'N/A'          ,'Ep' : 'N/A'          ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
