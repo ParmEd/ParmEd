@@ -7,25 +7,29 @@ Date: Aug. 11, 2015
 """
 from __future__ import division, print_function
 
-from collections import defaultdict, Sequence
+from collections import defaultdict
 from contextlib import closing
 import math
 import os
-from parmed.amber.offlib import AmberOFFLibrary
-from parmed.constants import TINY
-from parmed.exceptions import ParameterError, AmberWarning, ParameterWarning
-from parmed.modeller.residue import ResidueTemplateContainer
-from parmed.formats.mol2 import Mol2File
-from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet
-from parmed.periodic_table import Mass, element_by_mass, AtomicNum
-from parmed.topologyobjects import (AtomType, BondType, AngleType, DihedralType,
-                                    DihedralTypeList)
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
-from parmed.utils.six.moves import map
 import re
 import warnings
+from .offlib import AmberOFFLibrary
+from ..constants import TINY
+from ..exceptions import ParameterError, AmberWarning, ParameterWarning
+from ..modeller.residue import ResidueTemplateContainer
+from ..formats.mol2 import Mol2File
+from ..formats.registry import FileFormatType
+from ..parameters import ParameterSet
+from ..periodic_table import Mass, element_by_mass, AtomicNum
+from ..topologyobjects import (AtomType, BondType, AngleType, DihedralType,
+                                    DihedralTypeList)
+from ..utils.io import genopen
+from ..utils.six import add_metaclass, string_types, iteritems, PY2
+from ..utils.six.moves import map
+if PY2:
+    from collections import Sequence
+else:
+    from collections.abc import Sequence
 
 # parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',

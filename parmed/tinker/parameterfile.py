@@ -55,7 +55,7 @@ class _ParamType(object):
 
     def __init__(self, *args, **kwargs):
         """ Instantiates the parameter type """
-        raise NotImplemented('virtual method')
+        raise NotImplementedError('virtual method')
 
     @classmethod
     def register(cls, obj, key):
@@ -325,11 +325,12 @@ class _AtomType(object):
 
 class _Atom(object):
     """ An atom in a parameter set """
-
-    def __init__(self, typeindex, name, descrip, atomic_number, mass, val):
+    AtomList=dict()
+    def __init__(self, index,typeindex, name, descrip, atomic_number, mass, val):
         self.name = name
         self.description = descrip
         self.type = get_atom_type(typeindex, atomic_number, mass, val)
+        _Atom.AtomList[index] = self # cache this type
 
     # Allow _Atom instances to access (but not modify) type properties
     def _typeindex(self): return self.type.index
@@ -360,6 +361,7 @@ class _Atom(object):
         if hasattr(self, 'polarizability'):
             retstr += '; dipole pol=%s; thole=%s; connected atoms=%r' % (
                         self.polarizability, self.thole, self.connected_types)
+        return retstr+'>'
 
     @classmethod
     def reset(cls):
@@ -447,7 +449,7 @@ class AmoebaParameterSet(object):
         while line.lstrip()[:5].lower() == 'atom ':
             rematch = self.atomre.match(line)
             num, typenum, name, descrip, anum, mass, val = rematch.groups()
-            self.atoms[int(num)] = _Atom(typenum, name, descrip,
+            self.atoms[int(num)] = _Atom(int(num),typenum, name, descrip,
                                                  anum, mass, val)
             line = f.readline().replace('\t', ' ')
         # Now parse out the van der waals terms
@@ -475,16 +477,18 @@ class AmoebaParameterSet(object):
                 raise
             line = f.readline().replace('\t', ' ')
             rematch = self.anglere.match(line)
-        # Now parse out the stretch-bend parameters
-        while line.lstrip()[:7].lower() != 'strbnd ':
+        # Now parse out the stretch-bend parameters. From here on out, some of
+        # the terms may not exist in all versions of the force field, so
+        # protect for EOF and make sure we rewind to avoid missing any terms.
+        f.mark()
+        while line.lstrip()[:7].lower() != 'strbnd ' and line:
             line = f.readline().replace('\t', ' ')
-        while line.lstrip()[:7].lower() == 'strbnd ':
+        while line.lstrip()[:7].lower() == 'strbnd ' and line:
+            f.mark()
             _StretchBendType(*line.split()[1:])
             line = f.readline().replace('\t', ' ')
-        # Get the Urey-Bradley term(s). From here on out, some of the terms may
-        # not exist in all versions of the force field, so protect for EOF and
-        # make sure we rewind to avoid missing any terms
-        f.mark()
+        # Get the Urey-Bradley term(s)
+        f.rewind(); line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9].lower() != 'ureybrad ' and line:
             line = f.readline().replace('\t', ' ')
         while line.lstrip()[:9].lower() == 'ureybrad ' and line:

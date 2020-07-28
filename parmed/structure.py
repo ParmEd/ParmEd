@@ -24,7 +24,7 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
                               TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
-                              UreyBradley)
+                              UreyBradley, Link)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .utils.six import integer_types, iteritems, string_types
@@ -206,6 +206,8 @@ class Structure(object):
         match the coordinates present on the atoms.
     symmetry : :class:`Symmetry`
         if no symmetry is set, this is set to None.
+    links : :class:`TrackedList` (:class:`Link`)
+        The list of Link definitions for this Structure
 
     Notes
     -----
@@ -279,6 +281,7 @@ class Structure(object):
         self.stretch_bend_types = TrackedList()
         self.torsion_torsion_types = TrackedList()
         self.adjust_types = TrackedList()
+        self.links = TrackedList()
 
         self._box = None
         self._coordinates = None
@@ -411,8 +414,7 @@ class Structure(object):
         for atom in self.atoms:
             res = atom.residue
             a = copy(atom)
-            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code,
-                       res.segid)
+            c.add_atom(a, res.name, res.number, res.chain, res.insertion_code, res.segid)
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(copy(bt))
@@ -605,6 +607,11 @@ class Structure(object):
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
+        for l in self.links:
+            c.links.append(
+                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length,
+                     l.symmetry_op1, l.symmetry_op2)
+            )
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
         c.combining_rule = self.combining_rule
@@ -1343,14 +1350,10 @@ class Structure(object):
                 charges = tuple('%.6f' % a.charge for a in res)
                 rmins = tuple('%.6f' % a.rmin for a in res)
                 epsilons = tuple('%.6f' % a.epsilon for a in res)
-                if (res.name, len(res), names, charges,
-                    rmins, epsilons) in res_molecules:
-                    counts[res_molecules[(res.name, len(res), names,
-                                          charges, rmins, epsilons)]].add(i)
+                oneres_key = (res.name, len(res), names, charges, rmins, epsilons)
+                if oneres_key in res_molecules:
+                    counts[res_molecules[oneres_key]].add(i)
                     continue
-                else:
-                    res_molecules[(res.name, len(res), names,
-                                   charges, rmins, epsilons)] = len(structs)
             is_duplicate = False
             for j, struct in enumerate(structs):
                 if len(struct.atoms) == len(sel):
@@ -1366,6 +1369,9 @@ class Structure(object):
                         is_duplicate = True
                         break
             if not is_duplicate:
+                if len(involved_residues) == 1:
+                    # Cache single-residue molecules
+                    res_molecules[oneres_key] = len(structs)
                 mol = self[[atom.marked == i+1 for atom in self.atoms]]
                 structs.append(mol)
                 counts.append(set([i]))
@@ -1734,8 +1740,7 @@ class Structure(object):
             coords = None
         else:
             coords = np.array(coords)
-        # Wipe out our existing coordinates if we think anything might have
-        # changed
+        # Wipe out our existing coordinates if we think anything might have changed
         if self._coordinates is not None:
             if coords is None:
                 self._coordinates = None
@@ -3616,7 +3621,7 @@ class Structure(object):
 
         # Now the metadata stuff, if applicable
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries'):
             try:
                 retdict[key] = getattr(self, key)
@@ -3637,7 +3642,7 @@ class Structure(object):
             getattr(self, attr).claim()
         # Assign the possible metadata
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
-                    'pmid', 'journal_authors', 'volume_page', 'title', 'year',
+                    'pmid', 'journal_authors', 'volume', 'title', 'year',
                     'resolution', 'related_entries', '_coordinates', '_box',
                     'nrexcl', '_combining_rule', 'unknown_functional',
                     'space_group'):

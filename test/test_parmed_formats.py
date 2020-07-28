@@ -19,7 +19,7 @@ import random
 import os
 import sys
 import unittest
-from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
+from utils import (get_fn, diff_files, get_saved_fn, run_all_tests, is_jenkins,
                    HAS_GROMACS, FileIOTestCase, create_random_structure)
 import warnings
 
@@ -232,7 +232,7 @@ class TestFileLoader(FileIOTestCase):
 
     def test_misdetect_pqr(self):
         """ Check that PQR autodetection does not identify a PDB file """
-        pdb = formats.PDBFile.download('3p4a')
+        pdb = read_PDB(get_fn('3p4a.pdb'))
         fname = get_fn('3p4a_chainA.pdb', written=True)
         pdb['A',:,:].save(fname)
         self.assertFalse(formats.PQRFile.id_format(fname))
@@ -251,19 +251,12 @@ class TestFileLoader(FileIOTestCase):
 
     def test_negative_residue_number(self):
         """ Tests automatic detection of PDB file with negative residue #s """
-        pdb = download_PDB('1kx5', saveto=get_fn('1kx5.pdb', written=True))
-        pdb2 = formats.load_file(get_fn('1kx5.pdb', written=True))
-        self.assertEqual(len(pdb.atoms), len(pdb2.atoms))
-        for a1, a2 in zip(pdb.atoms, pdb2.atoms):
-            self.assertEqual(a1.name, a2.name)
-            self.assertEqual(a1.residue.name, a2.residue.name)
-        np.testing.assert_allclose(pdb.coordinates, pdb2.coordinates)
+        pdb = formats.load_file(get_fn('1kx5.pdb'))
+        self.assertTrue(any(res.number < 0 for res in pdb.residues))
 
     def test_dbref_keyword(self):
         """ Tests automatic detection of PDB file with DBREF record(s) """
-        fn = get_fn('3p49.pdb', written=True)
-        download_PDB('3p49', saveto=fn)
-        formats.load_file(fn)
+        self.assertTrue(formats.PDBFile.id_format(get_fn('3p49.pdb')))
 
     def test_natom_hasbox_keywords(self):
         """ Tests that the hasbox/natom arguments are special-cased in load_file """
@@ -323,7 +316,7 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_pdb_anisou_inscode(self):
         """ Tests that PDB files with ANISOU records on inscodes work """
-        download_PDB('1gdu')
+        formats.PDBFile.parse(get_fn('1gdu.pdb'))
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -378,6 +371,7 @@ class TestPDBStructure(FileIOTestCase):
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
@@ -385,6 +379,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
         self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
         fname = get_fn('downloaded.pdb', written=True)
@@ -446,13 +441,16 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb.residues[0].number, 9999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb.residues[1].number, 10000)
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 10003)
-        self.assertEqual(pdb.residues[5].number, 65535)
-        self.assertEqual(pdb.residues[6].number, 65536) # inferred
-        # Now check error raised if the overflow is not just ****
+        self.assertEqual(pdb.residues[5].number, 10004)
+        self.assertEqual(pdb.residues[6].number, 10005)
+        # Non-numerical residue numbers are only checked for uniqueness to compare with previous
+        # residue to see if a new one should be created
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
@@ -463,7 +461,9 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'CA', ' ', 'RE6', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
                  7, 'CA', ' ', 'RE7', 'A', '>:-O', '', 1, 1, 1, 1, 1, '', '')
             )
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
         # Now check if the residue sequence field is simply expanded
         with open(fn, 'w') as f:
             f.write(pdbtext %
@@ -484,8 +484,8 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 99999)
-        self.assertEqual(pdb.residues[5].number, 100000)
-        self.assertEqual(pdb.residues[6].number, 100001)
+        self.assertEqual(pdb.residues[5].number, 10000)
+        self.assertEqual(pdb.residues[6].number, 10000)
 
         # Check proper residue distinguishing for overflowed case. NR marks
         # atoms that *should* be turned into a new residue because there's a
@@ -500,11 +500,13 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'XX', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '', # NR
                  7, 'EP', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
+        # In the above, the PDB parser should recognize at the very least that there are at least
+        # 5 distinct residues. Atoms 4 and 5 have the same residue name *and* atom name (and the
+        # same residue number) so it's reasonable to treat them as the same or different residues
         pdb = formats.PDBFile.parse(fn)
-        self.assertEqual(len(pdb.residues), 6)
-        self.assertEqual([len(r) for r in pdb.residues], [1, 1, 1, 1, 1, 2])
-        self.assertIsInstance(pdb[6], topologyobjects.ExtraPoint)
+        self.assertGreaterEqual(len(pdb.residues), 5)
+        self.assertEqual([len(r) for r in pdb.residues[:3]], [1, 1, 1])
+        self.assertIsInstance(pdb.atoms[6], topologyobjects.ExtraPoint)
 
     def test_atom_number_overflow(self):
         """ Tests PDB file where residue number overflows """
@@ -525,12 +527,14 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb[0].number, 99999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb[1].number, 100000)
         self.assertEqual(pdb[2].number, 100001)
         self.assertEqual(pdb[3].number, 100002)
         self.assertEqual(pdb[4].number, 100003)
-        self.assertEqual(pdb[5].number, 1048575)
-        self.assertEqual(pdb[6].number, 1048576)
+        self.assertEqual(pdb[5].number, 100004)
+        self.assertEqual(pdb[6].number, 100005)
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (99999, 'CA', ' ', 'RE1', 'A', 1, '', 1, 1, 1, 1, 1, '', '',
@@ -541,8 +545,12 @@ class TestPDBStructure(FileIOTestCase):
                  'fffff', 'CA', ' ', 'RE6', 'A', 6, '', 1, 1, 1, 1, 1, '', '',
                  '*a***', 'CA', ' ', 'RE7', 'A', 7, '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        # Check the parsing. PDB file no longer cares if atom number is not numeric
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb.atoms[-1].name, 'CA')
+        self.assertEqual(pdb.atoms[-1].residue.name, 'RE7')
 
     def test_pdb_with_models(self):
         """ Test parsing of PDB files with multiple models """
@@ -879,7 +887,7 @@ class TestPDBStructure(FileIOTestCase):
         with open(fn, 'r') as f:
             self.assertEqual(sum([l.startswith('TER') for l in f]), 5)
         # Make sure TER cards *don't* get added for water
-        pdbfile = download_PDB('4lzt')
+        pdbfile = read_PDB(get_fn('4lzt.pdb'))
         pdbfile.write_pdb(fn)
         with open(fn, 'r') as f:
             for line in f:
@@ -1106,7 +1114,7 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
     def test_pdb_multimodel_parsing_bug_820(self):
         """ Test model failing in parsing due to bug #820 in GitHub """
         # Just make sure it does not raise an exception
-        self.assertEqual(len(download_PDB('1aaf').atoms), 893)
+        self.assertEqual(len(read_PDB(get_fn('1aaf.pdb')).atoms), 893)
 
     def test_pdb_write_symmetry_data(self):
         """ Tests writing PDB file with symmetry data """
@@ -1129,7 +1137,7 @@ REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
         assert_remark_290(parm, remark_290_lines)
 
         # 2idg
-        parm = pmd.download_PDB('2igd')
+        parm = read_PDB(get_fn('2igd.pdb'))
         remark_290_lines = """
 REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
 REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
@@ -1191,6 +1199,40 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
         self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
         self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
+
+    def test_link(self):
+        """ Tests proper handling and processing of LINK records in PDB files """
+        parm = pmd.load_file(get_fn('5qk8.pdb'))
+        # This PDB file has 47 LINK records, all have symmetry operations 1555
+        self.assertEqual(len(parm.links), 47) # 47 LINK records in this PDB file
+        # Here are the first few lines of those LINK records:
+        # LINK         O   ALA A  96                MG    MG A 301     1555   1555  2.09  
+        # LINK         OE2 GLU A 112                MG    MG A 302     1555   1555  2.06  
+        # Check these by hand
+        link1, link2 = parm.links[:2]
+        self.assertEqual(link1.atom1.name, 'O')
+        self.assertEqual(link1.atom2.name, 'MG')
+        self.assertEqual(link1.atom1.residue.name, 'ALA')
+        self.assertEqual(link1.atom1.residue.number, 96)
+        self.assertEqual(link1.atom2.residue.name, 'MG')
+        self.assertEqual(link1.atom2.residue.number, 301)
+        self.assertEqual(link1.symmetry_op1, '1555')
+        self.assertEqual(link1.symmetry_op2, '1555')
+
+        self.assertEqual(link2.atom1.name, 'OE2')
+        self.assertEqual(link2.atom2.name, 'MG')
+        self.assertEqual(link2.atom1.residue.name, 'GLU')
+        self.assertEqual(link2.atom1.residue.number, 112)
+        self.assertEqual(link2.atom2.residue.name, 'MG')
+        self.assertEqual(link2.atom2.residue.number, 302)
+        self.assertEqual(link2.symmetry_op1, '1555')
+        self.assertEqual(link2.symmetry_op2, '1555')
+
+        # Now test writing
+        written_file = get_fn('link.pdb', written=True)
+        parm.write_pdb(written_file, write_links=True, renumber=False)
+        parm2 = pmd.load_file(written_file)
+        self.assertEqual(len(parm2.links), 47)
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
@@ -1660,6 +1702,7 @@ class TestCIFStructure(FileIOTestCase):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
         self._check4lzt(read_CIF(self.lzt))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Test CIF downloading on 4LZT """
         fn = get_fn('4lzt.cif', written=True)
@@ -1670,7 +1713,7 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_cif_symmetry(self):
         """ Tests that symmetry is parsed from mmCIF files correctly """
-        self.assertEqual(download_CIF('1aki').space_group, 'P 21 21 21')
+        self.assertEqual(read_CIF(get_fn('1aki.cif')).space_group, 'P 21 21 21')
 
     def test_cif_space_group_written_from_structure(self):
         """ Tests CIF file writing with space groups """
@@ -1683,7 +1726,7 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
-        cif = download_CIF('2koc')
+        cif = read_CIF(get_fn('2koc.cif'))
         self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(cif.atoms), 451)
         output = StringIO()

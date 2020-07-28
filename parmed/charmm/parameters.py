@@ -22,7 +22,7 @@ from ..parameters import ParameterSet
 from ..periodic_table import AtomicNum, element_by_mass
 from ..topologyobjects import (AngleType, Atom, AtomType, BondType, CmapType,
                                DihedralType, DihedralTypeList, ImproperType,
-                               NoUreyBradley)
+                               NoUreyBradley, DrudeAtom, DrudeAnisotropy)
 from ..utils.io import genopen
 from ..utils.six import integer_types, iteritems, string_types
 from ..utils.six.moves import zip
@@ -394,7 +394,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 for i, word in enumerate(words):
                     if word.upper() == 'E14FAC':
                         try:
-                            scee = float(words[i+1])
+                            scee = 1 / float(words[i+1])
                         except (ValueError, IndexError):
                             raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
                                               'from NONBONDED card')
@@ -407,7 +407,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 if diff > TINY:
                                     raise CharmmError('Inconsistent 1-4 scalings')
                         else:
-                            scee = 1 / scee
                             for key, dtl in iteritems(self.dihedral_types):
                                 for dt in dtl:
                                     dt.scee = scee
@@ -422,6 +421,9 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 section = 'NBFIX'
                 continue
             if line.upper().startswith('HBOND'):
+                section = None
+                continue
+            if line.upper().startswith('THOLE'):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
@@ -661,7 +663,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     for i, word in enumerate(words):
                         if word.upper() == 'E14FAC':
                             try:
-                                scee = float(words[i+1])
+                                scee = 1 / float(words[i+1])
                             except (ValueError, IndexError):
                                 raise CharmmError('Could not parse electrostatic scaling constant')
                             if self._declared_nbrules:
@@ -672,7 +674,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 if diff > TINY:
                                     raise CharmmError('Inconsistent 1-4 scalings')
                             else:
-                                scee = 1 / scee
                                 for key, dtl in iteritems(self.dihedral_types):
                                     for dt in dtl:
                                         dt.scee = scee
@@ -776,6 +777,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         tpatches = OrderedDict()
         line = next(f)
         line_index = 0
+        skip_adding_residue = False
         try:
             while line:
                 line = line.strip()
@@ -823,8 +825,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     words = line.split()
                     resname = words[1].upper()
                     if resname in self.residues:
-                        warnings.warn('Replacing residue {}'.format(resname)
-                                      , ParameterWarning)
+                        warnings.warn('Replacing residue {}'.format(resname), ParameterWarning)
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
@@ -838,6 +839,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                         res = PatchTemplate(resname)
                     else:
                         assert False, 'restype != RESI or PRES'
+                    skip_adding_residue = False
                     line = next(f)
                     group = []
                     ictable = []
@@ -852,7 +854,18 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             name = words[1].upper()
                             type = words[2].upper()
                             charge = float(words[3])
-                            atom = Atom(name=name, type=type, charge=charge)
+                            if 'ALPHA' in words:
+                                # This is a polarizable atom.
+                                alpha = float(words[words.index('ALPHA')+1])
+                                thole = 1.3
+                                drude_type = 'DRUD'
+                                if 'THOLE' in words:
+                                    thole = float(words[words.index('THOLE')+1])
+                                if 'TYPE' in words:
+                                    drude_type = words[words.index('TYPE')+1]
+                                atom = DrudeAtom(name=name, type=type, charge=charge, alpha=alpha, thole=thole, drude_type=drude_type)
+                            else:
+                                atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
                         elif line[:6].upper() == 'DELETE':
@@ -864,7 +877,8 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             elif entity_type == 'IMPR':
                                 res.delete_impropers.append(words[2:5])
                             else:
-                                warnings.warn('WARNING: Ignoring "%s" because entity type %s not used.' % (line.strip(), entity_type))
+                                warnings.warn('WARNING: Ignoring "%s" because entity type %s not '
+                                              'used.' % (line.strip(), entity_type))
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
@@ -900,14 +914,18 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             # TODO: This currently doesn't handle some formats, like Note 3 in the above URL
                             words = line.split()
                             lptype_keyword = words[1][0:4].upper()
-                            if lptype_keyword not in ['BISE', 'RELE']:
-                                raise CharmmError('LONEPAIR type {} not supported; only BISEctor and RELEtive supported.'.format(words[1]))
+                            if not skip_adding_residue and lptype_keyword not in ['BISE', 'RELA']:
+                                warnings.warn('LONEPAIR type %s not supported; only BISEctor and '
+                                              'RELAtive supported' % words[1])
+                                skip_adding_residue = True
+                                break
                             a1, a2, a3, a4 = words[2:6]
-                            keywords = { words[index][0:4].upper() : float(words[index+1]) for index in range(6,len(words),2) }
+                            keywords = {words[index][0:4].upper() : float(words[index+1])
+                                        for index in range(6,len(words),2) }
                             r = keywords['DIST'] # angstrom
                             theta = keywords['ANGL'] # degrees
                             phi = keywords['DIHE'] # degrees
-                            lptypes = { 'BISE' : 'bisector', 'RELE' : 'relative' }
+                            lptypes = { 'BISE' : 'bisector', 'RELA' : 'relative' }
                             lonepair = (lptypes[lptype_keyword], a1, a2, a3, a4, r, theta, phi) # TODO: Define a LonePair object?
                             res.lonepairs.append(lonepair)
                         elif line[:2].upper() == 'IC':
@@ -930,13 +948,24 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                                 res._impr.append((a1, a2, a3, a4))
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
+                        elif line[:10].upper() == 'ANISOTROPY':
+                            words = line.split()
+                            atoms = [res[name] for name in words[1:5]]
+                            keywords = {words[index].upper() : float(words[index+1])
+                                        for index in range(5,len(words),2)}
+                            a11 = float(keywords['A11'])
+                            a22 = float(keywords['A22'])
+                            atoms[0].anisotropy = DrudeAnisotropy(*atoms, a11=a11, a22=a22)
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
                             # Back up a line and bail
                             break
                         line = next(f)
                     if group: res.groups.append(group)
                     _fit_IC_table(res, ictable)
-                    if restype == 'RESI':
+                    if skip_adding_residue:
+                        # Do not add this residue to the lookup library
+                        continue
+                    elif restype == 'RESI':
                         residues[resname] = res
                     elif restype == 'PRES':
                         patches[resname] = res

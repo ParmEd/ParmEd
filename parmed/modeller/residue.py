@@ -82,6 +82,7 @@ class ResidueTemplate(object):
         self.atoms = AtomList()
         self.bonds = TrackedList()
         self.lonepairs = list() # TODO: Should this be a TrackedList?
+        self.anisotropies = list()
         self.name = name
         self.head = None
         self.tail = None
@@ -464,7 +465,11 @@ class ResidueTemplate(object):
                 residue.delete_atom(atom_name)
                 modifications_made = True
             except (KeyError, MoleculeError) as e:
-                raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
+                if atom_name.startswith('D') and atom_name[1:] in self and atom_name[1:] in patch.delete_atoms:
+                    # This is a Drude particle.  We're also deleting its parent atom, so don't report an error.
+                    pass
+                else:
+                    raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
@@ -502,7 +507,7 @@ class ResidueTemplate(object):
             raise IncompatiblePatchError('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
         # Ensure residue is connected
         import networkx as nx
-        G = residue.to_networkx()
+        G = residue.to_networkx(False)
         if not nx.is_connected(G):
             components = [ c for c in nx.connected_components(G) ]
             raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
@@ -535,8 +540,13 @@ class ResidueTemplate(object):
         except IncompatiblePatchError:
             return False
 
-    def to_networkx(self):
+    def to_networkx(self, include_extra_particles=True):
         """ Create a NetworkX graph of atoms and bonds
+
+        Parameters
+        ----------
+        include_extra_particles : bool
+            Whether to include "atoms" that actually represent extra particles (atomic_number == 0).
 
         Returns
         -------
@@ -547,9 +557,11 @@ class ResidueTemplate(object):
         import networkx
         G = networkx.Graph()
         for atom in self.atoms:
-            G.add_node(atom.name, charge=atom.charge, type=atom.type)
+            if atom.atomic_number != 0 or include_extra_particles:
+                G.add_node(atom.name, charge=atom.charge, type=atom.type)
         for bond in self.bonds:
-            G.add_edge(bond.atom1.name, bond.atom2.name)
+            if (bond.atom1.atomic_number != 0 and bond.atom2.atomic_number != 0) or include_extra_particles:
+                G.add_edge(bond.atom1.name, bond.atom2.name)
         return G
 
     def to_dataframe(self):

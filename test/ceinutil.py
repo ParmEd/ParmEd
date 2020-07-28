@@ -59,10 +59,10 @@ group.add_argument('-resnums', dest='resnums', metavar='NUM',
                    default=None)
 group.add_argument('-notresnums', dest='notresnums', nargs='*', metavar='NUM',
                  help='Residue numbers to exclude from CEIN file', default=None)
-group.add_argument('-mineo', dest='minpka', metavar='Eo', type=float,
+group.add_argument('-mineo', dest='mineo', metavar='Eo', type=float,
                    help='Minimum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=-999999)
-group.add_argument('-maxeo', dest='maxpka', metavar='Eo', type=float,
+group.add_argument('-maxeo', dest='maxeo', metavar='Eo', type=float,
                    help='Maximum reference standard Redox Potential (given in Volts) to include in CEIN file',
                    default=9999999)
 group = parser.add_argument_group('System Information')
@@ -85,7 +85,7 @@ def print_residues(resnames,mode):
             print ('%s is not titratable\n' % resname)
             sys.exit(0)
         if not getattr(residues, resname).typ == "redox" and mode == 1:
-            print ('%s is not a Redox Potential titratable residue\n' % resname)
+            print ('%s is not a redox-active titratable residue\n' % resname)
             sys.exit(0)
         if getattr(residues, resname).typ == "redox":
             print (str(getattr(residues, resname)) + '\n')
@@ -134,8 +134,8 @@ def main(opt):
     notresnums = process_arglist(opt.notresnums, int)
     resnames = process_arglist(opt.resnames, str)
     notresnames = process_arglist(opt.notresnames, str)
-    minpka = opt.minpka
-    maxpka = opt.maxpka
+    mineo = opt.mineo
+    maxeo = opt.maxeo
 
     if not opt.igb in (1, 2, 5, 7, 8):
         raise AmberError('-igb must be 1, 2, 5, 7, or 8!')
@@ -160,7 +160,7 @@ def main(opt):
             if not resname in residues.titratable_residues:
                 raise AmberError('%s is not a titratable residue!' % resname)
             elif not getattr(residues, resname).typ == "redox":
-                raise AmberError('%s is not a Redox Potential titratable residue!' % resname)
+                raise AmberError('%s is not a redox-active titratable residue!' % resname)
             titratable_residues.append(resname)
     else:
         for resname in residues.titratable_residues:
@@ -173,8 +173,8 @@ def main(opt):
     # Filter titratable residues based on min and max pKa
     new_reslist = []
     for res in titratable_residues:
-        if getattr(residues, res).pKa < minpka: continue
-        if getattr(residues, res).pKa > maxpka: continue
+        if getattr(residues, res).Eo < mineo: continue
+        if getattr(residues, res).Eo > maxeo: continue
         new_reslist.append(res)
     titratable_residues = new_reslist
     del new_reslist
@@ -219,6 +219,7 @@ def main(opt):
                 break
     main_reslist = TitratableResidueList(system_name=opt.system,
                         solvated=solvated, first_solvent=first_solvent)
+    trescnt = 0
     for resnum in resnums:
         resname = parm.parm_data['RESIDUE_LABEL'][resnum-1]
         if not resname in titratable_residues: continue
@@ -235,6 +236,14 @@ def main(opt):
         # If we have gotten this far, add it to the list.
         main_reslist.add_residue(res, resnum,
                                  parm.parm_data['RESIDUE_POINTER'][resnum-1])
+        trescnt += 1
+
+    # Prints a warning if the number of titratable residues is larger than 50
+    if trescnt > 50: sys.stderr.write('Warning: Your CEIN file has more than 50 titratable residues! pmemd and sander have a\n'
+                                      '         default limit of 50 titrable residues, thus this CEIN file can only be used\n'
+                                      '         if the definitions for this limit are modified at the top of\n'
+                                      '         $AMBERHOME/src/pmemd/src/constante.F90 or $AMBERHOME/AmberTools/src/sander/constante.F90.\n'
+                                      '         AMBER needs to be recompilied after these files are modified.\n')
 
     # Set the states if requested
     if resstates is not None:

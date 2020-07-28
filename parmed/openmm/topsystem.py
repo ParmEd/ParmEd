@@ -27,7 +27,7 @@ __all__ = ['load_topology']
 
 
 @needs_openmm
-def load_topology(topology, system=None, xyz=None, box=None):
+def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types=True):
     """
     Creates a :class:`parmed.structure.Structure` instance from an OpenMM
     Topology, optionally filling in parameters from a System
@@ -47,6 +47,10 @@ def load_topology(topology, system=None, xyz=None, box=None):
         information unless ``box`` (below) is also specified
     box : array of 6 floats
         Unit cell dimensions
+    condense_atom_types : bool, default=True
+        If True, create unique atom types based on de-duplicating properties. If False,
+        create one atom type for each atom in the system, even if its properties match
+        an existing atom type.
 
     Returns
     -------
@@ -90,7 +94,11 @@ def load_topology(topology, system=None, xyz=None, box=None):
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
                 else:
-                    atype = a.id if not isinstance(a.id, integer_types) else ''
+                    try:
+                        aid = int(a.id)
+                    except ValueError:
+                        aid = a.id
+                    atype = aid if not isinstance(aid, integer_types) else ''
                     atom = Atom(atomic_number=a.element.atomic_number,
                                 name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
@@ -175,7 +183,7 @@ def load_topology(topology, system=None, xyz=None, box=None):
         elif isinstance(force, mm.CMAPTorsionForce):
             _process_cmap(struct, force)
         elif isinstance(force, mm.NonbondedForce):
-            _process_nonbonded(struct, force)
+            _process_nonbonded(struct, force, condense_atom_types)
         elif isinstance(force, ignored_forces):
             continue
         else:
@@ -368,7 +376,7 @@ def _process_cmap(struct, force):
             struct.cmap_types.append(cmap_type)
     struct.cmap_types.claim()
 
-def _process_nonbonded(struct, force):
+def _process_nonbonded(struct, force, condense_atom_types):
     """ Adds nonbonded parameters to the structure """
     typemap = dict()
     element_typemap = defaultdict(int)
@@ -379,7 +387,7 @@ def _process_nonbonded(struct, force):
         atype_name = (atom.type if atom.type != ''
                       else Element[atom.atomic_number])
         key = (atype_name, sig._value, eps._value)
-        if key in typemap:
+        if key in typemap and condense_atom_types:
             atom_type = typemap[key]
         else:
             if atom.type == '':
@@ -444,6 +452,5 @@ def _process_nonbonded(struct, force):
     for ai, exceptions in iteritems(bond_graph_exceptions):
         if exceptions - explicit_exceptions[ai]:
             struct.unknown_functional = True
-            warnings.warn('Detected incomplete exceptions. Not supported.',
-                          OpenMMWarning)
+            warnings.warn('Detected incomplete exceptions. Not supported.', OpenMMWarning)
             break

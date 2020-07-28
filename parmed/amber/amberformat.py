@@ -824,8 +824,8 @@ class AmberFormat(object):
 
         Parameters
         ----------
-        name : str
-            Name of the file to write the topology file to
+        name : str or file-like
+            Name of the file to write the topology file to or file-like object to write
         """
         # now that we know we will write the new prmtop file, open the new file
         if isinstance(name, string_types):

@@ -29,7 +29,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Chiral
            'NonbondedExceptionType', 'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group',
            'AtomType', 'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'RBTorsionType',
-           'UnassignedAtomType']
+           'UnassignedAtomType', 'Link', 'DrudeAtom', 'DrudeAnisotropy']
 
 # Create the AKMA unit system which is the unit system used by Amber and CHARMM
 scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
@@ -1713,8 +1713,9 @@ class Bond(object):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
-            raise MoleculeError('Cannot bond atom to itself! '
-                                'Atoms are: %s %s' % (atom1, atom2))
+            raise MoleculeError('Cannot bond atom to itself! Atoms are: %s %s' % (atom1, atom2))
+        if isinstance(atom1, ExtraPoint) and isinstance(atom2, ExtraPoint):
+            raise MoleculeError('Cannot bond two virtual sites/extra points together')
         # Order the atoms so the lowest atom # is first
         self.atom1 = atom1
         self.atom2 = atom2
@@ -4135,6 +4136,75 @@ class MultipoleFrame(object):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class DrudeAtom(Atom):
+    """
+    An Atom that has a Drude particle attached to it.  This is a subclass of
+    Atom, so it also has all the properties defined for regular Atoms.
+
+    Parameters
+    ----------
+    alpha : ``float``
+        the atomic polarizability
+    thole : ``float``
+        the Thole damping facior
+    drude_type : ``str``
+        the atom type to use for the Drude particle.
+
+    Other Attributes
+    ----------------
+    anisotropy : :class:`DrudeAnisotropy`
+        describes how this atom is anisotropically polarizable.  For isotropic
+        atoms, this is None.
+    """
+    #===================================================
+
+    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', **kwargs):
+        Atom.__init__(self, **kwargs)
+        self.alpha = alpha
+        self.thole = thole
+        self.drude_type = drude_type
+        self.anisotropy = None
+
+    @property
+    def drude_charge(self):
+        sign = (-1 if self.alpha < 0 else 1)
+        alpha = abs(self.alpha)*u.angstrom**3/(138.935456*u.kilojoules_per_mole*u.nanometer)
+        return sign*math.sqrt(alpha*2*(500*u.kilocalories_per_mole/u.angstrom**2))
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class DrudeAnisotropy(_FourAtomTerm):
+    """
+    A description of an anisotropically polarizable atom.
+
+    Atom 1 is a :class:`DrudeAtom` whose polarizability is anisotropic.  The
+    other three atoms define the coordinate frame.
+
+    Parameters
+    ----------
+    atom1 : :class:`DrudeAtom`
+        the polarizable atom
+    atom2 : :class:`Atom`
+        the second atom defining the coordinate frame
+    atom3 : :class:`Atom`
+        the third atom defining the coordinate frame
+    atom4 : :class:`Atom`
+        the fourth atom defining the coordinate frame
+    a11 : ``float``
+        the scale factor for the polarizability along the direction defined by
+        atom1 and atom2
+    a22 : ``float``
+        the scale factor for the polarizability along the direction defined by
+        atom3 and atom4
+    """
+
+    def __init__(self, atom1, atom2, atom3, atom4, a11, a22):
+        _FourAtomTerm.__init__(self, atom1, atom2, atom3, atom4)
+        self.a11 = a11
+        self.a22 = a22
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class Residue(_ListItem):
     """
     A single residue that is composed of a small number of atoms
@@ -5185,6 +5255,35 @@ class Group(object):
     @_exception_to_notimplemented
     def __eq__(self, other):
         return (self.atom is other.atom and self.type == other.type and self.move == other.move)
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class Link(object):
+    """ An intra-residue "Link" as defined by the PDB standard:
+
+    See http://www.wwpdb.org/documentation/file-format-content/format33/sect6.html#LINK for more
+    information
+
+    Parameters
+    ----------
+    atom1 : :class:`Atom`
+        The first Atom involved in the Link
+    atom2 : :class:`Atom`
+        The other atom to which ``atom1`` is bonded in this link
+    length : float
+        The length of the link
+    symmetry_op1 : str, optional
+        The first symmetry operator for the link
+    symmetry_op2 : str, optional
+        The second symmetry operator for the link
+    """
+
+    def __init__(self, atom1, atom2, length, symmetry_op1='1555', symmetry_op2='1555'):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.length = length
+        self.symmetry_op1 = symmetry_op1
+        self.symmetry_op2 = symmetry_op2
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

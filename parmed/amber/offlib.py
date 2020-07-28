@@ -7,16 +7,16 @@ from __future__ import print_function
 from collections import OrderedDict
 from contextlib import closing
 import numpy as np
-from parmed import Atom
-from parmed.constants import RAD_TO_DEG
-from parmed.exceptions import AmberWarning
-from parmed.formats.registry import FileFormatType
-from parmed.modeller.residue import ResidueTemplate, ResidueTemplateContainer
-from parmed.modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
-from parmed import periodic_table as pt
-from parmed.utils.io import genopen
-from parmed.utils.six import string_types, add_metaclass
-from parmed.utils.six.moves import range
+from ..topologyobjects import Atom
+from ..constants import RAD_TO_DEG
+from ..exceptions import AmberWarning
+from ..formats.registry import FileFormatType
+from ..modeller.residue import ResidueTemplate, ResidueTemplateContainer
+from ..modeller.residue import PROTEIN, NUCLEIC, SOLVENT, UNKNOWN
+from .. import periodic_table as pt
+from ..utils.io import genopen
+from ..utils.six import string_types, add_metaclass
+from ..utils.six.moves import range
 import re
 import warnings
 

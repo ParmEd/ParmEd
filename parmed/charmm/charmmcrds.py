@@ -11,13 +11,13 @@ from __future__ import print_function, division, absolute_import
 
 from contextlib import closing
 import numpy as np
-from parmed.utils import io
-from parmed.formats.registry import FileFormatType
-from parmed.exceptions import CharmmError
-from parmed import unit as u
-from parmed.utils.six import add_metaclass, string_types
-from parmed.utils.six.moves import range
-from parmed.vec3 import Vec3
+from ..utils import io
+from ..formats.registry import FileFormatType
+from ..exceptions import CharmmError
+from .. import unit as u
+from ..utils.six import add_metaclass, string_types
+from ..utils.six.moves import range
+from ..vec3 import Vec3
 
 CHARMLEN = 22
 TIMESCALE = 4.888821E-14 * 1e12 # AKMA time units to picoseconds
@@ -88,7 +88,6 @@ class CharmmCrdFile(object):
                     float(line[4])
                     float(line[5])
                     float(line[6])
-                    int(line[8])
                     float(line[9])
             except (IndexError, ValueError):
                 return False
@@ -158,7 +157,7 @@ class CharmmCrdFile(object):
                     self.coords.append(float(line[5]))
                     self.coords.append(float(line[6]))
                     self.segid.append(line[7])
-                    self.resid.append(int(line[8]))
+                    self.resid.append(line[8])
                     self.weighting.append(float(line[9]))
 
                 assert 3*self.natom == len(self.coords), '# atom mismatch'
