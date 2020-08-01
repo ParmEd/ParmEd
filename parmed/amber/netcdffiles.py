@@ -264,7 +264,7 @@ class NetCDFRestart(object):
     def velocities(self):
         if 'velocities' in self._ncfile.variables:
             vels = self._ncfile.variables['velocities'][:]
-            return (vels.reshape((-1, self.atom, 3)) * self.velocity_scale)
+            return (vels.reshape((1, self.atom, 3)) * self.velocity_scale)
 
     @velocities.setter
     def velocities(self, stuff):

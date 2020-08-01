@@ -102,7 +102,7 @@ def load_file(filename, *args, **kwargs):
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
 
-    SDF file is loaded via `rdkit` package. 
+    SDF file is loaded via `rdkit` package.
 
     Examples
     --------

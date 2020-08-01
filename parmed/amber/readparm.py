@@ -15,7 +15,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-   
+
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330,
@@ -44,7 +44,7 @@ def LoadParm(parmname, xyz=None, box=None):
     parmname : ``str``
         The name of the topology file to load
     xyz : str or array, optional
-        If provided, the coordinates and unit cell dimensions from the provided
+        If provided, the coordinates, velocities and unit cell dimensions from the provided
         Amber inpcrd/restart file will be loaded into the molecule, or the
         coordinates will be loaded from the coordinate array
     box : array, optional
@@ -74,8 +74,11 @@ def LoadParm(parmname, xyz=None, box=None):
         if not hasattr(f, 'coordinates') or f.coordinates is None:
             raise TypeError('%s does not have coordinates' % xyz)
         parm.coordinates = f.coordinates
+        if hasattr(f, 'velocities') and f.velocities is not None:
+            parm.velocities = f.velocities
         if hasattr(f, 'box') and f.box is not None and box is None:
             parm.box = f.box
+
     else:
         parm.coordinates = xyz
     if box is not None:
