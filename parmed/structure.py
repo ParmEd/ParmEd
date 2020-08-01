@@ -1394,6 +1394,8 @@ class Structure(object):
             - CHARMM coordinate file (.crd, charmmcrd)
             - Gromacs topology file (.top, gromacs)
             - Gromacs GRO file (.gro, gro)
+            - DLPOLY topology file (.field, field)
+            - DLPOLY coordinate file (.config, config)
             - Mol2 file (.mol2, mol2)
             - Mol3 file (.mol3, mol3)
             - Amber ASCII restart (.rst7/.inpcrd/.restrt, rst7)
@@ -1426,7 +1428,7 @@ class Structure(object):
         ``overwrite`` is ``False``, the filesystem is read-only, or write
         permissions are not granted for the user
         """
-        from parmed import amber, charmm, formats, gromacs
+        from parmed import amber, charmm, formats, gromacs, dlpoly
         extmap = {
                 '.pdb' : 'PDB',
                 '.pqr' : 'PQR',
@@ -1437,6 +1439,8 @@ class Structure(object):
                 '.psf' : 'PSF',
                 '.top' : 'GROMACS',
                 '.gro' : 'GRO',
+                '.field' : 'FIELD',
+                '.config' : 'CONFIG',
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
                 '.crd' : 'CHARMMCRD',
@@ -1482,12 +1486,17 @@ class Structure(object):
                 s.write_psf(fname, **kwargs)
             elif format == 'GRO':
                 gromacs.GromacsGroFile.write(self, fname, **kwargs)
+            elif format == 'CONFIG':
+                dlpoly.DlpolyConfigFile.write(self, fname, **kwargs)
             elif format == 'MOL2':
                 formats.Mol2File.write(self, fname, **kwargs)
             elif format == 'MOL3':
                 formats.Mol2File.write(self, fname, mol3=True, **kwargs)
             elif format == 'GROMACS':
                 s = gromacs.GromacsTopologyFile.from_structure(self)
+                s.write(fname, **kwargs)
+            elif format == 'FIELD':
+                s = dlpoly.DlpolyFieldFile.from_structure(self)
                 s.write(fname, **kwargs)
             elif format == 'CHARMMCRD':
                 charmm.CharmmCrdFile.write(self, fname, **kwargs)

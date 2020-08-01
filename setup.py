@@ -87,7 +87,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.tinker', 'parmed.unit', 'parmed.amber.mdin',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta', 'parmed.rdkit',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
-            'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
+            'parmed.utils', 'parmed.gromacs', 'parmed.dlpoly', 'parmed.tools', 'parmed.namd',
             'parmed.tools.gui', 'parmed.tools.simulations']
 
 # Optimized readparm

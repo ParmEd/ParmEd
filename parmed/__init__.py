@@ -9,7 +9,7 @@ between standard and amber file formats, manipulate structures, etc.
 __author__ = 'Jason Swails'
 
 __all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils',
-           'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs',
+           'Structure', 'StructureView', 'amber', 'charmm', 'namd', 'gromacs', 'dlpoly',
            'tinker', 'openmm', 'rosetta', 'rdkit', 'formats', 'Vec3', 'ParameterSet',
            'load_file', 'read_PDB', 'read_CIF', 'write_PDB', 'write_CIF',
            'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
@@ -22,7 +22,7 @@ from parmed import exceptions, periodic_table, residue
 from parmed import unit, utils
 from parmed.topologyobjects import *
 from parmed.structure import Structure, StructureView
-from parmed import amber, charmm, gromacs, namd, openmm, rosetta, tinker
+from parmed import amber, charmm, gromacs, dlpoly, namd, openmm, rosetta, tinker
 from parmed import formats
 from parmed.vec3 import Vec3
 from parmed.parameters import ParameterSet
