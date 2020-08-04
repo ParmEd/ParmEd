@@ -40,7 +40,7 @@ class DlpolyConfigFile(object):
             varwidth = 5 + precision
             crdfmt = '%%%d.%df' % (varwidth, precision)
             velfmt = '%%%d.%df' % (varwidth, precision)
-            dest.write('%5s %6d' % (atom.name[:5], atid))
+            dest.write('%-5s %6d' % (atom.type[:5], atid))
             dest.write('\n')
             dest.write((crdfmt % (atom.xx))[:varwidth])
             dest.write((crdfmt % (atom.xy))[:varwidth])

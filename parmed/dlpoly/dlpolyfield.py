@@ -1,6 +1,5 @@
 """
-This module contains functionality relevant to loading a DLPOLY topology file
-and building a Structure from it
+This module contains functionality relevant to building a DLPOLY topology file
 """
 from __future__ import print_function, division, absolute_import
 
@@ -1297,7 +1296,7 @@ class DlpolyFieldFile(Structure):
 
     #===================================================
 
-    def write(self, dest, combine=None, parameters='inline', molfile=None, itp=False):
+    def write(self, dest, combine=None, parameters='inline'):
         """ Write a Dlpoly Topology File from a Structure
 
         Parameters
@@ -1317,30 +1316,12 @@ class DlpolyFieldFile(Structure):
             top of `dest`. If it is a file-like object, parameters will be
             written there.  If parameters is the same as ``dest``, then the
             parameter types will be written to the same topologyfile.
-        molfile : None or str of file-like object, optional
-            If specified as other than None, the molecules will be written to a
-            separate file that is included in the main topology file. The
-            name of this file will be the provided srting. If None or
-            the same as the ``dest'', the molecules will be written into the
-            body of the topology file. If it is a file-like object,
-            the molecules will be written there. Using this option can make
-            it easier to combine multiple molecules into the same topology.
-            This will change where the following topology sections are
-            written: moleculetype, atoms, bonds, pairs, angles, dihedrals,
-            cmap, settles, virtual_sites2, virtual_sites3 and exclusions.
-        itp : bool, optional
-            If True the following topology sections are not written:
-            defaults, atomtypes, nonbond_params, bondtypes, pairtypes,
-            angletypes, dihedraltypes, cmaptypes, system and molecules
-            Thus only the individual molecules will be written in a stand-alone
-            fashion, i.e. an itp-file.
-            If True the molfile parameter will be set to None
 
         Raises
         ------
         ValueError if the same molecule number appears in multiple combine lists
         TypeError if the dest input cannot be parsed
-        ValueError if the combine, parameters, or molfile input cannot be parsed
+        ValueError if the combine, or parameters input cannot be parsed
         """
         import parmed.dlpoly as gmx
         from parmed import __version__
@@ -1373,28 +1354,9 @@ class DlpolyFieldFile(Structure):
                              'a file-like object')
 
         # Determine where to write the molecules
-        if itp :
-            molfile = None
         own_molfile_handle = False
         include_molfile = None
-        if molfile is None:
-            _molfile = dest
-        elif isinstance(molfile, string_types):
-            if molfile == fname.strip():
-                _molfile = dest
-            else:
-                own_molfile_handle = True
-                _molfile = genopen(molfile, 'w')
-                include_molfile = molfile
-        elif hasattr(molfile, 'write'):
-            _molfile = molfile
-            include_molfile = _molfile.name
-            # I assume the file should still be included even if it's not passed
-            # in as a file name. I'm not sure if all `write`-able objects have a
-            # `name` property, though.
-        else:
-            raise ValueError('molfile must be "top", a file name, or '
-                             'a file-like object')
+        _molfile = dest
 
         # Error-checking for combine
         if combine is not None:
@@ -1412,203 +1374,12 @@ class DlpolyFieldFile(Structure):
                     combine_lists.append(indices)
         try:
             # Write the header
-            now = datetime.now()
-            dest.write('''\
-;
-;   File %s was generated
-;   By user: %s (%d)
-;   On host: %s
-;   At date: %s
-;
-;   This is a standalone topology file
-;
-;   Created by:
-;   ParmEd:       %s, VERSION %s
-;   Executable:   %s
-;   Library dir:  %s
-;   Command line:
-;     %s
-;
-''' % (fname, _username, _userid, _uname, now.strftime('%a. %B  %w %X %Y'),
-       os.path.split(sys.argv[0])[1], __version__,
-       os.path.split(sys.argv[0])[1], gmx.DLPOLY_TOPDIR,
-       (' '.join(sys.argv)).encode('unicode_escape').decode('utf-8')))
-            if not itp :
-                dest.write('\n[ defaults ]\n')
-                dest.write('; nbfunc        comb-rule       gen-pairs       '
-                            'fudgeLJ fudgeQQ\n')
-                dest.write('%-15d %-15d %-15s %-12.8g %-12.8g\n\n' %
-                            (self.defaults.nbfunc, self.defaults.comb_rule,
-                            self.defaults.gen_pairs, self.defaults.fudgeLJ,
-                            self.defaults.fudgeQQ))
-            if include_parfile is not None:
-                dest.write('#include "%s"\n\n' % include_parfile)
-            # Print all atom types
-            if not itp :
-                parfile.write('[ atomtypes ]\n')
-                if any(typ._bond_type is not None
-                        for key, typ in iteritems(params.atom_types)):
-                    print_bond_types = True
-                else:
-                    print_bond_types = False
-                if all(typ.atomic_number != -1
-                        for key, typ in iteritems(params.atom_types)):
-                    print_atnum = True
-                else:
-                    print_atnum = False
-                parfile.write('; name    ')
-                if print_bond_types:
-                    parfile.write('bond_type ')
-                if print_atnum:
-                    parfile.write('at.num    ')
-                parfile.write('mass    charge ptype  sigma      epsilon\n')
-                econv = u.kilocalories.conversion_factor_to(u.kilojoules)
-                for key, atom_type in iteritems(params.atom_types):
-                    parfile.write('%-7s ' % atom_type)
-                    if print_bond_types:
-                        parfile.write('%-8s ' % atom_type.bond_type)
-                    if print_atnum:
-                        parfile.write('%8d ' % atom_type.atomic_number)
-                    parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
-                                  atom_type.mass, atom_type.charge, atom_type.sigma/10,
-                                  atom_type.epsilon*econv))
-                parfile.write('\n')
-            # Nonbonded parameters
-            if not itp and self.has_NBFIX():
-                typemap = dict(self.parameterset.nbfix_types)
-                types_in_system = self.parameterset.atom_types.keys()
-                dest.write('[ nonbond_params ]\n')
-                eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
-                for key, val in typemap.items():
-                    if key[0] in types_in_system and key[1] in types_in_system:
-                        eps = val[0] # kcal
-                        sig = val[1] # Angstrom
-                        eps *= eps_conversion
-                        sig *= 0.1
-                        dest.write('{0} {1} 1 {2} {3}\n'.format(
-                            key[0], key[1], sig/2**(1/6), eps))
-            # Print all parameter types unless we asked for inline
-            if not itp and parameters != 'inline':
-                if params.bond_types:
-                    parfile.write('[ bondtypes ]\n')
-                    parfile.write('; i    j  func       b0          kb\n')
-                    used_keys = set()
-                    conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
-                                u.kilojoule/u.nanometer**2) * 2
-                    for key, param in iteritems(params.bond_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s    1   %.5f   %f\n' % (key[0],
-                                      key[1], param.req/10, param.k*conv))
-                    parfile.write('\n')
-                if params.pair_types and self.defaults.gen_pairs == 'no':
-                    parfile.write('[ pairtypes ]\n')
-                    parfile.write('; i j   func    sigma1-4    epsilon1-4 ;'
-                                  ' ; THESE ARE 1-4 INTERACTIONS\n')
-                    econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
-                    lconv = u.angstrom.conversion_factor_to(u.nanometer)
-                    used_keys = set()
-                    for key, param in iteritems(params.pair_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.9f %.9f\n' %
-                                      (key[0], key[1], param.sigma*lconv,
-                                       param.epsilon*econv))
-                    parfile.write('\n')
-                if params.angle_types:
-                    parfile.write('[ angletypes ]\n')
-                    parfile.write(';  i    j    k  func       th0       cth '
-                                  '   rub         kub\n')
-                    used_keys = set()
-                    conv = (u.kilocalorie/u.radian**2).conversion_factor_to(
-                                u.kilojoule/u.radian**2) * 2
-                    bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
-                                u.kilojoule/u.nanometer**2) * 2
-                    for key, param in iteritems(params.angle_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        part = '%-5s %-5s %-5s    %%d   %12.7f   %12.7f' % (
-                                key[0], key[1], key[2], param.theteq,
-                                param.k*conv)
-                        if key in params.urey_bradley_types:
-                            ub = params.urey_bradley_types[key]
-                            parfile.write(part % 5)
-                            parfile.write('  %12.7f  %12.7f\n' % (0.1*ub.req,
-                                          ub.k*bconv))
-                        else:
-                            parfile.write(part % 1)
-                            parfile.write('\n')
-                    parfile.write('\n')
-                if params.dihedral_types:
-                    parfile.write('[ dihedraltypes ]\n')
-                    parfile.write(';i  j   k  l  func      phase      kd      '
-                                  'pn\n')
-                    used_keys = set()
-                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-                    fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
-                    for key, param in iteritems(params.dihedral_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        for dt in param:
-                            parfile.write(fmt % (key[0], key[1], key[2],
-                                          key[3], 9, dt.phase,
-                                          dt.phi_k*conv, int(dt.per)))
-                    parfile.write('\n')
-                if params.improper_periodic_types:
-                    parfile.write('[ dihedraltypes ]\n')
-                    parfile.write(';i  j   k  l  func      phase      kd      '
-                                  'pn\n')
-                    used_keys = set()
-                    conv = u.kilojoules.conversion_factor_to(u.kilocalories)
-                    fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
-                    for key, param in iteritems(params.improper_periodic_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        parfile.write(fmt % (key[0], key[1], key[2], key[3],
-                                      4, param.phase, param.phi_k*conv,
-                                      int(param.per)))
-                    parfile.write('\n')
-                if params.improper_types:
-                    # BUGBUG -- The ordering is borked here because that made it
-                    # simpler for me to work with back when I wrote the CHARMM
-                    # parsers. This needs to be fixed now and handled correctly.
-                    parfile.write('[ dihedraltypes ]\n')
-                    parfile.write('; i  j       k       l       func     q0    '
-                                  'cq\n')
-                    fmt = '%-6s %-6s %-6s %-6s    %d   %.6f   %.6f\n'
-                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
-                    for key, param in iteritems(params.improper_types):
-                        parfile.write(fmt % (key[0], key[1], key[2], key[3],
-                                      2, param.psi_eq, param.psi_k*conv))
-                    parfile.write('\n')
-            # CMAP grids are never printed inline, so if we have them, we need
-            # to write a dedicated section for them
-            if not itp and params.cmap_types:
-                    parfile.write('[ cmaptypes ]\n\n')
-                    used_keys = set()
-                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-                    for key, param in iteritems(params.cmap_types):
-                        if key in used_keys: continue
-                        used_keys.add(key)
-                        used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-6s %-6s %-6s %-6s %-6s   1   '
-                                      '%4d %4d' % (key[0], key[1], key[2],
-                                      key[3], key[7], param.resolution,
-                                      param.resolution))
-                        res2 = param.resolution * param.resolution
-                        for i in range(0, res2, 10):
-                            parfile.write('\\\n')
-                            end = min(i+10, res2)
-                            parfile.write(' '.join(str(param.grid[j]*conv)
-                                          for j in range(i, end)))
-                        parfile.write('\n\n')
-            if include_molfile is not None:
-                dest.write('#include "%s"\n\n' % include_molfile)
+            if self.title:
+                dest.write(self.title+"\n")
+            else:
+                dest.write('AMBER_SYSTEM\n') # pragma: no cover
+            dest.write('UNITS kcal\n')
+            dest.write('MOLECULAR types 1(NEEDS FIXING)\n')
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -1631,44 +1402,29 @@ class DlpolyFieldFile(Structure):
                     DlpolyFieldFile._write_molecule(molecule, _molfile,
                                                         title, params,
                                                         parameters == 'inline')
-                if not itp :
-                    # System
-                    dest.write('[ system ]\n; Name\n')
-                    if self.title:
-                        dest.write(self.title)
+                # Molecules
+                dest.write('[ molecules 1 ]\n; Compound       #mols\n')
+                total_mols = sum(len(m[1]) for m in molecules)
+                i = 0
+                while i < total_mols:
+                    for j, (molecule, lst) in enumerate(molecules):
+                        if i in lst:
+                            break
                     else:
-                        dest.write('Generic title')
-                    dest.write('\n\n')
-                    # Molecules
-                    dest.write('[ molecules ]\n; Compound       #mols\n')
-                    total_mols = sum(len(m[1]) for m in molecules)
-                    i = 0
-                    while i < total_mols:
-                        for j, (molecule, lst) in enumerate(molecules):
-                            if i in lst:
-                                break
-                        else:
-                            raise AssertionError('Could not find molecule %d '
-                                                 'in list' % i)
-                        ii = i
-                        while ii < total_mols and ii in lst:
-                            ii += 1
-                        dest.write('%-15s %6d\n' % (names[j], ii-i))
-                        i = ii
+                        raise AssertionError('Could not find molecule %d '
+                                             'in list' % i)
+                    ii = i
+                    while ii < total_mols and ii in lst:
+                        ii += 1
+                    dest.write('%-15s %6d\n' % (names[j], ii-i))
+                    i = ii
             elif isinstance(combine, string_types) and combine.lower() == 'all':
                 DlpolyFieldFile._write_molecule(self, _molfile, 'system',
                                                     params,
                                                     parameters == 'inline')
-                if not itp :
-                    dest.write('[ system ]\n; Name\n')
-                    if self.title:
-                        dest.write(self.title)
-                    else:
-                        dest.write('Generic title') # pragma: no cover
-                    dest.write('\n\n')
-                    # Molecules
-                    dest.write('[ molecules ]\n; Compound       #mols\n')
-                    dest.write('%-15s %6d\n' % ('system', 1))
+                # Molecules
+                dest.write('[ molecules 2 ]\n; Compound       #mols\n')
+                dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 molecules = self.split()
                 nmols = sum(len(m[1]) for m in molecules)
@@ -1747,30 +1503,22 @@ class DlpolyFieldFile(Structure):
                     DlpolyFieldFile._write_molecule(molecule, _molfile,
                                                         title, params,
                                                         parameters == 'inline')
-                if not itp :
-                    # System
-                    dest.write('[ system ]\n; Name\n')
-                    if self.title:
-                        dest.write(self.title)
+                # Molecules
+                dest.write('[ molecules 3 ]\n; Compound       #mols\n')
+                total_mols = sum(len(m[1]) for m in new_molecules)
+                i = 0
+                while i < total_mols:
+                    for j, (molecule, lst) in enumerate(new_molecules):
+                        if i in lst:
+                            break
                     else:
-                        dest.write('Generic title') # pragma: no cover
-                    dest.write('\n\n')
-                    # Molecules
-                    dest.write('[ molecules ]\n; Compound       #mols\n')
-                    total_mols = sum(len(m[1]) for m in new_molecules)
-                    i = 0
-                    while i < total_mols:
-                        for j, (molecule, lst) in enumerate(new_molecules):
-                            if i in lst:
-                                break
-                        else:
-                            raise AssertionError('Could not find molecule %d '
-                                                 'in list' % i)
-                        ii = i
-                        while ii < total_mols and ii in lst:
-                            ii += 1
-                        dest.write('%-15s %6d\n' % (names[j], ii-i))
-                        i = ii
+                        raise AssertionError('Could not find molecule %d '
+                                             'in list' % i)
+                    ii = i
+                    while ii < total_mols and ii in lst:
+                        ii += 1
+                    dest.write('%-15s %6d\n' % (names[j], ii-i))
+                    i = ii
         finally:
             if own_handle:
                 dest.close()
@@ -1783,131 +1531,84 @@ class DlpolyFieldFile(Structure):
 
     @staticmethod
     def _write_molecule(struct, dest, title, params, writeparams):
-        dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
-        dest.write('%s          %d\n\n' % (title, struct.nrexcl))
-        dest.write('[ atoms ]\n')
-        dest.write(';   nr       type  resnr residue  atom   cgnr    '
-                   'charge       mass  typeB    chargeB      massB\n')
-        runchg = 0
+        # Printing molecule header
+        dest.write('%s\n' % (title))
+        dest.write('NUMMOLS    1(TO BE FIXED)\n')
+        # Getting number of atoms
+        natoms = 0
         for residue in struct.residues:
-            dest.write('; residue %4d %s rtp %s q %.1f\n' %
-                       (residue.idx+1, residue.name, residue.name,
-                        sum(a.charge for a in residue)))
             for atom in residue:
-                runchg += atom.charge
-                dest.write('%5d %10s %6d %6s %6s %6d %10.8f %10.6f   ; '
-                           'qtot %.6f\n' % (atom.idx+1, atom.type,
-                            residue.idx+1, residue.name, atom.name,
-                            atom.idx+1, atom.charge, atom.mass, runchg))
-        dest.write('\n')
+                natoms += 1
+        # Print masses and charges
+        dest.write('ATOMS %d\n'%(natoms))
+        #for residue in struct.residues:
+        #    for atom in residue:
+        #        dest.write('%-8s %10.6f %12.8f 1\n' %
+        #                   (atom.type, atom.mass, atom.charge))
+        #dest.write('\n')
         # Do valence terms now
         EPs = [a for a in struct.atoms if isinstance(a, ExtraPoint)]
-        settle = False
         if len(struct.atoms) - len(EPs) == 3:
             try:
                 oxy, = (a for a in struct.atoms if a.atomic_number == 8)
                 hyd1, hyd2 = (a for a in struct.atoms if a.atomic_number == 1)
-                settle = True
             except ValueError:
                 pass
+        # Print bonds
         if struct.bonds:
-            conv = (u.kilocalorie_per_mole/u.angstrom**2).conversion_factor_to(
-                    u.kilojoule_per_mole/u.nanometer**2)*2
-            if settle:
-                dest.write('#ifdef FLEXIBLE\n\n')
-            dest.write('[ bonds ]\n')
-            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                       'funct', 'c0', 'c1', 'c2', 'c3'))
+            conv = 2.0
+            dest.write('BONDS %d\n'%(len(struct.bonds)))
             for bond in struct.bonds:
                 if (isinstance(bond.atom1, ExtraPoint) or isinstance(bond.atom2, ExtraPoint)):
                     continue # pragma: no cover
-                dest.write('%7d %6d %5d' % (bond.atom1.idx+1, bond.atom2.idx+1, bond.funct))
+                # bond.funct ==1 is for a simple harmonic potential
+                if (bond.funct != 1):
+                    raise DlpolyError('Bond between atoms %d and %d is of an invalid type!'
+                                       % (bond.atom1.idx+1, bond.atom2.idx+1))
+                #dest.write('%4s %7d %6d' % ('harm', bond.atom1.idx+1, bond.atom2.idx+1))
                 if bond.type is None:
                     dest.write('\n')
                     continue # pragma: no cover
                 key = (_gettype(bond.atom1), _gettype(bond.atom2))
-                if writeparams or key not in params.bond_types or \
-                        bond.type != params.bond_types[key]:
-                    dest.write('   %.5f %f' % (bond.type.req/10, bond.type.k*conv))
-                dest.write('\n')
-            dest.write('\n')
-        # Do the pair-exceptions
-        if struct.adjusts:
-            dest.write('[ pairs ]\n')
-            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                       'funct', 'c0', 'c1', 'c2', 'c3'))
-            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            lconv = u.angstroms.conversion_factor_to(u.nanometer)
-            for adjust in struct.adjusts:
-                key = (_gettype(adjust.atom1), _gettype(adjust.atom2))
-                dest.write('%7d %6d %5d' % (adjust.atom1.idx+1, adjust.atom2.idx+1, adjust.funct))
-                if struct.defaults.gen_pairs == 'no' and (writeparams or
-                        key not in params.pair_types or
-                        adjust.type != params.pair_types[key]) and adjust.type is not None:
-                    dest.write(' %.9f %.9f' % (adjust.type.sigma*lconv, adjust.type.epsilon*econv))
-                dest.write('\n')
-            dest.write('\n')
-        elif struct.dihedrals:
-            dest.write('[ pairs ]\n')
-            dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
-                       'funct', 'c0', 'c1', 'c2', 'c3'))
-            # Get the 1-4 pairs from the dihedral list
-            struct.update_dihedral_exclusions()
-            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            lconv = u.angstroms.conversion_factor_to(u.nanometer)
-            for dihed in struct.dihedrals:
-                if dihed.ignore_end or dihed.improper: continue
-                a1, a2 = dihed.atom1, dihed.atom4
-                if a1 in a2.bond_partners or a1 in a2.angle_partners:
-                    continue # pragma: no cover
-                dest.write('%7d %6d %5d' % (a1.idx+1, a2.idx+1, 1))
-                if struct.defaults.gen_pairs == 'no':
-                    dest.write('  %.9f  %.9f' % (0.5*(a1.sigma_14+a2.sigma_14)*lconv,
-                                math.sqrt(a1.epsilon_14*a2.epsilon_14)*econv))
-                dest.write('\n')
-            dest.write('\n')
+                #if writeparams or key not in params.bond_types or \
+                #        bond.type != params.bond_types[key]:
+                #    dest.write('   %10.6f %10.6f %10.6f %10.6f' % (bond.type.k*conv, bond.type.req, 0.0, 0.0))
+                #dest.write('\n')
+            #dest.write('\n')
         # Angles
         if struct.angles:
-            conv = (u.kilocalorie_per_mole/u.radian**2).conversion_factor_to(
-                        u.kilojoule_per_mole/u.radian**2)*2
-            conv2 = (u.kilocalorie_per_mole/u.angstrom**2).conversion_factor_to(
-                    u.kilojoule_per_mole/u.nanometer**2)*2
-            dest.write('[ angles ]\n')
-            dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
-                       ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
+            conv = 2.0
+            dest.write('ANGLES %d\n'%(len(struct.angles)))
             for angle in struct.angles:
-                dest.write('%7d %6d %6d %5d' % (angle.atom1.idx+1, angle.atom2.idx+1,
-                           angle.atom3.idx+1, angle.funct))
+                # angle.funct ==1 is for a simple harmonic potential
+                if (angle.funct != 1):
+                    raise DlpolyError('Angle between atoms %d, %d and %d is of an invalid type!'
+                                       % (angle.atom1.idx+1, angle.atom2.idx+1,
+                                          angle.atom3.idx+1))
+                #dest.write('%4s %6d %6d %6d' % ('harm', angle.atom1.idx+1, angle.atom2.idx+1,
+                #           angle.atom3.idx+1))
                 if angle.type is None:
                     dest.write('\n')
                     continue
                 key = (_gettype(angle.atom1), _gettype(angle.atom2), _gettype(angle.atom3))
                 param_equal = params.angle_types.get(key) == angle.type
-                if angle.funct == 5:
-                    # Find the Urey-Bradley term, if it exists
-                    for ub in struct.urey_bradleys:
-                        if angle.atom1 in ub and angle.atom3 in ub:
-                            ubtype = ub.type
-                            break
-                    else:
-                        ubtype = NoUreyBradley
-                    param_equal = param_equal and params.urey_bradley_types.get(key) == ubtype
-                if writeparams or not param_equal:
-                    dest.write('   %.7f %f' % (angle.type.theteq, angle.type.k*conv))
-                    if angle.funct == 5:
-                        dest.write(' %.7f %f' % (ubtype.req/10, ubtype.k*conv2))
-                dest.write('\n')
-            dest.write('\n')
+                #if writeparams or not param_equal:
+                #    dest.write('   %12.7f %12.7f %12.7f %12.7f' % (angle.type.k*conv,
+                #               angle.type.theteq, 0.0, 0.0))
+                #dest.write('\n')
+            #dest.write('\n')
         # Dihedrals
         if struct.dihedrals:
-            dest.write('[ dihedrals ]\n')
-            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
-                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'))
-            dest.write('\n')
-            conv = u.kilocalories.conversion_factor_to(u.kilojoules)
+            dest.write('DIHEDRALS %d\n'%(len(struct.dihedrals)))
+            conv = 1.0
             for dihed in struct.dihedrals:
-                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1, dihed.atom2.idx+1,
-                           dihed.atom3.idx+1, dihed.atom4.idx+1, dihed.funct))
+                # dihed.funct ==1 or 4 is for a simple harmonic potential
+                if (dihed.funct != 1 and dihed.funct != 4):
+                    raise DlpolyError('Dihedral between atoms %d, %d, %d and %d is of an invalid type!'
+                                       % (dihed.atom1.idx+1, dihed.atom2.idx+1,
+                                          dihed.atom3.idx+1, dihed.atom4.idx+1))
+                #dest.write('%-4s %6d %6d %6d %6d' % ('cos', dihed.atom1.idx+1, dihed.atom2.idx+1,
+                #           dihed.atom3.idx+1, dihed.atom4.idx+1))
                 if dihed.type is None:
                     dest.write('\n')
                     continue
@@ -1917,149 +1618,36 @@ class DlpolyFieldFile(Structure):
                     typedict = params.dihedral_types
                 key = (_gettype(dihed.atom1), _gettype(dihed.atom2),
                         _gettype(dihed.atom3), _gettype(dihed.atom4))
-                if writeparams or key not in typedict or \
-                        _diff_diheds(dihed.type, typedict[key]):
-                    if isinstance(dihed.type, DihedralTypeList):
-                        dest.write('  %.6f  %.6f  %d' % (dihed.type[0].phase,
-                            dihed.type[0].phi_k*conv, int(dihed.type[0].per)))
-                        for dt in dihed.type[1:]:
-                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.7f  %d' %
-                                    (dihed.atom1.idx+1, dihed.atom2.idx+1,
-                                     dihed.atom3.idx+1, dihed.atom4.idx+1,
-                                     dihed.funct, dt.phase, dt.phi_k*conv,
-                                     int(dt.per)))
-                    else:
-                        dest.write('  %.7f  %.7f  %d' % (dihed.type.phase,
-                            dihed.type.phi_k*conv, int(dihed.type.per)))
-                dest.write('\n')
-            dest.write('\n')
-        # RB-torsions
-        if struct.rb_torsions:
-            dest.write('[ dihedrals ]\n')
-            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
-                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
-                       'c4', 'c5'))
-            dest.write('\n')
-            conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            paramfmt = '  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f'
-            for dihed in struct.rb_torsions:
-                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
-                           dihed.atom2.idx+1, dihed.atom3.idx+1,
-                           dihed.atom4.idx+1, dihed.funct))
-                if dihed.type is None:
-                    dest.write('\n')
-                    continue
-                key = (_gettype(dihed.atom1), _gettype(dihed.atom2),
-                        _gettype(dihed.atom3), _gettype(dihed.atom4))
-                if writeparams or key not in params.rb_torsion_types or \
-                        params.rb_torsion_types[key] != dihed.type:
-                    dest.write(paramfmt % (dihed.type.c0*conv,
-                                           dihed.type.c1*conv,
-                                           dihed.type.c2*conv,
-                                           dihed.type.c3*conv,
-                                           dihed.type.c4*conv,
-                                           dihed.type.c5*conv))
-                    dest.write('\n')
-            dest.write('\n')
+                #if writeparams or key not in typedict or \
+                #        _diff_diheds(dihed.type, typedict[key]):
+                #    dest.write('  %12.7f  %12.7f  %4d  %10.5f  %10.5f' % (dihed.type.phi_k*conv,
+                #               dihed.type.phase, int(dihed.type.per), dihed.type.scee,
+                #               dihed.type.scnb))
+                #dest.write('\n')
+            #dest.write('\n')
         # Impropers
         if struct.impropers:
-            dest.write('[ dihedrals ]\n')
-            dest.write((';%6s %6s %6s %6s %5s'+' %10s'*4) % ('ai', 'aj',
-                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3'))
-            dest.write('\n')
-            conv = u.kilocalories.conversion_factor_to(u.kilojoules) * 2
+            dest.write('INVERSIONS %d\n'%(len(struct.impropers)))
+            conv = 2.0
             for dihed in struct.impropers:
-                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
+                # dihed.funct ==1 is for a simple harmonic potential
+                if (dihed.funct != 1):
+                    raise DlpolyError('Dihedral between atoms %d, %d, %d and %d is of an invalid type!'
+                                       % (dihed.atom1.idx+1, dihed.atom2.idx+1,
+                                          dihed.atom3.idx+1, dihed.atom4.idx+1))
+                dest.write('%-4s %6d %6d %6d %6d' % ('harm', dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
-                           dihed.atom4.idx+1, dihed.funct))
+                           dihed.atom4.idx+1))
                 if dihed.type is None:
                     dest.write('\n')
                     continue
                 # BUGBUG: We always write improper types since we don't
                 # currently store the correct ordering of the types in the
                 # improper section
-                dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_eq,
-                                                   dihed.type.psi_k*conv))
+                dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_k*conv, dihed.type.psi_eq))
             dest.write('\n')
-        # Cmaps
-        if struct.cmaps:
-            dest.write('[ cmap ]\n')
-            dest.write(';%6s %6s %6s %6s %6s %5s\n' % ('ai', 'aj', 'ak',
-                       'al', 'am', 'funct'))
-            for cmap in struct.cmaps:
-                dest.write('%7d %6d %6d %6d %6d %5d\n' % (cmap.atom1.idx+1,
-                           cmap.atom2.idx+1, cmap.atom3.idx+1,
-                           cmap.atom4.idx+1, cmap.atom5.idx+1, cmap.funct))
-        # See if this is a solvent molecule with 3 or fewer particles that can
-        # be SETTLEd
-        if settle:
-            dest.write('\n#else\n\n')
-            dest.write('[ settles ]\n')
-            dest.write('; i     funct   doh     dhh\n')
-            for b in oxy.bonds:
-                if hyd1 in b:
-                    # Use default values for TIPnP if no type exists
-                    doh = 0.09572 if b.type is None else b.type.req / 10
-                    break
-            for b in hyd1.bonds:
-                if hyd2 in b:
-                    # Use default values for TIPnP if no type exists
-                    dhh = 0.15139 if b.type is None else b.type.req / 10
-                    break
-            else:
-                for a in oxy.angles:
-                    if hyd1 in a and hyd2 in a:
-                        theteq = a.type.theteq * DEG_TO_RAD
-                        dhh = math.sqrt(2*doh*doh - 2*doh*doh*math.cos(theteq))
-                        break
-                else:
-                    raise DlpolyError('Cannot determine SETTLE geometry') # pragma: no cover
-            dest.write('1     1   %.8f   %.8f\n\n#endif\n\n' % (doh, dhh))
-        # Virtual sites
-        if EPs:
-            ftypes = set(type(a.frame_type) for a in EPs)
-            for ftype in ftypes:
-                if ftype is TwoParticleExtraPointFrame:
-                    dest.write('[ virtual_sites2 ]\n')
-                    dest.write('; Site  from    funct  a\n')
-                    for EP in EPs:
-                        if not isinstance(EP.frame_type, ftype): continue
-                        a1, a2 = EP.frame_type.get_atoms()
-                        dest.write('%-5d %-4d %-4d %-4d   %.6f\n' %
-                                   (EP.idx+1, a1.idx+1, a2.idx+1, 1,
-                                    EP.get_weights()[0]))
-                    dest.write('\n')
-                elif ftype in (ThreeParticleExtraPointFrame,
-                               OutOfPlaneExtraPointFrame):
-                    dest.write('[ virtual_sites3 ]\n')
-                    dest.write('; Site  from                   funct\n')
-                    for EP in EPs:
-                        if isinstance(EP.frame_type,
-                                ThreeParticleExtraPointFrame):
-                            a1, a2, a3 = EP.frame_type.get_atoms()
-                            junk, w1, w2 = EP.frame_type.get_weights()
-                            dest.write('%-5d %-4d %-4d %-4d %-4d   %.6f  %.6f\n'
-                                    % (EP.idx+1, a1.idx+1, a2.idx+1, a3.idx+1,
-                                       1, w1, w2))
-                        elif isinstance(EP.frame_type,
-                                OutOfPlaneExtraPointFrame):
-                            a1, a2, a3 = EP.frame_type.get_atoms()
-                            w1, w2, w3 = EP.frame_type.get_weights()
-                            dest.write('%-5d %-4d %-4d %-4d %-4d   %.6f  %.6f  '
-                                       '%.6f\n' % (EP.idx+1, a1.idx+1, a2.idx+1,
-                                       a3.idx+1, w1, w2, w3))
-                    dest.write('\n')
-        # Do we need to list exclusions for systems with EPs?
-        if EPs or settle:
-            dest.write('[ exclusions ]\n')
-            for i, atom in enumerate(struct.atoms):
-                dest.write('%d' % (i+1))
-                for a in atom.bond_partners:
-                    dest.write('  %d' % (a.idx+1))
-                for a in atom.angle_partners:
-                    dest.write('  %d' % (a.idx+1))
-                dest.write('\n')
-            dest.write('\n')
+        # Finish
+        dest.write('FINISH\n')
 
     #===================================================
 
