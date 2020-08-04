@@ -1379,9 +1379,9 @@ class DlpolyFieldFile(Structure):
             else:
                 dest.write('AMBER_SYSTEM\n') # pragma: no cover
             dest.write('UNITS kcal\n')
-            dest.write('MOLECULAR types 1(NEEDS FIXING)\n')
             if combine is None:
                 molecules = self.split()
+                dest.write('MOLECULAR types %d\n'%(len(molecules)))
                 sysnum = 1
                 names = []
                 nameset = set()
@@ -1400,26 +1400,11 @@ class DlpolyFieldFile(Structure):
                     names.append(title)
                     nameset.add(title)
                     DlpolyFieldFile._write_molecule(molecule, _molfile,
-                                                        title, params,
+                                                        title, len(num), params,
                                                         parameters == 'inline')
-                # Molecules
-                dest.write('[ molecules 1 ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(molecules):
-                        if i in lst:
-                            break
-                    else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
             elif isinstance(combine, string_types) and combine.lower() == 'all':
-                DlpolyFieldFile._write_molecule(self, _molfile, 'system',
+                dest.write('MOLECULAR types 1\n')
+                DlpolyFieldFile._write_molecule(self, _molfile, 'system', 1,
                                                     params,
                                                     parameters == 'inline')
                 # Molecules
@@ -1486,6 +1471,7 @@ class DlpolyFieldFile(Structure):
                 sysnum = 1
                 names = []
                 nameset = set()
+                dest.write('MOLECULAR types %d\n'%(len(new_molecules)))
                 for molecule, num in new_molecules:
                     if len(molecule.residues) == 1:
                         title = molecule.residues[0].name
@@ -1501,25 +1487,26 @@ class DlpolyFieldFile(Structure):
                     names.append(title)
                     nameset.add(title)
                     DlpolyFieldFile._write_molecule(molecule, _molfile,
-                                                        title, params,
+                                                        title, len(num), params,
                                                         parameters == 'inline')
-                # Molecules
-                dest.write('[ molecules 3 ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in new_molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(new_molecules):
-                        if i in lst:
-                            break
-                    else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
         finally:
+            # Print all VdW parameters for the full system
+            nattyps = len(params.atom_types)
+            parfile.write('VDW %d\n'%(int(nattyps*(nattyps+1)/2)))
+            cnt1 = 0
+            for key1, atom_type1 in iteritems(params.atom_types):
+                cnt1 += 1
+                cnt2 = 0
+                for key2, atom_type2 in iteritems(params.atom_types):
+                    cnt2 += 1
+                    if (cnt2 < cnt1): continue
+                    eps = math.sqrt(atom_type1.epsilon*atom_type2.epsilon)
+                    sig = (atom_type1.sigma+atom_type2.sigma)/2
+                    parfile.write('%-6s %-6s %4s %14.8f %14.8f\n'%
+                          (atom_type1, atom_type2, 'lj', eps, sig))
+            # Close statement
+            dest.write('CLOSE\n')
+            # Close handles
             if own_handle:
                 dest.close()
             if own_parfile_handle:
@@ -1530,10 +1517,10 @@ class DlpolyFieldFile(Structure):
     #===================================================
 
     @staticmethod
-    def _write_molecule(struct, dest, title, params, writeparams):
+    def _write_molecule(struct, dest, title, nmols, params, writeparams):
         # Printing molecule header
         dest.write('%s\n' % (title))
-        dest.write('NUMMOLS    1(TO BE FIXED)\n')
+        dest.write('NUMMOLS %d\n'%(nmols))
         # Getting number of atoms
         natoms = 0
         for residue in struct.residues:
@@ -1541,11 +1528,10 @@ class DlpolyFieldFile(Structure):
                 natoms += 1
         # Print masses and charges
         dest.write('ATOMS %d\n'%(natoms))
-        #for residue in struct.residues:
-        #    for atom in residue:
-        #        dest.write('%-8s %10.6f %12.8f 1\n' %
-        #                   (atom.type, atom.mass, atom.charge))
-        #dest.write('\n')
+        for residue in struct.residues:
+            for atom in residue:
+                dest.write('%-8s %10.6f %12.8f 1\n' %
+                           (atom.type, atom.mass, atom.charge))
         # Do valence terms now
         EPs = [a for a in struct.atoms if isinstance(a, ExtraPoint)]
         if len(struct.atoms) - len(EPs) == 3:
@@ -1565,16 +1551,15 @@ class DlpolyFieldFile(Structure):
                 if (bond.funct != 1):
                     raise DlpolyError('Bond between atoms %d and %d is of an invalid type!'
                                        % (bond.atom1.idx+1, bond.atom2.idx+1))
-                #dest.write('%4s %7d %6d' % ('harm', bond.atom1.idx+1, bond.atom2.idx+1))
+                dest.write('%4s %6d %6d' % ('harm', bond.atom1.idx+1, bond.atom2.idx+1))
                 if bond.type is None:
                     dest.write('\n')
                     continue # pragma: no cover
                 key = (_gettype(bond.atom1), _gettype(bond.atom2))
-                #if writeparams or key not in params.bond_types or \
-                #        bond.type != params.bond_types[key]:
-                #    dest.write('   %10.6f %10.6f %10.6f %10.6f' % (bond.type.k*conv, bond.type.req, 0.0, 0.0))
-                #dest.write('\n')
-            #dest.write('\n')
+                if writeparams or key not in params.bond_types or \
+                        bond.type != params.bond_types[key]:
+                    dest.write('   %12.6f %12.6f %12.6f %12.6f' % (bond.type.k*conv, bond.type.req, 0.0, 0.0))
+                dest.write('\n')
         # Angles
         if struct.angles:
             conv = 2.0
@@ -1585,18 +1570,17 @@ class DlpolyFieldFile(Structure):
                     raise DlpolyError('Angle between atoms %d, %d and %d is of an invalid type!'
                                        % (angle.atom1.idx+1, angle.atom2.idx+1,
                                           angle.atom3.idx+1))
-                #dest.write('%4s %6d %6d %6d' % ('harm', angle.atom1.idx+1, angle.atom2.idx+1,
-                #           angle.atom3.idx+1))
+                dest.write('%4s %6d %6d %6d' % ('harm', angle.atom1.idx+1, angle.atom2.idx+1,
+                           angle.atom3.idx+1))
                 if angle.type is None:
                     dest.write('\n')
                     continue
                 key = (_gettype(angle.atom1), _gettype(angle.atom2), _gettype(angle.atom3))
                 param_equal = params.angle_types.get(key) == angle.type
-                #if writeparams or not param_equal:
-                #    dest.write('   %12.7f %12.7f %12.7f %12.7f' % (angle.type.k*conv,
-                #               angle.type.theteq, 0.0, 0.0))
-                #dest.write('\n')
-            #dest.write('\n')
+                if writeparams or not param_equal:
+                    dest.write('   %12.7f %12.7f %12.7f %12.7f' % (angle.type.k*conv,
+                               angle.type.theteq, 0.0, 0.0))
+                dest.write('\n')
         # Dihedrals
         if struct.dihedrals:
             dest.write('DIHEDRALS %d\n'%(len(struct.dihedrals)))
@@ -1607,8 +1591,8 @@ class DlpolyFieldFile(Structure):
                     raise DlpolyError('Dihedral between atoms %d, %d, %d and %d is of an invalid type!'
                                        % (dihed.atom1.idx+1, dihed.atom2.idx+1,
                                           dihed.atom3.idx+1, dihed.atom4.idx+1))
-                #dest.write('%-4s %6d %6d %6d %6d' % ('cos', dihed.atom1.idx+1, dihed.atom2.idx+1,
-                #           dihed.atom3.idx+1, dihed.atom4.idx+1))
+                dest.write('%-4s %6d %6d %6d %6d' % ('cos', dihed.atom1.idx+1, dihed.atom2.idx+1,
+                           dihed.atom3.idx+1, dihed.atom4.idx+1))
                 if dihed.type is None:
                     dest.write('\n')
                     continue
@@ -1618,13 +1602,12 @@ class DlpolyFieldFile(Structure):
                     typedict = params.dihedral_types
                 key = (_gettype(dihed.atom1), _gettype(dihed.atom2),
                         _gettype(dihed.atom3), _gettype(dihed.atom4))
-                #if writeparams or key not in typedict or \
-                #        _diff_diheds(dihed.type, typedict[key]):
-                #    dest.write('  %12.7f  %12.7f  %4d  %10.5f  %10.5f' % (dihed.type.phi_k*conv,
-                #               dihed.type.phase, int(dihed.type.per), dihed.type.scee,
-                #               dihed.type.scnb))
-                #dest.write('\n')
-            #dest.write('\n')
+                if writeparams or key not in typedict or \
+                        _diff_diheds(dihed.type, typedict[key]):
+                    dest.write('  %12.7f  %12.7f  %4d  %10.5f  %10.5f' % (dihed.type.phi_k*conv,
+                               dihed.type.phase, int(dihed.type.per), dihed.type.scee,
+                               dihed.type.scnb))
+                dest.write('\n')
         # Impropers
         if struct.impropers:
             dest.write('INVERSIONS %d\n'%(len(struct.impropers)))
@@ -1645,7 +1628,6 @@ class DlpolyFieldFile(Structure):
                 # currently store the correct ordering of the types in the
                 # improper section
                 dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_k*conv, dihed.type.psi_eq))
-            dest.write('\n')
         # Finish
         dest.write('FINISH\n')
 
