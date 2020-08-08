@@ -17,7 +17,7 @@ class DlpolyConfigFile(object):
     #===================================================
 
     @staticmethod
-    def write(struct, dest, precision=9, combine=False):
+    def write(struct, dest, precision=12, combine=False):
         """ Write a Dlpoly CONFIG File from a Structure
 
         Parameters
@@ -37,10 +37,10 @@ class DlpolyConfigFile(object):
         """
 
         def _write_atom_line(atom, atid, resid, has_vels, dest, precision):
-            varwidth = 5 + precision
+            varwidth = 8 + precision
             crdfmt = '%%%d.%df' % (varwidth, precision)
             velfmt = '%%%d.%df' % (varwidth, precision)
-            dest.write('%-5s %6d' % (atom.type[:5], atid))
+            dest.write('%-8s %6d' % (atom.type[:5], atid))
             dest.write('\n')
             dest.write((crdfmt % (atom.xx))[:varwidth])
             dest.write((crdfmt % (atom.xy))[:varwidth])
@@ -82,8 +82,8 @@ class DlpolyConfigFile(object):
         dest.write('     %5d         0.0000000000E+00\n' % len(struct.atoms))
         # Box information
         if struct.box is not None:
-            varwidth = 5 + precision
-            boxfmt = '%%%d.%df %%%d.%df %%%d.%df\n' % (varwidth, precision, varwidth, precision, varwidth, precision)
+            varwidth = 8 + precision
+            boxfmt = '%%%d.%df%%%d.%df%%%d.%df\n' % (varwidth, precision, varwidth, precision, varwidth, precision)
             dest.write(boxfmt % (a[0], a[1], a[2]))
             dest.write(boxfmt % (b[0], b[1], b[2]))
             dest.write(boxfmt % (c[0], c[1], c[2]))

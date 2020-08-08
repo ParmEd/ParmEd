@@ -1502,7 +1502,7 @@ class DlpolyFieldFile(Structure):
                     if (cnt2 < cnt1): continue
                     eps = math.sqrt(atom_type1.epsilon*atom_type2.epsilon)
                     sig = (atom_type1.sigma+atom_type2.sigma)/2
-                    parfile.write('%-6s %-6s %4s %14.8f %14.8f\n'%
+                    parfile.write('%-8s%-8s%4s %14.8f %14.8f\n'%
                           (atom_type1, atom_type2, 'lj', eps, sig))
             # Close statement
             dest.write('CLOSE\n')
@@ -1604,9 +1604,13 @@ class DlpolyFieldFile(Structure):
                         _gettype(dihed.atom3), _gettype(dihed.atom4))
                 if writeparams or key not in typedict or \
                         _diff_diheds(dihed.type, typedict[key]):
+                    scee = 0.0
+                    if (dihed.type.scee > 0.0): scee = 1.0/dihed.type.scee
+                    scnb = 0.0
+                    if (dihed.type.scnb > 0.0): scnb = 1.0/dihed.type.scnb
                     dest.write('  %12.7f  %12.7f  %4d  %10.5f  %10.5f' % (dihed.type.phi_k*conv,
-                               dihed.type.phase, int(dihed.type.per), dihed.type.scee,
-                               dihed.type.scnb))
+                               dihed.type.phase, int(dihed.type.per), scee,
+                               scnb))
                 dest.write('\n')
         # Impropers
         if struct.impropers:
