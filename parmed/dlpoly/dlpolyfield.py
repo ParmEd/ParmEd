@@ -3,25 +3,15 @@ This module contains functionality relevant to building a DLPOLY topology file
 """
 from __future__ import print_function, division, absolute_import
 
-from collections import OrderedDict, defaultdict
-from contextlib import closing
+from collections import defaultdict
 import copy
-from datetime import datetime
 import math
 import os
-import re
-try:
-    from string import letters
-except ImportError:
-    from string import ascii_letters as letters
 import sys
-import warnings
 
-from parmed.constants import TINY, DEG_TO_RAD
-from parmed.exceptions import DlpolyError, DlpolyWarning, ParameterError
+from parmed.exceptions import DlpolyError
 from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet, _find_ureybrad_key
-from parmed.dlpoly._dlpolyfile import DlpolyFile
+from parmed.parameters import ParameterSet
 from parmed.structure import Structure
 from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
@@ -29,27 +19,9 @@ from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
             NonbondedExceptionType, UnassignedAtomType)
-from parmed.periodic_table import element_by_mass, AtomicNum
-from parmed import unit as u
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
-
-try:
-    import pwd
-    try:
-        _username = pwd.getpwuid(os.getuid())[0]
-    except KeyError:
-        _username = 'username'
-    _userid = os.getuid()
-    _uname = os.uname()[1]
-except ImportError:
-    import getpass
-    _username = getpass.getuser()   # pragma: no cover
-    _userid = 0                     # pragma: no cover
-    import platform                 # pragma: no cover
-    _uname = platform.node()        # pragma: no cover
-
 
 
 # Dlpoly uses "funct" flags in its parameter files to indicate what kind of
@@ -94,8 +66,6 @@ except ImportError:
 # 10 - F_RESTRDIHS : Restricted torsion potential
 # 11 - F_CBTDIHS : combined bending-torsion potential
 
-_sectionre = re.compile(r'\[ (\w+) \]\s*$')
-
 class _Defaults(object):
     """ Global properties of force fields as implemented in DLPOLY """
     def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='no',
@@ -120,16 +90,6 @@ class _Defaults(object):
         return ('<_Defaults: nbfunc=%d, comb-rule=%d, gen-pairs="%s", '
                 'fudgeLJ=%g, fudgeQQ=%g>' % (self.nbfunc, self.comb_rule,
                     self.gen_pairs, self.fudgeLJ, self.fudgeQQ))
-
-    def __getitem__(self, idx):
-        # Treat it like the array that it is in the topology file
-        if idx < 0: idx += 5
-        if idx == 0: return self.nbfunc
-        if idx == 1: return self.comb_rule
-        if idx == 2: return self.gen_pairs
-        if idx == 3: return self.fudgeLJ
-        if idx == 4: return self.fudgeQQ
-        raise IndexError('Index %d out of range' % idx)
 
     def __eq__(self, other):
         return (self.nbfunc == other.nbfunc and
@@ -165,1029 +125,16 @@ class _Defaults(object):
 
 @add_metaclass(FileFormatType)
 class DlpolyFieldFile(Structure):
-    """ Class providing a parser and writer for a DLPOLY topology file
-
-    Parameters
-    ----------
-    fname : str
-        The name of the file to read
-    defines : list of str=None
-        If specified, this is the set of defines to use when parsing the
-        topology file
-    parametrized : bool, optional
-        If True, parameters are assigned after parsing is done from the
-        parametertypes sections. If False, only parameter types defined in the
-        parameter sections themselves are loaded (i.e., on the same line as the
-        parameter was defined). Default is True
-    xyz : str or array, optional
-        The source of atomic coordinates. It can be a string containing the name
-        of a coordinate file from which to fill the coordinates (and optionally
-        the unit cell information), or it can be an array with the coordinates.
-        Default is None
-    box : array, optional
-        If provided, the unit cell information will be set from this variable.
-        If provided, it must be a collection of 6 floats representing the unit
-        cell dimensions a, b, c, alpha, beta, and gamma, respectively. Default
-        is None.
-
-    Notes
-    -----
-    If the ``xyz`` argument is a file name that contains the unit cell
-    information, this unit cell information is set. However, the ``box``
-    argument takes precedence and will override values given in the coordinate
-    file unless it has its default value of ``None``.
+    """ Class providing a writer for a DLPOLY topology file
     """
 
     #===================================================
 
-    @staticmethod
-    def id_format(filename):
-        """ Identifies the file as a DLPOLY topology file
-
-        Parameters
-        ----------
-        filename : str
-            Name of the file to check if it is a dlpoly topology file
-
-        Returns
-        -------
-        is_fmt : bool
-            If it is identified as a dlpoly topology, return True. False
-            otherwise
-        """
-        with closing(genopen(filename)) as f:
-            for line in f:
-                if line.startswith(';'):
-                    line = line[:line.index(';')]
-                if not line.strip(): continue
-                if line.startswith('#'):
-                    if line.startswith('#if'): continue
-                    if line.startswith('#define'): continue
-                    if line.startswith('#include'): continue
-                    if line.startswith('#undef'): continue
-                    if line.startswith('#endif'): continue
-                    return False
-                rematch = _sectionre.match(line)
-                if not rematch:
-                    return False
-                sec, = rematch.groups()
-                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype',
-                               'system', 'bondtypes', 'angletypes', 'cmaptypes',
-                               'dihedraltypes', 'bonds', 'angles', 'dihedrals',
-                               'cmaps', 'molecules', 'exclusions',
-                               'nonbond_params', 'position_restraints')
-            return False
-
-    #===================================================
-
-    def __init__(self, fname=None, defines=None, parametrize=True,
-                 xyz=None, box=None):
+    def __init__(self):
         from parmed import load_file
         super(DlpolyFieldFile, self).__init__()
         self.parameterset = None
         self.defaults = _Defaults(gen_pairs='yes') # make ParmEd's default yes
-        if fname is not None:
-            self.read(fname, defines, parametrize)
-            # Fill in coordinates and unit cell information if appropriate
-            if xyz is not None:
-                if isinstance(xyz, string_types):
-                    f = load_file(xyz, skip_bonds=True)
-                    if not hasattr(f, 'coordinates') or f.coordinates is None:
-                        raise TypeError('File %s does not have coordinates' %
-                                        xyz)
-                    self.coordinates = f.coordinates
-                    if box is None and hasattr(f, 'box'):
-                        self.box = f.box
-                else:
-                    self.coordinates = xyz
-            if box is not None:
-                self.box = box
-            self.unchange()
-        elif xyz is not None or box is not None:
-            raise ValueError('Cannot provide coordinates/box and NOT a top')
-
-    #===================================================
-
-    def read(self, fname, defines=None, parametrize=True):
-        """ Reads the topology file into the current instance """
-        from parmed import dlpoly as gmx
-        params = self.parameterset = ParameterSet()
-        molecules = self.molecules = dict()
-        bond_types = dict()
-        angle_types = dict()
-        ub_types = dict()
-        dihedral_types = dict()
-        exc_types = dict()
-        structure_contents = []
-        molnames = []
-        if defines is None:
-            defines = OrderedDict(FLEXIBLE=1)
-        proper_multiterm_dihedrals = dict()
-        with closing(DlpolyFile(fname, includes=[gmx.DLPOLY_TOPDIR], defines=defines)) as f:
-            current_section = None
-            for line in f:
-                line = line.strip()
-                if not line: continue
-
-                if line[0] == '[':
-                    current_section = line[1:-1].strip()
-                elif current_section == 'moleculetype':
-                    molname, nrexcl = line.split()
-                    nrexcl = int(nrexcl)
-                    if molname in molecules:
-                        raise DlpolyError('Duplicate definition of molecule %s'
-                                           % molname)
-                    molecule = Structure()
-                    molecules[molname] = (molecule, nrexcl)
-                    molnames.append(molname)
-                    molecule.nrexcl = nrexcl
-                    bond_types = dict()
-                    angle_types = dict()
-                    ub_types = dict()
-                    dihedral_types = dict()
-                    exc_types = dict()
-                elif current_section == 'atoms':
-                    molecule.add_atom(*self._parse_atoms(line, params))
-                elif current_section == 'bonds':
-                    bond, bond_type = self._parse_bonds(line, bond_types, molecule.atoms)
-                    molecule.bonds.append(bond)
-                    if bond_type is not None:
-                        molecule.bond_types.append(bond_type)
-                        bond_type.list = molecule.bond_types
-                elif current_section == 'pairs':
-                    nbe, nbet = self._parse_pairs(line, exc_types, molecule.atoms)
-                    molecule.adjusts.append(nbe)
-                    if nbet is not None:
-                        molecule.adjust_types.append(nbet)
-                        nbet.list = molecule.adjust_types
-                elif current_section == 'angles':
-                    ang, ub, angt, ubt = self._parse_angles(line, angle_types, ub_types,
-                                                            molecule.atoms)
-                    molecule.angles.append(ang)
-                    if ub is not None:
-                        molecule.urey_bradleys.append(ub)
-                    if angt is not None:
-                        molecule.angle_types.append(angt)
-                        angt.list = molecule.angle_types
-                    if ubt is not None and ubt is not NoUreyBradley:
-                        molecule.urey_bradley_types.append(ubt)
-                        ubt.list = molecule.urey_bradley_types
-                elif current_section == 'dihedrals':
-                    self._parse_dihedrals(line, dihedral_types, proper_multiterm_dihedrals,
-                                          molecule)
-                elif current_section == 'cmap':
-                    cmap = self._parse_cmaps(line, molecule.atoms)
-                    molecule.cmaps.append(cmap)
-                elif current_section == 'system':
-                    self.title = line
-                elif current_section == 'defaults':
-                    words = line.split()
-                    if len(words) < 2: # 3, 4, and 5 fields are optional
-                        raise DlpolyError('Too few fields in [ defaults ]')
-                    if words[0] != '1':
-                        warnings.warn('Unsupported nonbonded type; unknown functional',
-                                      DlpolyWarning)
-                        self.unknown_functional = True
-                    if words[1] in ('1', '3'):
-                        self.combining_rule = 'geometric'
-                    self.defaults = _Defaults(*words)
-                elif current_section == 'molecules':
-                    name, num = line.split()
-                    num = int(num)
-                    structure_contents.append((name, num))
-                elif current_section == 'settles':
-                    bnds, bndts = self._parse_settles(line, molecule.atoms)
-                    molecule.bonds.extend(bnds)
-                    molecule.bond_types.extend(bndts)
-                    molecule.bond_types.claim()
-                elif current_section in ('virtual_sites3', 'dummies3'):
-                    try:
-                        b, bt = self._parse_vsites3(line, molecule.atoms, params)
-                    except KeyError:
-                        raise DlpolyError('Cannot determine vsite geometry '
-                                           'without parameter types')
-                    molecule.bonds.append(b)
-                    molecule.bond_types.append(bt)
-                    bt.list = molecule.bond_types
-                elif current_section == 'exclusions':
-                    atoms = [molecule.atoms[int(w)-1] for w in line.split()]
-                    for a in atoms[1:]:
-                        atoms[0].exclude(a)
-                elif current_section == 'atomtypes':
-                    attype, typ = self._parse_atomtypes(line)
-                    params.atom_types[attype] = typ
-                elif current_section == 'nonbond_params':
-                    words = line.split()
-                    a1, a2 = words[:2]
-#                   func = int(words[2]) #... unused
-                    sig, eps = (float(x) for x in words[3:5])
-                    sig *= 10 # Convert to Angstroms
-                    eps *= u.kilojoule.conversion_factor_to(u.kilocalorie)
-                    params.nbfix_types[(a1, a2)] = (eps, sig*2**(1/6))
-                    params.nbfix_types[(a2, a1)] = (eps, sig*2**(1/6))
-                    params.atom_types[a1].add_nbfix(a2, sig*2**(1/6), eps)
-                    params.atom_types[a2].add_nbfix(a1, sig*2**(1/6), eps)
-                elif current_section == 'bondtypes':
-                    a, b, t = self._parse_bondtypes(line)
-                    params.bond_types[(a, b)] = t
-                    params.bond_types[(b, a)] = t
-                elif current_section == 'angletypes':
-                    a, b, c, t, ut = self._parse_angletypes(line)
-                    params.angle_types[(a, b, c)] = t
-                    params.angle_types[(c, b, a)] = t
-                    if ut is not None:
-                        params.urey_bradley_types[(a, b, c)] = ut
-                        params.urey_bradley_types[(c, b, a)] = ut
-                elif current_section == 'dihedraltypes':
-                    key, knd, t, replace = self._parse_dihedraltypes(line)
-                    rkey = tuple(reversed(key))
-                    if knd == 'normal':
-                        if replace or key not in params.dihedral_types:
-                            t = DihedralTypeList([t])
-                            params.dihedral_types[key] = t
-                            params.dihedral_types[rkey] = t
-                        elif key in params.dihedral_types:
-                            params.dihedral_types[key].append(t, override=True)
-                    elif knd == 'improper':
-                        params.improper_types[key] = t
-                    elif knd == 'improper_periodic':
-                        params.improper_periodic_types[key] = t
-                        params.improper_periodic_types[rkey] = t
-                    elif knd == 'rbtorsion':
-                        params.rb_torsion_types[key] = t
-                        params.rb_torsion_types[rkey] = t
-                elif current_section == 'cmaptypes':
-                    a1, a2, a3, a4, a5, t = self._parse_cmaptypes(line)
-                    params.cmap_types[(a1, a2, a3, a4, a2, a3, a4, a5)] = t
-                    params.cmap_types[(a5, a4, a3, a2, a4, a3, a2, a1)] = t
-                elif current_section == 'pairtypes':
-                    a, b, t = self._parse_pairtypes(line)
-                    params.pair_types[(a, b)] = params.pair_types[(b, a)] = t
-            itplist = f.included_files
-
-        # If the file did not contain the molecules section, perhaps
-        # because it was an itp-file. We assume that each molecule loaded
-        # should be contained once in this structure
-        if not structure_contents :
-            for name in molnames :
-                structure_contents.append((name, 1))
-
-        # Combine first, then parametrize. That way, we don't have to create
-        # copies of the ParameterType instances in self.parameterset
-        for molname, num in structure_contents:
-            if molname not in molecules:
-                raise DlpolyError('Structure contains %s molecules, but no '
-                                   'template defined' % molname)
-            molecule, nrexcl = molecules[molname]
-            if nrexcl < 3 and _any_atoms_farther_than(molecule, nrexcl):
-                warnings.warn('nrexcl %d not currently supported' % nrexcl,
-                              DlpolyWarning)
-            elif nrexcl > 3 and _any_atoms_farther_than(molecule, 3):
-                warnings.warn('nrexcl %d not currently supported' % nrexcl,
-                              DlpolyWarning)
-            if num == 0:
-                warnings.warn('Detected addition of 0 %s molecules in topology '
-                              'file' % molname, DlpolyWarning)
-            if num == 1:
-                self += molecules[molname][0]
-            elif num > 1:
-                self += molecules[molname][0] * num
-            else:
-                raise DlpolyError("Can't add %d %s molecules" % (num, molname))
-        self.itps = itplist
-        if parametrize:
-            self.parametrize()
-
-    #===================================================
-
-    # Private parsing helper functions
-
-    def _parse_atoms(self, line, params):
-        """ Parses an atom line. Returns an Atom, resname, resnum """
-        words = line.split()
-        try:
-            attype = params.atom_types[words[1]]
-        except KeyError:
-            attype = None
-        if len(words) < 8:
-            if attype is not None:
-                mass = attype.mass
-                atomic_number = attype.atomic_number
-            else:
-                mass = -1
-                atomic_number = -1
-        else:
-            mass = float(words[7])
-            if attype is not None and attype.atomic_number >= 0:
-                atomic_number = attype.atomic_number
-            else:
-                atomic_number = AtomicNum[element_by_mass(mass)]
-        charge = float(words[6]) if len(words) > 6 else None
-        if atomic_number == 0:
-            atom = ExtraPoint(name=words[4], type=words[1], charge=charge)
-        else:
-            atom = Atom(atomic_number=atomic_number, name=words[4],
-                        type=words[1], charge=charge, mass=mass)
-        return atom, words[3], int(words[2])
-
-    def _parse_bonds(self, line, bond_types, atoms):
-        """ Parses a bond line. Returns a Bond, BondType/None """
-        words = line.split()
-        i, j = int(words[0])-1, int(words[1])-1
-        funct = int(words[2])
-        if funct != 1:
-            warnings.warn('bond funct != 1; unknown functional',
-                          DlpolyWarning)
-            self.unknown_functional = True
-        bond = Bond(atoms[i], atoms[j])
-        bond.funct = funct
-        bond_type = None
-        if len(words) >= 5 and funct == 1:
-            req, k = (float(x) for x in words[3:5])
-            if (req, k) in bond_types:
-                bond.type = bond_types[(req, k)]
-            else:
-                bond_type = BondType(
-                        k*u.kilojoule_per_mole/u.nanometer**2/2,
-                        req*u.nanometer
-                )
-                bond_types[(req, k)] = bond.type = bond_type
-        return bond, bond_type
-
-    def _parse_pairs(self, line, exc_types, atoms):
-        """ Parses a pairs line. Returns NonbondedException, NEType/None """
-        words = line.split()
-        i, j = int(words[0])-1, int(words[1])-1
-        funct = int(words[2])
-        if funct != 1:
-            # This is not even supported in Dlpoly
-            warnings.warn('pairs funct != 1; unknown functional',
-                          DlpolyWarning)
-            self.unknown_functional = True
-        nbe = NonbondedException(atoms[i], atoms[j])
-        nbe.funct = funct
-        nbet = None
-        if funct == 1 and len(words) >= 5:
-            sig = float(words[3]) * 2**(1/6)
-            eps = float(words[4])
-            if (sig, eps) in exc_types:
-                nbe.type = exc_types[(sig, eps)]
-            else:
-                nbet = NonbondedExceptionType(sig*u.nanometers, eps*u.kilojoules_per_mole,
-                                              self.defaults.fudgeQQ)
-                exc_types[(sig, eps)] = nbe.type = nbet
-        return nbe, nbet
-
-    def _parse_angles(self, line, angle_types, ub_types, atoms):
-        """ Parse an angles line, Returns Angle, UB/None, and types """
-        words = line.split()
-        i, j, k = [int(w)-1 for w in words[:3]]
-        funct = int(words[3])
-        if funct not in (1, 5):
-            warnings.warn('angles funct != 1 or 5; unknown '
-                          'functional', DlpolyWarning)
-            self.unknown_functional = True
-        angt = ub = ubt = None
-        ang = Angle(atoms[i], atoms[j], atoms[k])
-        ang.funct = funct
-        if funct == 5:
-            ub = UreyBradley(atoms[i], atoms[k])
-        if (funct == 1 and len(words) >= 6) or (funct == 5 and len(words) >= 8):
-            theteq, k = (float(x) for x in words[4:6])
-            if (theteq, k) in angle_types:
-                ang.type = angle_types[(theteq, k)]
-            else:
-                angt = AngleType(k*u.kilojoule_per_mole/u.radian**2/2,
-                                 theteq*u.degree)
-                angle_types[(theteq, k)] = ang.type = angt
-        if funct == 5 and len(words) >= 8:
-            ubreq, ubk = (float(x) for x in words[6:8])
-            if ubk > 0:
-                if (ubreq, ubk) in ub_types:
-                    ub.type = ub_types[(ubreq, ubk)]
-                else:
-                    ubt = BondType(
-                        ubk*u.kilojoule_per_mole/u.nanometer**2/2,
-                        ubreq*u.nanometer,
-                    )
-                    ub_types[(ubreq, ubk)] = ub.type = ubt
-            else:
-                ub.type = NoUreyBradley
-        return ang, ub, angt, ubt
-
-    def _parse_dihedrals(self, line, dihedral_types, PMD, molecule):
-        """ Processes a dihedrals line, returns None """
-        words = line.split()
-        i, j, k, l = [int(x)-1 for x in words[:4]]
-        funct = int(words[4])
-        if funct in (1, 4) or (funct == 9 and len(words) < 8):
-            dih, diht = self._process_normal_dihedral(words, molecule.atoms, i,
-                                                      j, k, l, dihedral_types,
-                                                      funct==4)
-            molecule.dihedrals.append(dih)
-            if diht is not None:
-                molecule.dihedral_types.append(diht)
-                diht.list = molecule.dihedral_types
-        elif funct == 2:
-            dih, impt = self._process_improper(words, i, j, k, l,
-                                               molecule.atoms, dihedral_types)
-            molecule.impropers.append(dih)
-            if impt is not None:
-                molecule.improper_types.append(impt)
-                impt.list = molecule.improper_types
-        elif funct == 3:
-            dih, rbt = self._process_rbtorsion(words, i, j, k, l, molecule.atoms,
-                                              dihedral_types)
-            molecule.rb_torsions.append(dih)
-            if rbt is not None:
-                molecule.rb_torsion_types.append(rbt)
-                rbt.list = molecule.rb_torsion_types
-        elif funct == 9:
-            # in-line parameters, since len(words) must be >= 8
-            key = (molecule.atoms[i], molecule.atoms[j],
-                   molecule.atoms[k], molecule.atoms[l])
-            if key in PMD:
-                diht = PMD[key]
-                self._process_dihedral_series(words, diht)
-                dih = None
-            else:
-                dih = Dihedral(*key)
-                diht = self._process_dihedral_series(words)
-                dih.type = PMD[key] = PMD[tuple(reversed(key))] = diht
-                molecule.dihedrals.append(dih)
-                molecule.dihedral_types.append(diht)
-                diht.list = molecule.dihedral_types
-        else:
-            # ??? unknown funct
-            warnings.warn('torsions funct != 1, 2, 3, 4, 9; unknown'
-                          ' functional', DlpolyWarning)
-            dih = Dihedral(molecule.atoms[i], molecule.atoms[j],
-                           molecule.atoms[k], molecule.atoms[l])
-            molecule.dihedrals.append(dih)
-            self.unknown_functional = True
-
-        if dih is not None:
-            dih.funct = funct
-
-    def _parse_cmaps(self, line, atoms):
-        """ Parses cmap terms, returns cmap """
-        words = line.split()
-        i, j, k, l, m = (int(w)-1 for w in words[:5])
-        funct = int(words[5])
-        if funct != 1:
-            warnings.warn('cmap funct != 1; unknown functional',
-                          DlpolyWarning)
-            self.unknown_functional = True
-        cmap = Cmap(atoms[i], atoms[j], atoms[k], atoms[l], atoms[m])
-        cmap.funct = funct
-        return cmap
-
-    def _parse_settles(self, line, atoms):
-        """ Parses settles line; returns list of Bonds, list of BondTypes """
-        # Instead of adding bonds that get constrained for waters (or other
-        # 3-atom molecules), DLPOLY uses a "settles" section to specify the
-        # constraint geometry. We have to translate that into bonds.
-        natoms = len([a for a in atoms if not isinstance(a, ExtraPoint)])
-        if natoms != 3:
-            raise DlpolyError("Cannot SETTLE a %d-atom molecule" % natoms)
-        try:
-            oxy, = [atom for atom in atoms if atom.atomic_number == 8]
-            hyd1, hyd2 = [atom for atom in atoms if atom.atomic_number == 1]
-        except ValueError:
-            raise DlpolyError('Can only SETTLE water; wrong atoms')
-        #TODO see if there's a bond_type entry in the parameter set
-        #     that we can fill in? Wait until this is needed...
-        try:
-            i, funct, doh, dhh = line.split()
-            doh, dhh = float(doh), float(dhh)
-        except ValueError:
-            raise DlpolyError('Bad [ settles ] line')
-        nm = u.nanometers
-        bt_oh = BondType(5e5*u.kilojoules_per_mole/nm**2, doh*nm)
-        bt_hh = BondType(5e5*u.kilojoules_per_mole/nm**2, dhh*nm)
-        return [Bond(oxy, hyd1, bt_oh), Bond(oxy, hyd2, bt_oh),
-                Bond(hyd1, hyd2, bt_hh)], [bt_oh, bt_hh]
-
-    def _parse_vsites3(self, line, all_atoms, params):
-        """ Parse vsites3/dummy3 line; returns Bond, BondType """
-        words = line.split()
-        vsite = all_atoms[int(words[0])-1]
-        atoms = [all_atoms[int(i)-1] for i in words[1:4]]
-        funct = int(words[4])
-        if funct == 1:
-            a, b = float(words[5]), float(words[6])
-            if abs(a - b) > TINY:
-                raise DlpolyError("No vsite frames with different weights")
-        else:
-            raise DlpolyError('Only 3-point vsite type 1 is supported')
-        # We need to know the geometry of the frame in order to
-        # determine the bond length between the virtual site and its
-        # parent atom
-        parent = atoms[0]
-        if vsite in parent.bond_partners:
-            raise DlpolyError('Unexpected bond b/w vsite and its parent')
-        kws = dict()
-        for bond in parent.bonds:
-            if atoms[1] in bond:
-                key = (_gettype(parent), _gettype(atoms[1]))
-                kws['dp1'] = (bond.type or params.bond_types[key]).req
-            if atoms[2] in bond:
-                key = (_gettype(bond.atom1), _gettype(bond.atom2))
-                kws['dp2'] = (bond.type or params.bond_types[key]).req
-        for angle in parent.angles:
-            if parent is not angle.atom2: continue
-            if atoms[0] not in angle or atoms[1] not in angle: continue
-            key = (_gettype(angle.atom1), _gettype(angle.atom2),
-                   _gettype(angle.atom3))
-            kws['theteq'] = (angle.type or params.angle_types[key]).theteq
-            break
-        else: # Did not break, no theta found
-            for bond in atoms[1].bonds:
-                if atoms[2] in bond:
-                    key = (_gettype(bond.atom1), _gettype(bond.atom2))
-                    kws['d12'] = (bond.type or params.bond_types[key]).req
-        bondlen = ThreeParticleExtraPointFrame.from_weights(parent, atoms[1],
-                                                    atoms[2], a, b, **kws)
-        bt_vs = BondType(0, bondlen*u.angstroms)
-        return Bond(vsite, parent, bt_vs), bt_vs
-
-    def _parse_atomtypes(self, line):
-        """ Parses line from atomtypes section, returns str, AtomType """
-        words = line.split()
-        # Support the following spec, found in the Dlpoly source code:
-        # Field 0 (mandatory) : nonbonded type name (string)
-        # Field 1 (optional)  : bonded type (string)
-        # Field 2 (optional)  : atomic number (int)
-        # Field 3 (mandatory) : mass (float)
-        # Field 4 (mandatory) : charge (float)
-        # Field 5 (mandatory) : particle type (single character)
-        attype = words[0]
-        if len(words[3]) == 1 and words[3] in letters:
-            # Field 1 and Field 2 are both missing
-            atnum = -1
-            sigidx = 4
-#           ptypeidx = 3 # ... unused
-            massidx = 1
-            bond_type = None
-        elif len(words[5]) == 1 and words[5] in letters:
-            # Both Field 1 and Field 2 are present
-            sigidx = 6
-#           ptypeidx = 5 # ... unused
-            massidx = 3
-            atnum = int(words[2])
-            bond_type = words[1]
-        else:
-            # One of Field 1 or 2 are missing
-#           ptypeidx = 4 # ... unused
-            massidx = 2
-            sigidx = 5
-            try:
-                atnum = int(words[1])
-                bond_type = None
-            except ValueError:
-                # This must be a bonded type string
-                bond_type = words[1]
-                atnum = -1
-        mass = float(words[massidx])
-        if mass > 0 and atnum == -1:
-            atnum = AtomicNum[element_by_mass(mass)]
-        chg = float(words[massidx+1])
-#       ptype = words[ptypeidx] # ... unused
-        sig = float(words[sigidx]) * u.nanometers
-        eps = float(words[sigidx+1]) * u.kilojoules_per_mole
-        typ = AtomType(attype, None, mass, atnum, bond_type=bond_type, charge=chg)
-        typ.set_lj_params(eps, sig*2**(1/6)/2)
-        return attype, typ
-
-    def _parse_bondtypes(self, line):
-        """ Parse bondtypes line. Returns str, str, BondType """
-        words = line.split()
-        r = float(words[3]) * u.nanometers
-        k = (float(words[4]) / 2) * (u.kilojoules_per_mole / u.nanometers**2)
-        if words[2] != '1':
-            warnings.warn('bondtypes funct != 1; unknown functional',
-                          DlpolyWarning)
-            self.unknown_functional = True
-        return words[0], words[1], BondType(k, r)
-
-    def _parse_angletypes(self, line):
-        """
-        Parses angletypes line. Returns str, str, str, AngleType, BondType/None
-        """
-        words = line.split()
-        theta = float(words[4]) * u.degrees
-        k = (float(words[5]) / 2) * (u.kilojoules_per_mole / u.radians**2)
-        if words[3] != '1' and words[3] != '5':
-            warnings.warn('angletypes funct != 1 or 5; unknown functional',
-                          DlpolyWarning)
-            self.unknown_functional = True
-        ub = None
-        if words[3] == '5':
-            # Contains the angle with urey-bradley
-            ub0 = float(words[6])
-            cub = float(words[7]) / 2
-            if cub == 0:
-                ub = NoUreyBradley
-            else:
-                ub0 *= u.nanometers
-                cub *= u.kilojoules_per_mole / u.nanometers**2
-                ub = BondType(cub, ub0)
-        return words[0], words[1], words[2], AngleType(k, theta), ub
-
-    def _parse_dihedraltypes(self, line):
-        """ Parse dihedraltypes, returns (str,str,str,str), str, Type, bool """
-        words = line.split()
-        replace = False
-        dtype = 'normal'
-        # Ugh. Dlpoly allows only two atom types (the middle atom types) to be
-        # specified. This signifies wild-cards
-        if words[2] in ('1', '2', '3', '4', '5', '8', '9', '10', '11'):
-            a1 = a4 = 'X'
-            a2, a3 = words[:2]
-            si = 2
-        else:
-            a1, a2, a3, a4 = words[:4]
-            si = 4
-        improper_periodic = False
-        replace = words[si] in ('1', '2', '3', '4')
-        improper_periodic = words[si] == '4'
-        if words[si] == '2':
-            dtype = 'improper'
-        elif words[si] == '3':
-            dtype = 'rbtorsion'
-        elif words[si] not in ('1', '4', '9'):
-            warnings.warn('dihedraltypes funct not supported', DlpolyWarning)
-            self.unknown_functional = True
-        # Do the proper types
-        if dtype == 'normal':
-            phase = float(words[si+1]) * u.degrees
-            phi_k = float(words[si+2]) * u.kilojoules_per_mole
-            per = int(words[si+3])
-            ptype = DihedralType(phi_k, per, phase,
-                                 scee=1/self.defaults.fudgeQQ,
-                                 scnb=1/self.defaults.fudgeLJ)
-            if improper_periodic:
-                # must do this here, since dtype has to be 'normal' above
-                dtype = 'improper_periodic'
-        elif dtype == 'improper':
-            theta = float(words[si+1])*u.degrees
-            k = float(words[si+2])*u.kilojoules_per_mole/u.radians**2/2
-            a1, a2, a3, a4 = sorted([a1, a2, a3, a4])
-            ptype = ImproperType(k, theta)
-        elif dtype == 'rbtorsion':
-            a1, a2, a3, a4 = words[:4]
-            c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoules_per_mole
-                                        for x in words[si+1:si+7])
-            ptype = RBTorsionType(c0, c1, c2, c3, c4, c5,
-                                  scee=1/self.defaults.fudgeQQ,
-                                  scnb=1/self.defaults.fudgeLJ)
-        return (a1, a2, a3, a4), dtype, ptype, replace
-
-    def _parse_cmaptypes(self, line):
-        words = line.split()
-        a1, a2, a3, a4, a5 = words[:5]
-#       funct = int(words[5]) # ... unused
-        res1, res2 = int(words[6]), int(words[7])
-        grid = [float(w) for w in words[8:]] * u.kilojoules_per_mole
-        if len(grid) != res1 * res2:
-            raise DlpolyError('CMAP grid dimensions do not match resolution')
-        if res1 != res2:
-            raise DlpolyError('Only square CMAPs are supported')
-        return a1, a2, a3, a4, a5, CmapType(res1, grid)
-
-    def _parse_pairtypes(self, line):
-        words = line.split()
-        a1, a2 = words[:2]
-#       funct = int(words[2]) # ... unused
-        cs6, cs12 = (float(x) for x in words[3:5])
-        cs6 *= u.nanometers * 2**(1/6)
-        cs12 *= u.kilojoules_per_mole
-        return a1, a2, NonbondedExceptionType(cs6, cs12, self.defaults.fudgeQQ)
-
-    #===================================================
-
-    # Internal Dihedral processing routines for different kinds of dihedrals
-
-    def _process_normal_dihedral(self, words, atoms, i, j, k, l,
-                                 dihedral_types, imp):
-        dih = Dihedral(atoms[i], atoms[j], atoms[k], atoms[l], improper=imp)
-        diht = None
-        if len(words) >= 8:
-            phase, phi_k, per = (float(x) for x in words[5:8])
-            if (phase, phi_k, per) in dihedral_types:
-                dih.type = dihedral_types[(phase, phi_k, per)]
-            else:
-                diht = DihedralType(phi_k*u.kilojoule_per_mole,
-                                    per, phase*u.degrees,
-                                    scee=1/self.defaults.fudgeQQ,
-                                    scnb=1/self.defaults.fudgeLJ)
-                dihedral_types[(phase, phi_k, per)] = dih.type = diht
-        return dih, diht
-
-    def _process_dihedral_series(self, words, dihtype=None):
-        phase, phi_k, per = (float(x) for x in words[5:8])
-        dt = DihedralType(phi_k*u.kilojoule_per_mole,
-                          per, phase*u.degrees,
-                          scee=1/self.defaults.fudgeQQ,
-                          scnb=1/self.defaults.fudgeLJ)
-        if dihtype is not None:
-            dihtype.append(dt)
-            dtl = None
-        else:
-            dt = DihedralType(phi_k*u.kilojoule_per_mole,
-                              per, phase*u.degrees,
-                              scee=1/self.defaults.fudgeQQ,
-                              scnb=1/self.defaults.fudgeLJ)
-            dtl = DihedralTypeList()
-            dtl.append(dt)
-        return dtl
-
-    def _process_improper(self, words, i, j, k, l, atoms, dihedral_types):
-        """ Processes an improper, returns Improper, ImproperType """
-        # Improper
-        imp = Improper(atoms[i], atoms[j], atoms[k], atoms[l])
-        impt = None
-        if len(words) >= 7:
-            psieq, k = (float(x) for x in words[5:7])
-            if (psieq, k) in dihedral_types:
-                imp.type = dihedral_types[(psieq, k)]
-            else:
-                impt = ImproperType(k*u.kilojoule_per_mole/u.radian**2/2,
-                                    psieq*u.degree)
-                imp.type = dihedral_types[(psieq, k)] = impt
-        return imp, impt
-
-    def _process_rbtorsion(self, words, i, j, k, l, atoms, dihedral_types):
-        rb = Dihedral(atoms[i], atoms[j], atoms[k], atoms[l])
-        rbt = None
-        if len(words) >= 11:
-            c0, c1, c2, c3, c4, c5 = (float(x) for x in words[5:11])
-            if (c0, c1, c2, c3, c4, c5) in dihedral_types:
-                rb.type = dihedral_types[(c0, c1, c2, c3, c4, c5)]
-            else:
-                kjpm = u.kilojoules_per_mole
-                rbt = RBTorsionType(c0*kjpm, c1*kjpm, c2*kjpm,
-                                    c3*kjpm, c4*kjpm, c5*kjpm,
-                                    scee=1/self.defaults.fudgeQQ,
-                                    scnb=1/self.defaults.fudgeLJ)
-                dihedral_types[(c0, c1, c2, c3, c4, c5)] = rb.type = rbt
-        return rb, rbt
-
-    #===================================================
-
-    def parametrize(self):
-        """
-        Assign parameters to the current structure. This should be called
-        *after* `read`
-        """
-        if self.parameterset is None:
-            raise RuntimeError('parametrize called before read')
-        params = copy.copy(self.parameterset)
-        def update_typelist_from(ptypes, types):
-            added_types = set(id(typ) for typ in types)
-            for k, typ in iteritems(ptypes):
-                if not typ.used: continue
-                if id(typ) in added_types: continue
-                added_types.add(id(typ))
-                types.append(typ)
-            types.claim()
-        # Assign all of the parameters. If they've already been assigned (i.e.,
-        # on the parameter line itself) keep the existing parameters
-        for atom in self.atoms:
-            atom.atom_type = params.atom_types[atom.type]
-        # The list of ordered 2-tuples of atoms explicitly specified in [ pairs ].
-        # Under most circumstances, this is the list of 1-4 pairs.
-        gmx_pair = set()
-        for pair in self.adjusts:
-            if pair.atom1 > pair.atom2:
-                gmx_pair.add((pair.atom2, pair.atom1))
-            else:
-                gmx_pair.add((pair.atom1, pair.atom2))
-            if pair.type is not None: continue
-            key = (_gettype(pair.atom1), _gettype(pair.atom2))
-            if key in params.pair_types:
-                pair.type = params.pair_types[key]
-                pair.type.used = True
-            elif self.defaults.gen_pairs == 'yes':
-                assert self.combining_rule in ('geometric', 'lorentz'), \
-                        'Unrecognized combining rule'
-                if self.combining_rule == 'geometric':
-                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
-                    sig = math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
-                elif self.combining_rule == 'lorentz':
-                    eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
-                    sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
-                eps *= self.defaults.fudgeLJ
-                pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
-                            self.defaults.fudgeQQ, list=self.adjust_types)
-                self.adjust_types.append(pairtype)
-                pair.type = pairtype
-                pair.type.used = True
-            else:
-                raise ParameterError('Not all pair parameters can be found')
-        update_typelist_from(params.pair_types, self.adjust_types)
-        # This is the list of 1-4 pairs determined from the bond graph.
-        # If this is different from what's in [ pairs ], we print a warning
-        # and make some adjustments (specifically, other programs assume
-        # the 1-4 list is complete, so we zero out the parameters for
-        # 1-4 pairs that aren't in [ pairs ].
-        true_14 = set()
-        for bond in self.bonds:
-            for bpi in bond.atom1.bond_partners:
-                for bpj in bond.atom2.bond_partners:
-                    if len(set([bpi, bond.atom1, bond.atom2, bpj])) < 4:
-                        continue
-                    if bpi in bpj.bond_partners or bpi in bpj.angle_partners:
-                        continue
-                    if bpi > bpj:
-                        true_14.add((bpj, bpi))
-                    else:
-                        true_14.add((bpi, bpj))
-            if bond.type is not None: continue
-            key = (_gettype(bond.atom1), _gettype(bond.atom2))
-            if key in params.bond_types:
-                bond.type = params.bond_types[key]
-                bond.type.used = True
-            else:
-                raise ParameterError('Not all bond parameters found')
-        if len(true_14 - gmx_pair) > 0:
-            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0,
-                                                   list=self.adjust_types)
-            self.adjust_types.append(zero_pairtype)
-            num_zero_14 = 0
-            for a1, a2 in (true_14 - gmx_pair):
-                self.adjusts.append(NonbondedException(a1, a2, zero_pairtype))
-                num_zero_14 += 1
-            warnings.warn('%i 1-4 pairs were missing from the [ pairs ] '
-                          'section and were set to zero; make sure you '
-                          'know what you\'re doing!' % num_zero_14,
-                          DlpolyWarning)
-        if len(gmx_pair - true_14) > 0:
-            warnings.warn('The [ pairs ] section contains %i exceptions that '
-                          'aren\'t 1-4 pairs; make sure you know what '
-                          'you\'re doing!' % (len(gmx_pair - true_14)),
-                          DlpolyWarning)
-        update_typelist_from(params.bond_types, self.bond_types)
-        for angle in self.angles:
-            if angle.type is not None: continue
-            key = (_gettype(angle.atom1), _gettype(angle.atom2),
-                   _gettype(angle.atom3))
-            if key in params.angle_types:
-                angle.type = params.angle_types[key]
-                angle.type.used = True
-            else:
-                raise ParameterError('Not all angle parameters found')
-        update_typelist_from(params.angle_types, self.angle_types)
-        for ub in self.urey_bradleys:
-            if ub.type is not None: continue
-            key = _find_ureybrad_key(ub)
-            if key in params.urey_bradley_types:
-                ub.type = params.urey_bradley_types[key]
-                if ub.type is not NoUreyBradley:
-                    ub.type.used = True
-            else:
-                raise ParameterError('Not all urey-bradley parameters found')
-        # Now strip out all of the Urey-Bradley terms whose parameters are 0
-        for i in reversed(range(len(self.urey_bradleys))):
-            if self.urey_bradleys[i].type is NoUreyBradley:
-                del self.urey_bradleys[i]
-        update_typelist_from(params.urey_bradley_types, self.urey_bradley_types)
-        for t in self.dihedrals:
-            if t.type is not None: continue
-            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
-                   _gettype(t.atom4))
-            if not t.improper:
-                wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
-                wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
-                          _gettype(t.atom3), 'X')
-                wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
-                          _gettype(t.atom4))
-                if key in params.dihedral_types:
-                    t.type = params.dihedral_types[key]
-                    t.type.used = True
-                elif wckey1 in params.dihedral_types:
-                    t.type = params.dihedral_types[wckey1]
-                    t.type.used = True
-                elif wckey2 in params.dihedral_types:
-                    t.type = params.dihedral_types[wckey2]
-                    t.type.used = True
-                elif wckey in params.dihedral_types:
-                    t.type = params.dihedral_types[wckey]
-                    t.type.used = True
-                else:
-                    raise ParameterError('Not all torsion parameters found')
-            else:
-                if key in params.improper_periodic_types:
-                    t.type = params.improper_periodic_types[key]
-                    t.type.used = True
-                else:
-                    for wckey in [(key[0],key[1],key[2],'X'),
-                                  ('X',key[1],key[2],key[3]),
-                                  (key[0],key[1],'X','X'),
-                                  ('X','X',key[2],key[3])]:
-                        if wckey in params.improper_periodic_types:
-                            t.type = params.improper_periodic_types[wckey]
-                            t.type.used = True
-                            break
-                    else:
-                        raise ParameterError('Not all improper torsion '
-                                             'parameters found')
-        update_typelist_from(params.dihedral_types, self.dihedral_types)
-        update_typelist_from(params.improper_periodic_types, self.dihedral_types)
-        for t in self.rb_torsions:
-            if t.type is not None: continue
-            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
-                   _gettype(t.atom4))
-            wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
-            wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
-                      _gettype(t.atom3), 'X')
-            wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
-                      _gettype(t.atom4))
-            if key in params.rb_torsion_types:
-                t.type = params.rb_torsion_types[key]
-                t.type.used = True
-            elif wckey1 in params.rb_torsion_types:
-                t.type = params.rb_torsion_types[wckey1]
-                t.type.used = True
-            elif wckey2 in params.rb_torsion_types:
-                t.type = params.rb_torsion_types[wckey2]
-                t.type.used = True
-            elif wckey in params.rb_torsion_types:
-                t.type = params.rb_torsion_types[wckey]
-                t.type.used = True
-            else:
-                raise ParameterError('Not all R-B torsion parameters found')
-        update_typelist_from(params.rb_torsion_types, self.rb_torsion_types)
-        self.update_dihedral_exclusions()
-        for t in self.impropers:
-            if t.type is not None: continue
-            key = tuple(sorted([_gettype(t.atom1), _gettype(t.atom2),
-                                _gettype(t.atom3), _gettype(t.atom4)]))
-            if key in params.improper_types:
-                t.type = params.improper_types[key]
-                t.type.used = True
-                continue
-            # Now we will try to find a compatible wild-card... the first atom
-            # is the central atom. So take each of the other three and plug that
-            # one in
-            for anchor in (_gettype(t.atom2), _gettype(t.atom3),
-                           _gettype(t.atom4)):
-                wckey = tuple(sorted([_gettype(t.atom1), anchor, 'X', 'X']))
-                if wckey not in params.improper_types: continue
-                t.type = params.improper_types[wckey]
-                t.type.used = True
-                break
-            else:
-                raise ParameterError('Not all improper parameters found')
-        update_typelist_from(params.improper_types, self.improper_types)
-        for c in self.cmaps:
-            if c.type is not None: continue
-            key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
-                    _gettype(c.atom4), _gettype(c.atom5))
-            key = (key[0],key[1],key[2],key[3],key[1],key[2],key[3],key[4])
-            if key in params.cmap_types:
-                c.type = params.cmap_types[key]
-                c.type.used = True
-            else:
-                raise ParameterError('Not all cmap parameters found')
-        update_typelist_from(params.cmap_types, self.cmap_types)
-
-    #===================================================
-
-    def copy(self, cls, split_dihedrals=False):
-        """
-        Makes a copy of the current structure as an instance of a specified
-        subclass
-
-        Parameters
-        ----------
-        cls : Structure subclass
-            The returned object is a copy of this structure as a `cls` instance
-        split_dihedrals : ``bool``
-            If True, then the Dihedral entries will be split up so that each one
-            is paired with a single DihedralType (rather than a
-            DihedralTypeList)
-
-        Returns
-        -------
-        *cls* instance
-            The instance of the Structure subclass `cls` with a copy of the
-            current Structure's topology information
-        """
-        c = super(DlpolyFieldFile, self).copy(cls, split_dihedrals)
-        c.defaults = copy.copy(self.defaults)
-        return c
-
-    #===================================================
-
-    def __getitem__(self, selection):
-        """ See Structure.__getitem__ for documentation """
-        # Make sure defaults is properly copied
-        struct = super(DlpolyFieldFile, self).__getitem__(selection)
-        if isinstance(struct, Atom):
-            return struct
-        struct.defaults = copy.copy(self.defaults)
-        return struct
 
     #===================================================
 
@@ -1205,35 +152,35 @@ class DlpolyFieldFile(Structure):
 
         Returns
         -------
-        gmxtop : :class:`DlpolyFieldFile`
+        dlpolyfield : :class:`DlpolyFieldFile`
             The topology file defined by the given struct
         """
         from copy import copy as _copy
-        gmxtop = cls()
+        dlpolyfield = cls()
         if copy:
             struct = _copy(struct)
             struct.join_dihedrals()
-        gmxtop.atoms = struct.atoms
-        gmxtop.residues = struct.residues
-        gmxtop.bonds = struct.bonds
-        gmxtop.angles = struct.angles
-        gmxtop.dihedrals = struct.dihedrals
-        gmxtop.impropers = struct.impropers
-        gmxtop.cmaps = struct.cmaps
-        gmxtop.rb_torsions = struct.rb_torsions
-        gmxtop.urey_bradleys = struct.urey_bradleys
-        gmxtop.adjusts = struct.adjusts
-        gmxtop.bond_types = struct.bond_types
-        gmxtop.angle_types = struct.angle_types
-        gmxtop.dihedral_types = struct.dihedral_types
-        gmxtop.improper_types = struct.improper_types
-        gmxtop.cmap_types = struct.cmap_types
-        gmxtop.rb_torsion_types = struct.rb_torsion_types
-        gmxtop.urey_bradley_types = struct.urey_bradley_types
-        gmxtop.adjust_types = struct.adjust_types
-        gmxtop.combining_rule = struct.combining_rule
-        gmxtop.box = struct.box
-        gmxtop.nrexcl = struct.nrexcl
+        dlpolyfield.atoms = struct.atoms
+        dlpolyfield.residues = struct.residues
+        dlpolyfield.bonds = struct.bonds
+        dlpolyfield.angles = struct.angles
+        dlpolyfield.dihedrals = struct.dihedrals
+        dlpolyfield.impropers = struct.impropers
+        dlpolyfield.cmaps = struct.cmaps
+        dlpolyfield.rb_torsions = struct.rb_torsions
+        dlpolyfield.urey_bradleys = struct.urey_bradleys
+        dlpolyfield.adjusts = struct.adjusts
+        dlpolyfield.bond_types = struct.bond_types
+        dlpolyfield.angle_types = struct.angle_types
+        dlpolyfield.dihedral_types = struct.dihedral_types
+        dlpolyfield.improper_types = struct.improper_types
+        dlpolyfield.cmap_types = struct.cmap_types
+        dlpolyfield.rb_torsion_types = struct.rb_torsion_types
+        dlpolyfield.urey_bradley_types = struct.urey_bradley_types
+        dlpolyfield.adjust_types = struct.adjust_types
+        dlpolyfield.combining_rule = struct.combining_rule
+        dlpolyfield.box = struct.box
+        dlpolyfield.nrexcl = struct.nrexcl
         if (struct.trigonal_angles or
                 struct.out_of_plane_bends or
                 struct.pi_torsions or
@@ -1245,7 +192,7 @@ class DlpolyFieldFile(Structure):
         # Now check what the 1-4 scaling factors should be
         if hasattr(struct, 'defaults') and isinstance(struct.defaults,
                                                       _Defaults):
-            gmxtop.defaults = struct.defaults
+            dlpolyfield.defaults = struct.defaults
         else:
             scee_values = set()
             scnb_values = set()
@@ -1259,7 +206,7 @@ class DlpolyFieldFile(Structure):
                 # In order to specify specific pair parameters, we need to set
                 # gen_pairs to 'no' so that the pair-specific L-J parameters are
                 # printed to the topology file (rather than being auto-created)
-                gmxtop.defaults.gen_pairs = 'no'
+                dlpolyfield.defaults.gen_pairs = 'no'
             else:
                 for dihedral in struct.dihedrals:
                     if dihedral.type is None or dihedral.ignore_end: continue
@@ -1280,19 +227,19 @@ class DlpolyFieldFile(Structure):
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
             if len(set('%.5f' % x for x in scee_values)) == 1:
-                gmxtop.defaults.fudgeQQ = 1/scee_values[0]
+                dlpolyfield.defaults.fudgeQQ = 1/scee_values[0]
             else:
-                gmxtop.defaults.fudgeQQ = 1.0
+                dlpolyfield.defaults.fudgeQQ = 1.0
             if len(set('%.5f' % x for x in scnb_values)) == 1:
-                gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
+                dlpolyfield.defaults.fudgeLJ = 1/scnb_values[0]
             else:
-                gmxtop.defaults.fudgeLJ = 1.0
-        if gmxtop.combining_rule == 'geometric':
-            gmxtop.defaults.comb_rule = 3
+                dlpolyfield.defaults.fudgeLJ = 1.0
+        if dlpolyfield.combining_rule == 'geometric':
+            dlpolyfield.defaults.comb_rule = 3
 
-        gmxtop.parameterset = ParameterSet.from_structure(struct,
+        dlpolyfield.parameterset = ParameterSet.from_structure(struct,
                                             allow_unequal_duplicates=True)
-        return gmxtop
+        return dlpolyfield
 
     #===================================================
 
@@ -1634,65 +581,6 @@ class DlpolyFieldFile(Structure):
                 dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_k*conv, dihed.type.psi_eq))
         # Finish
         dest.write('FINISH\n')
-
-    #===================================================
-
-    def __getstate__(self):
-        d = Structure.__getstate__(self)
-        d['parameterset'] = self.parameterset
-        d['defaults'] = self.defaults
-        return d
-
-    def __setstate__(self, d):
-        Structure.__setstate__(self, d)
-        self.parameterset = d['parameterset']
-        self.defaults = d['defaults']
-
-def _any_atoms_farther_than(structure, limit=3):
-    """
-    This function checks to see if there are any atom pairs farther away in the
-    bond graph than the desired limit
-
-    Parameters
-    ----------
-    structure : :class:`Structure`
-        The structure to search through
-    limit : int, optional
-        The most number of bonds away to check for. Default is 3
-
-    Returns
-    -------
-    within : bool
-        True if any atoms are *more* than ``limit`` bonds away from any other
-        atom
-    """
-    import sys
-    if len(structure.atoms) <= limit + 1: return False
-    sys.setrecursionlimit(max(sys.getrecursionlimit(), limit+1))
-    for atom in structure.atoms:
-        for atom in structure.atoms: atom.marked = limit + 1
-        _mark_graph(atom, 0)
-        if any((atom.marked > limit for atom in structure.atoms)):
-            return True
-    return False
-
-def _mark_graph(atom, num):
-    """ Marks all atoms in the graph listing the minimum number of bonds each
-    atom is away from the current atom
-
-    Parameters
-    ----------
-    atom : :class:`Atom`
-        The current atom to evaluate in the bond graph
-    num : int
-        The current depth in our search
-    limit : int
-        The maximum depth we want to search
-    """
-    atom.marked = num
-    for a in atom.bond_partners:
-        if a.marked <= num: continue
-        _mark_graph(a, num+1)
 
 def _diff_diheds(dt1, dt2):
     """ Determine if 2 dihedrals are *really* different. dt1 can either be a
