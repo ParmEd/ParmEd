@@ -80,13 +80,17 @@ gmx_top.save('pmaa.crd', format='rst7')
 
 # convert AMBER topology to GROMACS, CHARMM formats
 amber = pmd.load_file('prmtop', 'inpcrd')
-# Save a GROMACS topology and GRO file
+# Save a GROMACS topology and GRO files
 amber.save('gromacs.top')
 amber.save('gromacs.gro')
 
-# Save a CHARMM PSF and crd file
+# Save a CHARMM PSF and crd files
 amber.save('charmm.psf')
 amber.save('charmm.crd')
+
+# Save a DLPOLY FIELD and CONFIG files
+amber.save('dlpoly.field')
+amber.save('dlpoly.config')
 
 # convert mol2 to pdb file
 mol2_parm = pmd.load_file('my.mol2')
