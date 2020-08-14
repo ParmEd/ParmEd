@@ -6,19 +6,13 @@ from __future__ import print_function, division, absolute_import
 from collections import defaultdict
 import copy
 import math
-import os
-import sys
 
 from parmed.exceptions import DlpolyError
 from parmed.formats.registry import FileFormatType
 from parmed.parameters import ParameterSet
 from parmed.structure import Structure
-from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
-            NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
-            AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
-            RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
-            TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
-            NonbondedExceptionType, UnassignedAtomType)
+from parmed.topologyobjects import (ExtraPoint, DihedralType, DihedralTypeList,
+                                    UnassignedAtomType)
 from parmed.utils.io import genopen
 from parmed.utils.six import add_metaclass, string_types, iteritems
 from parmed.utils.six.moves import range
@@ -131,7 +125,6 @@ class DlpolyFieldFile(Structure):
     #===================================================
 
     def __init__(self):
-        from parmed import load_file
         super(DlpolyFieldFile, self).__init__()
         self.parameterset = None
         self.defaults = _Defaults(gen_pairs='yes') # make ParmEd's default yes
@@ -270,8 +263,6 @@ class DlpolyFieldFile(Structure):
         TypeError if the dest input cannot be parsed
         ValueError if the combine, or parameters input cannot be parsed
         """
-        import parmed.dlpoly as gmx
-        from parmed import __version__
         own_handle = False
         fname = ''
         params = ParameterSet.from_structure(self, allow_unequal_duplicates=True)
@@ -284,7 +275,6 @@ class DlpolyFieldFile(Structure):
 
         # Determine where to write the parameters
         own_parfile_handle = False
-        include_parfile = None
         if parameters == 'inline':
             parfile = dest
         elif isinstance(parameters, string_types):
@@ -293,7 +283,6 @@ class DlpolyFieldFile(Structure):
             else:
                 own_parfile_handle = True
                 parfile = genopen(parameters, 'w')
-                include_parfile = parameters
         elif hasattr(parameters, 'write'):
             parfile = parameters
         else:
@@ -302,7 +291,6 @@ class DlpolyFieldFile(Structure):
 
         # Determine where to write the molecules
         own_molfile_handle = False
-        include_molfile = None
         _molfile = dest
 
         # Error-checking for combine
