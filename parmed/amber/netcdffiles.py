@@ -252,7 +252,7 @@ class NetCDFRestart(object):
     @property
     def coordinates(self):
         coords = self._ncfile.variables['coordinates'][:]
-        return coords.reshape((1, self.atom, 3))
+        return coords.reshape((-1, self.atom, 3))
 
     @coordinates.setter
     def coordinates(self, stuff):
@@ -264,7 +264,7 @@ class NetCDFRestart(object):
     def velocities(self):
         if 'velocities' in self._ncfile.variables:
             vels = self._ncfile.variables['velocities'][:]
-            return (vels.reshape((1, self.atom, 3)) * self.velocity_scale)
+            return (vels.reshape((-1, self.atom, 3)) * self.velocity_scale)
 
     @velocities.setter
     def velocities(self, stuff):
