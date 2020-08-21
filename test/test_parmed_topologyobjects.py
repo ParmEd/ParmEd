@@ -337,7 +337,7 @@ class TestTopologyObjects(unittest.TestCase):
         # Test that units get stripped on assignment and that unit-ed attributes have units
         a = Atom(name='CA')
         a.charge = (0.1 * u.elementary_charge).in_units_of(u.coulomb)
-        self.assertEqual(a.charge, 0.1)
+        self.assertAlmostEqual(a.charge, 0.1)
         self.assertEqual(a.ucharge, 0.1 * u.elementary_charge)
         a.rmin = 1
         self.assertEqual(a.rmin, 1)
