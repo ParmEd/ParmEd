@@ -285,7 +285,6 @@ The corresponding classes are:
     NetCDFRestart
     NetCDFTraj
     AmberMdcrd
-    netcdffiles.use
 
 Inpcrd and Restart files
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -494,41 +493,8 @@ endian <http://en.wikipedia.org/wiki/Endianness>`_), and extensible (i.e., you
 can extend a file convention to include more data *without* breaking existing
 parsers).
 
-Python cannot read NetCDF files without the support of an external package. In
-particular, the following packages provide Python bindings to the NetCDF API:
+ParmEd uses, by default, numpy as a backend.
 
-    1. `scipy <http://www.scipy.org/>`_
-    2. `netCDF4 <https://github.com/Unidata/netcdf4-python>`_
-    3. `ScientificPython <http://dirac.cnrs-orleans.fr/plone/software/scientificpython/>`_
-
-All three of these files provide similar, although not identical interfaces. The
-ParmEd API supports all three NetCDF backends. You can swap out backends at any
-time using the :func:`use <parmed.amber.netcdffiles.use>` function. If you do
-not choose one, one will be picked automatically based on the available
-packages.  If several of those packages are available, the first one in the
-above list that is available will be picked.
-
-For most users, simply ensuring that at least one of the above packages is
-available and working and using the default will suffice. For the other small
-percentage that may want more fine-grained control, the :func:`use
-<parmed.amber.netcdffiles.use>` function will let you specify a particular
-implementation to use.  You can change the back-end at any time, but note that
-the behavior of a NetCDF object *created* with one implementation is undefined
-if you switch to a different one. So you are cautioned against switching NetCDF
-implementations when open NetCDF file handles are still open.
-
-An example of switching between NetCDF implementations is shown below::
-
-    from parmed.amber import netcdffiles
-    # Use the default NetCDF package (if one is already selected,
-    # this does nothing)
-    netcdffiles.use() # You can also pass "None"
-    # Use scipy for NetCDF files
-    netcdffiles.use('scipy')
-    # Use ScientificPython for NetCDF files
-    netcdffiles.use('Scientific') # Can also be ScientificPython
-    # Use netCDF4
-    netcdffiles.use('netCDF4')
 
 Amber mask syntax
 -----------------
