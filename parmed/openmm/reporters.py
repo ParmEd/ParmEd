@@ -666,8 +666,8 @@ class ProgressReporter(StateDataReporter):
 
     See Also
     --------
-    In addition to the above, ProgressReporter also accepts arguments for
-    StateDataReporter
+    StateDataReporter : In addition to the above, ProgressReporter also accepts arguments for
+        StateDataReporter
     """
 
     @needs_openmm

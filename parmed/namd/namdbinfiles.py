@@ -26,7 +26,7 @@ class NamdBinFile(object):
 
     See also
     --------
-    :class:`NamdBinCoor` and :class:`NamdBinVel`
+    NamdBinCoor, NamdBinVel
     """
     _SCALE_FACTOR = 1.0
     def __init__(self, values=[]):

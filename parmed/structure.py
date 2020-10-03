@@ -632,8 +632,8 @@ class Structure(object):
 
         See Also
         --------
-        :func:`parmed.utils.pandautils.create_dataframe` for full
-        documentation of the generated DataFrame
+        :func:`parmed.utils.pandautils.create_dataframe` : for full
+            documentation of the generated DataFrame
         """
         from parmed.utils.pandautils import create_dataframe
         return create_dataframe(self)
@@ -651,7 +651,7 @@ class Structure(object):
 
         See Also
         --------
-        :func:`parmed.utils.pandautils.load_dataframe` for full documentation
+        :func:`parmed.utils.pandautils.load_dataframe` : for full documentation
         """
         from parmed.utils.pandautils import load_dataframe
         return load_dataframe(self, df)
@@ -3910,8 +3910,8 @@ class StructureView(object):
 
         See Also
         --------
-        :func:`parmed.utils.pandautils.create_dataframe` for full
-        documentation of the generated DataFrame
+        :func:`parmed.utils.pandautils.create_dataframe` : for full
+            documentation of the generated DataFrame
         """
         from parmed.utils.pandautils import create_dataframe
         return create_dataframe(self)
@@ -3927,7 +3927,7 @@ class StructureView(object):
 
         See Also
         --------
-        :func:`parmed.utils.pandautils.load_dataframe` for full documentation
+        :func:`parmed.utils.pandautils.load_dataframe` : for full documentation
         """
         from parmed.utils.pandautils import load_dataframe
         return load_dataframe(self, df)

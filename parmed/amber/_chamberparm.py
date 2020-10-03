@@ -87,8 +87,8 @@ class ChamberParm(AmberParm):
 
     See Also
     --------
-    See :class:`AmberParm` for list of other attributes present in ChamberParm
-    instances
+    :class:`AmberParm` : for list of other attributes present in ChamberParm
+        instances
     """
 
     _cmap_prefix = "CHARMM_"
