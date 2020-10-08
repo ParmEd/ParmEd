@@ -338,7 +338,7 @@ class TestTopologyObjects(unittest.TestCase):
         a = Atom(name='CA')
         a.charge = (0.1 * u.elementary_charge).in_units_of(u.coulomb)
         self.assertAlmostEqual(a.charge, 0.1)
-        self.assertEqual(a.ucharge, 0.1 * u.elementary_charge)
+        self.assertAlmostEqual(a.ucharge.value_in_unit(u.coulomb), 0.1)
         a.rmin = 1
         self.assertEqual(a.rmin, 1)
         self.assertEqual(a.urmin, 1*u.angstroms)
@@ -349,14 +349,14 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(a.epsilon, 1)
         self.assertEqual(a.uepsilon, 1*u.kilocalories_per_mole)
         a.rmin_14 = 1.1
-        self.assertEqual(a.rmin_14, 1.1)
-        self.assertEqual(a.urmin_14, 1.1*u.angstroms)
+        self.assertAlmostEqual(a.rmin_14, 1.1)
+        self.assertAlmostEqual(a.urmin_14.value_in_unit(u.angstroms), 1.1)
         a.sigma_14 = 1.1
-        self.assertEqual(a.sigma_14, 1.1)
-        self.assertEqual(a.usigma_14, 1.1*u.angstroms)
+        self.assertAlmostEqual(a.sigma_14, 1.1)
+        self.assertAlmostEqual(a.usigma_14.value_in_unit(u.angstroms), 1.1)
         a.epsilon = 1.1
-        self.assertEqual(a.epsilon, 1.1)
-        self.assertEqual(a.uepsilon, 1.1*u.kilocalories_per_mole)
+        self.assertAlmostEqual(a.epsilon, 1.1)
+        self.assertAlmostEqual(a.uepsilon.value_in_unit(u.angstroms), 1.1)
 
     #=============================================
 
