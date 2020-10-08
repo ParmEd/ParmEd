@@ -36,11 +36,12 @@ from ._amberparm import AmberParm
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChamberParm(AmberParm):
-    """
-    Chamber Topology (parm7 format) class. Gives low, and some high, level
-    access to topology data or interact with some of the high-level classes
-    comprising the system topology and parameters.  The ChamberParm class uses
-    the same attributes that the AmberParm class uses, and only the ones unique
+    """Chamber Topology (parm7 format) class.
+
+    Gives low, and some high, level access to topology data or
+    interact with some of the high-level classes comprising the system
+    topology and parameters.  The ChamberParm class uses the same
+    attributes that the AmberParm class uses, and only the ones unique
     to ChamberParm will be shown below.
 
     Parameters
@@ -87,8 +88,7 @@ class ChamberParm(AmberParm):
 
     See Also
     --------
-    :class:`AmberParm` : for list of other attributes present in ChamberParm
-        instances
+    :class:`AmberParm`
     """
 
     _cmap_prefix = "CHARMM_"

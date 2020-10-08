@@ -12,10 +12,8 @@ addons:
 
 matrix:
   include:
-    - { os: linux, env: PYTHON_VERSION=2.7 MINIMAL_PACKAGES=yes }
-    - { os: linux, env: PYTHON_VERSION=3.7 MINIMAL_PACKAGES=yes }
-    - { os: linux, env: PYTHON_VERSION=3.6 }
-    - { os: linux, env: PYTHON_VERSION=pypy }
+    - { os: linux, env: PYTHON_VERSION=3.8 MINIMAL_PACKAGES=yes }
+    - { os: linux, env: PYTHON_VERSION=3.7 }
 
 install:
     - source devtools/ci/travis/install.sh

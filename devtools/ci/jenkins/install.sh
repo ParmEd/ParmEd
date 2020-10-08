@@ -27,7 +27,6 @@ conda --version
 # Now add the packages we want
 conda install --quiet -yn ${CONDAENV} numpy scipy pandas nose openmm coverage nose-timer \
                                       python-coveralls ambermini=16.16 netCDF4 lxml
-conda install --quiet -yn ${CONDAENV} pyflakes=1.0.0
 conda install --quiet -yn ${CONDAENV} rdkit==2015.09.1 -c omnia
 conda install --quiet -yn ${CONDAENV} boost==1.59.0 -c omnia
 conda install --quiet -yn ${CONDAENV} nglview==0.5.1
@@ -40,10 +39,6 @@ conda install --quiet -yn ${CONDAENV} --no-deps pysander
 
 # Now enter this superamazingawesome environment we just created
 source activate ${CONDAENV}
-
-# Lint
-echo "Checking the parmed source code with pyflakes"
-sh devtools/ci/pyflakes_check.sh
 
 # Now install ParmEd
 python setup.py install
