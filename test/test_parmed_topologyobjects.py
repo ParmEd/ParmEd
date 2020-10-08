@@ -356,7 +356,7 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertAlmostEqual(a.usigma_14.value_in_unit(u.angstroms), 1.1)
         a.epsilon = 1.1
         self.assertAlmostEqual(a.epsilon, 1.1)
-        self.assertAlmostEqual(a.uepsilon.value_in_unit(u.angstroms), 1.1)
+        self.assertAlmostEqual(a.uepsilon.value_in_unit(u.kilocalories_per_mole), 1.1)
 
     #=============================================
 
