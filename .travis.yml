@@ -15,7 +15,6 @@ matrix:
     - { os: linux, env: PYTHON_VERSION=2.7 MINIMAL_PACKAGES=yes }
     - { os: linux, env: PYTHON_VERSION=3.7 MINIMAL_PACKAGES=yes }
     - { os: linux, env: PYTHON_VERSION=3.6 }
-    - { os: linux, env: PYTHON_VERSION=pypy }
 
 install:
     - source devtools/ci/travis/install.sh
