@@ -7,8 +7,7 @@ if [ "$PYTHON_VERSION" = "pypy" ]; then
     pyenv install pypy3.6-7.2.0
     pyenv global pypy3.6-7.2.0
 
-    pypy -m pip install nose pyflakes==1.0.0 nose-timer lxml
-    which pyflakes
+    pypy -m pip install nose nose-timer lxml
     pypy -m pip install numpy
 else # Otherwise, CPython... go through conda
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
@@ -44,7 +43,6 @@ else # Otherwise, CPython... go through conda
             nose-timer
     fi
     source activate myenv
-    pip install pyflakes==1.0.0
     if [ -z "$MINIMAL_PACKAGES" ]; then
         pip uninstall parmed -y # from ambertools
     fi
