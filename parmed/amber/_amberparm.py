@@ -829,8 +829,8 @@ class AmberParm(AmberFormat, Structure):
         Lorentz-Berthelot combining rules to the values in :attr:`LJ_radius` and
         :attr:`LJ_depth`.
 
-        Note
-        ----
+        Notes
+        -----
         This will undo any off-diagonal L-J modifications you may have made, so
         call this function with care.
         """

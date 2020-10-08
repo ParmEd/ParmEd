@@ -664,10 +664,10 @@ class ProgressReporter(StateDataReporter):
         The mass of the system used when reporting density (useful in instances
         where masses are set to 0 to constrain their positions)
 
-    See Also
-    --------
-    In addition to the above, ProgressReporter also accepts arguments for
-    StateDataReporter
+    Notes
+    -----
+    In addition to the above, :class:`ProgressReporter` also accepts arguments for
+    :class:`StateDataReporter`
     """
 
     @needs_openmm

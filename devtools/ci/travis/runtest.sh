@@ -8,13 +8,11 @@ do_coverage() {
     coverage report -m
 }
 
-echo "Checking parmed source with pyflakes linter"
 if [ "$PYTHON_VERSION" = "pypy" ]; then
     export PYENV_ROOT="${HOME}/.pyenv"
     export PATH="${PYENV_ROOT}/bin:${PATH}"
     eval "$(pyenv init -)"
 fi
-sh devtools/ci/pyflakes_check.sh
 echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"
