@@ -28,9 +28,6 @@ from parmed.amber._chamberparm import ChamberParm, ConvertFromPSF
 from parmed.amber._tinkerparm import AmoebaParm, BeemanRestart
 from parmed.utils.six import string_types
 
-# Silence pyflakes warnings for deprecated/unused classes
-assert BeemanRestart and ConvertFromPSF
-
 # Define importables via *
 __all__ = ['AmberFormat', 'AmberParm', 'ChamberParm', 'LoadParm', 'Rst7']
 
