@@ -338,7 +338,7 @@ class TestTopologyObjects(unittest.TestCase):
         a = Atom(name='CA')
         a.charge = (0.1 * u.elementary_charge).in_units_of(u.coulomb)
         self.assertAlmostEqual(a.charge, 0.1)
-        self.assertAlmostEqual(a.ucharge.value_in_unit(u.coulomb), 0.1)
+        self.assertAlmostEqual(a.ucharge.value_in_unit(u.elementary_charge), 0.1)
         a.rmin = 1
         self.assertEqual(a.rmin, 1)
         self.assertEqual(a.urmin, 1*u.angstroms)
