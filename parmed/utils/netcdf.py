@@ -853,12 +853,15 @@ class netcdf_variable(object):
     ----------
     dimensions : list of str
         List of names of dimensions used by the variable object.
-    isrec, shape
-        Properties
+    isrec
+        Property
+    shape
+        Property
 
-    See also
+    See Also
     --------
-    isrec, shape
+    isrec
+    shape
 
     """
     def __init__(self, data, typecode, size, shape, dimensions,
