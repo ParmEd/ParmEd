@@ -24,9 +24,10 @@ class NamdBinFile(object):
     effectively arbitrary, but for convenience derived classes are provided
     which alias the values to more descriptive names (e.g. "coordinates").
 
-    See also
+    See Also
     --------
-    :class:`NamdBinCoor` and :class:`NamdBinVel`
+    :class:`NamdBinCoor`
+    :class:`NamdBinVel`
     """
     _SCALE_FACTOR = 1.0
     def __init__(self, values=[]):
