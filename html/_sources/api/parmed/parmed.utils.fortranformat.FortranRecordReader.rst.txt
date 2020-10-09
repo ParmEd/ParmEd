@@ -2,6 +2,6 @@ parmed.utils.fortranformat.FortranRecordReader module
 =====================================================
 
 .. automodule:: parmed.utils.fortranformat.FortranRecordReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

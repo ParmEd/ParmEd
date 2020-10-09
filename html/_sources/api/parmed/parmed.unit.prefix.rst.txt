@@ -2,6 +2,6 @@ parmed.unit.prefix module
 =========================
 
 .. automodule:: parmed.unit.prefix
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

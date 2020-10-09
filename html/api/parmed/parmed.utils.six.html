@@ -1,584 +1,703 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils.six module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils.six module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.utils.six module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.utils.six.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.utils.six">
 <span id="parmed-utils-six-module"></span><h1>parmed.utils.six module<a class="headerlink" href="#module-parmed.utils.six" title="Permalink to this headline">¶</a></h1>
 <p>Utilities for writing code that runs on Python 2 and 3</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib</code><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">module</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">doc</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">module</span></code></p>
 <p>Create a six.moves.urllib namespace that resembles the Python 3 namespace</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib.error">
-<code class="descname">error</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.error' (&lt;parmed.utils.six._SixMetaPathImporter object&gt;)&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.error" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">error</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.error' (&lt;parmed.utils.six._SixMetaPathImporter object&gt;)&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib.parse">
-<code class="descname">parse</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib_parse'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.parse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib_parse'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.parse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib.request">
-<code class="descname">request</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.request' (&lt;parmed.utils.six._SixMetaPathImporter object&gt;)&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.request" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">request</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.request' (&lt;parmed.utils.six._SixMetaPathImporter object&gt;)&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.request" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib.response">
-<code class="descname">response</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.response'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.response" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">response</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.response'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.response" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib.robotparser">
-<code class="descname">robotparser</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.robotparser'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.robotparser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">robotparser</code><em class="property"> = &lt;module 'parmed.utils.six.moves.urllib.robotparser'&gt;</em><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib.robotparser" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib_error">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib_error</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
 <p>Lazy loading of moved objects in six.moves.urllib_error</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_error.ContentTooShortError">
-<code class="descname">ContentTooShortError</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_error.ContentTooShortError" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ContentTooShortError</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_error.ContentTooShortError" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib_parse</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib_parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
 <p>Lazy loading of moved objects in six.moves.urllib_parse</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.ParseResult">
-<code class="descname">ParseResult</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.ParseResult" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ParseResult</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.ParseResult" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.SplitResult">
-<code class="descname">SplitResult</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.SplitResult" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">SplitResult</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.SplitResult" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.parse_qs">
-<code class="descname">parse_qs</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.parse_qs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse_qs</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.parse_qs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.parse_qsl">
-<code class="descname">parse_qsl</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.parse_qsl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse_qsl</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.parse_qsl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.quote">
-<code class="descname">quote</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.quote" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quote</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.quote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.quote_plus">
-<code class="descname">quote_plus</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.quote_plus" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">quote_plus</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.quote_plus" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.splitquery">
-<code class="descname">splitquery</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splitquery" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">splitquery</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splitquery" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.splittag">
-<code class="descname">splittag</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splittag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">splittag</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splittag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.splituser">
-<code class="descname">splituser</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splituser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">splituser</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.splituser" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.unquote">
-<code class="descname">unquote</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.unquote" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unquote</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.unquote" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.unquote_plus">
-<code class="descname">unquote_plus</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.unquote_plus" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unquote_plus</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.unquote_plus" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urldefrag">
-<code class="descname">urldefrag</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urldefrag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urldefrag</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urldefrag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urlencode">
-<code class="descname">urlencode</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlencode" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlencode</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlencode" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urljoin">
-<code class="descname">urljoin</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urljoin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urljoin</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urljoin" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urlparse">
-<code class="descname">urlparse</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlparse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlparse</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlparse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urlsplit">
-<code class="descname">urlsplit</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlsplit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlsplit</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlsplit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urlunparse">
-<code class="descname">urlunparse</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlunparse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlunparse</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlunparse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.urlunsplit">
-<code class="descname">urlunsplit</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlunsplit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlunsplit</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.urlunsplit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.uses_fragment">
-<code class="descname">uses_fragment</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_fragment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">uses_fragment</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_fragment" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.uses_netloc">
-<code class="descname">uses_netloc</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_netloc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">uses_netloc</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_netloc" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.uses_params">
-<code class="descname">uses_params</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_params" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">uses_params</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_params" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.uses_query">
-<code class="descname">uses_query</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_query" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">uses_query</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_query" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_parse.uses_relative">
-<code class="descname">uses_relative</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_relative" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">uses_relative</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_parse.uses_relative" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib_request</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib_request</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
 <p>Lazy loading of moved objects in six.moves.urllib_request</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.AbstractBasicAuthHandler">
-<code class="descname">AbstractBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.AbstractBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">AbstractBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.AbstractBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.AbstractDigestAuthHandler">
-<code class="descname">AbstractDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.AbstractDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">AbstractDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.AbstractDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.BaseHandler">
-<code class="descname">BaseHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.BaseHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">BaseHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.BaseHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.CacheFTPHandler">
-<code class="descname">CacheFTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.CacheFTPHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CacheFTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.CacheFTPHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.FTPHandler">
-<code class="descname">FTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FTPHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">FTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FTPHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.FancyURLopener">
-<code class="descname">FancyURLopener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FancyURLopener" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">FancyURLopener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FancyURLopener" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.FileHandler">
-<code class="descname">FileHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FileHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">FileHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.FileHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPBasicAuthHandler">
-<code class="descname">HTTPBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPCookieProcessor">
-<code class="descname">HTTPCookieProcessor</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPCookieProcessor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPCookieProcessor</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPCookieProcessor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPDefaultErrorHandler">
-<code class="descname">HTTPDefaultErrorHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPDefaultErrorHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPDefaultErrorHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPDefaultErrorHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPDigestAuthHandler">
-<code class="descname">HTTPDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPErrorProcessor">
-<code class="descname">HTTPErrorProcessor</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPErrorProcessor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPErrorProcessor</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPErrorProcessor" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPHandler">
-<code class="descname">HTTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgr">
-<code class="descname">HTTPPasswordMgr</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPPasswordMgr</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgrWithDefaultRealm">
-<code class="descname">HTTPPasswordMgrWithDefaultRealm</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgrWithDefaultRealm" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPPasswordMgrWithDefaultRealm</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPPasswordMgrWithDefaultRealm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPRedirectHandler">
-<code class="descname">HTTPRedirectHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPRedirectHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPRedirectHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPRedirectHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.HTTPSHandler">
-<code class="descname">HTTPSHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPSHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">HTTPSHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.HTTPSHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.OpenerDirector">
-<code class="descname">OpenerDirector</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.OpenerDirector" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">OpenerDirector</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.OpenerDirector" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.ProxyBasicAuthHandler">
-<code class="descname">ProxyBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ProxyBasicAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyBasicAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.ProxyDigestAuthHandler">
-<code class="descname">ProxyDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ProxyDigestAuthHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyDigestAuthHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.ProxyHandler">
-<code class="descname">ProxyHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ProxyHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.ProxyHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.Request">
-<code class="descname">Request</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.Request" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">Request</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.Request" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.URLopener">
-<code class="descname">URLopener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.URLopener" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">URLopener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.URLopener" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.UnknownHandler">
-<code class="descname">UnknownHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.UnknownHandler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">UnknownHandler</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.UnknownHandler" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.build_opener">
-<code class="descname">build_opener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.build_opener" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">build_opener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.build_opener" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.getproxies">
-<code class="descname">getproxies</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.getproxies" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getproxies</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.getproxies" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.install_opener">
-<code class="descname">install_opener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.install_opener" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">install_opener</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.install_opener" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.pathname2url">
-<code class="descname">pathname2url</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.pathname2url" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pathname2url</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.pathname2url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.proxy_bypass">
-<code class="descname">proxy_bypass</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.proxy_bypass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">proxy_bypass</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.proxy_bypass" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.url2pathname">
-<code class="descname">url2pathname</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.url2pathname" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">url2pathname</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.url2pathname" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.urlcleanup">
-<code class="descname">urlcleanup</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.urlcleanup" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlcleanup</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.urlcleanup" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_request.urlretrieve">
-<code class="descname">urlretrieve</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.urlretrieve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">urlretrieve</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_request.urlretrieve" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib_response">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib_response</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib_response</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
 <p>Lazy loading of moved objects in six.moves.urllib_response</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_response.addbase">
-<code class="descname">addbase</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addbase" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addbase</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addbase" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_response.addclosehook">
-<code class="descname">addclosehook</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addclosehook" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addclosehook</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addclosehook" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_response.addinfo">
-<code class="descname">addinfo</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addinfo" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addinfo</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addinfo" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_response.addinfourl">
-<code class="descname">addinfourl</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addinfourl" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">addinfourl</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_response.addinfourl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.Module_six_moves_urllib_robotparser">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">Module_six_moves_urllib_robotparser</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_robotparser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_robotparser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">Module_six_moves_urllib_robotparser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#Module_six_moves_urllib_robotparser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_robotparser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyModule</span></code></p>
 <p>Lazy loading of moved objects in six.moves.urllib_robotparser</p>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.utils.six.Module_six_moves_urllib_robotparser.RobotFileParser">
-<code class="descname">RobotFileParser</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_robotparser.RobotFileParser" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">RobotFileParser</code><a class="headerlink" href="#parmed.utils.six.Module_six_moves_urllib_robotparser.RobotFileParser" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.MovedAttribute">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">MovedAttribute</code><span class="sig-paren">(</span><em>name</em>, <em>old_mod</em>, <em>new_mod</em>, <em>old_attr=None</em>, <em>new_attr=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#MovedAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.MovedAttribute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyDescr</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">MovedAttribute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">old_mod</span></em>, <em class="sig-param"><span class="n">new_mod</span></em>, <em class="sig-param"><span class="n">old_attr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">new_attr</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#MovedAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.MovedAttribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyDescr</span></code></p>
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.utils.six.MovedModule">
-<em class="property">class </em><code class="descclassname">parmed.utils.six.</code><code class="descname">MovedModule</code><span class="sig-paren">(</span><em>name</em>, <em>old</em>, <em>new=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#MovedModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.MovedModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.utils.six._LazyDescr</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">MovedModule</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">old</span></em>, <em class="sig-param"><span class="n">new</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#MovedModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.MovedModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.utils.six._LazyDescr</span></code></p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.add_metaclass">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">add_metaclass</code><span class="sig-paren">(</span><em>metaclass</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#add_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.add_metaclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">add_metaclass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">metaclass</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#add_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.add_metaclass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class decorator for creating a class with a metaclass.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.add_move">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">add_move</code><span class="sig-paren">(</span><em>move</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#add_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.add_move" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">add_move</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">move</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#add_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.add_move" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an item to six.moves.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.assertCountEqual">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">assertCountEqual</code><span class="sig-paren">(</span><em>self</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertCountEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">assertCountEqual</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertCountEqual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertCountEqual" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.assertRaisesRegex">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">assertRaisesRegex</code><span class="sig-paren">(</span><em>self</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertRaisesRegex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">assertRaisesRegex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertRaisesRegex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.assertRegex">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">assertRegex</code><span class="sig-paren">(</span><em>self</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertRegex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertRegex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">assertRegex</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#assertRegex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.assertRegex" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.b">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">b</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.b" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">b</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.b" title="Permalink to this definition">¶</a></dt>
 <dd><p>Byte literal</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.get_unbound_function">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">get_unbound_function</code><span class="sig-paren">(</span><em>unbound</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#get_unbound_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.get_unbound_function" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">get_unbound_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unbound</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#get_unbound_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.get_unbound_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the function out of a possibly unbound function</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.iteritems">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">iteritems</code><span class="sig-paren">(</span><em>d</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iteritems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iteritems" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">iteritems</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iteritems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iteritems" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the (key, value) pairs of a dictionary.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.iterkeys">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">iterkeys</code><span class="sig-paren">(</span><em>d</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iterkeys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iterkeys" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">iterkeys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iterkeys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iterkeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the keys of a dictionary.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.iterlists">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">iterlists</code><span class="sig-paren">(</span><em>d</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iterlists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iterlists" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">iterlists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#iterlists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.iterlists" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the (key, [values]) pairs of a dictionary.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.itervalues">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">itervalues</code><span class="sig-paren">(</span><em>d</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#itervalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.itervalues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">itervalues</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">d</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#itervalues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.itervalues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an iterator over the values of a dictionary.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.python_2_unicode_compatible">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">python_2_unicode_compatible</code><span class="sig-paren">(</span><em>klass</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#python_2_unicode_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.python_2_unicode_compatible" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">python_2_unicode_compatible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">klass</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#python_2_unicode_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.python_2_unicode_compatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>A decorator that defines __unicode__ and __str__ methods under Python 2.
 Under Python 3 it does nothing.</p>
 <p>To support Python 2 and 3 with a single code base, define a __str__ method
 returning text and apply this decorator to the class.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.raise_from">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">raise_from</code><span class="sig-paren">(</span><em>value</em>, <em>from_value</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#raise_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.raise_from" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">raise_from</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">from_value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#raise_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.raise_from" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.remove_move">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">remove_move</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#remove_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.remove_move" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">remove_move</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#remove_move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.remove_move" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove item from six.moves.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.reraise">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">reraise</code><span class="sig-paren">(</span><em>tp</em>, <em>value</em>, <em>tb=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#reraise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.reraise" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">reraise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tp</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">tb</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#reraise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.reraise" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reraise an exception.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.u">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">u</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#u"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.u" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">u</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#u"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.u" title="Permalink to this definition">¶</a></dt>
 <dd><p>Text literal</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.six.with_metaclass">
-<code class="descclassname">parmed.utils.six.</code><code class="descname">with_metaclass</code><span class="sig-paren">(</span><em>meta</em>, <em>*bases</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#with_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.with_metaclass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.six.</code><code class="sig-name descname">with_metaclass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">meta</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">bases</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/six.html#with_metaclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.six.with_metaclass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a base class with a metaclass.</p>
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.utils.six.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

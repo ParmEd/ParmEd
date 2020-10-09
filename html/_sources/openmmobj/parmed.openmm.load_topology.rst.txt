@@ -1,5 +1,5 @@
-parmed.openmm.load_topology
-===========================
+parmed.openmm.load\_topology
+============================
 
 .. currentmodule:: parmed.openmm
 

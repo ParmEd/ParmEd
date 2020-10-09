@@ -2,6 +2,6 @@ parmed.tools.simulations.sanderapi module
 =========================================
 
 .. automodule:: parmed.tools.simulations.sanderapi
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

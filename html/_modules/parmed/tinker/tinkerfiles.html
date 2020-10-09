@@ -1,65 +1,178 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.tinker.tinkerfiles &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.tinker.tinkerfiles &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>parmed.tinker.tinkerfiles</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.tinker.tinkerfiles</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">This module contains classes for reading various TINKER-style files</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="k">import</span> <span class="n">TinkerError</span>
-<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="k">import</span> <span class="n">FileFormatType</span><span class="p">,</span> <span class="n">load_file</span>
-<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="k">import</span> <span class="n">element_by_name</span><span class="p">,</span> <span class="n">AtomicNum</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">Residue</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">TinkerError</span>
+<span class="kn">from</span> <span class="nn">parmed.formats.registry</span> <span class="kn">import</span> <span class="n">FileFormatType</span><span class="p">,</span> <span class="n">load_file</span>
+<span class="kn">from</span> <span class="nn">parmed.periodic_table</span> <span class="kn">import</span> <span class="n">element_by_name</span><span class="p">,</span> <span class="n">AtomicNum</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">Residue</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">add_metaclass</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">zip</span>
 
 <div class="viewcode-block" id="KeywordControlFile"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.KeywordControlFile">[docs]</a><span class="k">class</span> <span class="nc">KeywordControlFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reads and processes a keyword control file for TINKER simulations &quot;&quot;&quot;</span>
@@ -67,7 +180,7 @@
                   <span class="s1">&#39;C-AXIS&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;ALPHA&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;BETA&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
                   <span class="s1">&#39;GAMMA&#39;</span> <span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="c1"># The currently recognized/parsed keywords (these are the only ones</span>
         <span class="c1"># necessary for running Amoeba in Amber)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;PARAMETERS&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;A-AXIS&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;B-AXIS&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
@@ -90,8 +203,8 @@
                                   <span class="s1">&#39;convert the value of </span><span class="si">%s</span><span class="s1"> into type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                                   <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatypes</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span></div>
 
-<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
-<div class="viewcode-block" id="XyzFile"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.XyzFile">[docs]</a><span class="k">class</span> <span class="nc">XyzFile</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
+<div class="viewcode-block" id="XyzFile"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.XyzFile">[docs]</a><span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">FileFormatType</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">XyzFile</span><span class="p">(</span><span class="n">Structure</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reads and processes a Tinker XYZ file</span>
 
 <span class="sd">    Parameters</span>
@@ -155,8 +268,8 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="XyzFile.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.XyzFile.id_format">[docs]</a>    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="XyzFile.id_format"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.XyzFile.id_format">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">id_format</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Identify the file as a Tinker XYZ file</span>
 
 <span class="sd">        Parameters</span>
@@ -194,8 +307,8 @@
                 <span class="n">words</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">XyzFile</span><span class="o">.</span><span class="n">_check_atom_record</span><span class="p">(</span><span class="n">words</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">XyzFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">seq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">XyzFile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">fxyz</span> <span class="o">=</span> <span class="n">genopen</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">own_handle_xyz</span> <span class="o">=</span> <span class="kc">True</span>
@@ -259,7 +372,7 @@
 
 <div class="viewcode-block" id="DynFile"><a class="viewcode-back" href="../../../api/parmed/parmed.tinker.tinkerfiles.html#parmed.tinker.DynFile">[docs]</a><span class="k">class</span> <span class="nc">DynFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reads and processes a Tinker DYN file &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
@@ -362,41 +475,50 @@
     <span class="k">return</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">element_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">)]</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

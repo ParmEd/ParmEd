@@ -2,6 +2,6 @@ parmed.charmm.parameters module
 ===============================
 
 .. automodule:: parmed.charmm.parameters
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

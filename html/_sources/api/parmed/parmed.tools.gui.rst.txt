@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.tools.gui.guiactions
    parmed.tools.gui.guifiletools
@@ -14,6 +15,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.tools.gui
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

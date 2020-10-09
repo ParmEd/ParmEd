@@ -1,243 +1,361 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.tools.argumentlist module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.tools.argumentlist module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.tools.argumentlist module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.tools.argumentlist.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.tools.argumentlist">
 <span id="parmed-tools-argumentlist-module"></span><h1>parmed.tools.argumentlist module<a class="headerlink" href="#module-parmed.tools.argumentlist" title="Permalink to this headline">¶</a></h1>
 <p>This stores a list of arguments, tokenizing a string into a list of arguments.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.tools.argumentlist.Argument">
-<em class="property">class </em><code class="descclassname">parmed.tools.argumentlist.</code><code class="descname">Argument</code><span class="sig-paren">(</span><em>string</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.tools.argumentlist.</code><code class="sig-name descname">Argument</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">string</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Is an argument</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.isfloat" title="parmed.tools.argumentlist.Argument.isfloat"><code class="xref py py-obj docutils literal"><span class="pre">isfloat</span></code></a>()</td>
-<td>Determines if it can be a double</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.isfloat" title="parmed.tools.argumentlist.Argument.isfloat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isfloat</span></code></a>()</p></td>
+<td><p>Determines if it can be a double</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.isint" title="parmed.tools.argumentlist.Argument.isint"><code class="xref py py-obj docutils literal"><span class="pre">isint</span></code></a>()</td>
-<td>Determines if it can be an integer</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.isint" title="parmed.tools.argumentlist.Argument.isint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isint</span></code></a>()</p></td>
+<td><p>Determines if it can be an integer</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.ismask" title="parmed.tools.argumentlist.Argument.ismask"><code class="xref py py-obj docutils literal"><span class="pre">ismask</span></code></a>()</td>
-<td>Determines if we can be an Amber mask or not</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.ismask" title="parmed.tools.argumentlist.Argument.ismask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ismask</span></code></a>()</p></td>
+<td><p>Determines if we can be an Amber mask or not</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.lower" title="parmed.tools.argumentlist.Argument.lower"><code class="xref py py-obj docutils literal"><span class="pre">lower</span></code></a>()</td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.lower" title="parmed.tools.argumentlist.Argument.lower"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower</span></code></a>()</p></td>
+<td><p>Make the argument lower-case</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.mark" title="parmed.tools.argumentlist.Argument.mark"><code class="xref py py-obj docutils literal"><span class="pre">mark</span></code></a>()</td>
-<td>Provide a way of forcibly marking an argument</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.mark" title="parmed.tools.argumentlist.Argument.mark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mark</span></code></a>()</p></td>
+<td><p>Provide a way of forcibly marking an argument</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.Argument.unmark" title="parmed.tools.argumentlist.Argument.unmark"><code class="xref py py-obj docutils literal"><span class="pre">unmark</span></code></a>()</td>
-<td>Provide a way of forcibly unmarking an argument</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.Argument.unmark" title="parmed.tools.argumentlist.Argument.unmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unmark</span></code></a>()</p></td>
+<td><p>Provide a way of forcibly unmarking an argument</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.isfloat">
-<code class="descname">isfloat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.isfloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.isfloat" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">isfloat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.isfloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.isfloat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if it can be a double</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.isint">
-<code class="descname">isint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.isint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.isint" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">isint</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.isint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.isint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if it can be an integer</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.ismask">
-<code class="descname">ismask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.ismask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.ismask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">ismask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.ismask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.ismask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines if we can be an Amber mask or not</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.lower">
-<code class="descname">lower</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.lower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.lower" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">lower</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.lower"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.lower" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make the argument lower-case</p>
+</dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.mark">
-<code class="descname">mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.mark" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.mark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.mark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a way of forcibly marking an argument</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.Argument.unmark">
-<code class="descname">unmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.unmark" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unmark</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#Argument.unmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.Argument.unmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Provide a way of forcibly unmarking an argument</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.tools.argumentlist.ArgumentList">
-<em class="property">class </em><code class="descclassname">parmed.tools.argumentlist.</code><code class="descname">ArgumentList</code><span class="sig-paren">(</span><em>inp</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.tools.argumentlist.</code><code class="sig-name descname">ArgumentList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inp</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>List of arguments.  
-The arguments should be parsed in the following order to ensure it&#8217;s done
+The arguments should be parsed in the following order to ensure it’s done
 correctly:</p>
 <blockquote>
-<div>get_key_*
+<div><p>get_key_*
 get_next_int
 get_next_float
 get_next_mask
-get_next_string</div></blockquote>
+get_next_string</p>
+</div></blockquote>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_float" title="parmed.tools.argumentlist.ArgumentList.get_key_float"><code class="xref py py-obj docutils literal"><span class="pre">get_key_float</span></code></a>(key,&nbsp;default)</td>
-<td>Get a float that follows a keyword</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_float" title="parmed.tools.argumentlist.ArgumentList.get_key_float"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key_float</span></code></a>(key, default)</p></td>
+<td><p>Get a float that follows a keyword</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_int" title="parmed.tools.argumentlist.ArgumentList.get_key_int"><code class="xref py py-obj docutils literal"><span class="pre">get_key_int</span></code></a>(key,&nbsp;default)</td>
-<td>Get an integer that follows a keyword</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_int" title="parmed.tools.argumentlist.ArgumentList.get_key_int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key_int</span></code></a>(key, default)</p></td>
+<td><p>Get an integer that follows a keyword</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_mask" title="parmed.tools.argumentlist.ArgumentList.get_key_mask"><code class="xref py py-obj docutils literal"><span class="pre">get_key_mask</span></code></a>(key,&nbsp;default)</td>
-<td>Get a mask that follows a keyword</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_mask" title="parmed.tools.argumentlist.ArgumentList.get_key_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key_mask</span></code></a>(key, default)</p></td>
+<td><p>Get a mask that follows a keyword</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_string" title="parmed.tools.argumentlist.ArgumentList.get_key_string"><code class="xref py py-obj docutils literal"><span class="pre">get_key_string</span></code></a>(key,&nbsp;default)</td>
-<td>Get a string that follows a keyword</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_key_string" title="parmed.tools.argumentlist.ArgumentList.get_key_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_key_string</span></code></a>(key, default)</p></td>
+<td><p>Get a string that follows a keyword</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_float" title="parmed.tools.argumentlist.ArgumentList.get_next_float"><code class="xref py py-obj docutils literal"><span class="pre">get_next_float</span></code></a>([optional,&nbsp;default])</td>
-<td>Returns the next unmarked float in the token list</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_float" title="parmed.tools.argumentlist.ArgumentList.get_next_float"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_float</span></code></a>([optional, default])</p></td>
+<td><p>Returns the next unmarked float in the token list</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_int" title="parmed.tools.argumentlist.ArgumentList.get_next_int"><code class="xref py py-obj docutils literal"><span class="pre">get_next_int</span></code></a>([optional,&nbsp;default])</td>
-<td>Returns the next unmarked integer in the token list</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_int" title="parmed.tools.argumentlist.ArgumentList.get_next_int"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_int</span></code></a>([optional, default])</p></td>
+<td><p>Returns the next unmarked integer in the token list</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_mask" title="parmed.tools.argumentlist.ArgumentList.get_next_mask"><code class="xref py py-obj docutils literal"><span class="pre">get_next_mask</span></code></a>([optional,&nbsp;default])</td>
-<td>Returns the next string as long as it matches a mask</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_mask" title="parmed.tools.argumentlist.ArgumentList.get_next_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_mask</span></code></a>([optional, default])</p></td>
+<td><p>Returns the next string as long as it matches a mask</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_string" title="parmed.tools.argumentlist.ArgumentList.get_next_string"><code class="xref py py-obj docutils literal"><span class="pre">get_next_string</span></code></a>([optional,&nbsp;keep_quotes,&nbsp;default])</td>
-<td>Returns the next unmarked float in the token list</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.get_next_string" title="parmed.tools.argumentlist.ArgumentList.get_next_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_next_string</span></code></a>([optional, keep_quotes, default])</p></td>
+<td><p>Returns the next unmarked float in the token list</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.has_key" title="parmed.tools.argumentlist.ArgumentList.has_key"><code class="xref py py-obj docutils literal"><span class="pre">has_key</span></code></a>(key[,&nbsp;mark])</td>
-<td>See if a particular keyword is present (optionally mark it)</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.has_key" title="parmed.tools.argumentlist.ArgumentList.has_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_key</span></code></a>(key[, mark])</p></td>
+<td><p>See if a particular keyword is present (optionally mark it)</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.tokenize" title="parmed.tools.argumentlist.ArgumentList.tokenize"><code class="xref py py-obj docutils literal"><span class="pre">tokenize</span></code></a>(instring)</td>
-<td>Tokenizes the line, everything between quotes is a single token,</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.tokenize" title="parmed.tools.argumentlist.ArgumentList.tokenize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tokenize</span></code></a>(instring)</p></td>
+<td><p>Tokenizes the line, everything between quotes is a single token, including whitespace</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.unmarked" title="parmed.tools.argumentlist.ArgumentList.unmarked"><code class="xref py py-obj docutils literal"><span class="pre">unmarked</span></code></a>()</td>
-<td>Returns all unmarked arguments as a list of strings</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.tools.argumentlist.ArgumentList.unmarked" title="parmed.tools.argumentlist.ArgumentList.unmarked"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unmarked</span></code></a>()</p></td>
+<td><p>Returns all unmarked arguments as a list of strings</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_key_float">
-<code class="descname">get_key_float</code><span class="sig-paren">(</span><em>key</em>, <em>default</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_float" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_key_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a float that follows a keyword</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_key_int">
-<code class="descname">get_key_int</code><span class="sig-paren">(</span><em>key</em>, <em>default</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_key_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an integer that follows a keyword</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_key_mask">
-<code class="descname">get_key_mask</code><span class="sig-paren">(</span><em>key</em>, <em>default</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_key_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a mask that follows a keyword</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_key_string">
-<code class="descname">get_key_string</code><span class="sig-paren">(</span><em>key</em>, <em>default</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_key_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">default</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_key_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_key_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a string that follows a keyword</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_next_float">
-<code class="descname">get_next_float</code><span class="sig-paren">(</span><em>optional=False</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_float" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_next_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_float" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next unmarked float in the token list</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_next_int">
-<code class="descname">get_next_int</code><span class="sig-paren">(</span><em>optional=False</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_int" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_next_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next unmarked integer in the token list</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_next_mask">
-<code class="descname">get_next_mask</code><span class="sig-paren">(</span><em>optional=False</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_mask" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_next_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next string as long as it matches a mask</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.get_next_string">
-<code class="descname">get_next_string</code><span class="sig-paren">(</span><em>optional=False</em>, <em>keep_quotes=False</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_string" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_next_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optional</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">keep_quotes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.get_next_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.get_next_string" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next unmarked float in the token list</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.has_key">
-<code class="descname">has_key</code><span class="sig-paren">(</span><em>key</em>, <em>mark=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.has_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.has_key" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">has_key</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">mark</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.has_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.has_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>See if a particular keyword is present (optionally mark it)</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.tokenize">
-<code class="descname">tokenize</code><span class="sig-paren">(</span><em>instring</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.tokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.tokenize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">tokenize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instring</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.tokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.tokenize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tokenizes the line, everything between quotes is a single token,
 including whitespace</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.tools.argumentlist.ArgumentList.unmarked">
-<code class="descname">unmarked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.unmarked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.unmarked" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">unmarked</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/tools/argumentlist.html#ArgumentList.unmarked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.tools.argumentlist.ArgumentList.unmarked" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all unmarked arguments as a list of strings</p>
 </dd></dl>
 
@@ -246,47 +364,50 @@ including whitespace</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.tools.argumentlist.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

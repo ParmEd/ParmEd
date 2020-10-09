@@ -1,138 +1,244 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.rdkit.rdkit module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.rdkit.rdkit module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.rdkit.rdkit module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.rdkit.rdkit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.rdkit.rdkit">
 <span id="parmed-rdkit-rdkit-module"></span><h1>parmed.rdkit.rdkit module<a class="headerlink" href="#module-parmed.rdkit.rdkit" title="Permalink to this headline">¶</a></h1>
 <p>This package contains classes responsible for loading rdkit objects</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.rdkit.rdkit.RDKit">
-<em class="property">class </em><code class="descclassname">parmed.rdkit.rdkit.</code><code class="descname">RDKit</code><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.rdkit.rdkit.</code><code class="sig-name descname">RDKit</code><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.from_sdf" title="parmed.rdkit.rdkit.RDKit.from_sdf"><code class="xref py py-obj docutils literal"><span class="pre">from_sdf</span></code></a>(filename[,&nbsp;structure])</td>
-<td>Load SDF file to <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.from_sdf" title="parmed.rdkit.rdkit.RDKit.from_sdf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_sdf</span></code></a>(filename[, structure])</p></td>
+<td><p>Load SDF file to <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.from_smiles" title="parmed.rdkit.rdkit.RDKit.from_smiles"><code class="xref py py-obj docutils literal"><span class="pre">from_smiles</span></code></a>(smiles[,&nbsp;coordinates])</td>
-<td>Load smiles string to <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.from_smiles" title="parmed.rdkit.rdkit.RDKit.from_smiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_smiles</span></code></a>(smiles[, coordinates])</p></td>
+<td><p>Load smiles string to <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.load" title="parmed.rdkit.rdkit.RDKit.load"><code class="xref py py-obj docutils literal"><span class="pre">load</span></code></a>(rmol)</td>
-<td>Load a <code class="xref py py-class docutils literal"><span class="pre">Mol</span></code> object and return a populated <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.rdkit.rdkit.RDKit.load" title="parmed.rdkit.rdkit.RDKit.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(rmol)</p></td>
+<td><p>Load a <code class="xref py py-class docutils literal notranslate"><span class="pre">Mol</span></code> object and return a populated <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instance</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.rdkit.rdkit.RDKit.from_sdf">
-<em class="property">static </em><code class="descname">from_sdf</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.from_sdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.from_sdf" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load SDF file to <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename: str</strong></p>
-<p><strong>structure</strong> : bool, default False</p>
-<blockquote class="last">
-<div><p>if True, return a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>
-if False, return a list of <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<em class="property">static </em><code class="sig-name descname">from_sdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">structure</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.from_sdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.from_sdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load SDF file to <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename: str</strong></dt><dd></dd>
+<dt><strong>structure</strong><span class="classifier">bool, default False</span></dt><dd><p>if True, return a <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>
+if False, return a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.rdkit.rdkit.RDKit.from_smiles">
-<em class="property">static </em><code class="descname">from_smiles</code><span class="sig-paren">(</span><em>smiles</em>, <em>coordinates=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.from_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.from_smiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load smiles string to <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>smiles</strong> : str, smiles</p>
-<p><strong>coordinates</strong> : bool, default True</p>
-<blockquote>
-<div><p>if True, use <a href="#id1"><span class="problematic" id="id2">`</span></a>rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>parm</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-</td>
-</tr>
-</tbody>
-</table>
+<em class="property">static </em><code class="sig-name descname">from_smiles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">smiles</span></em>, <em class="sig-param"><span class="n">coordinates</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.from_smiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.from_smiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load smiles string to <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>smiles</strong><span class="classifier">str, smiles</span></dt><dd></dd>
+<dt><strong>coordinates</strong><span class="classifier">bool, default True</span></dt><dd><p>if True, use <a href="#id1"><span class="problematic" id="id2">`</span></a>rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>parm</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.rdkit.rdkit.RDKit.load">
-<em class="property">static </em><code class="descname">load</code><span class="sig-paren">(</span><em>rmol</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load a <code class="xref py py-class docutils literal"><span class="pre">Mol</span></code> object and return a populated <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code>
+<em class="property">static </em><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rmol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/rdkit/rdkit.html#RDKit.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.rdkit.rdkit.RDKit.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a <code class="xref py py-class docutils literal notranslate"><span class="pre">Mol</span></code> object and return a populated <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code>
 instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rmol: :class:`Mol`</strong></p>
-<blockquote class="last">
-<div><p>RDKit <code class="xref py py-class docutils literal"><span class="pre">Mol</span></code> object to convert</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rmol: :class:`Mol`</strong></dt><dd><p>RDKit <code class="xref py py-class docutils literal notranslate"><span class="pre">Mol</span></code> object to convert</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="k">import</span> <span class="n">Chem</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;Cc1ccccc1&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">load_rdkit</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
@@ -145,47 +251,50 @@ instance</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.rdkit.rdkit.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

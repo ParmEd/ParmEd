@@ -18,6 +18,8 @@ parmed.topologyobjects.Dihedral
       ~Dihedral.energy
       ~Dihedral.measure
       ~Dihedral.same_atoms
+      ~Dihedral.uenergy
+      ~Dihedral.umeasure
    
    
 

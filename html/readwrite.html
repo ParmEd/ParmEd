@@ -1,55 +1,180 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>File input/output with ParmEd &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>File input/output with ParmEd &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="parmed.formats.registry.load_file" href="fileio/parmed.formats.registry.load_file.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="next" title="parmed.formats.registry.load_file" href="fileio/parmed.formats.registry.load_file.html" />
+    <link rel="prev" title="parmed.unit.UnitSystem" href="unitobj/parmed.unit.UnitSystem.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reading and writing files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reading-files-with-load-file">Reading files with <code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fileio/parmed.formats.registry.load_file.html">parmed.formats.registry.load_file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#writing-files-with-structure-save">Writing files with <code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.save</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#keywords">Keywords</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>File input/output with ParmEd</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/readwrite.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="file-input-output-with-parmed">
 <h1>File input/output with ParmEd<a class="headerlink" href="#file-input-output-with-parmed" title="Permalink to this headline">¶</a></h1>
@@ -57,244 +182,244 @@
 input/output easier for a wide range of file formats.</p>
 <p>The API for parsing different file types is not always consistent due to the
 technical needs of each class.  For instance, the Amber topology file class
-subclasses from <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>, so it can be
-instantiated directly from a filename. On the other hand, <a class="reference internal" href="api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.PDBFile" title="parmed.formats.pdb.PDBFile"><code class="xref py py-class docutils literal"><span class="pre">PDBFile</span></code></a> contains a <code class="docutils literal"><span class="pre">parse</span></code> static method that returns a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance directly rather than
+subclasses from <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>, so it can be
+instantiated directly from a filename. On the other hand, <a class="reference internal" href="api/parmed/parmed.formats.pdb.html#parmed.formats.pdb.PDBFile" title="parmed.formats.pdb.PDBFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">PDBFile</span></code></a> contains a <code class="docutils literal notranslate"><span class="pre">parse</span></code> static method that returns a
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance directly rather than
 subclassing.</p>
 <div class="section" id="reading-files-with-load-file">
-<h2>Reading files with <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file</span></code></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<h2>Reading files with <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a><a class="headerlink" href="#reading-files-with-load-file" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal"><span class="pre">load_file</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
-<td>Identifies the file format of the specified file and returns its parsed contents.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_file</span></code></a>(filename, *args, **kwargs)</p></td>
+<td><p>Identifies the file format of the specified file and returns its parsed contents.</p></td>
 </tr>
 </tbody>
 </table>
 <p>To provide a single interface for parsing <em>any</em> type of file, the
-<a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file</span></code></a> function takes a filename
+<a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a> function takes a filename
 and any relevant arguments or keyword arguments for the supported file formats
 and calls the appropriate parsing function.  Supported file formats along with
 the extra supported keyword arguments (if applicable) are shown in the table
 below (the filename argument is omitted):</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="45%" />
-<col width="55%" />
+<col style="width: 45%" />
+<col style="width: 55%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">File type</th>
-<th class="head">Supported arguments</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>File type</p></th>
+<th class="head"><p>Supported arguments</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>Amber ASCII restart file</td>
-<td>None</td>
+<tbody>
+<tr class="row-even"><td><p>Amber ASCII restart file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Amber prmtop</td>
-<td><code class="docutils literal"><span class="pre">xyz</span></code>, <code class="docutils literal"><span class="pre">box</span></code></td>
+<tr class="row-odd"><td><p>Amber prmtop</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xyz</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Amber MDL (e.g., RISM)</td>
-<td>None</td>
+<tr class="row-even"><td><p>Amber MDL (e.g., RISM)</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Amber MDCRD trajectory</td>
-<td><code class="docutils literal"><span class="pre">natom</span></code>*, <code class="docutils literal"><span class="pre">hasbox</span></code>*</td>
+<tr class="row-odd"><td><p>Amber MDCRD trajectory</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">natom</span></code>*, <code class="docutils literal notranslate"><span class="pre">hasbox</span></code>*</p></td>
 </tr>
-<tr class="row-even"><td>Amber OFF library</td>
-<td>None</td>
+<tr class="row-even"><td><p>Amber OFF library</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Amber frcmod/parm.dat</td>
-<td>list of filenames</td>
+<tr class="row-odd"><td><p>Amber frcmod/parm.dat</p></td>
+<td><p>list of filenames</p></td>
 </tr>
-<tr class="row-even"><td>PDBx/mmCIF file</td>
-<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
+<tr class="row-even"><td><p>PDBx/mmCIF file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>CHARMM coordinate file</td>
-<td>None</td>
+<tr class="row-odd"><td><p>CHARMM coordinate file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-even"><td>CHARMM restart file</td>
-<td>None</td>
+<tr class="row-even"><td><p>CHARMM restart file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Gromacs GRO file</td>
-<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
+<tr class="row-odd"><td><p>Gromacs GRO file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Gromacs topology file</td>
-<td><code class="docutils literal"><span class="pre">defines</span></code>, <code class="docutils literal"><span class="pre">parametrize</span></code>
-<code class="docutils literal"><span class="pre">xyz</span></code>, <code class="docutils literal"><span class="pre">box</span></code></td>
+<tr class="row-even"><td><p>Gromacs topology file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">defines</span></code>, <code class="docutils literal notranslate"><span class="pre">parametrize</span></code>
+<code class="docutils literal notranslate"><span class="pre">xyz</span></code>, <code class="docutils literal notranslate"><span class="pre">box</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Mol2 and Mol3 files</td>
-<td><code class="docutils literal"><span class="pre">structure</span></code></td>
+<tr class="row-odd"><td><p>Mol2 and Mol3 files</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">structure</span></code></p></td>
 </tr>
-<tr class="row-even"><td>NetCDF restart file</td>
-<td>None</td>
+<tr class="row-even"><td><p>NetCDF restart file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>NetCDF trajectory file</td>
-<td>None</td>
+<tr class="row-odd"><td><p>NetCDF trajectory file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-even"><td>PDB file</td>
-<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
+<tr class="row-even"><td><p>PDB file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>PQR file</td>
-<td><code class="docutils literal"><span class="pre">skip_bonds</span></code></td>
+<tr class="row-odd"><td><p>PQR file</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code></p></td>
 </tr>
-<tr class="row-even"><td>PSF file</td>
-<td>None</td>
+<tr class="row-even"><td><p>PSF file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Serialized System XML</td>
-<td>None</td>
+<tr class="row-odd"><td><p>Serialized System XML</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-even"><td>Serialized State XML</td>
-<td>None</td>
+<tr class="row-even"><td><p>Serialized State XML</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-odd"><td>Serialized Integrator
-XML file</td>
-<td>None</td>
+<tr class="row-odd"><td><p>Serialized Integrator
+XML file</p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-even"><td>ForceField XML file</td>
-<td>None</td>
+<tr class="row-even"><td><p>ForceField XML file</p></td>
+<td><p>None</p></td>
 </tr>
 </tbody>
 </table>
 <p>*These arguments are <em>required</em> when parsing the corresponding format file</p>
 <p>The optional keyword arguments are described below:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">xyz</span></code> &#8211; Either a file name for a coordinate file or an array with the
+<li><p><code class="docutils literal notranslate"><span class="pre">xyz</span></code> – Either a file name for a coordinate file or an array with the
 coordinates. If the unit cell information is stored in the coordinate file, it
-is used (unless an explicit <code class="docutils literal"><span class="pre">box</span></code> argument is given; see below). If the file
-is a trajectory file, the first frame is used for the coordinates.</li>
-<li><code class="docutils literal"><span class="pre">box</span></code> &#8211; The unit cell dimensions in Angstroms (and angles in degrees).</li>
-<li><code class="docutils literal"><span class="pre">natom</span></code> &#8211; The number of atoms from which the file was written</li>
-<li><code class="docutils literal"><span class="pre">hasbox</span></code> &#8211; Whether unit cell information is stored in this trajectory file</li>
-<li><code class="docutils literal"><span class="pre">defines</span></code> &#8211; <code class="docutils literal"><span class="pre">dict</span></code> of preprocessor defines (order is respected if given
-via an <code class="docutils literal"><span class="pre">OrderedDict</span></code>)</li>
-<li><code class="docutils literal"><span class="pre">parametrize</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, parameters are assigned from the parameter
-database.  If <code class="docutils literal"><span class="pre">False</span></code>, they are not (default is <code class="docutils literal"><span class="pre">True</span></code>).</li>
-<li><code class="docutils literal"><span class="pre">structure</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance. Default is <code class="docutils literal"><span class="pre">False</span></code></li>
-<li><code class="docutils literal"><span class="pre">skip_bonds</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, no attempt is made to identify covalent bonds
-between any atoms for these formats. If <code class="docutils literal"><span class="pre">False</span></code> (default), bonds are first
+is used (unless an explicit <code class="docutils literal notranslate"><span class="pre">box</span></code> argument is given; see below). If the file
+is a trajectory file, the first frame is used for the coordinates.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">box</span></code> – The unit cell dimensions in Angstroms (and angles in degrees).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">natom</span></code> – The number of atoms from which the file was written</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hasbox</span></code> – Whether unit cell information is stored in this trajectory file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">defines</span></code> – <code class="docutils literal notranslate"><span class="pre">dict</span></code> of preprocessor defines (order is respected if given
+via an <code class="docutils literal notranslate"><span class="pre">OrderedDict</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parametrize</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, parameters are assigned from the parameter
+database.  If <code class="docutils literal notranslate"><span class="pre">False</span></code>, they are not (default is <code class="docutils literal notranslate"><span class="pre">True</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">structure</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, return the Mol2/Mol3 file as a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, no attempt is made to identify covalent bonds
+between any atoms for these formats. If <code class="docutils literal notranslate"><span class="pre">False</span></code> (default), bonds are first
 assigned by comparing to standard residue templates, then based on distance
 criteria for any atom not specified within the templates. This has a
 side-effect of improving element identification for PDB files that have no
 element columns specified as well as substantially improving element
 identification for ions in GRO files. You are suggested to keep the default
-(<code class="docutils literal"><span class="pre">False</span></code>) unless you are <em>only</em> using the coordinates, in which case setting
-<code class="docutils literal"><span class="pre">skip_bonds</span></code> to <code class="docutils literal"><span class="pre">True</span></code> will result in significantly improved performance.</li>
+(<code class="docutils literal notranslate"><span class="pre">False</span></code>) unless you are <em>only</em> using the coordinates, in which case setting
+<code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> will result in significantly improved performance.</p></li>
 </ul>
-<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file()</span></code></a> automatically inspects the contents of the file with the given
+<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file()</span></code></a> automatically inspects the contents of the file with the given
 name to determine what format the file is based on the first couple lines.
 Except in rare, pathological cases, the file format detection mechanism is
 fairly robust. If any files <em>fail</em> this detection, feel free to file an issue on
 the Github issue tracker to improve file type prediction.</p>
-<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file()</span></code></a> has a number of helpful features. For instance, files ending
-with the <code class="docutils literal"><span class="pre">.gz</span></code> or <code class="docutils literal"><span class="pre">.bz2</span></code> suffix will automatically be decompressed in-memory
+<p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file()</span></code></a> has a number of helpful features. For instance, files ending
+with the <code class="docutils literal notranslate"><span class="pre">.gz</span></code> or <code class="docutils literal notranslate"><span class="pre">.bz2</span></code> suffix will automatically be decompressed in-memory
 using Gzip or Bzip2, respectively (except for some binary file formats, like
-NetCDF). Furthermore, URLs beginning with <code class="docutils literal"><span class="pre">http://</span></code>, <code class="docutils literal"><span class="pre">https://</span></code>, or
-<code class="docutils literal"><span class="pre">ftp://</span></code> are valid file names and will result in the remote file being
+NetCDF). Furthermore, URLs beginning with <code class="docutils literal notranslate"><span class="pre">http://</span></code>, <code class="docutils literal notranslate"><span class="pre">https://</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">ftp://</span></code> are valid file names and will result in the remote file being
 downloaded and processed (again, in-memory).</p>
-<p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance from file types that support returning
-one by passing the <code class="docutils literal"><span class="pre">structure=True</span></code> keyword to <code class="docutils literal"><span class="pre">load_file</span></code>. If this argument
+<p>Finally, to make it so that you can always retrieve a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance from file types that support returning
+one by passing the <code class="docutils literal notranslate"><span class="pre">structure=True</span></code> keyword to <code class="docutils literal notranslate"><span class="pre">load_file</span></code>. If this argument
 is not supported by the resulting file type, it is simply ignored, as is the
-<code class="docutils literal"><span class="pre">natom</span></code>, <code class="docutils literal"><span class="pre">hasbox</span></code>, and <code class="docutils literal"><span class="pre">skip_bonds</span></code> keywords.</p>
+<code class="docutils literal notranslate"><span class="pre">natom</span></code>, <code class="docutils literal notranslate"><span class="pre">hasbox</span></code>, and <code class="docutils literal notranslate"><span class="pre">skip_bonds</span></code> keywords.</p>
 </div>
 <div class="section" id="writing-files-with-structure-save">
-<h2>Writing files with <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><code class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></code></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
+<h2>Writing files with <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.save</span></code></a><a class="headerlink" href="#writing-files-with-structure-save" title="Permalink to this headline">¶</a></h2>
 <p>Many of the file formats supported by ParmEd either parse directly to a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance or subclass, and many
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance or subclass, and many
 of the desired file type conversions that ParmEd is designed to facilitate are
 between these formats (e.g., Amber topology, PDB, CHARMM PSF file, etc.).</p>
 <p>To facilitate the required conversion and file writing, the base
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class has a <code class="docutils literal"><span class="pre">save</span></code> method that
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class has a <code class="docutils literal notranslate"><span class="pre">save</span></code> method that
 will convert to the requested file format and write the output file. The desired
 format is specified either explicitly or by file name extension (with explicit
-format specifications taking precedence).  Because <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><code class="xref py py-meth docutils literal"><span class="pre">Structure.save</span></code></a> is a convenience method, it will protect
-against accidentally overwriting an existing file. The <code class="docutils literal"><span class="pre">overwrite</span></code> argument,
-when set to <code class="docutils literal"><span class="pre">True</span></code>, will allow an existing file to be overwritten. If set to
-<code class="docutils literal"><span class="pre">False</span></code> (or left at its default), <code class="docutils literal"><span class="pre">IOError</span></code> will be raised when attempting
+format specifications taking precedence).  Because <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.save" title="parmed.structure.Structure.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.save</span></code></a> is a convenience method, it will protect
+against accidentally overwriting an existing file. The <code class="docutils literal notranslate"><span class="pre">overwrite</span></code> argument,
+when set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, will allow an existing file to be overwritten. If set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code> (or left at its default), <code class="docutils literal notranslate"><span class="pre">IOError</span></code> will be raised when attempting
 to overwrite an existing file. The supported file formats, along with their
 supported extra keyword arguments, are detailed in the following table.</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="17%" />
-<col width="31%" />
-<col width="20%" />
-<col width="32%" />
+<col style="width: 17%" />
+<col style="width: 31%" />
+<col style="width: 20%" />
+<col style="width: 32%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">File type</th>
-<th class="head">Recognized extension(s)</th>
-<th class="head">Format keyword</th>
-<th class="head">Supported arguments</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>File type</p></th>
+<th class="head"><p>Recognized extension(s)</p></th>
+<th class="head"><p>Format keyword</p></th>
+<th class="head"><p>Supported arguments</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>PDB</td>
-<td><code class="docutils literal"><span class="pre">.pdb</span></code></td>
-<td><code class="docutils literal"><span class="pre">pdb</span></code></td>
-<td rowspan="2"><code class="docutils literal"><span class="pre">charmm</span></code>*,
-<code class="docutils literal"><span class="pre">renumber</span></code>,
-<code class="docutils literal"><span class="pre">coordinates</span></code>,
-<code class="docutils literal"><span class="pre">altlocs</span></code>,
-<code class="docutils literal"><span class="pre">write_anisou</span></code>,
-<code class="docutils literal"><span class="pre">standard_resnames</span></code></td>
+<tbody>
+<tr class="row-even"><td><p>PDB</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.pdb</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pdb</span></code></p></td>
+<td rowspan="2"><p><code class="docutils literal notranslate"><span class="pre">charmm</span></code>*,
+<code class="docutils literal notranslate"><span class="pre">renumber</span></code>,
+<code class="docutils literal notranslate"><span class="pre">coordinates</span></code>,
+<code class="docutils literal notranslate"><span class="pre">altlocs</span></code>,
+<code class="docutils literal notranslate"><span class="pre">write_anisou</span></code>,
+<code class="docutils literal notranslate"><span class="pre">standard_resnames</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>PDBx/mmCIF</td>
-<td><code class="docutils literal"><span class="pre">.cif</span></code>, <code class="docutils literal"><span class="pre">.pdbx</span></code></td>
-<td><code class="docutils literal"><span class="pre">cif</span></code></td>
+<tr class="row-odd"><td><p>PDBx/mmCIF</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.cif</span></code>, <code class="docutils literal notranslate"><span class="pre">.pdbx</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cif</span></code></p></td>
 </tr>
-<tr class="row-even"><td>PQR</td>
-<td><code class="docutils literal"><span class="pre">.pqr</span></code></td>
-<td><code class="docutils literal"><span class="pre">pqr</span></code></td>
-<td><code class="docutils literal"><span class="pre">renumber</span></code>,
-<code class="docutils literal"><span class="pre">coordinates</span></code>,
-<code class="docutils literal"><span class="pre">standard_resnames</span></code></td>
+<tr class="row-even"><td><p>PQR</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.pqr</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pqr</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">renumber</span></code>,
+<code class="docutils literal notranslate"><span class="pre">coordinates</span></code>,
+<code class="docutils literal notranslate"><span class="pre">standard_resnames</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Amber prmtop</td>
-<td><code class="docutils literal"><span class="pre">.parm7</span></code>, <code class="docutils literal"><span class="pre">.prmtop</span></code></td>
-<td><code class="docutils literal"><span class="pre">amber</span></code></td>
-<td>None</td>
+<tr class="row-odd"><td><p>Amber prmtop</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.parm7</span></code>, <code class="docutils literal notranslate"><span class="pre">.prmtop</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">amber</span></code></p></td>
+<td><p>None</p></td>
 </tr>
-<tr class="row-even"><td>CHARMM PSF</td>
-<td><code class="docutils literal"><span class="pre">.psf</span></code></td>
-<td><code class="docutils literal"><span class="pre">charmm</span></code></td>
-<td><code class="docutils literal"><span class="pre">vmd</span></code></td>
+<tr class="row-even"><td><p>CHARMM PSF</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.psf</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">charmm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">vmd</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Gromacs
-topology</td>
-<td><code class="docutils literal"><span class="pre">.top</span></code></td>
-<td><code class="docutils literal"><span class="pre">gromacs</span></code></td>
-<td><code class="docutils literal"><span class="pre">combine</span></code>,
-<code class="docutils literal"><span class="pre">parameters</span></code></td>
+<tr class="row-odd"><td><p>Gromacs
+topology</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.top</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gromacs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">combine</span></code>,
+<code class="docutils literal notranslate"><span class="pre">parameters</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Gromacs GRO</td>
-<td><code class="docutils literal"><span class="pre">.gro</span></code></td>
-<td><code class="docutils literal"><span class="pre">gro</span></code></td>
-<td><code class="docutils literal"><span class="pre">precision</span></code>, <code class="docutils literal"><span class="pre">nobox</span></code></td>
+<tr class="row-even"><td><p>Gromacs GRO</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.gro</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gro</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code>, <code class="docutils literal notranslate"><span class="pre">nobox</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Mol2</td>
-<td><code class="docutils literal"><span class="pre">.mol2</span></code></td>
-<td><code class="docutils literal"><span class="pre">mol2</span></code></td>
-<td><code class="docutils literal"><span class="pre">split</span></code></td>
+<tr class="row-odd"><td><p>Mol2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.mol2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mol2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">split</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Mol3</td>
-<td><code class="docutils literal"><span class="pre">.mol3</span></code></td>
-<td><code class="docutils literal"><span class="pre">mol3</span></code></td>
-<td><code class="docutils literal"><span class="pre">split</span></code></td>
+<tr class="row-even"><td><p>Mol3</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.mol3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mol3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">split</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Amber ASCII
-coordinates</td>
-<td><code class="docutils literal"><span class="pre">.rst7</span></code>, <code class="docutils literal"><span class="pre">.inpcrd</span></code>,
-<code class="docutils literal"><span class="pre">.restrt</span></code></td>
-<td><code class="docutils literal"><span class="pre">rst7</span></code></td>
-<td><code class="docutils literal"><span class="pre">title</span></code>, <code class="docutils literal"><span class="pre">time</span></code></td>
+<tr class="row-odd"><td><p>Amber ASCII
+coordinates</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.rst7</span></code>, <code class="docutils literal notranslate"><span class="pre">.inpcrd</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.restrt</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rst7</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Amber NetCDF
-restart</td>
-<td><code class="docutils literal"><span class="pre">.ncrst</span></code></td>
-<td><code class="docutils literal"><span class="pre">ncrst</span></code></td>
-<td><code class="docutils literal"><span class="pre">title</span></code>, <code class="docutils literal"><span class="pre">time</span></code></td>
+<tr class="row-even"><td><p>Amber NetCDF
+restart</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.ncrst</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ncrst</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">time</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -304,59 +429,59 @@ subsection.</p>
 <div class="section" id="keywords">
 <h3>Keywords<a class="headerlink" href="#keywords" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">charmm</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, the SEGID will be printed in columns 73 to 76 of
-the PDB file (default is <code class="docutils literal"><span class="pre">False</span></code>)</li>
-<li><code class="docutils literal"><span class="pre">renumber</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, atoms and residues will be numbered according to
-their absolute index (starting from 1) in the system. If <code class="docutils literal"><span class="pre">False</span></code>, the
+<li><p><code class="docutils literal notranslate"><span class="pre">charmm</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the SEGID will be printed in columns 73 to 76 of
+the PDB file (default is <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">renumber</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, atoms and residues will be numbered according to
+their absolute index (starting from 1) in the system. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, the
 numbers will be retained from their original source (e.g., in the original PDB
-file). Default is <code class="docutils literal"><span class="pre">True</span></code></li>
-<li><code class="docutils literal"><span class="pre">coordinates</span></code> &#8211; A set of coordinates for one or multiple frames. If more
+file). Default is <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">coordinates</span></code> – A set of coordinates for one or multiple frames. If more
 than one frame is provided, the resulting PDB or PDBx/mmCIF file will have
-multiple models defined. Default is <code class="docutils literal"><span class="pre">None</span></code>, and the generated coordinates
-are the ones stored on the atoms themselves.</li>
-<li><code class="docutils literal"><span class="pre">altlocs</span></code> &#8211; Allowable values are <code class="docutils literal"><span class="pre">all</span></code> (print all alternate locations for
-all conformers), <code class="docutils literal"><span class="pre">first</span></code> (print only the first alternate conformer), and
-<code class="docutils literal"><span class="pre">occupancy</span></code> (print the conformer with the highest occupancy). Default is
-<code class="docutils literal"><span class="pre">all</span></code></li>
-<li><code class="docutils literal"><span class="pre">write_anisou</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, print anistropic B-factors for the various
-atoms (either as a separate CIF section or as <code class="docutils literal"><span class="pre">ANISOU</span></code> records in a PDB
-file). Default is <code class="docutils literal"><span class="pre">False</span></code></li>
-<li><code class="docutils literal"><span class="pre">standard_resnames</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, residue names will be regularlized from
+multiple models defined. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>, and the generated coordinates
+are the ones stored on the atoms themselves.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">altlocs</span></code> – Allowable values are <code class="docutils literal notranslate"><span class="pre">all</span></code> (print all alternate locations for
+all conformers), <code class="docutils literal notranslate"><span class="pre">first</span></code> (print only the first alternate conformer), and
+<code class="docutils literal notranslate"><span class="pre">occupancy</span></code> (print the conformer with the highest occupancy). Default is
+<code class="docutils literal notranslate"><span class="pre">all</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">write_anisou</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, print anistropic B-factors for the various
+atoms (either as a separate CIF section or as <code class="docutils literal notranslate"><span class="pre">ANISOU</span></code> records in a PDB
+file). Default is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">standard_resnames</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, residue names will be regularlized from
 common alternatives back to the PDB standard. For example, ASH and GLH will be
 translated to ASP and GLU, respectively, as they often refer to different
-protomers of aspartate and glutamate.</li>
-<li><code class="docutils literal"><span class="pre">vmd</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, write a VMD-style PSF file. This is very similar to
-XPLOR format PSF files. Default is <code class="docutils literal"><span class="pre">False</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">combine</span></code> &#8211; Can be <code class="docutils literal"><span class="pre">None</span></code> to combine no molecules when writing a GROMACS
-topology file. A value of <code class="docutils literal"><span class="pre">all</span></code> will combine all of the molecules into a
-single moleculetype. Default is <code class="docutils literal"><span class="pre">None</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">parameters</span></code> &#8211; Can be <code class="docutils literal"><span class="pre">inline</span></code> (write the parameters inline in the
+protomers of aspartate and glutamate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vmd</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, write a VMD-style PSF file. This is very similar to
+XPLOR format PSF files. Default is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">combine</span></code> – Can be <code class="docutils literal notranslate"><span class="pre">None</span></code> to combine no molecules when writing a GROMACS
+topology file. A value of <code class="docutils literal notranslate"><span class="pre">all</span></code> will combine all of the molecules into a
+single moleculetype. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">parameters</span></code> – Can be <code class="docutils literal notranslate"><span class="pre">inline</span></code> (write the parameters inline in the
 GROMACS topology file). Can also be a string or a file-like object. If it is
 the same as the topology file name, it will be written in the previous
 sections of the GROMACS topology file. Other strings will be interpreted as
 filenames to print the parameters to as an include topology file. Default is
-<code class="docutils literal"><span class="pre">inline</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">precision</span></code> &#8211; The number of decimal places to print coordinates with in GRO
-files. Default is 3.</li>
-<li><code class="docutils literal"><span class="pre">nobox</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code> and the <code class="docutils literal"><span class="pre">Structure</span></code> does not have a unit cell
+<code class="docutils literal notranslate"><span class="pre">inline</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">precision</span></code> – The number of decimal places to print coordinates with in GRO
+files. Default is 3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nobox</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code> and the <code class="docutils literal notranslate"><span class="pre">Structure</span></code> does not have a unit cell
 defined, no box is written to the bottom of the GRO file. Otherwise, an
-enclosing box (buffered by 5 angstroms) is written</li>
-<li><code class="docutils literal"><span class="pre">split</span></code> &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, all residues will be split into separate mol2 or
+enclosing box (buffered by 5 angstroms) is written</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">split</span></code> – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, all residues will be split into separate mol2 or
 mol3 entries in the same file (like the ZINC database, for example). If
-<code class="docutils literal"><span class="pre">False</span></code>, all residues will be part of the same mol2 or mol3 entry. Default
-is <code class="docutils literal"><span class="pre">False</span></code>.</li>
-<li><code class="docutils literal"><span class="pre">title</span></code> &#8211; Purely cosmetic, it will specify the title that will be written
-to the coordinate files</li>
-<li><code class="docutils literal"><span class="pre">time</span></code> &#8211; Also cosmetic, this is the time corresponding to the snapshot that
-will be written to the coordinate files</li>
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, all residues will be part of the same mol2 or mol3 entry. Default
+is <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">title</span></code> – Purely cosmetic, it will specify the title that will be written
+to the coordinate files</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">time</span></code> – Also cosmetic, this is the time corresponding to the snapshot that
+will be written to the coordinate files</p></li>
 </ul>
 </div>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>The following examples use various files from the ParmEd test suite, which can
-be found in the <code class="docutils literal"><span class="pre">test/files/</span></code> directory of the ParmEd source code:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+be found in the <code class="docutils literal notranslate"><span class="pre">test/files/</span></code> directory of the ParmEd source code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load a Mol2 file</span>
 <span class="gp">... </span><span class="n">pmd</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;tripos1.mol2&#39;</span><span class="p">)</span>
 <span class="go">&lt;ResidueTemplate DAN: 31 atoms; 33 bonds; head=None; tail=None&gt;</span>
@@ -384,13 +509,13 @@ be found in the <code class="docutils literal"><span class="pre">test/files/</sp
 <span class="go">&lt;GromacsTopologyFile 40560 atoms [9650 EPs]; 9779 residues; 30934 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
-<p>Any of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> subclasses shown
-above can be saved as any other kind of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class or subclass <em>for which the conversion is
+<p>Any of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> subclasses shown
+above can be saved as any other kind of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class or subclass <em>for which the conversion is
 supported</em>. For instance, a raw PDB file has no defined parameters, so it cannot
 be saved as an Amber topology file. An Amber topology file, on the other hand,
 has all of the information required for a PDB, and so that conversion is
 supported:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;test_parm.pdb&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">parm</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;test_parm.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># You can also convert CIF to PDB</span>
 <span class="gp">... </span><span class="n">cif</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;test_cif.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or you can convert PDB to CIF</span>
@@ -408,63 +533,59 @@ supported:</p>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">File input/output with ParmEd</a><ul>
-<li><a class="reference internal" href="#reading-files-with-load-file">Reading files with <code class="docutils literal"><span class="pre">load_file</span></code></a></li>
-<li><a class="reference internal" href="#writing-files-with-structure-save">Writing files with <code class="docutils literal"><span class="pre">Structure.save</span></code></a><ul>
-<li><a class="reference internal" href="#keywords">Keywords</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#examples">Examples</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="fileio/parmed.formats.registry.load_file.html" class="btn btn-neutral float-right" title="parmed.formats.registry.load_file" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="unitobj/parmed.unit.UnitSystem.html" class="btn btn-neutral float-left" title="parmed.unit.UnitSystem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/readwrite.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="fileio/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

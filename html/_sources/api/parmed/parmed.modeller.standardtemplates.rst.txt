@@ -2,6 +2,6 @@ parmed.modeller.standardtemplates module
 ========================================
 
 .. automodule:: parmed.modeller.standardtemplates
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

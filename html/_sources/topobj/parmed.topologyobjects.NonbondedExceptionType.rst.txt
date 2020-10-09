@@ -25,5 +25,8 @@ parmed.topologyobjects.NonbondedExceptionType
    
       ~NonbondedExceptionType.idx
       ~NonbondedExceptionType.sigma
+      ~NonbondedExceptionType.uepsilon
+      ~NonbondedExceptionType.urmin
+      ~NonbondedExceptionType.usigma
    
    

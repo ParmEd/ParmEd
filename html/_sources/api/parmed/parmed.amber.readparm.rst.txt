@@ -2,6 +2,6 @@ parmed.amber.readparm module
 ============================
 
 .. automodule:: parmed.amber.readparm
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

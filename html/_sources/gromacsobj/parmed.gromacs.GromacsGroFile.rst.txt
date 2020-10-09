@@ -13,6 +13,7 @@ parmed.gromacs.GromacsGroFile
 
    .. autosummary::
    
+      ~GromacsGroFile.__init__
       ~GromacsGroFile.id_format
       ~GromacsGroFile.parse
       ~GromacsGroFile.write

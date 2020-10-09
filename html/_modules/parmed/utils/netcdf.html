@@ -1,53 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils.netcdf &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils.netcdf &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../utils.html" accesskey="U">parmed.utils</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../utils.html">parmed.utils</a> &raquo;</li>
+        
+      <li>parmed.utils.netcdf</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.utils.netcdf</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -63,43 +177,14 @@
 <span class="sd">modules, allowing these modules to be used interchangeably when working</span>
 <span class="sd">with NetCDF files.</span>
 
-<span class="sd">This file is taken from the scipy source code. The scipy license is included</span>
-<span class="sd">below:</span>
+<span class="sd">Only NetCDF3 is supported here; for NetCDF4 see</span>
+<span class="sd">`netCDF4-python &lt;http://unidata.github.io/netcdf4-python/&gt;`__,</span>
+<span class="sd">which has a similar API.</span>
 
-<span class="sd">Copyright (C) 2001, 2002 Enthought, Inc.</span>
-<span class="sd">All rights reserved.</span>
-
-<span class="sd">Copyright (C) 2003-2013 SciPy Developers.</span>
-<span class="sd">All rights reserved.</span>
-<span class="sd">Redistribution and use in source and binary forms, with or without modification,</span>
-<span class="sd">are permitted provided that the following conditions are met:</span>
-
-<span class="sd">Redistributions of source code must retain the above copyright notice, this</span>
-<span class="sd">list of conditions and the following disclaimer.</span>
-<span class="sd">Redistributions in binary form must reproduce the above copyright notice,</span>
-<span class="sd">this list of conditions and the following disclaimer in the documentation</span>
-<span class="sd">and/or other materials provided with the distribution.</span>
-<span class="sd">Neither the name of Enthought nor the names of the SciPy Developers may be</span>
-<span class="sd">used to endorse or promote products derived from this software without</span>
-<span class="sd">specific prior written permission.</span>
-
-<span class="sd">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</span>
-<span class="sd">AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</span>
-<span class="sd">IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</span>
-<span class="sd">ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR</span>
-<span class="sd">ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</span>
-<span class="sd">DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</span>
-<span class="sd">SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
-<span class="sd">CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR</span>
-<span class="sd">TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF</span>
-<span class="sd">THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="c1"># TODO:</span>
 <span class="c1"># * properly implement ``_FillValue``.</span>
-<span class="c1"># * implement Jeff Whitaker&#39;s patch for masked variables.</span>
 <span class="c1"># * fix character variables.</span>
 <span class="c1"># * implement PAGESIZE for Python 2.6?</span>
 
@@ -112,54 +197,70 @@
 <span class="c1"># otherwise the key would be inserted into userspace attributes.</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;netcdf_file&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;netcdf_file&#39;</span><span class="p">,</span> <span class="s1">&#39;netcdf_variable&#39;</span><span class="p">]</span>
 
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">weakref</span>
-<span class="kn">from</span> <span class="nn">operator</span> <span class="k">import</span> <span class="n">mul</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">mul</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">platform</span> <span class="kn">import</span> <span class="n">python_implementation</span>
+
 <span class="kn">import</span> <span class="nn">mmap</span> <span class="k">as</span> <span class="nn">mm</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.compat</span> <span class="k">import</span> <span class="n">asbytes</span><span class="p">,</span> <span class="n">asstr</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">fromstring</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">little_endian</span> <span class="k">as</span> <span class="n">LITTLE_ENDIAN</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">numpy.compat</span> <span class="kn">import</span> <span class="n">asbytes</span><span class="p">,</span> <span class="n">asstr</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">frombuffer</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">empty</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">asarray</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">little_endian</span> <span class="k">as</span> <span class="n">LITTLE_ENDIAN</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
 
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">text_type</span><span class="p">,</span> <span class="n">binary_type</span>
 
-<span class="n">ABSENT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
-<span class="n">ZERO</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span>
-<span class="n">NC_BYTE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01</span><span class="s1">&#39;</span>
-<span class="n">NC_CHAR</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x02</span><span class="s1">&#39;</span>
-<span class="n">NC_SHORT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x03</span><span class="s1">&#39;</span>
-<span class="n">NC_INT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x04</span><span class="s1">&#39;</span>
-<span class="n">NC_FLOAT</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x05</span><span class="s1">&#39;</span>
-<span class="n">NC_DOUBLE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x06</span><span class="s1">&#39;</span>
-<span class="n">NC_DIMENSION</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\n</span><span class="s1">&#39;</span>
-<span class="n">NC_VARIABLE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0b</span><span class="s1">&#39;</span>
-<span class="n">NC_ATTRIBUTE</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0c</span><span class="s1">&#39;</span>
+<span class="n">IS_PYPY</span> <span class="o">=</span> <span class="n">python_implementation</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;PyPy&#39;</span>
 
+<span class="n">ABSENT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+<span class="n">ZERO</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x00</span><span class="s1">&#39;</span>
+<span class="n">NC_BYTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x01</span><span class="s1">&#39;</span>
+<span class="n">NC_CHAR</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x02</span><span class="s1">&#39;</span>
+<span class="n">NC_SHORT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x03</span><span class="s1">&#39;</span>
+<span class="n">NC_INT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x04</span><span class="s1">&#39;</span>
+<span class="n">NC_FLOAT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x05</span><span class="s1">&#39;</span>
+<span class="n">NC_DOUBLE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x06</span><span class="s1">&#39;</span>
+<span class="n">NC_DIMENSION</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\n</span><span class="s1">&#39;</span>
+<span class="n">NC_VARIABLE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0b</span><span class="s1">&#39;</span>
+<span class="n">NC_ATTRIBUTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00\x00\x00\x0c</span><span class="s1">&#39;</span>
+<span class="n">FILL_BYTE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x81</span><span class="s1">&#39;</span>
+<span class="n">FILL_CHAR</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span>
+<span class="n">FILL_SHORT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80\x01</span><span class="s1">&#39;</span>
+<span class="n">FILL_INT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x80\x00\x00\x01</span><span class="s1">&#39;</span>
+<span class="n">FILL_FLOAT</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x7C\xF0\x00\x00</span><span class="s1">&#39;</span>
+<span class="n">FILL_DOUBLE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x47\x9E\x00\x00\x00\x00\x00\x00</span><span class="s1">&#39;</span>
 
 <span class="n">TYPEMAP</span> <span class="o">=</span> <span class="p">{</span><span class="n">NC_BYTE</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">NC_CHAR</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">NC_SHORT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-            <span class="n">NC_INT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-            <span class="n">NC_FLOAT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-            <span class="n">NC_DOUBLE</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)}</span>
+           <span class="n">NC_CHAR</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+           <span class="n">NC_SHORT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+           <span class="n">NC_INT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+           <span class="n">NC_FLOAT</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+           <span class="n">NC_DOUBLE</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)}</span>
+
+<span class="n">FILLMAP</span> <span class="o">=</span> <span class="p">{</span><span class="n">NC_BYTE</span><span class="p">:</span> <span class="n">FILL_BYTE</span><span class="p">,</span>
+           <span class="n">NC_CHAR</span><span class="p">:</span> <span class="n">FILL_CHAR</span><span class="p">,</span>
+           <span class="n">NC_SHORT</span><span class="p">:</span> <span class="n">FILL_SHORT</span><span class="p">,</span>
+           <span class="n">NC_INT</span><span class="p">:</span> <span class="n">FILL_INT</span><span class="p">,</span>
+           <span class="n">NC_FLOAT</span><span class="p">:</span> <span class="n">FILL_FLOAT</span><span class="p">,</span>
+           <span class="n">NC_DOUBLE</span><span class="p">:</span> <span class="n">FILL_DOUBLE</span><span class="p">}</span>
 
 <span class="n">REVERSE</span> <span class="o">=</span> <span class="p">{(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_BYTE</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="n">NC_SHORT</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_FLOAT</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="n">NC_DOUBLE</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="n">NC_SHORT</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_FLOAT</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="n">NC_DOUBLE</span><span class="p">,</span>
 
-            <span class="c1"># these come from asarray(1).dtype.char and asarray(&#39;foo&#39;).dtype.char,</span>
-            <span class="c1"># used when getting the types from generic attributes.</span>
-            <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
-            <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">}</span>
+           <span class="c1"># these come from asarray(1).dtype.char and asarray(&#39;foo&#39;).dtype.char,</span>
+           <span class="c1"># used when getting the types from generic attributes.</span>
+           <span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span> <span class="n">NC_INT</span><span class="p">,</span>
+           <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="n">NC_CHAR</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="netcdf_file"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file">[docs]</a><span class="k">class</span> <span class="nc">netcdf_file</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -191,8 +292,11 @@
 <span class="sd">    version : {1, 2}, optional</span>
 <span class="sd">        version of netcdf to read / write, where 1 means *Classic</span>
 <span class="sd">        format* and 2 means *64-bit offset format*.  Default is 1.  See</span>
-<span class="sd">        `here &lt;http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Which-Format.html&gt;`__</span>
+<span class="sd">        `here &lt;https://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html#select_format&gt;`__</span>
 <span class="sd">        for more info.</span>
+<span class="sd">    maskandscale : bool, optional</span>
+<span class="sd">        Whether to automatically scale and/or mask data based on attributes.</span>
+<span class="sd">        Default is False.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -203,7 +307,7 @@
 <span class="sd">    NetCDF files are a self-describing binary data format. The file contains</span>
 <span class="sd">    metadata that describes the dimensions and variables in the file. More</span>
 <span class="sd">    details about NetCDF files can be found `here</span>
-<span class="sd">    &lt;http://www.unidata.ucar.edu/software/netcdf/docs/netcdf.html&gt;`__. There</span>
+<span class="sd">    &lt;https://www.unidata.ucar.edu/software/netcdf/guide_toc.html&gt;`__. There</span>
 <span class="sd">    are three main sections to a NetCDF data structure:</span>
 
 <span class="sd">    1. Dimensions</span>
@@ -251,19 +355,19 @@
 <span class="sd">    &gt;&gt;&gt; time.units = &#39;days since 2008-01-01&#39;</span>
 <span class="sd">    &gt;&gt;&gt; f.close()</span>
 
-<span class="sd">    Note the assignment of ``range(10)`` to ``time[:]``.  Exposing the slice</span>
+<span class="sd">    Note the assignment of ``arange(10)`` to ``time[:]``.  Exposing the slice</span>
 <span class="sd">    of the time variable allows for the data to be set in the object, rather</span>
-<span class="sd">    than letting ``range(10)`` overwrite the ``time`` variable.</span>
+<span class="sd">    than letting ``arange(10)`` overwrite the ``time`` variable.</span>
 
 <span class="sd">    To read the NetCDF file we just created:</span>
 
 <span class="sd">    &gt;&gt;&gt; from scipy.io import netcdf</span>
 <span class="sd">    &gt;&gt;&gt; f = netcdf.netcdf_file(&#39;simple.nc&#39;, &#39;r&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; print(f.history)</span>
-<span class="sd">    Created for a test</span>
+<span class="sd">    b&#39;Created for a test&#39;</span>
 <span class="sd">    &gt;&gt;&gt; time = f.variables[&#39;time&#39;]</span>
 <span class="sd">    &gt;&gt;&gt; print(time.units)</span>
-<span class="sd">    days since 2008-01-01</span>
+<span class="sd">    b&#39;days since 2008-01-01&#39;</span>
 <span class="sd">    &gt;&gt;&gt; print(time.shape)</span>
 <span class="sd">    (10,)</span>
 <span class="sd">    &gt;&gt;&gt; print(time[-1])</span>
@@ -289,10 +393,11 @@
 <span class="sd">    &gt;&gt;&gt; from scipy.io import netcdf</span>
 <span class="sd">    &gt;&gt;&gt; with netcdf.netcdf_file(&#39;simple.nc&#39;, &#39;r&#39;) as f:</span>
 <span class="sd">    ...     print(f.history)</span>
-<span class="sd">    Created for a test</span>
+<span class="sd">    b&#39;Created for a test&#39;</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">mmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">maskandscale</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize netcdf_file from fileobj (str or file-like).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;rwa&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mode must be either &#39;r&#39;, &#39;w&#39; or &#39;a&#39;.&quot;</span><span class="p">)</span>
@@ -309,7 +414,10 @@
             <span class="n">omode</span> <span class="o">=</span> <span class="s1">&#39;r+&#39;</span> <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span> <span class="k">else</span> <span class="n">mode</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">b&#39;</span> <span class="o">%</span> <span class="n">omode</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mmap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">mmap</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># Mmapped files on PyPy cannot be usually closed</span>
+                <span class="c1"># before the GC runs, so it&#39;s better to use mmap=False</span>
+                <span class="c1"># as the default.</span>
+                <span class="n">mmap</span> <span class="o">=</span> <span class="p">(</span><span class="ow">not</span> <span class="n">IS_PYPY</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
             <span class="c1"># Cannot read write-only files</span>
@@ -318,9 +426,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">use_mmap</span> <span class="o">=</span> <span class="n">mmap</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span> <span class="o">=</span> <span class="n">maskandscale</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span> <span class="o">=</span> <span class="mi">0</span>
@@ -332,28 +441,27 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span> <span class="o">=</span> <span class="n">mm</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">access</span><span class="o">=</span><span class="n">mm</span><span class="o">.</span><span class="n">ACCESS_READ</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="s1">&#39;ra&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># Store user defined attributes in a separate dict,</span>
         <span class="c1"># so we can save them to file later.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="netcdf_file.close"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Closes the NetCDF file.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fp&#39;</span><span class="p">):</span> <span class="k">return</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fp&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
             <span class="k">finally</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">ref</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_mm_buf</span> <span class="o">=</span> <span class="kc">None</span>
@@ -372,12 +480,12 @@
                         <span class="p">),</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_mm</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-    <span class="n">__del__</span> <span class="o">=</span> <span class="n">close</span>
+    <span class="fm">__del__</span> <span class="o">=</span> <span class="n">close</span>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <div class="viewcode-block" id="netcdf_file.createDimension"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.createDimension">[docs]</a>    <span class="k">def</span> <span class="nf">createDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
@@ -385,7 +493,7 @@
 <span class="sd">        Adds a dimension to the Dimension section of the NetCDF data structure.</span>
 
 <span class="sd">        Note that this function merely adds a new dimension that the variables can</span>
-<span class="sd">        reference.  The values for the dimension, if desired, should be added as</span>
+<span class="sd">        reference. The values for the dimension, if desired, should be added as</span>
 <span class="sd">        a variable using `createVariable`, referring to this dimension.</span>
 
 <span class="sd">        Parameters</span>
@@ -400,6 +508,9 @@
 <span class="sd">        createVariable</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only first dimension may be unlimited!&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
@@ -435,7 +546,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">])</span>
-        <span class="n">shape_</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">dim</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">])</span>  <span class="c1"># replace None with 0 for numpy</span>
+        <span class="n">shape_</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">dim</span> <span class="ow">or</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">])</span>  <span class="c1"># replace None with 0 for NumPy</span>
 
         <span class="nb">type</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
         <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="nb">type</span><span class="o">.</span><span class="n">itemsize</span>
@@ -443,7 +554,9 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NetCDF 3 does not support type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">shape_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">type</span><span class="o">.</span><span class="n">newbyteorder</span><span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">))</span>  <span class="c1"># convert to big endian always for NetCDF 3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_variable</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_variable</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span>
+                <span class="n">maskandscale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="netcdf_file.flush"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_file.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -461,8 +574,8 @@
 
     <span class="k">def</span> <span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span><span class="p">,</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version_byte</span><span class="p">,</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
 
         <span class="c1"># Write headers and data.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_numrecs</span><span class="p">()</span>
@@ -474,7 +587,7 @@
         <span class="c1"># Get highest record count from all record variables.</span>
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_write_dim_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -497,7 +610,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_pack_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_write_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_att_values</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ABSENT</span><span class="p">)</span>
 
@@ -519,7 +632,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_metadata</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             <span class="c1"># Now that we have the metadata, we know the vsize of</span>
             <span class="c1"># each record variable, so we can calculate recsize.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span>
                     <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span><span class="p">])</span>
             <span class="c1"># Set the data for all variables.</span>
@@ -554,11 +667,11 @@
                             <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">isrec</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">rec_vars</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">vsize</span> <span class="o">+=</span> <span class="o">-</span><span class="n">vsize</span> <span class="o">%</span> <span class="mi">4</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_vsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vsize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_vsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vsize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">vsize</span><span class="p">)</span>
 
         <span class="c1"># Pack a bogus begin, and set the real value later.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_begin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_begin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pack_begin</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_write_var_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -572,14 +685,19 @@
 
         <span class="c1"># Write data.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">var</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
             <span class="n">count</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemsize</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_padding</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># record variable</span>
             <span class="c1"># Handle rec vars with shape[0] &lt; nrecs.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recs</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
                 <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">,)</span> <span class="o">+</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+                <span class="c1"># Resize in-place does not always work since</span>
+                <span class="c1"># the array might not be single-segment</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">var</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
             <span class="n">pos0</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">var</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
@@ -589,25 +707,27 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">rec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span> <span class="ow">or</span>
                         <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">LITTLE_ENDIAN</span><span class="p">)):</span>
                     <span class="n">rec</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
                 <span class="c1"># Padding</span>
                 <span class="n">count</span> <span class="o">=</span> <span class="n">rec</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">rec</span><span class="o">.</span><span class="n">itemsize</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_var_padding</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span> <span class="o">-</span> <span class="n">count</span><span class="p">)</span>
                 <span class="n">pos</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos0</span> <span class="o">+</span> <span class="n">var</span><span class="o">.</span><span class="n">_vsize</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_var_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">encoded_fill_value</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">_get_encoded_fill_value</span><span class="p">()</span>
+        <span class="n">num_fills</span> <span class="o">=</span> <span class="n">size</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">encoded_fill_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">encoded_fill_value</span> <span class="o">*</span> <span class="n">num_fills</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_att_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">):</span>
             <span class="n">nc_type</span> <span class="o">=</span> <span class="n">REVERSE</span><span class="p">[</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">char</span><span class="p">,</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">types</span> <span class="o">=</span> <span class="p">[(</span><span class="n">t</span><span class="p">,</span> <span class="n">NC_INT</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">integer_types</span><span class="p">]</span>
-            <span class="n">types</span> <span class="o">+=</span> <span class="p">[</span>
-                    <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">NC_FLOAT</span><span class="p">),</span>
-                    <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">NC_CHAR</span><span class="p">)</span>
-                    <span class="p">]</span>
-            <span class="c1"># bytes index into scalars in py3k.  Check for &quot;string&quot; types</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">text_type</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+            <span class="n">types</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">,</span> <span class="n">NC_INT</span><span class="p">),</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">NC_FLOAT</span><span class="p">),</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">NC_CHAR</span><span class="p">)]</span>
+
+            <span class="c1"># bytes index into scalars in py3k. Check for &quot;string&quot; types</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)):</span>
                 <span class="n">sample</span> <span class="o">=</span> <span class="n">values</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -621,7 +741,7 @@
 
         <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">TYPEMAP</span><span class="p">[</span><span class="n">nc_type</span><span class="p">]</span>
         <span class="n">dtype_</span> <span class="o">=</span> <span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span>
-        <span class="c1"># asarray() dies with bytes and &#39;&gt;c&#39; in py3k.  Change to &#39;S&#39;</span>
+        <span class="c1"># asarray() dies with bytes and &#39;&gt;c&#39; in py3k. Change to &#39;S&#39;</span>
         <span class="n">dtype_</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span> <span class="k">if</span> <span class="n">dtype_</span> <span class="o">==</span> <span class="s1">&#39;&gt;c&#39;</span> <span class="k">else</span> <span class="n">dtype_</span>
 
         <span class="n">values</span> <span class="o">=</span> <span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
@@ -637,17 +757,17 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">byteorder</span> <span class="o">==</span> <span class="s1">&#39;=&#39;</span> <span class="ow">and</span> <span class="n">LITTLE_ENDIAN</span><span class="p">)):</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
         <span class="n">count</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">values</span><span class="o">.</span><span class="n">itemsize</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
 
     <span class="k">def</span> <span class="nf">_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Check magic bytes and version</span>
         <span class="n">magic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">magic</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">magic</span> <span class="o">==</span> <span class="sa">b</span><span class="s1">&#39;CDF&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Error: </span><span class="si">%s</span><span class="s2"> is not a valid NetCDF 3 file&quot;</span> <span class="o">%</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;version_byte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;version_byte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;&gt;b&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Read file headers and set data.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_numrecs</span><span class="p">()</span>
@@ -656,7 +776,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_var_array</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_read_numrecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_recs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_read_dim_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
@@ -672,7 +792,7 @@
 
     <span class="k">def</span> <span class="nf">_read_gatt_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_att_array</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_read_att_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
@@ -680,10 +800,10 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unexpected header.&quot;</span><span class="p">)</span>
         <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
 
-        <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">asstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_string</span><span class="p">())</span>
-            <span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_values</span><span class="p">()</span>
+            <span class="n">attributes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_att_values</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">attributes</span>
 
     <span class="k">def</span> <span class="nf">_read_var_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -698,7 +818,7 @@
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
             <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span>
              <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype_</span><span class="p">,</span> <span class="n">begin_</span><span class="p">,</span> <span class="n">vsize</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_var</span><span class="p">()</span>
-            <span class="c1"># http://www.unidata.ucar.edu/software/netcdf/docs/netcdf.html</span>
+            <span class="c1"># https://www.unidata.ucar.edu/software/netcdf/guide_toc.html</span>
             <span class="c1"># Note that vsize is the product of the dimension lengths</span>
             <span class="c1"># (omitting the record dimension) and the number of bytes</span>
             <span class="c1"># per value (determined from the type), increased to the</span>
@@ -716,7 +836,7 @@
                 <span class="n">rec_vars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
                 <span class="c1"># The netCDF &quot;record size&quot; is calculated as the sum of</span>
                 <span class="c1"># the vsize&#39;s of all the record variables.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">vsize</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;_recsize&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">vsize</span>
                 <span class="k">if</span> <span class="n">begin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">begin</span> <span class="o">=</span> <span class="n">begin_</span>
                 <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -741,13 +861,15 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">begin_</span><span class="p">)</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">a_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">a_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_</span>
+                                      <span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                     <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
             <span class="c1"># Add variable.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">netcdf_variable</span><span class="p">(</span>
-                    <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">attributes</span><span class="p">)</span>
+                    <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span>
+                    <span class="n">maskandscale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">rec_vars</span><span class="p">:</span>
             <span class="c1"># Remove padding when only one record variable.</span>
@@ -762,12 +884,13 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
-                <span class="n">rec_array</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span>
+                <span class="n">rec_array</span> <span class="o">=</span> <span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_recsize</span><span class="p">),</span>
+                                       <span class="n">dtype</span><span class="o">=</span><span class="n">dtypes</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="n">rec_array</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recs</span><span class="p">,)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">rec_vars</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_array</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rec_array</span><span class="p">[</span><span class="n">var</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_read_var</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">asstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_unpack_string</span><span class="p">())</span>
@@ -794,7 +917,7 @@
 
         <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype_</span><span class="p">,</span> <span class="n">begin</span><span class="p">,</span> <span class="n">vsize</span>
 
-    <span class="k">def</span> <span class="nf">_read_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_read_att_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">nc_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
 
@@ -804,12 +927,12 @@
         <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># read padding</span>
 
-        <span class="k">if</span> <span class="n">typecode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">fromstring</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typecode</span> <span class="o">!=</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">frombuffer</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">typecode</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">1</span><span class="p">,):</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">values</span>
 
     <span class="k">def</span> <span class="nf">_pack_begin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">):</span>
@@ -819,35 +942,35 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int64</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_pack_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
     <span class="n">_pack_int32</span> <span class="o">=</span> <span class="n">_pack_int</span>
 
     <span class="k">def</span> <span class="nf">_unpack_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="s1">&#39;&gt;i&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">_unpack_int32</span> <span class="o">=</span> <span class="n">_unpack_int</span>
 
     <span class="k">def</span> <span class="nf">_pack_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">_unpack_int64</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">fromstring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="s1">&#39;&gt;q&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_pack_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
         <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pack_int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;0&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">))</span>  <span class="c1"># pad</span>
 
     <span class="k">def</span> <span class="nf">_unpack_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unpack_int</span><span class="p">()</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="o">-</span><span class="n">count</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>  <span class="c1"># read padding</span>
         <span class="k">return</span> <span class="n">s</span></div>
 
 
-<span class="k">class</span> <span class="nc">netcdf_variable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="netcdf_variable"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_variable">[docs]</a><span class="k">class</span> <span class="nc">netcdf_variable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A data object for the `netcdf` module.</span>
+<span class="sd">    A data object for netcdf files.</span>
 
 <span class="sd">    `netcdf_variable` objects are constructed by calling the method</span>
 <span class="sd">    `netcdf_file.createVariable` on the `netcdf_file` object. `netcdf_variable`</span>
@@ -873,47 +996,56 @@
 <span class="sd">    size : int</span>
 <span class="sd">        Desired element size for the data array.</span>
 <span class="sd">    shape : sequence of ints</span>
-<span class="sd">        The shape of the array.  This should match the lengths of the</span>
+<span class="sd">        The shape of the array. This should match the lengths of the</span>
 <span class="sd">        variable&#39;s dimensions.</span>
 <span class="sd">    dimensions : sequence of strings</span>
-<span class="sd">        The names of the dimensions used by the variable.  Must be in the</span>
+<span class="sd">        The names of the dimensions used by the variable. Must be in the</span>
 <span class="sd">        same order of the dimension lengths given by `shape`.</span>
 <span class="sd">    attributes : dict, optional</span>
-<span class="sd">        Attribute values (any type) keyed by string names.  These attributes</span>
+<span class="sd">        Attribute values (any type) keyed by string names. These attributes</span>
 <span class="sd">        become attributes for the netcdf_variable object.</span>
+<span class="sd">    maskandscale : bool, optional</span>
+<span class="sd">        Whether to automatically scale and/or mask data based on attributes.</span>
+<span class="sd">        Default is False.</span>
 
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dimensions : list of str</span>
 <span class="sd">        List of names of dimensions used by the variable object.</span>
-<span class="sd">    isrec, shape</span>
-<span class="sd">        Properties</span>
+<span class="sd">    isrec</span>
+<span class="sd">        Property</span>
+<span class="sd">    shape</span>
+<span class="sd">        Property</span>
 
-<span class="sd">    See also</span>
+<span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    isrec, shape</span>
+<span class="sd">    isrec</span>
+<span class="sd">    shape</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">typecode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span>
+                 <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">maskandscale</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span> <span class="o">=</span> <span class="n">typecode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">dimensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span> <span class="o">=</span> <span class="n">maskandscale</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">attributes</span> <span class="ow">or</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
-    <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="c1"># Store user defined attributes in a separate dict,</span>
         <span class="c1"># so we can save them to file later.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span> <span class="nf">isrec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns whether the variable has a record dimension or not.</span>
@@ -936,7 +1068,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="netcdf_variable.getValue"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_variable.getValue">[docs]</a>    <span class="k">def</span> <span class="nf">getValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve a scalar value from a `netcdf_variable` of length one.</span>
 
@@ -947,9 +1079,9 @@
 <span class="sd">            this exception will be raised.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">item</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">assignValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="netcdf_variable.assignValue"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_variable.assignValue">[docs]</a>    <span class="k">def</span> <span class="nf">assignValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign a scalar value to a `netcdf_variable` of length one.</span>
 
@@ -971,39 +1103,66 @@
             <span class="c1"># memory-mapped array causes a seg. fault.</span>
             <span class="c1"># See NumPy ticket #1622, and SciPy ticket #1202.</span>
             <span class="c1"># This check for `writeable` can be removed when the oldest version</span>
-            <span class="c1"># of numpy still supported by scipy contains the fix for #1622.</span>
+            <span class="c1"># of NumPy still supported by scipy contains the fix for #1622.</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;variable is not writeable&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemset</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">itemset</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">typecode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="netcdf_variable.typecode"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_variable.typecode">[docs]</a>    <span class="k">def</span> <span class="nf">typecode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the typecode of the variable.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        typecode : char</span>
-<span class="sd">            The character typecode of the variable (eg, &#39;i&#39; for int).</span>
+<span class="sd">            The character typecode of the variable (e.g., &#39;i&#39; for int).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span></div>
 
-    <span class="k">def</span> <span class="nf">itemsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="netcdf_variable.itemsize"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.netcdf.html#parmed.utils.netcdf.netcdf_variable.itemsize">[docs]</a>    <span class="k">def</span> <span class="nf">itemsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return the itemsize of the variable.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        itemsize : int</span>
-<span class="sd">            The element size of the variable (eg, 8 for float64).</span>
+<span class="sd">            The element size of the variable (e.g., 8 for float64).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span></div>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">missing_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_missing_value</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_missing_value</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">missing_value</span><span class="p">)</span>
+        <span class="n">scale_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale_factor&#39;</span><span class="p">)</span>
+        <span class="n">add_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;add_offset&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">scale_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scale_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale_factor</span>
+        <span class="k">if</span> <span class="n">add_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">+=</span> <span class="n">add_offset</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maskandscale</span><span class="p">:</span>
+            <span class="n">missing_value</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_get_missing_value</span><span class="p">()</span> <span class="ow">or</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;fill_value&#39;</span><span class="p">,</span> <span class="mi">999999</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;missing_value&#39;</span><span class="p">,</span> <span class="n">missing_value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;_FillValue&#39;</span><span class="p">,</span> <span class="n">missing_value</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">((</span><span class="n">data</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;add_offset&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span> <span class="o">/</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scale_factor&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">missing_value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typecode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;fd&#39;</span> <span class="ow">and</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
         <span class="c1"># Expand data for record vars?</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isrec</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
@@ -1016,50 +1175,135 @@
                 <span class="n">recs</span> <span class="o">=</span> <span class="n">rec_index</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="n">recs</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
                 <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">recs</span><span class="p">,)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+                <span class="c1"># Resize in-place does not always work since</span>
+                <span class="c1"># the array might not be single-segment</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">_default_encoded_fill_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The default encoded fill-value for this Variable&#39;s data type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nc_type</span> <span class="o">=</span> <span class="n">REVERSE</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">typecode</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemsize</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">FILLMAP</span><span class="p">[</span><span class="n">nc_type</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_encoded_fill_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the encoded fill value for this variable as bytes.</span>
+
+<span class="sd">        This is taken from either the _FillValue attribute, or the default fill</span>
+<span class="sd">        value for this variable&#39;s data type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;_FillValue&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">:</span>
+            <span class="n">fill_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="s1">&#39;_FillValue&#39;</span><span class="p">],</span>
+                                  <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fill_value</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemsize</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">fill_value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_encoded_fill_value</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_encoded_fill_value</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_missing_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the value denoting &quot;no data&quot; for this variable.</span>
+
+<span class="sd">        If this variable does not have a missing/fill value, returns None.</span>
+
+<span class="sd">        If both _FillValue and missing_value are given, give precedence to</span>
+<span class="sd">        _FillValue. The netCDF standard gives special meaning to _FillValue;</span>
+<span class="sd">        missing_value is  just used for compatibility with old datasets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;_FillValue&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">:</span>
+            <span class="n">missing_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="s1">&#39;_FillValue&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;missing_value&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">:</span>
+            <span class="n">missing_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="s1">&#39;missing_value&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">missing_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">missing_value</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_apply_missing_value</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">missing_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies the given missing value to the data array.</span>
+
+<span class="sd">        Returns a numpy.ma array, with any value equal to missing_value masked</span>
+<span class="sd">        out (unless missing_value is None, in which case the original array is</span>
+<span class="sd">        returned).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">missing_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">newdata</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">missing_value_isnan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">missing_value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                <span class="c1"># some data types (e.g., characters) cannot be tested for NaN</span>
+                <span class="n">missing_value_isnan</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">missing_value_isnan</span><span class="p">:</span>
+                <span class="n">mymask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mymask</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="n">missing_value</span><span class="p">)</span>
+
+            <span class="n">newdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_where</span><span class="p">(</span><span class="n">mymask</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">newdata</span></div>
 
 
 <span class="n">NetCDFFile</span> <span class="o">=</span> <span class="n">netcdf_file</span>
 <span class="n">NetCDFVariable</span> <span class="o">=</span> <span class="n">netcdf_variable</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../utils.html" >parmed.utils</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

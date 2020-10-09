@@ -18,6 +18,8 @@ parmed.topologyobjects.Improper
       ~Improper.energy
       ~Improper.measure
       ~Improper.same_atoms
+      ~Improper.uenergy
+      ~Improper.umeasure
    
    
 

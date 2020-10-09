@@ -2,6 +2,6 @@ parmed.utils.pandautils module
 ==============================
 
 .. automodule:: parmed.utils.pandautils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

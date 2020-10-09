@@ -2,6 +2,6 @@ parmed.formats.registry module
 ==============================
 
 .. automodule:: parmed.formats.registry
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

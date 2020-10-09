@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.gromacs.gromacsgro
    parmed.gromacs.gromacstop
@@ -13,6 +14,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.gromacs
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -5,14 +5,16 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    parmed.tools.gui
-    parmed.tools.simulations
+   parmed.tools.gui
+   parmed.tools.simulations
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.tools.actions
    parmed.tools.add1264
@@ -30,6 +32,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.tools
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

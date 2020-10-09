@@ -18,6 +18,7 @@ parmed.charmm.CharmmParameterSet
       ~CharmmParameterSet.from_parameterset
       ~CharmmParameterSet.from_structure
       ~CharmmParameterSet.load_set
+      ~CharmmParameterSet.match_improper_type
       ~CharmmParameterSet.read_parameter_file
       ~CharmmParameterSet.read_stream_file
       ~CharmmParameterSet.read_topology_file

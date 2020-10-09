@@ -1,52 +1,165 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.modeller.residue &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.modeller.residue &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>parmed.modeller.residue</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.modeller.residue</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -54,14 +167,15 @@
 <span class="sd">typically used in modelling applications</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">_copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="k">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
-<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="k">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="k">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
-<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="k">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.residue</span> <span class="kn">import</span> <span class="n">AminoAcidResidue</span><span class="p">,</span> <span class="n">RNAResidue</span><span class="p">,</span> <span class="n">DNAResidue</span>
+<span class="kn">from</span> <span class="nn">parmed.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">parmed.topologyobjects</span> <span class="kn">import</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">AtomList</span><span class="p">,</span> <span class="n">TrackedList</span>
+<span class="kn">from</span> <span class="nn">parmed.utils.six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+<span class="kn">from</span> <span class="nn">parmed.exceptions</span> <span class="kn">import</span> <span class="n">IncompatiblePatchError</span><span class="p">,</span> <span class="n">MoleculeError</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PROTEIN&#39;</span><span class="p">,</span> <span class="s1">&#39;NUCLEIC&#39;</span><span class="p">,</span> <span class="s1">&#39;SOLVENT&#39;</span><span class="p">,</span> <span class="s1">&#39;UNKNOWN&#39;</span><span class="p">,</span> <span class="s1">&#39;ResidueTemplate&#39;</span><span class="p">,</span>
@@ -71,13 +185,13 @@
 
 <span class="k">class</span> <span class="nc">_ResidueType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Singleton for various types of residues &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;ResidueType </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
 <span class="n">PROTEIN</span> <span class="o">=</span> <span class="n">_ResidueType</span><span class="p">(</span><span class="s1">&#39;PROTEIN&#39;</span><span class="p">)</span>
@@ -128,9 +242,11 @@
 <span class="sd">        (overrideLevel in OpenMM). Default is 0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">AtomList</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">TrackedList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lonepairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> <span class="c1"># TODO: Should this be a TrackedList?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anisotropies</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
@@ -141,8 +257,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">override_level</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_impr</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span>
         <span class="k">else</span><span class="p">:</span>
@@ -152,7 +269,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tail</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">: </span><span class="si">%d</span><span class="s1"> atoms; </span><span class="si">%d</span><span class="s1"> bonds; head=</span><span class="si">%s</span><span class="s1">; tail=</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">),</span>
                     <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">),</span> <span class="n">head</span><span class="p">,</span> <span class="n">tail</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -177,6 +294,48 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom</span></div>
+
+<div class="viewcode-block" id="ResidueTemplate.delete_atom"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.delete_atom">[docs]</a>    <span class="k">def</span> <span class="nf">delete_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete an atom from this residue template, along with corresponding bonds.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        atom : :class:`Atom` or str</span>
+<span class="sd">            The atom or atom name to be deleted</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">atom_name</span> <span class="o">=</span> <span class="n">atom</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atom_name</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="k">if</span> <span class="n">atom_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not find atom &#39;</span><span class="si">%s</span><span class="s2">&#39; in ResidueTemplate, which contains atoms: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+        <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">atom_name</span><span class="p">]</span>
+
+        <span class="c1"># Adjust head and tail if needed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">==</span> <span class="n">atom</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">==</span> <span class="n">atom</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Remove all bonds involving this atom</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span> <span class="o">==</span> <span class="n">atom</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom2</span> <span class="o">==</span> <span class="n">atom</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">delete_bond</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+
+        <span class="c1"># Remove all impropers involving this atom</span>
+        <span class="k">for</span> <span class="n">impr</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_impr</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">impr</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_impr</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">impr</span><span class="p">)</span>
+
+        <span class="c1"># Disconnect the atom from the residue so that it does not trigger atom.residue.delete_atom(atom)</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">residue</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Remove the atom from the ResidueTemplate</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_map</span><span class="p">[</span><span class="n">atom_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ResidueTemplate.add_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.add_bond">[docs]</a>    <span class="k">def</span> <span class="nf">add_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Adds a bond between the two provided atoms in the residue</span>
@@ -224,18 +383,32 @@
         <span class="k">if</span> <span class="n">atom1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atom2</span><span class="o">.</span><span class="n">bond_partners</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Bond</span><span class="p">(</span><span class="n">atom1</span><span class="p">,</span> <span class="n">atom2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">))</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ResidueTemplate.from_residue"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.from_residue">[docs]</a>    <span class="k">def</span> <span class="nf">from_residue</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplate.delete_bond"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.delete_bond">[docs]</a>    <span class="k">def</span> <span class="nf">delete_bond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Delete a bond from this residue template.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bond : :class:`Bond`</span>
+<span class="sd">            The bond to be deleted</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="n">bond</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The specified bond </span><span class="si">{}</span><span class="s1"> does not belong to this residue </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bond</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ResidueTemplate.from_residue"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.from_residue">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_residue</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">residue</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This constructor creates a ResidueTemplate from a particular Residue</span>
 <span class="sd">        object</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        residue : :class:`Residue`</span>
 <span class="sd">            The residue from which to create a template</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">atom</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
@@ -274,15 +447,50 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">a</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">xz</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crd</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">empirical_chemical_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the empirical chemical formula (in Hill notation) as a string (e.g. &#39;H2O&#39;, &#39;C6H12&#39;), omitting EPs &quot;&quot;&quot;</span>
+        <span class="c1"># Count number of appearances of each element</span>
+        <span class="n">element_count</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="n">element_count</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">element_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Pop EPs if they are present, since they are not chemical</span>
+        <span class="k">if</span> <span class="s1">&#39;EP&#39;</span> <span class="ow">in</span> <span class="n">element_count</span><span class="p">:</span>
+            <span class="n">element_count</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;EP&#39;</span><span class="p">)</span>
+        <span class="c1"># Render to string using Hill notation</span>
+        <span class="c1"># https://en.wikipedia.org/wiki/Chemical_formula#Hill_system</span>
+        <span class="k">def</span> <span class="nf">format_and_pop_element</span><span class="p">(</span><span class="n">element_count</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">element_count</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">element</span>
+            <span class="k">return</span> <span class="n">element</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+
+        <span class="n">chemical_formula</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1"># If carbon is present, first list C, then H (if present)</span>
+        <span class="k">if</span> <span class="s1">&#39;C&#39;</span> <span class="ow">in</span> <span class="n">element_count</span><span class="p">:</span>
+            <span class="n">chemical_formula</span> <span class="o">+=</span> <span class="n">format_and_pop_element</span><span class="p">(</span><span class="n">element_count</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;H&#39;</span> <span class="ow">in</span> <span class="n">element_count</span><span class="p">:</span>
+                <span class="n">chemical_formula</span> <span class="o">+=</span> <span class="n">format_and_pop_element</span><span class="p">(</span><span class="n">element_count</span><span class="p">,</span> <span class="s1">&#39;H&#39;</span><span class="p">)</span>
+        <span class="c1"># Remaining elements are listed alphabetically</span>
+        <span class="n">alphabetical_elements</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">element_count</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">alphabetical_elements</span><span class="p">:</span>
+            <span class="n">chemical_formula</span> <span class="o">+=</span> <span class="n">format_and_pop_element</span><span class="p">(</span><span class="n">element_count</span><span class="p">,</span> <span class="n">element</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">chemical_formula</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">net_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
     <span class="c1"># Make ResidueTemplate look like a container of atoms, also indexable by the</span>
     <span class="c1"># atom name</span>
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">Atom</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -309,7 +517,7 @@
 
         <span class="k">return</span> <span class="n">other</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">idx</span><span class="p">:</span>
@@ -361,7 +569,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Cannot fix charges on an empty residue&#39;</span><span class="p">)</span>
-        <span class="n">net_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+        <span class="n">net_charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net_charge</span>
         <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">to</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">net_charge</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -378,6 +586,147 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">charge</span> <span class="o">+=</span> <span class="n">to</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ResidueTemplate.apply_patch"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.apply_patch">[docs]</a>    <span class="k">def</span> <span class="nf">apply_patch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patch</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply the specified PatchTemplate to the ResidueTemplate.</span>
+
+<span class="sd">        This only handles patches that affect a single residue.</span>
+
+<span class="sd">        An exception is thrown if patch is incompatible because</span>
+<span class="sd">        * The patch specifies that an atom is to be deleted that doesn&#39;t exist in the residue</span>
+<span class="sd">        * A bond specified as being added in the patch does not have both atom names present after adding/deleting atoms from the patch</span>
+<span class="sd">        * The new net charge is not integral to the specified precision</span>
+<span class="sd">        * The residue is not modified in any way (no atoms or bonds added/changed/deleted)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        patch : PatchTemplate</span>
+<span class="sd">            The patch to apply to this residue</span>
+
+<span class="sd">        precision : int, optional</span>
+<span class="sd">            Each valid patch should be produce a net charge that is integral to</span>
+<span class="sd">            this many decimal places.</span>
+<span class="sd">            Default is 4</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        residue : ResidueTemplate</span>
+<span class="sd">            A new ResidueTemplate corresponding to the patched residue is returned.</span>
+<span class="sd">            The original remains unmodified.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a copy</span>
+        <span class="c1"># TODO: Once ResidueTemplate.from_residue() actually copies all info, use that instead?</span>
+        <span class="n">residue</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># Record whether we&#39;ve actually modified the residue.</span>
+        <span class="n">modifications_made</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Delete atoms</span>
+        <span class="k">for</span> <span class="n">atom_name</span> <span class="ow">in</span> <span class="n">patch</span><span class="o">.</span><span class="n">delete_atoms</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">delete_atom</span><span class="p">(</span><span class="n">atom_name</span><span class="p">)</span>
+                <span class="n">modifications_made</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">MoleculeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">atom_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;D&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">atom_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">and</span> <span class="n">atom_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">in</span> <span class="n">patch</span><span class="o">.</span><span class="n">delete_atoms</span><span class="p">:</span>
+                    <span class="c1"># This is a Drude particle.  We&#39;re also deleting its parent atom, so don&#39;t report an error.</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Atom </span><span class="si">%s</span><span class="s1"> could not be deleted from the patched residue: atoms are </span><span class="si">%s</span><span class="s1"> (exception: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="c1"># Add or replace atoms</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">patch</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">residue</span><span class="p">:</span>
+                <span class="c1"># Overwrite type and charge</span>
+                <span class="n">residue</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span>
+                <span class="n">residue</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">charge</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">))</span>
+            <span class="n">modifications_made</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Add bonds</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">atom1_name</span><span class="p">,</span> <span class="n">atom2_name</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span> <span class="ow">in</span> <span class="n">patch</span><span class="o">.</span><span class="n">add_bonds</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Remove dangling bonds</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="n">atom1_name</span><span class="p">,</span> <span class="n">atom2_name</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">head</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="n">residue</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                        <span class="n">residue</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="n">residue</span><span class="o">.</span><span class="n">tail</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="n">residue</span><span class="o">.</span><span class="n">tail</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+                        <span class="n">residue</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="c1"># Add bond</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">atom1_name</span><span class="p">,</span> <span class="n">atom2_name</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+                <span class="n">modifications_made</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="n">MoleculeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Bond </span><span class="si">%s</span><span class="s1">-</span><span class="si">%s</span><span class="s1"> could not be added to patched residue: atoms are </span><span class="si">%s</span><span class="s1"> (exception: </span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom1_name</span><span class="p">,</span> <span class="n">atom2_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">residue</span><span class="o">.</span><span class="n">_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="c1"># Delete impropers</span>
+        <span class="k">for</span> <span class="n">impr</span> <span class="ow">in</span> <span class="n">patch</span><span class="o">.</span><span class="n">delete_impropers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">residue</span><span class="o">.</span><span class="n">_impr</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">impr</span><span class="p">)</span>
+                <span class="c1"># removal of impropers doesn&#39;t do anything as far as OpenMM is concerned, so don&#39;t note this as a modification having been made</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Improper </span><span class="si">%s</span><span class="s1"> was not found in residue to be patched.&#39;</span> <span class="o">%</span> <span class="n">impr</span><span class="p">)</span>
+        <span class="c1"># Check that the net charge is integral.</span>
+        <span class="n">net_charge</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">net_charge</span>
+        <span class="n">is_integral</span> <span class="o">=</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">net_charge</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span> <span class="o">-</span> <span class="nb">round</span><span class="p">(</span><span class="n">net_charge</span><span class="p">))</span> <span class="o">==</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_integral</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Patch is not compatible with residue due to non-integral charge (charge was </span><span class="si">%f</span><span class="s1">).&#39;</span> <span class="o">%</span> <span class="n">net_charge</span><span class="p">)</span>
+        <span class="c1"># Ensure residue is connected</span>
+        <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">residue</span><span class="o">.</span><span class="n">to_networkx</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="p">]</span>
+            <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Patched residue bond graph is not a connected graph: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">components</span><span class="p">))</span>
+        <span class="c1"># Make sure the patch has actually modified the residue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">modifications_made</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">IncompatiblePatchError</span><span class="p">(</span><span class="s1">&#39;Patch did not modify residue.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">residue</span></div>
+
+<div class="viewcode-block" id="ResidueTemplate.patch_is_compatible"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.patch_is_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">patch_is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">patch</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Determine whether a specified patch is compatible with this residue.</span>
+
+<span class="sd">        Compatibility is determined by whether Residue.Template.apply_patch(patch) raises as</span>
+<span class="sd">        exception or not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        patch : PatchTemplate</span>
+<span class="sd">            The patch to be applied to this residue.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        is_compatible : bool</span>
+<span class="sd">            True if patch is compatible with the residue; False if not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apply_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">IncompatiblePatchError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ResidueTemplate.to_networkx"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.to_networkx">[docs]</a>    <span class="k">def</span> <span class="nf">to_networkx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_extra_particles</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a NetworkX graph of atoms and bonds</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        include_extra_particles : bool</span>
+<span class="sd">            Whether to include &quot;atoms&quot; that actually represent extra particles (atomic_number == 0).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        G : :class:`networkx.Graph`</span>
+<span class="sd">            A NetworkX Graph representing the molecule</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">networkx</span>
+        <span class="n">G</span> <span class="o">=</span> <span class="n">networkx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">include_extra_particles</span><span class="p">:</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">atomic_number</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">include_extra_particles</span><span class="p">:</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="o">.</span><span class="n">atom1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">bond</span><span class="o">.</span><span class="n">atom2</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span></div>
 
 <div class="viewcode-block" id="ResidueTemplate.to_dataframe"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplate.to_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Create a pandas dataframe from the atom information</span>
@@ -529,8 +878,8 @@
 <span class="sd">        TypeError if the structure cannot be converted to the desired format for</span>
 <span class="sd">        whatever reason</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="k">import</span> <span class="n">AmberOFFLibrary</span>
-        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="k">import</span> <span class="n">Mol2File</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
+        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="kn">import</span> <span class="n">Mol2File</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">,</span>
@@ -575,8 +924,12 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    delete : list of str</span>
-<span class="sd">        List of atoms that need to be deleted in applying the patch</span>
+<span class="sd">    add_bonds : list of (str, str, order)</span>
+<span class="sd">        List of bonds that need to be added in applying the patch</span>
+<span class="sd">    delete_atoms : list of str</span>
+<span class="sd">        List of atom names that need to be deleted in applying the patch</span>
+<span class="sd">    delete_impropers : list of tuple of str</span>
+<span class="sd">        List of impropers (tuple of atom names) that need to be deleted in applying the patch</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -588,9 +941,11 @@
 <span class="sd">    be deleted when applying this patch -- something that does not apply to</span>
 <span class="sd">    standard Residues</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PatchTemplate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span> <span class="o">=</span> <span class="p">[]</span></div>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PatchTemplate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_bonds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_impropers</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <span class="c1"># ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++</span>
 
@@ -604,12 +959,12 @@
 <span class="sd">    name : str, optional</span>
 <span class="sd">        The name of the residue container</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ResidueTemplateContainer.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">term_decorate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_structure">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">term_decorate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates a ResidueTemplateContainer from a Structure instance filled</span>
 <span class="sd">        with residues</span>
@@ -631,7 +986,7 @@
 <span class="sd">            For example, an N-terminal GLY will become NGLY, while a 5&#39;-terminal</span>
 <span class="sd">            DA will become DA5. Default is True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
             <span class="n">rt</span> <span class="o">=</span> <span class="n">ResidueTemplate</span><span class="o">.</span><span class="n">from_residue</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
             <span class="c1"># See if we need to decorate the termini names</span>
@@ -653,12 +1008,12 @@
         <span class="n">inst</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">box</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="c1"># Behave like a dict here... albeit a slow one</span>
             <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span> <span class="k">return</span> <span class="n">res</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ResidueTemplateContainer.fix_charges"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.fix_charges">[docs]</a>    <span class="k">def</span> <span class="nf">fix_charges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -709,8 +1064,8 @@
             <span class="n">ret</span><span class="p">[</span><span class="n">res</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ResidueTemplateContainer.from_library"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_library">[docs]</a>    <span class="k">def</span> <span class="nf">from_library</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ResidueTemplateContainer.from_library"><a class="viewcode-back" href="../../../api/parmed/parmed.modeller.residue.html#parmed.modeller.ResidueTemplateContainer.from_library">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_library</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">library</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts a dictionary of ResidueTemplate items into a</span>
 <span class="sd">        ResidueTemplateContainer.</span>
@@ -738,7 +1093,7 @@
 <span class="sd">        TypeError if any of the items in the input library is not a</span>
 <span class="sd">        ResidueTemplate instance (or an instance of a subclass)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cont</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">cont</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">library</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ResidueTemplate</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1"> is not a ResidueTemplate instance&#39;</span> <span class="o">%</span> <span class="n">res</span><span class="p">)</span>
@@ -785,8 +1140,8 @@
 <span class="sd">        contrast, ``Structure.save`` will save a single @&lt;MOLECULE&gt; mol2 file</span>
 <span class="sd">        with multiple residues if the mol2 format is requested.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="k">import</span> <span class="n">AmberOFFLibrary</span>
-        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="k">import</span> <span class="n">Mol2File</span>
+        <span class="kn">from</span> <span class="nn">parmed.amber.offlib</span> <span class="kn">import</span> <span class="n">AmberOFFLibrary</span>
+        <span class="kn">from</span> <span class="nn">parmed.formats.mol2</span> <span class="kn">import</span> <span class="n">Mol2File</span>
         <span class="n">extmap</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;.mol2&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL2&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;.mol3&#39;</span> <span class="p">:</span> <span class="s1">&#39;MOL3&#39;</span><span class="p">,</span>
@@ -813,41 +1168,50 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized format for ResidueTemplate save&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

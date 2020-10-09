@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.geometry module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.geometry module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.geometry module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.geometry.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.geometry">
 <span id="parmed-geometry-module"></span><h1>parmed.geometry module<a class="headerlink" href="#module-parmed.geometry" title="Permalink to this headline">¶</a></h1>
@@ -65,249 +181,203 @@ PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
 with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.angle">
-<code class="descclassname">parmed.geometry.</code><code class="descname">angle</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the cartesian angle between three atoms. Ignores periodic boundary
-conditions.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2, a3</strong> : Atom or collection of 3 coordinates</p>
-<blockquote>
-<div><p>The three atoms between whom the angle should be calculated (with a2
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">angle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a1</span></em>, <em class="sig-param"><span class="n">a2</span></em>, <em class="sig-param"><span class="n">a3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#angle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the cartesian angle between three atoms. Ignores periodic boundary conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a1, a2, a3</strong><span class="classifier">Atom or collection of 3 coordinates</span></dt><dd><p>The three atoms between whom the angle should be calculated (with a2
 being the central atoms)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>ang</strong> : float</p>
-<blockquote>
-<div><p>The angle between the vectors a1-a2 and a2-a3 in radians</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if a1, a2, or a3 are not Atom or iterable</strong></p>
-<p class="last"><strong>ValueError if a1, a2, or a3 are iterable, but do not have exactly 3 items</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>ang</strong><span class="classifier">float</span></dt><dd><p>The angle between the vectors a1-a2 and a2-a3 in degrees</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>TypeError if a1, a2, or a3 are not Atom or iterable</dt><dd></dd>
+<dt>ValueError if a1, a2, or a3 are iterable, but do not have exactly 3 items</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This is done in pure Python, so it should not be used for large numbers of
 distance calculations. For that, use numpy-vectorized routines and the numpy
 coordinate arrays</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.box_lengths_and_angles_to_vectors">
-<code class="descclassname">parmed.geometry.</code><code class="descname">box_lengths_and_angles_to_vectors</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em>, <em>alpha</em>, <em>beta</em>, <em>gamma</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#box_lengths_and_angles_to_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_lengths_and_angles_to_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">box_lengths_and_angles_to_vectors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">c</span></em>, <em class="sig-param"><span class="n">alpha</span></em>, <em class="sig-param"><span class="n">beta</span></em>, <em class="sig-param"><span class="n">gamma</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#box_lengths_and_angles_to_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_lengths_and_angles_to_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function takes the lengths of the unit cell vectors and the angles
 between them and returns 3 unit cell vectors satisfying those dimensions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : double (or length Quantity)</p>
-<blockquote>
-<div><p>Length of the first unit cell vector</p>
-</div></blockquote>
-<p><strong>b</strong> : double (or length Quantity)</p>
-<blockquote>
-<div><p>Length of the second unit cell vector</p>
-</div></blockquote>
-<p><strong>c</strong> : double (or length Quantity)</p>
-<blockquote>
-<div><p>Length of the third unit cell vector</p>
-</div></blockquote>
-<p><strong>alpha</strong> : double (or angle Quantity)</p>
-<blockquote>
-<div><p>Angle between vectors b and c</p>
-</div></blockquote>
-<p><strong>beta</strong> : double (or angle Quantity)</p>
-<blockquote>
-<div><p>Angle between vectors a and c</p>
-</div></blockquote>
-<p><strong>gamma</strong> : double (or angle Quantity)</p>
-<blockquote>
-<div><p>Angle between vectors a and b</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list Quantity, list Quantity, list Quantity</p>
-<blockquote class="last">
-<div><p>The 3, 3-element vectors as quantities with dimension length</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a</strong><span class="classifier">double (or length Quantity)</span></dt><dd><p>Length of the first unit cell vector</p>
+</dd>
+<dt><strong>b</strong><span class="classifier">double (or length Quantity)</span></dt><dd><p>Length of the second unit cell vector</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">double (or length Quantity)</span></dt><dd><p>Length of the third unit cell vector</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">double (or angle Quantity)</span></dt><dd><p>Angle between vectors b and c</p>
+</dd>
+<dt><strong>beta</strong><span class="classifier">double (or angle Quantity)</span></dt><dd><p>Angle between vectors a and c</p>
+</dd>
+<dt><strong>gamma</strong><span class="classifier">double (or angle Quantity)</span></dt><dd><p>Angle between vectors a and b</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>list Quantity, list Quantity, list Quantity</dt><dd><p>The 3, 3-element vectors as quantities with dimension length</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The unit cell lengths are assumed to be Angstroms if no explicit unit is
 given. The angles are assumed to be degrees</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.box_vectors_to_lengths_and_angles">
-<code class="descclassname">parmed.geometry.</code><code class="descname">box_vectors_to_lengths_and_angles</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#box_vectors_to_lengths_and_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_vectors_to_lengths_and_angles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">box_vectors_to_lengths_and_angles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#box_vectors_to_lengths_and_angles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.box_vectors_to_lengths_and_angles" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function takes the lengths of the unit cell vectors and the angles
 between them and returns 3 unit cell vectors satisfying those dimensions</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : collection of 3 floats (or length Quantity)</p>
-<blockquote>
-<div><p>The first unit cell vector</p>
-</div></blockquote>
-<p><strong>b</strong> : collection of 3 floats (or length Quantity)</p>
-<blockquote>
-<div><p>The second unit cell vector</p>
-</div></blockquote>
-<p><strong>c</strong> : collection of 3 floats (or length Quantity)</p>
-<blockquote>
-<div><p>The third unit cell vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">(a, b, c), (alpha, beta, gamma)</p>
-<blockquote class="last">
-<div><p>Two tuples, the first is the 3 unit cell vector lengths as
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a</strong><span class="classifier">collection of 3 floats (or length Quantity)</span></dt><dd><p>The first unit cell vector</p>
+</dd>
+<dt><strong>b</strong><span class="classifier">collection of 3 floats (or length Quantity)</span></dt><dd><p>The second unit cell vector</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">collection of 3 floats (or length Quantity)</span></dt><dd><p>The third unit cell vector</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>(a, b, c), (alpha, beta, gamma)</dt><dd><p>Two tuples, the first is the 3 unit cell vector lengths as
 length-dimension Quantity objects and the second is the set of angles
 between the unit cell vectors as angle-dimension Quantity objects</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The unit cell lengths are assumed to be Angstroms if no explicit unit is
 given.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.center_of_mass">
-<code class="descclassname">parmed.geometry.</code><code class="descname">center_of_mass</code><span class="sig-paren">(</span><em>coordinates</em>, <em>masses</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.center_of_mass" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">center_of_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">coordinates</span></em>, <em class="sig-param"><span class="n">masses</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#center_of_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.center_of_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute the center of mass of a group of coordinates.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>coordinates</strong> : numpy.ndarray</p>
-<blockquote>
-<div><p>Coordinate array</p>
-</div></blockquote>
-<p><strong>masses</strong> : numpy.ndarray</p>
-<blockquote>
-<div><p>Array of masses</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">COM</p>
-<blockquote class="last">
-<div><p>np.ndarray of shape (3,) identifying the cartesian center of mass</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>coordinates</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Coordinate array</p>
+</dd>
+<dt><strong>masses</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Array of masses</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>COM</dt><dd><p>np.ndarray of shape (3,) identifying the cartesian center of mass</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This method <em>requires</em> that the parameters be passed in as numpy arrays.
-AttributeError&#8217;s will ensue if this is not the case. Also, coordinates must
-be able to be reshaped to (len(masses), 3), or ValueError&#8217;s will ensue</p>
+AttributeError’s will ensue if this is not the case. Also, coordinates must
+be able to be reshaped to (len(masses), 3), or ValueError’s will ensue</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.dihedral">
-<code class="descclassname">parmed.geometry.</code><code class="descname">dihedral</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em>, <em>a3</em>, <em>a4</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.dihedral" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">dihedral</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a1</span></em>, <em class="sig-param"><span class="n">a2</span></em>, <em class="sig-param"><span class="n">a3</span></em>, <em class="sig-param"><span class="n">a4</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#dihedral"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.dihedral" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the angle between three vectors made up of four points (all three
 vectors share one point with one other vector)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2, a3, a4</strong> : Atom or collection of 4 coordinates</p>
-<blockquote>
-<div><p>The four atoms between whom the torsion angle should be calculated (with
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a1, a2, a3, a4</strong><span class="classifier">Atom or collection of 4 coordinates</span></dt><dd><p>The four atoms between whom the torsion angle should be calculated (with
 a1 and a4 being the two end-point atoms not shared between two vectors)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>dihed</strong> : float</p>
-<blockquote class="last">
-<div><p>The measured dihedral between the 4 points</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>dihed</strong><span class="classifier">float</span></dt><dd><p>The measured dihedral between the 4 points in degrees</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.distance2">
-<code class="descclassname">parmed.geometry.</code><code class="descname">distance2</code><span class="sig-paren">(</span><em>a1</em>, <em>a2</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#distance2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.distance2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the cartesian distance between two atoms. Ignores periodic boundary
-conditions.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a1, a2</strong> : Atom or collection of 3 coordinates</p>
-<blockquote>
-<div><p>The two atoms between whom the distance should be calculated</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>d2</strong> : float</p>
-<blockquote>
-<div><p>The square of the distance between the two atoms</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if a1 or a2 are not Atom or iterable</strong></p>
-<p class="last"><strong>ValueError if a1 or a2 are iterable, but do not have exactly 3 items</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">distance2</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a1</span></em>, <em class="sig-param"><span class="n">a2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#distance2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.distance2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the cartesian distance between two atoms. Ignores periodic boundary conditions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a1, a2</strong><span class="classifier">Atom or collection of 3 coordinates</span></dt><dd><p>The two atoms between whom the distance should be calculated</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>d2</strong><span class="classifier">float</span></dt><dd><p>The square of the distance between the two atoms</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>TypeError if a1 or a2 are not Atom or iterable</dt><dd></dd>
+<dt>ValueError if a1 or a2 are iterable, but do not have exactly 3 items</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This is done in pure Python, so it should not be used for large numbers of
 distance calculations. For that, use numpy-vectorized routines and the numpy
 coordinate arrays</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.geometry.reduce_box_vectors">
-<code class="descclassname">parmed.geometry.</code><code class="descname">reduce_box_vectors</code><span class="sig-paren">(</span><em>a</em>, <em>b</em>, <em>c</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#reduce_box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.reduce_box_vectors" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.geometry.</code><code class="sig-name descname">reduce_box_vectors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span></em>, <em class="sig-param"><span class="n">b</span></em>, <em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/geometry.html#reduce_box_vectors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.geometry.reduce_box_vectors" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function puts three unit cell vectors in a reduced form where a is
-&#8220;mostly&#8221; in x, b is &#8220;mostly&#8221; in y, and c is &#8220;mostly&#8221; in z. This form is
+“mostly” in x, b is “mostly” in y, and c is “mostly” in z. This form is
 necessary for some programs (notably OpenMM and Gromacs)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>a</strong> : 3-element collection of float</p>
-<blockquote>
-<div><p>First unit cell vector</p>
-</div></blockquote>
-<p><strong>b</strong> : 3-element collection of float</p>
-<blockquote>
-<div><p>Second unit cell vector</p>
-</div></blockquote>
-<p><strong>c</strong> : 3-element collection of float</p>
-<blockquote>
-<div><p>Third unit cell vector</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>red_a, red_b, red_c</strong> : Vec3, Vec3, Vec3</p>
-<blockquote class="last">
-<div><p>The reduced unit cell vectors in units of angstroms</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>a</strong><span class="classifier">3-element collection of float</span></dt><dd><p>First unit cell vector</p>
+</dd>
+<dt><strong>b</strong><span class="classifier">3-element collection of float</span></dt><dd><p>Second unit cell vector</p>
+</dd>
+<dt><strong>c</strong><span class="classifier">3-element collection of float</span></dt><dd><p>Third unit cell vector</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>red_a, red_b, red_c</strong><span class="classifier">Vec3, Vec3, Vec3</span></dt><dd><p>The reduced unit cell vectors in units of angstroms</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The implementation here is taken from the OpenMM Python application layer
 written by Peter Eastman</p>
@@ -316,47 +386,50 @@ written by Peter Eastman</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.geometry.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.amber.asciicrd module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.amber.asciicrd module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.amber.asciicrd module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.amber.asciicrd.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.amber.asciicrd">
 <span id="parmed-amber-asciicrd-module"></span><h1>parmed.amber.asciicrd module<a class="headerlink" href="#module-parmed.amber.asciicrd" title="Permalink to this headline">¶</a></h1>
@@ -55,379 +171,320 @@ formatted-ASCII, parsing and writing these files are expected to be slow. Binary
 alternatives (like DCD and NetCDF, provided in netcdffiles.py) are strongly
 encouraged, but these are provided for more complete compatibility and for
 instances where the prequisites may not be installed.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart">
-<em class="property">class </em><code class="descclassname">parmed.amber.asciicrd.</code><code class="descname">AmberAsciiRestart</code><span class="sig-paren">(</span><em>fname</em>, <em>mode='r'</em>, <em>natom=0</em>, <em>hasbox=None</em>, <em>title=None</em>, <em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.amber.asciicrd._AmberAsciiCoordinateFile</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.amber.asciicrd.</code><code class="sig-name descname">AmberAsciiRestart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'r'</span></em>, <em class="sig-param"><span class="n">natom</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">hasbox</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.amber.asciicrd._AmberAsciiCoordinateFile</span></code></p>
 <p>Parser for the Amber ASCII inpcrd/restart file format</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
-<blockquote class="last">
-<div><blockquote>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><blockquote>
 <div><p>File name to open</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>mode</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">str={&#8216;r&#8217;, &#8216;w&#8217;}</span><dd><p class="first last">Whether to open this file for &#8216;r&#8217;eading or &#8216;w&#8217;riting</p>
+<dl class="simple">
+<dt>mode<span class="classifier">str={‘r’, ‘w’}</span></dt><dd><p>Whether to open this file for ‘r’eading or ‘w’riting</p>
 </dd>
-<dt>natom</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">int, optional</span><dd><p class="first last">Number of atoms in the system (necessary when mode=&#8217;w&#8217;)</p>
+<dt>natom<span class="classifier">int, optional</span></dt><dd><p>Number of atoms in the system (necessary when mode=’w’)</p>
 </dd>
-<dt>hasbox</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">bool, optional</span><dd><p class="first last">Does the system have PBCs? Necessary when mode=&#8217;w&#8217;</p>
+<dt>hasbox<span class="classifier">bool, optional</span></dt><dd><p>Does the system have PBCs? Necessary when mode=’w’</p>
 </dd>
-<dt>title</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span><dd><p class="first last">Title to write to a new trajectory (when mode=&#8217;w&#8217;)</p>
+<dt>title<span class="classifier">str, optional</span></dt><dd><p>Title to write to a new trajectory (when mode=’w’)</p>
 </dd>
-<dt>time</dt>
- <span class="classifier-delimiter">:</span> <span class="classifier">float, optional</span><dd><p class="first last">The time to write to the restart file in ps. Default is 0.</p>
+<dt>time<span class="classifier">float, optional</span></dt><dd><p>The time to write to the restart file in ps. Default is 0.</p>
 </dd>
 </dl>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.box" title="parmed.amber.asciicrd.AmberAsciiRestart.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
-<td>Combined cell lengths and cell angles</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_angles" title="parmed.amber.asciicrd.AmberAsciiRestart.cell_angles"><code class="xref py py-obj docutils literal"><span class="pre">cell_angles</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_lengths" title="parmed.amber.asciicrd.AmberAsciiRestart.cell_lengths"><code class="xref py py-obj docutils literal"><span class="pre">cell_lengths</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.coordinates" title="parmed.amber.asciicrd.AmberAsciiRestart.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.positions" title="parmed.amber.asciicrd.AmberAsciiRestart.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.velocities" title="parmed.amber.asciicrd.AmberAsciiRestart.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.box" title="parmed.amber.asciicrd.AmberAsciiRestart.box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">box</span></code></a></dt><dd><p>Combined cell lengths and cell angles</p>
+</dd>
+<dt><strong>cell_angles</strong></dt><dd></dd>
+<dt><strong>cell_lengths</strong></dt><dd></dd>
+<dt><strong>coordinates</strong></dt><dd></dd>
+<dt><strong>positions</strong></dt><dd></dd>
+<dt><strong>velocities</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.close" title="parmed.amber.asciicrd.AmberAsciiRestart.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
-<td>Close the open file handler</td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code>()</p></td>
+<td><p>Close the open file handler</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.id_format" title="parmed.amber.asciicrd.AmberAsciiRestart.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as an Amber restart/inpcrd file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.id_format" title="parmed.amber.asciicrd.AmberAsciiRestart.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as an Amber restart/inpcrd file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberAsciiRestart.parse" title="parmed.amber.asciicrd.AmberAsciiRestart.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;structure])</td>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 53%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>parse</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.CRDS_PER_LINE">
-<code class="descname">CRDS_PER_LINE</code><em class="property"> = 6</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CRDS_PER_LINE</code><em class="property"> = 6</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.DEFAULT_TITLE">
-<code class="descname">DEFAULT_TITLE</code><em class="property"> = 'restart created by ParmEd'</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFAULT_TITLE</code><em class="property"> = 'restart created by ParmEd'</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.box">
-<code class="descname">box</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.box" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">box</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combined cell lengths and cell angles</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.cell_angles">
-<code class="descname">cell_angles</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_angles" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cell_angles</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_angles" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.cell_lengths">
-<code class="descname">cell_lengths</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_lengths" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">cell_lengths</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.cell_lengths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="parmed.amber.asciicrd.AmberAsciiRestart.close">
-<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Close the open file handler</p>
-</dd></dl>
-
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.coordinates">
-<code class="descname">coordinates</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.coordinates" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">coordinates</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">id_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an Amber restart/inpcrd file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to check format for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>True if it is an Amber restart/inpcrd file. False otherwise</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the file to check format for</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>is_fmt</strong><span class="classifier">bool</span></dt><dd><p>True if it is an Amber restart/inpcrd file. False otherwise</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.parse">
-<em class="property">classmethod </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>structure=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">structure</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberAsciiRestart.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.parse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
-<dt id="parmed.amber.asciicrd.AmberAsciiRestart.positions">
-<code class="descname">positions</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.positions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberAsciiRestart.velocities">
-<code class="descname">velocities</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.velocities" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">velocities</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberAsciiRestart.velocities" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.amber.asciicrd.AmberMdcrd">
-<em class="property">class </em><code class="descclassname">parmed.amber.asciicrd.</code><code class="descname">AmberMdcrd</code><span class="sig-paren">(</span><em>fname</em>, <em>natom</em>, <em>hasbox</em>, <em>mode='r'</em>, <em>title=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">parmed.amber.asciicrd._AmberAsciiCoordinateFile</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.amber.asciicrd.</code><code class="sig-name descname">AmberMdcrd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="n">natom</span></em>, <em class="sig-param"><span class="n">hasbox</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'r'</span></em>, <em class="sig-param"><span class="n">title</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.amber.asciicrd._AmberAsciiCoordinateFile</span></code></p>
 <p>A class to parse Amber ASCII trajectory files. This is <em>much</em> slower than
 parsing NetCDF files (or the equivalent parsing done in a compiled language
 like C or C++). For large trajectories, this may be significant.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.box" title="parmed.amber.asciicrd.AmberMdcrd.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.coordinates" title="parmed.amber.asciicrd.AmberMdcrd.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.frame" title="parmed.amber.asciicrd.AmberMdcrd.frame"><code class="xref py py-obj docutils literal"><span class="pre">frame</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.positions" title="parmed.amber.asciicrd.AmberMdcrd.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>box</strong></dt><dd></dd>
+<dt><strong>coordinates</strong></dt><dd></dd>
+<dt><strong>frame</strong></dt><dd></dd>
+<dt><strong>positions</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.add_box" title="parmed.amber.asciicrd.AmberMdcrd.add_box"><code class="xref py py-obj docutils literal"><span class="pre">add_box</span></code></a>(stuff)</td>
-<td>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.add_box" title="parmed.amber.asciicrd.AmberMdcrd.add_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_box</span></code></a>(stuff)</p></td>
+<td><p>Prints ‘stuff’ (which must be a 3-element list, array.array, tuple, or np.ndarray) as the box lengths for this frame</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.add_coordinates" title="parmed.amber.asciicrd.AmberMdcrd.add_coordinates"><code class="xref py py-obj docutils literal"><span class="pre">add_coordinates</span></code></a>(stuff)</td>
-<td>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the open file handler.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.add_coordinates" title="parmed.amber.asciicrd.AmberMdcrd.add_coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_coordinates</span></code></a>(stuff)</p></td>
+<td><p>Prints ‘stuff’ (which must be either an iterable of 3*natom or have an attribute ‘flatten’ that converts it into an iterable of 3*natom) to the open file handler.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.close" title="parmed.amber.asciicrd.AmberMdcrd.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
-<td>Close the open file handler</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code>()</p></td>
+<td><p>Close the open file handler</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.id_format" title="parmed.amber.asciicrd.AmberMdcrd.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as an Amber mdcrd file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.asciicrd.AmberMdcrd.id_format" title="parmed.amber.asciicrd.AmberMdcrd.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as an Amber mdcrd file</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.CRDS_PER_LINE">
-<code class="descname">CRDS_PER_LINE</code><em class="property"> = 10</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">CRDS_PER_LINE</code><em class="property"> = 10</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.CRDS_PER_LINE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.DEFAULT_TITLE">
-<code class="descname">DEFAULT_TITLE</code><em class="property"> = 'trajectory created by ParmEd'</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DEFAULT_TITLE</code><em class="property"> = 'trajectory created by ParmEd'</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.DEFAULT_TITLE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.add_box">
-<code class="descname">add_box</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints &#8216;stuff&#8217; (which must be a 3-element list, array.array, tuple, or
+<code class="sig-name descname">add_box</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stuff</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.add_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints ‘stuff’ (which must be a 3-element list, array.array, tuple, or
 np.ndarray) as the box lengths for this frame</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
-<blockquote>
-<div><p>This must be an iterable of length 3 with the box lengths</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
-<p><strong>currently expected to provide coordinates, a RuntimeError is raised.</strong></p>
-<p><strong>raised. If the provided box lengths are not length 3, a ValueError is</strong></p>
-<p class="last"><strong>raised.</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stuff</strong><span class="classifier">array or iterable</span></dt><dd><p>This must be an iterable of length 3 with the box lengths</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><dl class="simple">
+<dt>If the coordinate file is an old one being parsed or if you are</dt><dd></dd>
+<dt>currently expected to provide coordinates, a RuntimeError is raised.</dt><dd></dd>
+<dt>raised. If the provided box lengths are not length 3, a ValueError is</dt><dd></dd>
+<dt>raised.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.add_coordinates">
-<code class="descname">add_coordinates</code><span class="sig-paren">(</span><em>stuff</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints &#8216;stuff&#8217; (which must be either an iterable of 3*natom or have an
-attribute &#8216;flatten&#8217; that converts it into an iterable of 3*natom) to the
-open file handler. Can only be called on a &#8216;new&#8217; mdcrd, and adds these
+<code class="sig-name descname">add_coordinates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stuff</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.add_coordinates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.add_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints ‘stuff’ (which must be either an iterable of 3*natom or have an
+attribute ‘flatten’ that converts it into an iterable of 3*natom) to the
+open file handler. Can only be called on a ‘new’ mdcrd, and adds these
 coordinates to the current end of the file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stuff</strong> : array or iterable</p>
-<blockquote>
-<div><p>This must be an iterable of length 3*natom or a numpy array that can
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>stuff</strong><span class="classifier">array or iterable</span></dt><dd><p>This must be an iterable of length 3*natom or a numpy array that can
 be flattened to a 3*natom-length array</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>If the coordinate file is an old one being parsed or if you are</strong></p>
-<p><strong>currently expected to provide unit cell dimensions, a RuntimeError is</strong></p>
-<p><strong>raised. If the provided coordinate data does not have length 3*natom, or</strong></p>
-<p><strong>cannot be ``flatten()``ed to create a 3*natom array, a ValueError is</strong></p>
-<p class="last"><strong>raised.</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><dl class="simple">
+<dt>If the coordinate file is an old one being parsed or if you are</dt><dd></dd>
+<dt>currently expected to provide unit cell dimensions, a RuntimeError is</dt><dd></dd>
+<dt>raised. If the provided coordinate data does not have length 3*natom, or</dt><dd></dd>
+<dt>cannot be <a href="#id1"><span class="problematic" id="id2">``</span></a>flatten()``ed to create a 3*natom array, a ValueError is</dt><dd></dd>
+<dt>raised.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.box">
-<code class="descname">box</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.box" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">box</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.box" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="parmed.amber.asciicrd.AmberMdcrd.close">
-<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Close the open file handler</p>
-</dd></dl>
-
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.coordinates">
-<code class="descname">coordinates</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.coordinates" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">coordinates</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.extra_args">
-<code class="descname">extra_args</code><em class="property"> = ('natom', 'hasbox')</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.extra_args" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extra_args</code><em class="property"> = ('natom', 'hasbox')</em><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.extra_args" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.frame">
-<code class="descname">frame</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.frame" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">frame</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.frame" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.amber.asciicrd.AmberMdcrd.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">id_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/asciicrd.html#AmberMdcrd.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as an Amber mdcrd file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to check format for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>True if it is an Amber mdcrd file. False otherwise</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the file to check format for</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>is_fmt</strong><span class="classifier">bool</span></dt><dd><p>True if it is an Amber mdcrd file. False otherwise</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.amber.asciicrd.AmberMdcrd.positions">
-<code class="descname">positions</code><a class="headerlink" href="#parmed.amber.asciicrd.AmberMdcrd.positions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.amber.asciicrd.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

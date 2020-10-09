@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.parameters module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.parameters module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.parameters module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.parameters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.parameters">
 <span id="parmed-parameters-module"></span><h1>parmed.parameters module<a class="headerlink" href="#module-parmed.parameters" title="Permalink to this headline">¶</a></h1>
@@ -53,164 +169,154 @@
 topology, and stream files. It only extracts atom properties from the
 topology files and extracts all parameters from the parameter files</p>
 <p>Author: Jason M. Swails</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.parameters.ParameterSet">
-<em class="property">class </em><code class="descclassname">parmed.parameters.</code><code class="descname">ParameterSet</code><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.parameters.</code><code class="sig-name descname">ParameterSet</code><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Stores a parameter set defining a force field</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="6%" />
-<col width="94%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>atom_types</td>
-<td>(dict(str:AtomType)) Dictionary mapping the names of the atom types to the corresponding AtomType instances</td>
-</tr>
-<tr class="row-even"><td>atom_types_int</td>
-<td>(dict(int:AtomType)) Dictionary mapping the serial indexes of the atom types to the corresponding AtomType instances</td>
-</tr>
-<tr class="row-odd"><td>atom_types_tuple</td>
-<td>(dict((str,int):AtomType)) Dictionary mapping the (name,number) tuple of the atom types to the corresponding AtomType instances</td>
-</tr>
-<tr class="row-even"><td>bond_types</td>
-<td>(dict((str,str):AtomType)) Dictionary mapping the 2-element tuple of the names of the two atom types involved in the bond to the BondType instances</td>
-</tr>
-<tr class="row-odd"><td>angle_types</td>
-<td>(dict((str,str,str):AngleType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the AngleType instances</td>
-</tr>
-<tr class="row-even"><td>urey_bradley_types</td>
-<td>(dict((str,str,str):BondType)) Dictionary mapping the 3-element tuple of the names of the three atom types involved in the angle to the BondType instances of the Urey-Bradley terms</td>
-</tr>
-<tr class="row-odd"><td>dihedral_types</td>
-<td>(dict((str,str,str,str):list(DihedralType))) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the dihedral to the DihedralType instances. Since each torsion term can be a multiterm expansion, each item corresponding to a key in this dict is a list of <a href="#id1"><span class="problematic" id="id2">`</span></a>DihedralType`s for each term in the expansion</td>
-</tr>
-<tr class="row-even"><td>improper_types</td>
-<td>(dict((str,str,str,str):ImproperType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion to the ImproperType instances</td>
-</tr>
-<tr class="row-odd"><td>improper_periodic_types</td>
-<td>(dict((str,str,str,str):DihedralType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the improper torsion (modeled as a Fourier series) to the DihedralType instances. Note, the central atom should always be put in the <em>third</em> position of the key</td>
-</tr>
-<tr class="row-even"><td>rb_torsion_types</td>
-<td>(dict((str,str,str,str):RBTorsionType)) Dictionary mapping the 4-element tuple of the names of the four atom types involved in the Ryckaert-Bellemans torsion to the RBTorsionType instances</td>
-</tr>
-<tr class="row-odd"><td>cmap_types</td>
-<td>(dict((str,str,str,str,str,str,str,str):CmapType)) Dictionary mapping the 5-element tuple of the names of the five atom types involved in the correction map to the CmapType instances</td>
-</tr>
-<tr class="row-even"><td>nbfix_types</td>
-<td>(dict((str,str):(float,float))) Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term</td>
-</tr>
-<tr class="row-odd"><td>pair_types</td>
-<td>(dict((str,str):NonbondedExceptionType)) Dictionary mapping the 2-element tuple of atom type names for which explicit exclusion rules should be applied</td>
-</tr>
-<tr class="row-even"><td>parametersets</td>
-<td>(list(str)) List of parameter set names processed in the current ParameterSet</td>
-</tr>
-<tr class="row-odd"><td>residues</td>
-<td>(dict(str:ResidueTemplate|ResidueTemplateContainer)) A library of ResidueTemplate objects mapped to the residue name defined in the force field library files</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atom_types</strong><span class="classifier">dict(str:AtomType)</span></dt><dd><p>Dictionary mapping the names of the atom types to the corresponding AtomType instances</p>
+</dd>
+<dt><strong>atom_types_int</strong><span class="classifier">dict(int:AtomType)</span></dt><dd><p>Dictionary mapping the serial indexes of the atom types to the corresponding AtomType
+instances</p>
+</dd>
+<dt><strong>atom_types_tuple</strong><span class="classifier">dict((str,int):AtomType)</span></dt><dd><p>Dictionary mapping the (name,number) tuple of the atom types to the corresponding AtomType
+instances</p>
+</dd>
+<dt><strong>bond_types</strong><span class="classifier">dict((str,str):AtomType)</span></dt><dd><p>Dictionary mapping the 2-element tuple of the names of the two atom types involved in the
+bond to the BondType instances</p>
+</dd>
+<dt><strong>angle_types</strong><span class="classifier">dict((str,str,str):AngleType)</span></dt><dd><p>Dictionary mapping the 3-element tuple of the names of the three atom types involved in the
+angle to the AngleType instances</p>
+</dd>
+<dt><strong>urey_bradley_types</strong><span class="classifier">dict((str,str,str):BondType)</span></dt><dd><p>Dictionary mapping the 3-element tuple of the names of the three atom types involved in the
+angle to the BondType instances of the Urey-Bradley terms</p>
+</dd>
+<dt><strong>dihedral_types</strong><span class="classifier">dict((str,str,str,str):list(DihedralType))</span></dt><dd><p>Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+dihedral to the DihedralType instances. Since each torsion term can be a multiterm
+expansion, each item corresponding to a key in this dict is a list of <a href="#id1"><span class="problematic" id="id2">`</span></a>DihedralType`s for
+each term in the expansion</p>
+</dd>
+<dt><strong>improper_types</strong><span class="classifier">dict((str,str,str,str):ImproperType)</span></dt><dd><p>Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+improper torsion to the ImproperType instances</p>
+</dd>
+<dt><strong>improper_periodic_types</strong><span class="classifier">dict((str,str,str,str):DihedralType)</span></dt><dd><p>Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+improper torsion (modeled as a Fourier series) to the DihedralType instances. Note, the
+central atom should always be put in the <em>third</em> position of the key</p>
+</dd>
+<dt><strong>rb_torsion_types</strong><span class="classifier">dict((str,str,str,str):RBTorsionType)</span></dt><dd><p>Dictionary mapping the 4-element tuple of the names of the four atom types involved in the
+Ryckaert-Bellemans torsion to the RBTorsionType instances</p>
+</dd>
+<dt><strong>cmap_types</strong><span class="classifier">dict((str,str,str,str,str,str,str,str):CmapType)</span></dt><dd><p>Dictionary mapping the 5-element tuple of the names of the five atom types involved in the
+correction map to the CmapType instances</p>
+</dd>
+<dt><strong>nbfix_types</strong><span class="classifier">dict((str,str):(float,float))</span></dt><dd><p>Dictionary mapping the 2-element tuple of the names of the two atom types whose LJ terms are
+modified to the tuple of the (epsilon,rmin) terms for that off-diagonal term</p>
+</dd>
+<dt><strong>pair_types</strong><span class="classifier">dict((str,str):NonbondedExceptionType)</span></dt><dd><p>Dictionary mapping the 2-element tuple of atom type names for which explicit exclusion rules
+should be applied</p>
+</dd>
+<dt><strong>parametersets</strong><span class="classifier">list(str)</span></dt><dd><p>List of parameter set names processed in the current ParameterSet</p>
+</dd>
+<dt><strong>residues</strong><span class="classifier">dict(str:ResidueTemplate|ResidueTemplateContainer)</span></dt><dd><p>A library of ResidueTemplate objects mapped to the residue name defined in the force field
+library files</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.parameters.ParameterSet.condense" title="parmed.parameters.ParameterSet.condense"><code class="xref py py-obj docutils literal"><span class="pre">condense</span></code></a>([do_dihedrals])</td>
-<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.parameters.ParameterSet.condense" title="parmed.parameters.ParameterSet.condense"><code class="xref py py-obj docutils literal notranslate"><span class="pre">condense</span></code></a>([do_dihedrals])</p></td>
+<td><p>This function goes through each of the parameter type dicts and eliminates duplicate types.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.parameters.ParameterSet.from_structure" title="parmed.parameters.ParameterSet.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct[,&nbsp;...])</td>
-<td>Extracts known parameters from a Structure instance</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.parameters.ParameterSet.from_structure" title="parmed.parameters.ParameterSet.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>(struct[, …])</p></td>
+<td><p>Extracts known parameters from a Structure instance</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.parameters.ParameterSet.typeify_templates" title="parmed.parameters.ParameterSet.typeify_templates"><code class="xref py py-obj docutils literal"><span class="pre">typeify_templates</span></code></a>()</td>
-<td>Assign atom types to atom names in templates</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.parameters.ParameterSet.typeify_templates" title="parmed.parameters.ParameterSet.typeify_templates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">typeify_templates</span></code></a>()</p></td>
+<td><p>Assign atom types to atom names in templates</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.parameters.ParameterSet.combining_rule">
-<code class="descname">combining_rule</code><a class="headerlink" href="#parmed.parameters.ParameterSet.combining_rule" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">combining_rule</code><a class="headerlink" href="#parmed.parameters.ParameterSet.combining_rule" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.parameters.ParameterSet.condense">
-<code class="descname">condense</code><span class="sig-paren">(</span><em>do_dihedrals=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.condense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.condense" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">condense</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">do_dihedrals</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.condense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.condense" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function goes through each of the parameter type dicts and
 eliminates duplicate types. After calling this function, every unique
 bond, angle, dihedral, improper, or cmap type will pair with EVERY key
 in the type mapping dictionaries that points to the equivalent type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>do_dihedrals</strong> : bool=True</p>
-<blockquote>
-<div><p>Dihedrals can take the longest time to compress since testing their
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>do_dihedrals</strong><span class="classifier">bool=True</span></dt><dd><p>Dihedrals can take the longest time to compress since testing their
 equality takes the longest (this is complicated by the existence of
 multi-term torsions). This flag will allow you to <em>skip</em> condensing
 the dihedral parameter types (for large parameter sets, this can cut
 the compression time in half)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self</p>
-<blockquote class="last">
-<div><p>The instance that is being condensed</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>self</dt><dd><p>The instance that is being condensed</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The return value allows you to condense the types at construction time.</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="parmed.parameters.ParameterSet.from_structure">
-<em class="property">classmethod </em><code class="descname">from_structure</code><span class="sig-paren">(</span><em>struct</em>, <em>allow_unequal_duplicates=True</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_structure</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct</span></em>, <em class="sig-param"><span class="n">allow_unequal_duplicates</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extracts known parameters from a Structure instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
-<blockquote>
-<div><p>The parametrized <code class="docutils literal"><span class="pre">Structure</span></code> instance from which to extract
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>struct</strong><span class="classifier"><a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.structure.Structure</span></code></a></span></dt><dd><p>The parametrized <code class="docutils literal notranslate"><span class="pre">Structure</span></code> instance from which to extract
 parameters into a ParameterSet</p>
-</div></blockquote>
-<p><strong>allow_unequal_duplicates</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, if two or more unequal parameter types are defined by the
+</dd>
+<dt><strong>allow_unequal_duplicates</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, if two or more unequal parameter types are defined by the
 same atom types, the last one encountered will be assigned. If
 False, an exception will be raised. Default is True</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <a class="reference internal" href="#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></code></a></p>
-<blockquote>
-<div><p>The parameter set with all parameters defined in the Structure</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>:class:`parmed.exceptions.ParameterError` if allow_unequal_duplicates is</strong></p>
-<p><strong>False and 2+ unequal parameters are defined between the same atom types.</strong></p>
-<p><strong>`NotImplementedError` if any AMOEBA potential terms are defined in the</strong></p>
-<p class="last"><strong>input structure</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>params</strong><span class="classifier"><a class="reference internal" href="#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParameterSet</span></code></a></span></dt><dd><p>The parameter set with all parameters defined in the Structure</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="parmed.exceptions.html#parmed.exceptions.ParameterError" title="parmed.exceptions.ParameterError"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.exceptions.ParameterError</span></code></a> if allow_unequal_duplicates is</dt><dd></dd>
+<dt>False and 2+ unequal parameters are defined between the same atom types.</dt><dd></dd>
+<dt><cite>NotImplementedError</cite> if any AMOEBA potential terms are defined in the</dt><dd></dd>
+<dt>input structure</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The parameters here are copies of the ones in the Structure, so
-modifying the generated ParameterSet will have no effect on <code class="docutils literal"><span class="pre">struct</span></code>.
+modifying the generated ParameterSet will have no effect on <code class="docutils literal notranslate"><span class="pre">struct</span></code>.
 Furthermore, the <em>first</em> occurrence of each parameter will be used. If
 future ones differ, they will be silently ignored, since this is
 expected behavior in some instances (like with Gromacs topologies in the
-ff99sb-ildn force field) unless <code class="docutils literal"><span class="pre">allow_unequal_duplicates</span></code> is set to
-<code class="docutils literal"><span class="pre">False</span></code></p>
+ff99sb-ildn force field) unless <code class="docutils literal notranslate"><span class="pre">allow_unequal_duplicates</span></code> is set to
+<code class="docutils literal notranslate"><span class="pre">False</span></code></p>
 <p>Dihedrals are a little trickier. They can be multi-term, which can be
 represented either as a <em>single</em> entry in dihedrals with a type of
 DihedralTypeList or multiple entries in dihedrals with a DihedralType
@@ -219,9 +325,9 @@ the first DihedralTypeList found or the first DihedralType of each
 periodicity found if no matching DihedralTypeList is found.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.parameters.ParameterSet.typeify_templates">
-<code class="descname">typeify_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.typeify_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.typeify_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">typeify_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/parameters.html#ParameterSet.typeify_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.parameters.ParameterSet.typeify_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign atom types to atom names in templates</p>
 </dd></dl>
 
@@ -230,47 +336,50 @@ periodicity found if no matching DihedralTypeList is found.</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.parameters.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

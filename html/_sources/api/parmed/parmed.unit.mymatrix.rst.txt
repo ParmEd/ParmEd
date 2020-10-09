@@ -2,6 +2,6 @@ parmed.unit.mymatrix module
 ===========================
 
 .. automodule:: parmed.unit.mymatrix
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

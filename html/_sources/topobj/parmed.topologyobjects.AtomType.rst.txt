@@ -28,5 +28,11 @@ parmed.topologyobjects.AtomType
       ~AtomType.bond_type
       ~AtomType.sigma
       ~AtomType.sigma_14
+      ~AtomType.uepsilon
+      ~AtomType.uepsilon_14
+      ~AtomType.urmin
+      ~AtomType.urmin_14
+      ~AtomType.usigma
+      ~AtomType.usigma_14
    
    

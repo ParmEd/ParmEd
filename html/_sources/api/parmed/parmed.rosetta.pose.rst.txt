@@ -2,6 +2,6 @@ parmed.rosetta.pose module
 ==========================
 
 .. automodule:: parmed.rosetta.pose
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

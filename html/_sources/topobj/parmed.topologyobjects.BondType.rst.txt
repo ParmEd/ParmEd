@@ -24,5 +24,7 @@ parmed.topologyobjects.BondType
    .. autosummary::
    
       ~BondType.idx
+      ~BondType.uk
+      ~BondType.ureq
    
    

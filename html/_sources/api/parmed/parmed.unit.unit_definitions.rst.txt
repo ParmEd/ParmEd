@@ -1,7 +1,7 @@
-parmed.unit.unit_definitions module
-===================================
+parmed.unit.unit\_definitions module
+====================================
 
 .. automodule:: parmed.unit.unit_definitions
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

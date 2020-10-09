@@ -1,52 +1,165 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.charmm.parameters &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.charmm.parameters &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>parmed.charmm.parameters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.charmm.parameters</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -57,34 +170,36 @@
 <span class="sd">Contributors:</span>
 <span class="sd">Date: Mar. 26, 2017</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span> <span class="k">as</span> <span class="n">_copy</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span> <span class="k">as</span> <span class="n">_copy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
 
-<span class="kn">from</span> <span class="nn">..constants</span> <span class="k">import</span> <span class="n">TINY</span>
-<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">CharmmError</span><span class="p">,</span> <span class="n">ParameterWarning</span>
-<span class="kn">from</span> <span class="nn">..modeller</span> <span class="k">import</span> <span class="n">PatchTemplate</span><span class="p">,</span> <span class="n">ResidueTemplate</span>
-<span class="kn">from</span> <span class="nn">..parameters</span> <span class="k">import</span> <span class="n">ParameterSet</span>
-<span class="kn">from</span> <span class="nn">..periodic_table</span> <span class="k">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
-<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">AngleType</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">TINY</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">CharmmError</span><span class="p">,</span> <span class="n">ParameterWarning</span>
+<span class="kn">from</span> <span class="nn">..modeller</span> <span class="kn">import</span> <span class="n">PatchTemplate</span><span class="p">,</span> <span class="n">ResidueTemplate</span>
+<span class="kn">from</span> <span class="nn">..parameters</span> <span class="kn">import</span> <span class="n">ParameterSet</span>
+<span class="kn">from</span> <span class="nn">..periodic_table</span> <span class="kn">import</span> <span class="n">AtomicNum</span><span class="p">,</span> <span class="n">element_by_mass</span>
+<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AngleType</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span>
                                <span class="n">DihedralType</span><span class="p">,</span> <span class="n">DihedralTypeList</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span>
-                               <span class="n">NoUreyBradley</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..utils.io</span> <span class="k">import</span> <span class="n">genopen</span>
-<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="k">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="k">import</span> <span class="nb">zip</span>
-<span class="kn">from</span> <span class="nn">._charmmfile</span> <span class="k">import</span> <span class="n">CharmmFile</span><span class="p">,</span> <span class="n">CharmmStreamFile</span>
+                               <span class="n">NoUreyBradley</span><span class="p">,</span> <span class="n">DrudeAtom</span><span class="p">,</span> <span class="n">DrudeAnisotropy</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">..utils.io</span> <span class="kn">import</span> <span class="n">genopen</span>
+<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="kn">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="kn">import</span> <span class="nb">zip</span>
+<span class="kn">from</span> <span class="nn">._charmmfile</span> <span class="kn">import</span> <span class="n">CharmmFile</span><span class="p">,</span> <span class="n">CharmmStreamFile</span>
 
-<span class="n">_penaltyre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">r&#39;penalty\s*=\s*([\d\.]+)&#39;</span><span class="p">)</span>
+<span class="n">_penaltyre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;penalty\s*=\s*([\d\.]+)&#39;</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">_EmptyStringIterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Always yields an empty string &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">yield</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
 <span class="k">def</span> <span class="nf">_typeconv</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -97,7 +212,41 @@
     <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">LTU&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;STR&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
             <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">)[:</span><span class="mi">6</span><span class="p">]</span>
 
-<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="n">ParameterSet</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmImproperMatchingMixin"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmImproperMatchingMixin">[docs]</a><span class="k">class</span> <span class="nc">CharmmImproperMatchingMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Implements CHARMM-style improper matching &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CharmmImproperMatchingMixin.match_improper_type"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmImproperMatchingMixin.match_improper_type">[docs]</a>    <span class="k">def</span> <span class="nf">match_improper_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Matches an improper type based on atom type names &quot;&quot;&quot;</span>
+        <span class="n">typ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_improper_with_typemap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_match_improper_with_typemap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_periodic_types</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">typ</span></div>
+
+    <span class="k">def</span> <span class="nf">_match_improper_with_typemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typemap</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span> <span class="k">return</span> <span class="n">typemap</span><span class="p">[(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">a4</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span> <span class="k">return</span> <span class="n">typemap</span><span class="p">[(</span><span class="n">a4</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a1</span><span class="p">)]</span>
+
+        <span class="c1"># Now try any of the sortings. The documented CHARMM ordering does not seem to work for</span>
+        <span class="c1"># all systems CHARMM supports :(</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">typemap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+        <span class="k">for</span> <span class="n">exact1</span><span class="p">,</span> <span class="n">exact2</span><span class="p">,</span> <span class="n">exact3</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">exact1</span><span class="p">,</span> <span class="n">exact2</span><span class="p">,</span> <span class="n">exact3</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">typemap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+        <span class="k">for</span> <span class="n">exact1</span><span class="p">,</span> <span class="n">exact2</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">exact1</span><span class="p">,</span> <span class="n">exact2</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">typemap</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="CharmmParameterSet"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet">[docs]</a><span class="k">class</span> <span class="nc">CharmmParameterSet</span><span class="p">(</span><span class="n">ParameterSet</span><span class="p">,</span> <span class="n">CharmmImproperMatchingMixin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores a parameter set defined by CHARMM files. It stores the equivalent of</span>
 <span class="sd">    the information found in the MASS section of the CHARMM topology file</span>
@@ -126,7 +275,7 @@
         <span class="k">return</span> <span class="n">other</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Converts a data type to a desired type, raising CharmmError if it</span>
 <span class="sd">        fails</span>
@@ -134,13 +283,17 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not convert </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">))</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Could not convert </span><span class="si">%s</span><span class="s1"> to </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">line_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;input line </span><span class="si">%d</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line_index</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;input line: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">line</span>
+            <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CharmmParameterSet.__init__"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.__init__"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="c1"># Instantiate the list types</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CharmmParameterSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CharmmParameterSet</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parametersets</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_declared_nbrules</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Load all of the files</span>
@@ -171,8 +324,8 @@
         <span class="k">for</span> <span class="n">strf</span> <span class="ow">in</span> <span class="n">strs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">strf</span><span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="CharmmParameterSet.from_parameterset"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.from_parameterset">[docs]</a>    <span class="k">def</span> <span class="nf">from_parameterset</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.from_parameterset"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.from_parameterset">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_parameterset</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates a CharmmParameterSet from another ParameterSet (or</span>
 <span class="sd">        subclass). The main thing this feature is responsible for is converting</span>
@@ -196,7 +349,7 @@
 <span class="sd">            The parameter set whose atom type names are converted to all</span>
 <span class="sd">            upper-case</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_params</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">new_params</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
             <span class="n">do_copy</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -248,8 +401,8 @@
 
         <span class="k">return</span> <span class="n">new_params</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="CharmmParameterSet.from_structure"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.from_structure">[docs]</a>    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.from_structure"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.from_structure">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_structure</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">struct</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Extracts known parameters from a Structure instance</span>
 
 <span class="sd">        Parameters</span>
@@ -279,12 +432,12 @@
 <span class="sd">        the first DihedralTypeList found or the first DihedralType of each</span>
 <span class="sd">        periodicity found if no matching DihedralTypeList is found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">from_parameterset</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_parameterset</span><span class="p">(</span>
             <span class="n">ParameterSet</span><span class="o">.</span><span class="n">from_structure</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">allow_unequal_duplicates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="CharmmParameterSet.load_set"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.load_set">[docs]</a>    <span class="k">def</span> <span class="nf">load_set</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sfiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.load_set"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.load_set">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">load_set</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">tfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sfiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiates a CharmmParameterSet from a Topology file and a Parameter</span>
 <span class="sd">        file (or just a Parameter file if it has all information)</span>
@@ -310,7 +463,7 @@
 <span class="sd">        Parameters in each stream file will overwrite those that came before (or</span>
 <span class="sd">        simply append to the existing set if they are different)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">tfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">inst</span><span class="o">.</span><span class="n">read_topology_file</span><span class="p">(</span><span class="n">tfile</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">pfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -324,7 +477,7 @@
                 <span class="n">inst</span><span class="o">.</span><span class="n">read_stream_file</span><span class="p">(</span><span class="n">sfile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
-<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_parameter_file"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.read_parameter_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_parameter_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pfile</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads all of the parameters from a parameter file. Versions 36 and</span>
 <span class="sd">        later of the CHARMM force field files have an ATOMS section defining</span>
@@ -405,19 +558,19 @@
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;E14FAC&#39;</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="n">scee</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
                         <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
                             <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse 1-4 electrostatic scaling factor &#39;</span>
                                               <span class="s1">&#39;from NONBONDED card&#39;</span><span class="p">)</span>
                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_declared_nbrules</span><span class="p">:</span>
-                            <span class="c1"># We already specified it -- make sure it&#39;s the same</span>
-                            <span class="c1"># as the one we specified before</span>
-                            <span class="n">_</span><span class="p">,</span> <span class="n">dt0</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">))</span>
-                            <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scee</span> <span class="o">-</span> <span class="n">scee</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">TINY</span><span class="p">:</span>
-                                <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Inconsistent 1-4 scalings&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="c1"># We already specified it -- make sure it&#39;s the same</span>
+                                <span class="c1"># as the one we specified before</span>
+                                <span class="n">_</span><span class="p">,</span> <span class="n">dt0</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">))</span>
+                                <span class="n">diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dt0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scee</span> <span class="o">-</span> <span class="n">scee</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">TINY</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Inconsistent 1-4 scalings&#39;</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">scee</span>
                             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dtl</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
                                 <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dtl</span><span class="p">:</span>
                                     <span class="n">dt</span><span class="o">.</span><span class="n">scee</span> <span class="o">=</span> <span class="n">scee</span>
@@ -432,6 +585,9 @@
                 <span class="n">section</span> <span class="o">=</span> <span class="s1">&#39;NBFIX&#39;</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;HBOND&#39;</span><span class="p">):</span>
+                <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;THOLE&#39;</span><span class="p">):</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">continue</span>
             <span class="c1"># It seems like files? sections? can be terminated with &#39;END&#39;</span>
@@ -453,16 +609,16 @@
                 <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;END&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;atom type&#39;</span><span class="p">)</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;atom type&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;atom mass&#39;</span><span class="p">)</span>
+                    <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;atom mass&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse MASS section.&#39;</span><span class="p">)</span>
                 <span class="c1"># The parameter file might or might not have an element name</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">elem</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
-                        <span class="n">elem</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">lower</span><span class="p">();</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">elem</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                     <span class="n">atomic_number</span> <span class="o">=</span> <span class="n">AtomicNum</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span>
                 <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
                     <span class="c1"># Figure it out from the mass</span>
@@ -479,8 +635,8 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">type1</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type2</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;bond force constant&#39;</span><span class="p">)</span>
-                    <span class="n">req</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;bond equilibrium dist&#39;</span><span class="p">)</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;bond force constant&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">req</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;bond equilibrium dist&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse bonds.&#39;</span><span class="p">)</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">))</span>
@@ -506,8 +662,8 @@
                     <span class="n">type1</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type2</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type3</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;angle force constant&#39;</span><span class="p">)</span>
-                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;angle equilibrium value&#39;</span><span class="p">)</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;angle force constant&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;angle equilibrium value&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse angles.&#39;</span><span class="p">)</span>
 
@@ -527,8 +683,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">angle_types</span><span class="p">[(</span><span class="n">type3</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">angle_type</span>
                 <span class="c1"># See if we have a urey-bradley</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">ubk</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Urey-Bradley force constant&#39;</span><span class="p">)</span>
-                    <span class="n">ubeq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Urey-Bradley equil. value&#39;</span><span class="p">)</span>
+                    <span class="n">ubk</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Urey-Bradley force constant&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">ubeq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;Urey-Bradley equil. value&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="n">ubtype</span> <span class="o">=</span> <span class="n">BondType</span><span class="p">(</span><span class="n">ubk</span><span class="p">,</span> <span class="n">ubeq</span><span class="p">)</span>
                     <span class="n">ubtype</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -546,9 +702,9 @@
                     <span class="n">type2</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type3</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type4</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral force constant&#39;</span><span class="p">)</span>
-                    <span class="n">n</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral periodicity&#39;</span><span class="p">)</span>
-                    <span class="n">phase</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral phase&#39;</span><span class="p">)</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral force constant&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral periodicity&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">phase</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;dihedral phase&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse dihedrals.&#39;</span><span class="p">)</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">)</span>
@@ -586,8 +742,8 @@
                     <span class="n">type2</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type3</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">type4</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper force constant&#39;</span><span class="p">)</span>
-                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper equil. value&#39;</span><span class="p">)</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper force constant&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">theteq</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper equil. value&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse dihedrals.&#39;</span><span class="p">)</span>
                 <span class="c1"># If we have a 7th column, that is the real psi0 (and the 6th</span>
@@ -595,7 +751,7 @@
                 <span class="c1"># improper torsion (so it needs to be added to the</span>
                 <span class="c1"># improper_periodic_types list)</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper equil. value&#39;</span><span class="p">)</span>
+                    <span class="n">tmp</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;improper equil. value&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="n">per</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -605,7 +761,8 @@
                 <span class="c1"># defined in the first place, so just have the key a fully</span>
                 <span class="c1"># sorted list. We still depend on the PSF having properly</span>
                 <span class="c1"># ordered improper atoms</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">]))</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">type1</span><span class="p">,</span> <span class="n">type2</span><span class="p">,</span> <span class="n">type3</span><span class="p">,</span> <span class="n">type4</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_improper_key_map</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">key</span><span class="p">))]</span> <span class="o">=</span> <span class="n">key</span>
                 <span class="k">if</span> <span class="n">per</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">improp</span> <span class="o">=</span> <span class="n">ImproperType</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">theteq</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">improp</span>
@@ -641,7 +798,7 @@
                         <span class="n">type6</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                         <span class="n">type7</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                         <span class="n">type8</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                        <span class="n">res</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;CMAP resolution&#39;</span><span class="p">)</span>
+                        <span class="n">res</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;CMAP resolution&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse CMAP data.&#39;</span><span class="p">)</span>
                     <span class="c1"># order the torsions independently</span>
@@ -660,8 +817,8 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">atype</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="c1"># 1st column is ignored</span>
-                    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;vdW epsilon term&#39;</span><span class="p">)</span>
-                    <span class="n">rmin</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;vdW Rmin/2 term&#39;</span><span class="p">)</span>
+                    <span class="n">epsilon</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;vdW epsilon term&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">rmin</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;vdW Rmin/2 term&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="n">CharmmError</span><span class="p">):</span>
                     <span class="c1"># If we haven&#39;t read our first nonbonded term yet, we may</span>
                     <span class="c1"># just be parsing the settings that should be used. So</span>
@@ -670,7 +827,7 @@
                     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;E14FAC&#39;</span><span class="p">:</span>
                             <span class="k">try</span><span class="p">:</span>
-                                <span class="n">scee</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
                             <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
                                 <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse electrostatic scaling constant&#39;</span><span class="p">)</span>
                             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_declared_nbrules</span><span class="p">:</span>
@@ -681,7 +838,6 @@
                                 <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="n">TINY</span><span class="p">:</span>
                                     <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Inconsistent 1-4 scalings&#39;</span><span class="p">)</span>
                             <span class="k">else</span><span class="p">:</span>
-                                <span class="n">scee</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">scee</span>
                                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dtl</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dihedral_types</span><span class="p">):</span>
                                     <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">dtl</span><span class="p">:</span>
                                         <span class="n">dt</span><span class="o">.</span><span class="n">scee</span> <span class="o">=</span> <span class="n">scee</span>
@@ -707,8 +863,8 @@
                 <span class="c1"># See if we have 1-4 parameters</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># 4th column is ignored</span>
-                    <span class="n">eps14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;1-4 vdW epsilon term&#39;</span><span class="p">)</span>
-                    <span class="n">rmin14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;1-4 vdW Rmin/2 term&#39;</span><span class="p">)</span>
+                    <span class="n">eps14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;1-4 vdW epsilon term&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
+                    <span class="n">rmin14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;1-4 vdW Rmin/2 term&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="n">eps14</span> <span class="o">=</span> <span class="n">rmin14</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">nonbonded_types</span><span class="p">[</span><span class="n">atype</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">epsilon</span><span class="p">,</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">eps14</span><span class="p">,</span> <span class="n">rmin14</span><span class="p">]</span>
@@ -720,11 +876,11 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">at1</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="n">at2</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                    <span class="n">emin</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Emin&#39;</span><span class="p">))</span>
-                    <span class="n">rmin</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Rmin&#39;</span><span class="p">)</span>
+                    <span class="n">emin</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Emin&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">))</span>
+                    <span class="n">rmin</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Rmin&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">emin14</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Emin 1-4&#39;</span><span class="p">))</span>
-                        <span class="n">rmin14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Rmin 1-4&#39;</span><span class="p">)</span>
+                        <span class="n">emin14</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Emin 1-4&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">))</span>
+                        <span class="n">rmin14</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;NBFIX Rmin 1-4&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                         <span class="n">emin14</span> <span class="o">=</span> <span class="n">rmin14</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="k">try</span><span class="p">:</span>
@@ -761,7 +917,7 @@
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CharmmParameterSet.read_topology_file"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_topology_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_topology_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_topology_file"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.read_topology_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_topology_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads _only_ the atom type definitions from a topology file. This is</span>
 <span class="sd">        unnecessary for versions 36 and later of the CHARMM force field.</span>
@@ -779,19 +935,22 @@
             <span class="n">own_handle</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">tfile</span>
         <span class="n">hpatch</span> <span class="o">=</span> <span class="n">tpatch</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># default Head and Tail patches</span>
-        <span class="n">residues</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">hpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">tpatches</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">residues</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">patches</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">hpatches</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">tpatches</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">line_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">skip_adding_residue</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;MASS&#39;</span><span class="p">:</span>
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="k">try</span><span class="p">:</span>
-                        <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;atom type&#39;</span><span class="p">)</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;atom type&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">line_index</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                         <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-                        <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;atom mass&#39;</span><span class="p">)</span>
+                        <span class="n">mass</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;atom mass&#39;</span><span class="p">,</span> <span class="n">line_index</span><span class="o">=</span><span class="n">line_index</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="n">line</span><span class="p">)</span>
                     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">CharmmError</span><span class="p">(</span><span class="s1">&#39;Could not parse MASS section of </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">tfile</span><span class="p">)</span>
                     <span class="c1"># The parameter file might or might not have an element name</span>
@@ -830,8 +989,7 @@
                     <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                     <span class="n">resname</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">resname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
-                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Replacing residue </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                              <span class="n">resname</span><span class="p">,</span> <span class="n">ParameterWarning</span><span class="p">)</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Replacing residue </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resname</span><span class="p">),</span> <span class="n">ParameterWarning</span><span class="p">)</span>
                     <span class="c1"># Assign default patches</span>
                     <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">hpatch</span>
                     <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tpatch</span>
@@ -845,6 +1003,7 @@
                         <span class="n">res</span> <span class="o">=</span> <span class="n">PatchTemplate</span><span class="p">(</span><span class="n">resname</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restype != RESI or PRES&#39;</span>
+                    <span class="n">skip_adding_residue</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                     <span class="n">group</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">ictable</span> <span class="o">=</span> <span class="p">[]</span>
@@ -859,12 +1018,42 @@
                             <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                             <span class="nb">type</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
                             <span class="n">charge</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-                            <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="s1">&#39;ALPHA&#39;</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+                                <span class="c1"># This is a polarizable atom.</span>
+                                <span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">words</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;ALPHA&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="n">thole</span> <span class="o">=</span> <span class="mf">1.3</span>
+                                <span class="n">drude_type</span> <span class="o">=</span> <span class="s1">&#39;DRUD&#39;</span>
+                                <span class="k">if</span> <span class="s1">&#39;THOLE&#39;</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+                                    <span class="n">thole</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">words</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;THOLE&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="k">if</span> <span class="s1">&#39;TYPE&#39;</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+                                    <span class="n">drude_type</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="n">words</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;TYPE&#39;</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+                                <span class="n">atom</span> <span class="o">=</span> <span class="n">DrudeAtom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">thole</span><span class="o">=</span><span class="n">thole</span><span class="p">,</span> <span class="n">drude_type</span><span class="o">=</span><span class="n">drude_type</span><span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">charge</span><span class="o">=</span><span class="n">charge</span><span class="p">)</span>
                             <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
                             <span class="n">res</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">:</span>
+                            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                            <span class="n">entity_type</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s1">&#39;ATOM&#39;</span><span class="p">:</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">delete_atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">entity_type</span> <span class="o">==</span> <span class="s1">&#39;IMPR&#39;</span><span class="p">:</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">delete_impropers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;WARNING: Ignoring &quot;</span><span class="si">%s</span><span class="s1">&quot; because entity type </span><span class="si">%s</span><span class="s1"> not &#39;</span>
+                                              <span class="s1">&#39;used.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">entity_type</span><span class="p">))</span>
                         <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;BOND&#39;</span><span class="p">,</span> <span class="s1">&#39;DOUBLE&#39;</span><span class="p">):</span>
                             <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]])</span>
                             <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;PRES&#39;</span><span class="p">:</span>
+                                    <span class="c1"># Patches can have bonds that refer to atoms not in the patch, so store these in a list of tuples</span>
+                                    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+                                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DOUBLE&#39;</span><span class="p">:</span>
+                                        <span class="n">order</span> <span class="o">=</span> <span class="mi">2</span>
+                                    <span class="n">res</span><span class="o">.</span><span class="n">add_bonds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span> <span class="p">)</span>
+                                    <span class="k">continue</span>
+
                                 <span class="k">if</span> <span class="n">a1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">):</span>
                                     <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a2</span><span class="p">]</span>
                                     <span class="k">continue</span>
@@ -877,12 +1066,6 @@
                                 <span class="k">if</span> <span class="n">a2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
                                     <span class="n">res</span><span class="o">.</span><span class="n">tail</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span>
                                     <span class="k">continue</span>
-                                <span class="c1"># Apparently PRES objects do not need to put +</span>
-                                <span class="c1"># or - in front of atoms that belong to adjacent</span>
-                                <span class="c1"># residues</span>
-                                <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;PRES&#39;</span> <span class="ow">and</span> <span class="p">(</span><span class="n">a1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span> <span class="ow">or</span>
-                                                          <span class="n">a2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">res</span><span class="p">):</span>
-                                    <span class="k">continue</span>
                                 <span class="n">res</span><span class="o">.</span><span class="n">add_bond</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
                         <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;CMAP&#39;</span><span class="p">:</span>
                             <span class="k">pass</span>
@@ -890,6 +1073,25 @@
                             <span class="k">pass</span>
                         <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ACCEPT&#39;</span><span class="p">:</span>
                             <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;LONEPAIR&#39;</span><span class="p">:</span>
+                            <span class="c1"># See: https://www.charmm.org/charmm/documentation/by-version/c40b1/params/doc/lonepair/</span>
+                            <span class="c1"># TODO: This currently doesn&#39;t handle some formats, like Note 3 in the above URL</span>
+                            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                            <span class="n">lptype_keyword</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_adding_residue</span> <span class="ow">and</span> <span class="n">lptype_keyword</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;BISE&#39;</span><span class="p">,</span> <span class="s1">&#39;RELA&#39;</span><span class="p">]:</span>
+                                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;LONEPAIR type </span><span class="si">%s</span><span class="s1"> not supported; only BISEctor and &#39;</span>
+                                              <span class="s1">&#39;RELAtive supported&#39;</span> <span class="o">%</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="n">skip_adding_residue</span> <span class="o">=</span> <span class="kc">True</span>
+                                <span class="k">break</span>
+                            <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+                            <span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="n">words</span><span class="p">[</span><span class="n">index</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                                        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span> <span class="p">}</span>
+                            <span class="n">r</span> <span class="o">=</span> <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;DIST&#39;</span><span class="p">]</span> <span class="c1"># angstrom</span>
+                            <span class="n">theta</span> <span class="o">=</span> <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;ANGL&#39;</span><span class="p">]</span> <span class="c1"># degrees</span>
+                            <span class="n">phi</span> <span class="o">=</span> <span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;DIHE&#39;</span><span class="p">]</span> <span class="c1"># degrees</span>
+                            <span class="n">lptypes</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;BISE&#39;</span> <span class="p">:</span> <span class="s1">&#39;bisector&#39;</span><span class="p">,</span> <span class="s1">&#39;RELA&#39;</span> <span class="p">:</span> <span class="s1">&#39;relative&#39;</span> <span class="p">}</span>
+                            <span class="n">lonepair</span> <span class="o">=</span> <span class="p">(</span><span class="n">lptypes</span><span class="p">[</span><span class="n">lptype_keyword</span><span class="p">],</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span> <span class="c1"># TODO: Define a LonePair object?</span>
+                            <span class="n">res</span><span class="o">.</span><span class="n">lonepairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lonepair</span><span class="p">)</span>
                         <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;IC&#39;</span><span class="p">:</span>
                             <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
                             <span class="n">ictable</span><span class="o">.</span><span class="n">append</span><span class="p">(([</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[:</span><span class="mi">4</span><span class="p">]],</span>
@@ -904,23 +1106,33 @@
                                     <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                                 <span class="k">elif</span> <span class="n">tok</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;LAST&#39;</span><span class="p">):</span>
                                     <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">:</span>
-                            <span class="k">pass</span>
-                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;IMPR&#39;</span><span class="p">:</span>
-                            <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]])</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;IMPR&#39;</span><span class="p">,</span> <span class="s1">&#39;IMPH&#39;</span><span class="p">):</span>
+                            <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:])</span>
                             <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">it</span><span class="p">):</span>
+                                <span class="n">res</span><span class="o">.</span><span class="n">_impr</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">))</span>
                                 <span class="k">if</span> <span class="n">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="ow">or</span> <span class="n">a3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="ow">or</span> <span class="n">a4</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
                                     <span class="n">res</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">a1</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ANISOTROPY&#39;</span><span class="p">:</span>
+                            <span class="n">words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                            <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">words</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]]</span>
+                            <span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="n">words</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">index</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                                        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">),</span><span class="mi">2</span><span class="p">)}</span>
+                            <span class="n">a11</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;A11&#39;</span><span class="p">])</span>
+                            <span class="n">a22</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">keywords</span><span class="p">[</span><span class="s1">&#39;A22&#39;</span><span class="p">])</span>
+                            <span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">anisotropy</span> <span class="o">=</span> <span class="n">DrudeAnisotropy</span><span class="p">(</span><span class="o">*</span><span class="n">atoms</span><span class="p">,</span> <span class="n">a11</span><span class="o">=</span><span class="n">a11</span><span class="p">,</span> <span class="n">a22</span><span class="o">=</span><span class="n">a22</span><span class="p">)</span>
                         <span class="k">elif</span> <span class="n">line</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;RESI&#39;</span><span class="p">,</span> <span class="s1">&#39;PRES&#39;</span><span class="p">,</span> <span class="s1">&#39;MASS&#39;</span><span class="p">):</span>
                             <span class="c1"># Back up a line and bail</span>
                             <span class="k">break</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">group</span><span class="p">:</span> <span class="n">res</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
                     <span class="n">_fit_IC_table</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">ictable</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;RESI&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">skip_adding_residue</span><span class="p">:</span>
+                        <span class="c1"># Do not add this residue to the lookup library</span>
+                        <span class="k">continue</span>
+                    <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;RESI&#39;</span><span class="p">:</span>
                         <span class="n">residues</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
                     <span class="k">elif</span> <span class="n">restype</span> <span class="o">==</span> <span class="s1">&#39;PRES&#39;</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+                        <span class="n">patches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;restype != RESI or PRES&#39;</span>
                     <span class="c1"># We parsed a line we need to look at. So don&#39;t update the</span>
@@ -928,27 +1140,32 @@
                     <span class="k">continue</span>
                 <span class="c1"># Get the next line and cycle through</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">line_index</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="c1"># Go through the patches and add the appropriate one</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">resname</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">residues</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">patch_name</span> <span class="o">=</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">patch_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">res</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">first_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">patch_name</span><span class="p">]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">hpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">patch_name</span><span class="p">)</span>
+
+            <span class="n">patch_name</span> <span class="o">=</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">patch_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">res</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">]]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">last_patch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">patches</span><span class="p">[</span><span class="n">patch_name</span><span class="p">]</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">tpatches</span><span class="p">[</span><span class="n">resname</span><span class="p">])</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Patch </span><span class="si">%s</span><span class="s1"> not found&#39;</span> <span class="o">%</span> <span class="n">patch_name</span><span class="p">)</span>
         <span class="c1"># Now update the residues and patches with the ones we parsed here</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">own_handle</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CharmmParameterSet.read_stream_file"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.read_stream_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_stream_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sfile</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.read_stream_file"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.read_stream_file">[docs]</a>    <span class="k">def</span> <span class="nf">read_stream_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sfile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads RTF and PAR sections from a stream file and dispatches the</span>
 <span class="sd">        sections to read_topology_file or read_parameter_file</span>
@@ -974,7 +1191,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">read_parameter_file</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
             <span class="n">title</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">comments</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">next_section</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CharmmParameterSet.write"><a class="viewcode-back" href="../../../charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CharmmParameterSet.write"><a class="viewcode-back" href="../../../api/parmed/parmed.charmm.parameters.html#parmed.charmm.CharmmParameterSet.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">par</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a CHARMM parameter set to a file</span>
 
 <span class="sd">        Parameters</span>
@@ -1092,10 +1309,6 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%11.4f</span><span class="s1"> </span><span class="si">%2d</span><span class="s1"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                     <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">phi_k</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">typ</span><span class="o">.</span><span class="n">per</span><span class="p">),</span> <span class="n">typ</span><span class="o">.</span><span class="n">phase</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">typ</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">improper_types</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;X&#39;</span><span class="p">:</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%11.4f</span><span class="s1"> </span><span class="si">%2d</span><span class="s1"> </span><span class="si">%8.2f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span>
                     <span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">typ</span><span class="o">.</span><span class="n">psi_k</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">typ</span><span class="o">.</span><span class="n">psi_eq</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmap_types</span><span class="p">:</span>
@@ -1158,41 +1371,50 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="mf">0.0</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

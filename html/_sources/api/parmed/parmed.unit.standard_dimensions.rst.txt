@@ -1,7 +1,7 @@
-parmed.unit.standard_dimensions module
-======================================
+parmed.unit.standard\_dimensions module
+=======================================
 
 .. automodule:: parmed.unit.standard_dimensions
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

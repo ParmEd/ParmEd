@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.utils.fortranformat.FortranRecordReader
    parmed.utils.fortranformat.FortranRecordWriter
@@ -14,6 +15,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.utils.fortranformat
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

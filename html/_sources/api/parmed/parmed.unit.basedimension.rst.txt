@@ -2,6 +2,6 @@ parmed.unit.basedimension module
 ================================
 
 .. automodule:: parmed.unit.basedimension
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

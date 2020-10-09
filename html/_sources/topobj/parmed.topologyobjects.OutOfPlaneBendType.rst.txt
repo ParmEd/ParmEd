@@ -24,5 +24,6 @@ parmed.topologyobjects.OutOfPlaneBendType
    .. autosummary::
    
       ~OutOfPlaneBendType.idx
+      ~OutOfPlaneBendType.uk
    
    

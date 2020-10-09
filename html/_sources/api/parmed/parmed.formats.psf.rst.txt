@@ -2,6 +2,6 @@ parmed.formats.psf module
 =========================
 
 .. automodule:: parmed.formats.psf
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

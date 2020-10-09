@@ -1,190 +1,327 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The structure module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>The structure module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="parmed.structure.Structure" href="structobj/parmed.structure.Structure.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="structobj/parmed.structure.Structure.html" title="parmed.structure.Structure"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="next" title="parmed.structure.Structure" href="structobj/parmed.structure.Structure.html" />
+    <link rel="prev" title="parmed.topologyobjects.NonbondedExceptionType" href="topobj/parmed.topologyobjects.NonbondedExceptionType.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The core Structure class</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#structure-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> class</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="structobj/parmed.structure.Structure.html">parmed.structure.Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#attributes-of-structure-instances">Attributes of <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instances</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automated-bookkeeping">Automated Bookkeeping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coordinate-handling">Coordinate handling</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#structure-slicing-and-selections"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> Slicing and Selections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#structure-views">Structure views</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#structure-combining">Structure Combining</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#structure-replicating">Structure Replicating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#structure-splitting"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> splitting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#load-file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html">parmed.formats.registry.load_file</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">structure</span></code> module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/structure.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="the-structure-module">
-<h1>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="xref py py-mod docutils literal"><span class="pre">structure</span></code> module contains the core class defining systems of
-particles &#8211; the <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> class. The API documentation makes this
-class look intimidating, but its core features are the <code class="docutils literal"><span class="pre">atoms</span></code> attribute
-(which is an <code class="xref py py-class docutils literal"><span class="pre">AtomList</span></code>) and its <code class="docutils literal"><span class="pre">residues</span></code> attribute (which is a
-<code class="xref py py-class docutils literal"><span class="pre">ResidueList</span></code>). These two attributes are enough to write numerous files
+<h1>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">structure</span></code> module<a class="headerlink" href="#the-structure-module" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">structure</span></code> module contains the core class defining systems of
+particles – the <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> class. The API documentation makes this
+class look intimidating, but its core features are the <code class="docutils literal notranslate"><span class="pre">atoms</span></code> attribute
+(which is an <code class="xref py py-class docutils literal notranslate"><span class="pre">AtomList</span></code>) and its <code class="docutils literal notranslate"><span class="pre">residues</span></code> attribute (which is a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ResidueList</span></code>). These two attributes are enough to write numerous files
 (e.g., PDB and PDBx/mmCIF), and these are the only two attributes currently
 populated through the PDB and mmCIF parsing routines.</p>
 <div class="section" id="structure-class">
-<h2><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<h2><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class<a class="headerlink" href="#structure-class" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-obj docutils literal"><span class="pre">Structure</span></code></a>()</td>
-<td>A chemical structure composed of atoms, bonds, angles, torsions, and other</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Structure</span></code></a>()</p></td>
+<td><p>A chemical structure composed of atoms, bonds, angles, torsions, and other topological features</p></td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class may be instantiated directly, but is more often
-created by one of the parsers (see below for <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file</span></code></a>) or extended to
+<p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class may be instantiated directly, but is more often
+created by one of the parsers (see below for <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a>) or extended to
 support the structure files of various computational parmed programs.</p>
 <div class="section" id="attributes-of-structure-instances">
-<h3>Attributes of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instances<a class="headerlink" href="#attributes-of-structure-instances" title="Permalink to this headline">¶</a></h3>
-<p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class has many attributes that store the various
+<h3>Attributes of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instances<a class="headerlink" href="#attributes-of-structure-instances" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class has many attributes that store the various
 topological features and force field parameters of the molecular model. These
 include valence bonds, angles, torsions, and other more complex valence bond
 terms (like coupled-torsion correction maps and a variety of other terms
 describing common vibrational modes in the AMOEBA force field).</p>
-<p>Each of these attributes is stored in a <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a> instance, which is a simple subclass of
-the built-in <code class="docutils literal"><span class="pre">list</span></code> type that registers every time the list itself is changed
+<p>Each of these attributes is stored in a <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackedList</span></code></a> instance, which is a simple subclass of
+the built-in <code class="docutils literal notranslate"><span class="pre">list</span></code> type that registers every time the list itself is changed
 (e.g., by adding an item, deleting an item, swapping two items, etc.). In this
-way, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> can determine whether or not certain cached attributes
+way, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> can determine whether or not certain cached attributes
 need to be updated. This is particularly important for various subclasses, like
-<code class="xref py py-class docutils literal"><span class="pre">AmberParm</span></code> in which the topological
-arrays and a dictionary of &#8220;raw data&#8221; need to be kept synchronized.</p>
-<p>You should never delete or reassign any of these list attributes&#8212;instead you
-should delete all of the items from the list using the idiom <code class="docutils literal"><span class="pre">del</span> <span class="pre">mylist[:]</span></code>.</p>
-<p>Every <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance has the following <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a> attributes:</p>
-<table border="1" class="docutils">
+<code class="xref py py-class docutils literal notranslate"><span class="pre">AmberParm</span></code> in which the topological
+arrays and a dictionary of “raw data” need to be kept synchronized.</p>
+<p>You should never delete or reassign any of these list attributes—instead you
+should delete all of the items from the list using the idiom <code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">mylist[:]</span></code>.</p>
+<p>Every <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance has the following <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackedList</span></code></a> attributes:</p>
+<table class="docutils align-default">
 <colgroup>
-<col width="18%" />
-<col width="82%" />
+<col style="width: 18%" />
+<col style="width: 82%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Attribute</th>
-<th class="head">Description</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Description</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>bonds</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> instances</td>
+<tbody>
+<tr class="row-even"><td><p>bonds</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>angles</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle" title="parmed.topologyobjects.Angle"><code class="xref py py-class docutils literal"><span class="pre">Angle</span></code></a> instances</td>
+<tr class="row-odd"><td><p>angles</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Angle.html#parmed.topologyobjects.Angle" title="parmed.topologyobjects.Angle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Angle</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>urey_bradleys</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley" title="parmed.topologyobjects.UreyBradley"><code class="xref py py-class docutils literal"><span class="pre">UreyBradley</span></code></a> instances</td>
+<tr class="row-even"><td><p>urey_bradleys</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.UreyBradley.html#parmed.topologyobjects.UreyBradley" title="parmed.topologyobjects.UreyBradley"><code class="xref py py-class docutils literal notranslate"><span class="pre">UreyBradley</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>dihedrals</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal"><span class="pre">Dihedral</span></code></a> instances</td>
+<tr class="row-odd"><td><p>dihedrals</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Dihedral.html#parmed.topologyobjects.Dihedral" title="parmed.topologyobjects.Dihedral"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dihedral</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>impropers</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper" title="parmed.topologyobjects.Improper"><code class="xref py py-class docutils literal"><span class="pre">Improper</span></code></a> instances</td>
+<tr class="row-even"><td><p>impropers</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Improper.html#parmed.topologyobjects.Improper" title="parmed.topologyobjects.Improper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Improper</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>cmaps</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap" title="parmed.topologyobjects.Cmap"><code class="xref py py-class docutils literal"><span class="pre">Cmap</span></code></a> instances</td>
+<tr class="row-odd"><td><p>cmaps</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.Cmap.html#parmed.topologyobjects.Cmap" title="parmed.topologyobjects.Cmap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cmap</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>adjusts</td>
-<td>List of <code class="xref py py-class docutils literal"><span class="pre">NonbondedException</span></code> &lt;parmed.topologyobjects.NonbondedException&gt;` instances</td>
+<tr class="row-even"><td><p>adjusts</p></td>
+<td><p>List of <code class="xref py py-class docutils literal notranslate"><span class="pre">NonbondedException</span></code> &lt;parmed.topologyobjects.NonbondedException&gt;` instances</p></td>
 </tr>
-<tr class="row-odd"><td>stretch_bends</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend" title="parmed.topologyobjects.StretchBend"><code class="xref py py-class docutils literal"><span class="pre">StretchBend</span></code></a> instances</td>
+<tr class="row-odd"><td><p>stretch_bends</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.StretchBend.html#parmed.topologyobjects.StretchBend" title="parmed.topologyobjects.StretchBend"><code class="xref py py-class docutils literal notranslate"><span class="pre">StretchBend</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>out_of_plane_bends</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.OutOfPlaneBend.html#parmed.topologyobjects.OutOfPlaneBend" title="parmed.topologyobjects.OutOfPlaneBend"><code class="xref py py-class docutils literal"><span class="pre">OutOfPlaneBend</span></code></a> instances</td>
+<tr class="row-even"><td><p>out_of_plane_bends</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.OutOfPlaneBend.html#parmed.topologyobjects.OutOfPlaneBend" title="parmed.topologyobjects.OutOfPlaneBend"><code class="xref py py-class docutils literal notranslate"><span class="pre">OutOfPlaneBend</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>trigonal_angles</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TrigonalAngle.html#parmed.topologyobjects.TrigonalAngle" title="parmed.topologyobjects.TrigonalAngle"><code class="xref py py-class docutils literal"><span class="pre">TrigonalAngle</span></code></a> instances</td>
+<tr class="row-odd"><td><p>trigonal_angles</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TrigonalAngle.html#parmed.topologyobjects.TrigonalAngle" title="parmed.topologyobjects.TrigonalAngle"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrigonalAngle</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>torsion_torsions</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion" title="parmed.topologyobjects.TorsionTorsion"><code class="xref py py-class docutils literal"><span class="pre">TorsionTorsion</span></code></a> instances</td>
+<tr class="row-even"><td><p>torsion_torsions</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.TorsionTorsion.html#parmed.topologyobjects.TorsionTorsion" title="parmed.topologyobjects.TorsionTorsion"><code class="xref py py-class docutils literal notranslate"><span class="pre">TorsionTorsion</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>pi_torsions</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion" title="parmed.topologyobjects.PiTorsion"><code class="xref py py-class docutils literal"><span class="pre">PiTorsion</span></code></a> instances</td>
+<tr class="row-odd"><td><p>pi_torsions</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.PiTorsion.html#parmed.topologyobjects.PiTorsion" title="parmed.topologyobjects.PiTorsion"><code class="xref py py-class docutils literal notranslate"><span class="pre">PiTorsion</span></code></a> instances</p></td>
 </tr>
-<tr class="row-even"><td>chiral_frames</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.ChiralFrame.html#parmed.topologyobjects.ChiralFrame" title="parmed.topologyobjects.ChiralFrame"><code class="xref py py-class docutils literal"><span class="pre">ChiralFrame</span></code></a> instances</td>
+<tr class="row-even"><td><p>chiral_frames</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.ChiralFrame.html#parmed.topologyobjects.ChiralFrame" title="parmed.topologyobjects.ChiralFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChiralFrame</span></code></a> instances</p></td>
 </tr>
-<tr class="row-odd"><td>multipole_frames</td>
-<td>List of <a class="reference internal" href="topobj/parmed.topologyobjects.MultipoleFrame.html#parmed.topologyobjects.MultipoleFrame" title="parmed.topologyobjects.MultipoleFrame"><code class="xref py py-class docutils literal"><span class="pre">MultipoleFrame</span></code></a> instances</td>
+<tr class="row-odd"><td><p>multipole_frames</p></td>
+<td><p>List of <a class="reference internal" href="topobj/parmed.topologyobjects.MultipoleFrame.html#parmed.topologyobjects.MultipoleFrame" title="parmed.topologyobjects.MultipoleFrame"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipoleFrame</span></code></a> instances</p></td>
 </tr>
 </tbody>
 </table>
 <p>If the list is empty, then no terms of that type exist in the model.  All terms
-from <code class="docutils literal"><span class="pre">stretch_bends</span></code> to the bottom are exclusive to the Amoeba force field.</p>
+from <code class="docutils literal notranslate"><span class="pre">stretch_bends</span></code> to the bottom are exclusive to the Amoeba force field.</p>
 <p>In addition to those attributes, there is a list of parameter <em>types</em>
 corresponding to each of those valence parameters as well (except for the chiral
-and multipole frame lists).  For example, a <code class="docutils literal"><span class="pre">bond_types</span></code>, <code class="docutils literal"><span class="pre">angle_types</span></code>,
-<code class="docutils literal"><span class="pre">urey_bradley_types</span></code>, ... etc, that contain the parameter type objects
-(<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a>,
-<a class="reference internal" href="topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><code class="xref py py-class docutils literal"><span class="pre">AngleType</span></code></a>, and
-<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a> objects, respectively, since
+and multipole frame lists).  For example, a <code class="docutils literal notranslate"><span class="pre">bond_types</span></code>, <code class="docutils literal notranslate"><span class="pre">angle_types</span></code>,
+<code class="docutils literal notranslate"><span class="pre">urey_bradley_types</span></code>, … etc, that contain the parameter type objects
+(<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal notranslate"><span class="pre">BondType</span></code></a>,
+<a class="reference internal" href="topobj/parmed.topologyobjects.AngleType.html#parmed.topologyobjects.AngleType" title="parmed.topologyobjects.AngleType"><code class="xref py py-class docutils literal notranslate"><span class="pre">AngleType</span></code></a>, and
+<a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal notranslate"><span class="pre">BondType</span></code></a> objects, respectively, since
 the Urey-Bradley term is identical in functional form to a simple bond). The
-same warnings apply here&#8212;do not explicitly delete or reassign these lists.</p>
-<p>There are also two <em>special</em> subclasses of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a> tracking <code class="docutils literal"><span class="pre">atoms</span></code> and <code class="docutils literal"><span class="pre">residues</span></code>
-(namely the <a class="reference internal" href="topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><code class="xref py py-class docutils literal"><span class="pre">AtomList</span></code></a> and the
-<a class="reference internal" href="topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList" title="parmed.topologyobjects.ResidueList"><code class="xref py py-class docutils literal"><span class="pre">ResidueList</span></code></a> classes that have
+same warnings apply here—do not explicitly delete or reassign these lists.</p>
+<p>There are also two <em>special</em> subclasses of <a class="reference internal" href="api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackedList</span></code></a> tracking <code class="docutils literal notranslate"><span class="pre">atoms</span></code> and <code class="docutils literal notranslate"><span class="pre">residues</span></code>
+(namely the <a class="reference internal" href="topobj/parmed.topologyobjects.AtomList.html#parmed.topologyobjects.AtomList" title="parmed.topologyobjects.AtomList"><code class="xref py py-class docutils literal notranslate"><span class="pre">AtomList</span></code></a> and the
+<a class="reference internal" href="topobj/parmed.topologyobjects.ResidueList.html#parmed.topologyobjects.ResidueList" title="parmed.topologyobjects.ResidueList"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResidueList</span></code></a> classes that have
 extra functionality aiding in the automatic bookkeeping, as described below).</p>
 </div>
 <div class="section" id="automated-bookkeeping">
 <h3>Automated Bookkeeping<a class="headerlink" href="#automated-bookkeeping" title="Permalink to this headline">¶</a></h3>
-<p>One of the strengths of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class and its corresponding
-components (such as <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a>) is that it
-automates the process of <em>bookkeeping</em> for your structure&#8217;s model. For instance,
-creating a <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> instance automatically
-registers the pair of atoms involved in the bond as partners in the &#8220;bond
-graph&#8221;, which is used to determine atom connectivity. So when you create a
-<a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal"><span class="pre">Bond</span></code></a> object, you should immediately add
-it to that <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>&#8216;s <code class="docutils literal"><span class="pre">bonds</span></code> attribute. Likewise, if you give that
-bond a <a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal"><span class="pre">BondType</span></code></a>, you should
-immediately add that instance to the <code class="docutils literal"><span class="pre">bond_types</span></code> attribute of the
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance as well.</p>
-<p>If you plan on creating your own models directly through the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>
+<p>One of the strengths of the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class and its corresponding
+components (such as <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code></a>) is that it
+automates the process of <em>bookkeeping</em> for your structure’s model. For instance,
+creating a <a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code></a> instance automatically
+registers the pair of atoms involved in the bond as partners in the “bond
+graph”, which is used to determine atom connectivity. So when you create a
+<a class="reference internal" href="topobj/parmed.topologyobjects.Bond.html#parmed.topologyobjects.Bond" title="parmed.topologyobjects.Bond"><code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code></a> object, you should immediately add
+it to that <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>’s <code class="docutils literal notranslate"><span class="pre">bonds</span></code> attribute. Likewise, if you give that
+bond a <a class="reference internal" href="topobj/parmed.topologyobjects.BondType.html#parmed.topologyobjects.BondType" title="parmed.topologyobjects.BondType"><code class="xref py py-class docutils literal notranslate"><span class="pre">BondType</span></code></a>, you should
+immediately add that instance to the <code class="docutils literal notranslate"><span class="pre">bond_types</span></code> attribute of the
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance as well.</p>
+<p>If you plan on creating your own models directly through the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>
 API, you are encouraged to use existing parsers as examples, such as those for
 the AMBER, GROMACS, and CHARMM topology files.</p>
 </div>
 <div class="section" id="coordinate-handling">
 <h3>Coordinate handling<a class="headerlink" href="#coordinate-handling" title="Permalink to this headline">¶</a></h3>
 <p>It is often of interest to store (and use) a particular conformation of a
-molecule defined by the Cartesian coordinates of each atom. A <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>
+molecule defined by the Cartesian coordinates of each atom. A <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>
 need not have an assigned set of atomic positions (many files do not provide
 them by default, such as Amber prmtops, CHARMM PSF, and GROMACS topologies, just
 to name a few). Others <em>do</em> define them, such as PDB and PDBx/mmCIF files.</p>
@@ -194,12 +331,12 @@ trajectory analysis, as there are far superior libraries for doing that (e.g.,
 <a class="reference external" href="http://mdtraj.org">MDTraj</a> and <a class="reference external" href="https://amber-md.github.io/pytraj">pytraj</a>
 to name two). However, it is still often desirable to have access to atomic
 coordinates.</p>
-<p>In a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance, coordinates can be accessed as the <code class="docutils literal"><span class="pre">xx</span></code>,
-<code class="docutils literal"><span class="pre">xy</span></code>, and <code class="docutils literal"><span class="pre">xz</span></code> attributes on each atom individually, <em>or</em> they can be
-accessed from the <code class="docutils literal"><span class="pre">coordinates</span></code> attribute on the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance
-itself. The <code class="docutils literal"><span class="pre">coordinates</span></code> attribute is a numpy array of shape <code class="docutils literal"><span class="pre">(natom,</span> <span class="pre">3)</span></code>.
+<p>In a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance, coordinates can be accessed as the <code class="docutils literal notranslate"><span class="pre">xx</span></code>,
+<code class="docutils literal notranslate"><span class="pre">xy</span></code>, and <code class="docutils literal notranslate"><span class="pre">xz</span></code> attributes on each atom individually, <em>or</em> they can be
+accessed from the <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> attribute on the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance
+itself. The <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> attribute is a numpy array of shape <code class="docutils literal notranslate"><span class="pre">(natom,</span> <span class="pre">3)</span></code>.
 For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2koc&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.886, -5.163, 9.647)</span>
@@ -213,13 +350,13 @@ For example:</p>
 <span class="go">       [-11.877,   4.323,  -1.696]])</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">coordinates</span></code> attribute is simply a copy of the position attributes on
-each atom (and is set to <code class="docutils literal"><span class="pre">None</span></code> if any of the atoms do not have defined
-positions). As such, if you modify individual positions in the <code class="docutils literal"><span class="pre">coordinates</span></code>
+<p>The <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> attribute is simply a copy of the position attributes on
+each atom (and is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> if any of the atoms do not have defined
+positions). As such, if you modify individual positions in the <code class="docutils literal notranslate"><span class="pre">coordinates</span></code>
 array, they will <em>not</em> actually change the locations of that atom. In fact, if
-you change the <code class="docutils literal"><span class="pre">coordinates</span></code> array, all of the cached coordinates will be
+you change the <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> array, all of the cached coordinates will be
 discarded and replaced with a copy of the position attributes on each atom:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.886, -5.163, 9.647)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
@@ -234,9 +371,9 @@ discarded and replaced with a copy of the position attributes on each atom:</p>
 </div>
 <p>Note if you change the position of the first atom directly, that does get
 reflected in the coordinate array, but <em>not</em> in a reference to the old
-coordinates &#8211; i.e., the <code class="docutils literal"><span class="pre">coordinates</span></code> array is a cache that may be discarded
+coordinates – i.e., the <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> array is a cache that may be discarded
 when it no longer matches the positions on each atom:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="o">=</span> <span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">coords</span> <span class="c1"># A reference to the original cache!</span>
 <span class="go">array([[ -8.886,  -5.163,   9.647],</span>
@@ -257,16 +394,16 @@ when it no longer matches the positions on each atom:</p>
 </pre></div>
 </div>
 <p>This may seem surprising at first, but makes sense when you realize that
-<code class="docutils literal"><span class="pre">Structure.coordinates</span></code> is simply a descriptor that reports on the positions
+<code class="docutils literal notranslate"><span class="pre">Structure.coordinates</span></code> is simply a descriptor that reports on the positions
 of each atom.</p>
-<p>However, <em>assigning</em> to the <code class="docutils literal"><span class="pre">coordinates</span></code> attribute has special meaning.  You
+<p>However, <em>assigning</em> to the <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> attribute has special meaning.  You
 may assign any iterable of floating point numbers (must be reshape-able into a
-numpy array with the last two dimensions being <code class="docutils literal"><span class="pre">(natom,</span> <span class="pre">3)</span></code>), which will be
+numpy array with the last two dimensions being <code class="docutils literal notranslate"><span class="pre">(natom,</span> <span class="pre">3)</span></code>), which will be
 automatically converted into a numpy array <em>and assigned to the individual
-atoms</em>. For example, using the <code class="docutils literal"><span class="pre">coords</span></code> reference we stored in our previous
-example and assigned to <code class="docutils literal"><span class="pre">pdb.coordinates</span></code> will reset the first atoms&#8217; position
+atoms</em>. For example, using the <code class="docutils literal notranslate"><span class="pre">coords</span></code> reference we stored in our previous
+example and assigned to <code class="docutils literal notranslate"><span class="pre">pdb.coordinates</span></code> will reset the first atoms’ position
 to its original value:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coords</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">coords</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xz</span>
 <span class="go">(-8.8859999999999992, -5.1630000000000003, 9.6470000000000002)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
@@ -281,14 +418,14 @@ to its original value:</p>
 </div>
 <p>This brings us to our last note about working with coordinates. Several file
 types, like PDB and PDBx/mmCIF, permit storing multiple <em>conformations</em> of the
-molecule. The <code class="docutils literal"><span class="pre">coordinates</span></code> attribute only returns the first one, and each
-atom only stores a single x-, y-, and z-coordinate. However, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>
+molecule. The <code class="docutils literal notranslate"><span class="pre">coordinates</span></code> attribute only returns the first one, and each
+atom only stores a single x-, y-, and z-coordinate. However, <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>
 caches all of the conformations it reads (or is assigned). You can access all
-conformers using the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.get_coordinates" title="parmed.structure.Structure.get_coordinates"><code class="xref py py-meth docutils literal"><span class="pre">Structure.get_coordinates()</span></code></a> method, passing either a
-conformer number or the word <cite>&#8216;all&#8217;</cite> to get all coordinates.</p>
+conformers using the <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.get_coordinates" title="parmed.structure.Structure.get_coordinates"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.get_coordinates()</span></code></a> method, passing either a
+conformer number or the word <cite>‘all’</cite> to get all coordinates.</p>
 <p>As an example, consider the PDB 2KOC, which is an NMR structure with 20
 conformers:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2KOC&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;2KOC&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="go">array([[ -8.886,  -5.163,   9.647],</span>
 <span class="go">       [-10.305,  -4.745,  10.229],</span>
@@ -320,7 +457,7 @@ conformers:</p>
 <p>Be careful, though! Anything you do that makes the first conformer differ from
 the positions on each of the atoms will invalidate the cache and delete <em>all</em>
 conformers, as shown below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Invalidates cached coordinates!</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">xx</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Invalidates cached coordinates!</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">coordinates</span>
 <span class="go">array([[  0.   ,  -5.163,   9.647],</span>
 <span class="go">       [-10.305,  -4.745,  10.229],</span>
@@ -334,14 +471,14 @@ conformers, as shown below:</p>
 </pre></div>
 </div>
 <p><strong>Performance note</strong></p>
-<p>The way that ParmEd ensures that <code class="docutils literal"><span class="pre">Structure.coordinates</span></code> is always correct is
+<p>The way that ParmEd ensures that <code class="docutils literal notranslate"><span class="pre">Structure.coordinates</span></code> is always correct is
 to generate a new numpy array from the positions each time the attribute is
-accessed. As a result, repeated access to <code class="docutils literal"><span class="pre">Structure.coordinates</span></code> can be
+accessed. As a result, repeated access to <code class="docutils literal notranslate"><span class="pre">Structure.coordinates</span></code> can be
 <em>very</em> slow, and should be avoided. Iterating over the coordinates directly
 requires only a single access, as does storing a reference to it and accessing
 that instead. Below, I show some performance timings from IPython for a simple
 task of finding the lowest x-coordinate value among all atoms:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 
 <span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="k">def</span> <span class="nf">slow_min_x</span><span class="p">(</span><span class="n">struct</span><span class="p">):</span>
    <span class="o">...</span><span class="p">:</span>     <span class="k">return</span> <span class="nb">min</span><span class="p">([</span><span class="n">struct</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -372,58 +509,58 @@ task of finding the lowest x-coordinate value among all atoms:</p>
 <span class="mi">1000</span> <span class="n">loops</span><span class="p">,</span> <span class="n">best</span> <span class="n">of</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.29</span> <span class="n">ms</span> <span class="n">per</span> <span class="n">loop</span>
 </pre></div>
 </div>
-<p>Notice &#8211; the <code class="docutils literal"><span class="pre">slow_min_x</span></code> function is about 1000x slower than all of the
+<p>Notice – the <code class="docutils literal notranslate"><span class="pre">slow_min_x</span></code> function is about 1000x slower than all of the
 others! This is a contrived example, but it shows the danger of repeatedly
-accessing elements of <code class="docutils literal"><span class="pre">Structure.coordinates</span></code> instead of iterating over it or
+accessing elements of <code class="docutils literal notranslate"><span class="pre">Structure.coordinates</span></code> instead of iterating over it or
 working with a reference to the cached numpy array.</p>
 </div>
 </div>
 <div class="section" id="structure-manipulation-slicing-combining-replicating-and-splitting">
 <h2>Structure manipulation: slicing, combining, replicating, and splitting<a class="headerlink" href="#structure-manipulation-slicing-combining-replicating-and-splitting" title="Permalink to this headline">¶</a></h2>
 <p>This section describes a number of simple, yet powerful manipulations you can do
-to <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instances (and, by
+to <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instances (and, by
 extension, instances of their subclasses).  In order, these are <em>slicing</em>,
 <em>combining</em> (or <em>merging</em>), and <em>replicating</em>.</p>
 <div class="section" id="structure-slicing-and-selections">
-<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> Slicing and Selections<a class="headerlink" href="#structure-slicing-and-selections" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> Slicing and Selections<a class="headerlink" href="#structure-slicing-and-selections" title="Permalink to this headline">¶</a></h3>
 <p>One of the things that ParmEd tries to make easy to do is to select a subset of
-a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance as a new
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> (complete with all
+a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance as a new
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> (complete with all
 remaining atoms, residues, and parameters) by using the common Python idiom of
 <a class="reference external" href="http://www.pythoncentral.io/how-to-slice-listsarrays-and-tuples-in-python/">slicing</a>.
-The <em>slice</em>, or <em>selection</em> syntax of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> is designed to be flexible, expressive, and
+The <em>slice</em>, or <em>selection</em> syntax of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> is designed to be flexible, expressive, and
 intuitive (although accomplishing all of these is a challenge!).</p>
-<p>There are three many ways to select from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance:</p>
+<p>There are three many ways to select from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance:</p>
 <ol class="arabic simple">
-<li>By atom index</li>
-<li>By Amber selection mask (see <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMask" title="parmed.amber.AmberMask"><code class="xref py py-class docutils literal"><span class="pre">AmberMask</span></code></a>)</li>
-<li>By selection arrays, mask arrays, or slices of chains, residues, and/or
-atoms.</li>
+<li><p>By atom index</p></li>
+<li><p>By Amber selection mask (see <a class="reference internal" href="api/parmed/parmed.amber.html#parmed.amber.AmberMask" title="parmed.amber.AmberMask"><code class="xref py py-class docutils literal notranslate"><span class="pre">AmberMask</span></code></a>)</p></li>
+<li><p>By selection arrays, mask arrays, or slices of chains, residues, and/or
+atoms.</p></li>
 </ol>
-<p>When selecting from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>
+<p>When selecting from a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>
 instance, the return value can be one of two things:</p>
 <ol class="arabic simple">
-<li><a class="reference internal" href="topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">Atom</span></code></a> instance if the selection
+<li><p><a class="reference internal" href="topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">Atom</span></code></a> instance if the selection
 specified only a single atom either by atom index, atom index <em>within</em> a
 residue index, or an atom index <em>within</em> a residue index <em>within</em> a single
-chain.</li>
-<li><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> with all of the selected
+chain.</p></li>
+<li><p><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> with all of the selected
 atoms and all parameters that were present between the selected atoms. In
 this case, a copy is made of all selected atoms. If no atoms were selected,
-the resulting structure is empty, and will evaluate to boolean <code class="docutils literal"><span class="pre">False</span></code>.
+the resulting structure is empty, and will evaluate to boolean <code class="docutils literal notranslate"><span class="pre">False</span></code>.
 Note that selections return the same type as the original object being
-selected, so the resulting object may be a subclass of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>.</li>
+selected, so the resulting object may be a subclass of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>.</p></li>
 </ol>
 <p><strong>NOTE</strong></p>
-<p>The return value of a selection&#8212;unless it is selecting a single atom&#8212;is a
+<p>The return value of a selection—unless it is selecting a single atom—is a
 <em>copy</em> of the original structure, meaning that changes to the result of the
 slice will <em>not</em> change the structure from which you sliced.</p>
 <p>This is not always desirable. In cases where you want the resulting structure to
 contain the <em>same</em> atoms, residues, bonds, etc. as the original Structure so
 that you can simplify the process of modifying a subset of the structure, you
-want to use the <code class="docutils literal"><span class="pre">view</span></code> descriptor of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instead.  This is described in more detail below.</p>
-<p><strong>Let&#8217;s look at the simplest form of the selection syntax &#8211; by atom index</strong>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+want to use the <code class="docutils literal notranslate"><span class="pre">view</span></code> descriptor of <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instead.  This is described in more detail below.</p>
+<p><strong>Let’s look at the simplest form of the selection syntax – by atom index</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span> <span class="c1"># use the 4LZT.cif file in test/files/</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span>
 <span class="go">&lt;Structure 1164 atoms; 274 residues; 1043 bonds; PBC; NOT parametrized&gt;</span>
@@ -441,19 +578,19 @@ want to use the <code class="docutils literal"><span class="pre">view</span></co
   File <span class="nb">&quot;/.../structure.py&quot;</span>, line <span class="m">1021</span>, in <span class="n">__getitem__</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span>
   File <span class="nb">&quot;/.../topologyobjects.py&quot;</span>, line <span class="m">3932</span>, in <span class="n">__getitem__</span>
-    <span class="n">retval</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+    <span class="n">retval</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
 <span class="gr">IndexError</span>: <span class="n">list index out of range</span>
 </pre></div>
 </div>
 <p>Oops!  Our original structure only had 1164 atoms, so selecting the 1165th index
-(remember, Python indices start from 0) results in an <code class="docutils literal"><span class="pre">IndexError</span></code>. As with
-Python slicing, though, slice and Amber mask selections simply return <code class="docutils literal"><span class="pre">None</span></code>
+(remember, Python indices start from 0) results in an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code>. As with
+Python slicing, though, slice and Amber mask selections simply return <code class="docutils literal notranslate"><span class="pre">None</span></code>
 if no atoms match the selection.</p>
-<p><strong>Now let&#8217;s look at the slightly more complex Amber mask selection. See</strong> <a class="reference external" href="amber.html#amber-mask-syntax">Amber
+<p><strong>Now let’s look at the slightly more complex Amber mask selection. See</strong> <a class="reference external" href="amber.html#amber-mask-syntax">Amber
 mask syntax</a> <strong>for more details</strong>.</p>
 <p>If you pass a single string, it will be interpreted as an Amber mask. The
-example below continues from the same <code class="docutils literal"><span class="pre">struct</span></code> we were using above:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;@CA&#39;</span><span class="p">]</span>
+example below continues from the same <code class="docutils literal notranslate"><span class="pre">struct</span></code> we were using above:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;@CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;:1-10&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 75 atoms; 10 residues; 75 bonds; NOT parametrized&gt;</span>
@@ -465,22 +602,22 @@ example below continues from the same <code class="docutils literal"><span class
 <span class="go">&lt;Structure 88 atoms; 13 residues; 84 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
-<p><strong>Now let&#8217;s look at mask arrays</strong>.</p>
-<p>I&#8217;ll define my terminology.  A <em>mask array</em> is a boolean array (or it is
-interpreted as a boolean array) with a Truthy-value (e.g., <code class="docutils literal"><span class="pre">True</span></code>, <code class="docutils literal"><span class="pre">1</span></code>,
-etc.) for atoms you want to select and a Falsey-value (e.g., <code class="docutils literal"><span class="pre">False</span></code>, <code class="docutils literal"><span class="pre">0</span></code>,
+<p><strong>Now let’s look at mask arrays</strong>.</p>
+<p>I’ll define my terminology.  A <em>mask array</em> is a boolean array (or it is
+interpreted as a boolean array) with a Truthy-value (e.g., <code class="docutils literal notranslate"><span class="pre">True</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>,
+etc.) for atoms you want to select and a Falsey-value (e.g., <code class="docutils literal notranslate"><span class="pre">False</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code>,
 etc.) for atoms you do <em>not</em> want to select.  A <em>selection array</em>, described in
 more detail below, is an array of atom indices (first index is 0) of the atoms
 you want to select. These arrays can be any subscriptable iterable (e.g.,
-<code class="docutils literal"><span class="pre">tuple</span></code>, <code class="docutils literal"><span class="pre">list</span></code>, <code class="docutils literal"><span class="pre">numpy.ndarray</span></code>, etc.).</p>
+<code class="docutils literal notranslate"><span class="pre">tuple</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, etc.).</p>
 <p>A <em>mask array</em> must have the same number of elements as your system has atoms.
 So if an array has the same number of elements as you have atoms, it is
 interpreted as a mask array.  A common use-case for a mask array is to convert a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> to a Pandas <code class="docutils literal"><span class="pre">DataFrame</span></code>
-(see <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.to_dataframe" title="parmed.structure.Structure.to_dataframe"><code class="xref py py-func docutils literal"><span class="pre">Structure.to_dataframe</span></code></a>
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> to a Pandas <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>
+(see <a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.to_dataframe" title="parmed.structure.Structure.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">Structure.to_dataframe</span></code></a>
 for more information), and using Pandas/numpy to generate the mask array. An
 example of this is shown below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">resid</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">)]</span>
@@ -490,19 +627,19 @@ example of this is shown below:</p>
 <p>A mask array cannot be used alongside a residue or chain selection. In fact,
 ParmEd will simply interpret that array as a selection array, which may lead to
 unexpected results, as seen below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,:,</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,:,</span><span class="n">df</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CA&#39;</span><span class="p">]</span>
 <span class="go">&lt;Structure 409 atoms; 274 residues; 135 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
-<p>While you might expect this to select only the <code class="docutils literal"><span class="pre">CA</span></code> atoms (since all residues
-are in chain A), the key is that <code class="docutils literal"><span class="pre">df.name</span> <span class="pre">==</span> <span class="pre">'CA'</span></code> is interpreted as a
+<p>While you might expect this to select only the <code class="docutils literal notranslate"><span class="pre">CA</span></code> atoms (since all residues
+are in chain A), the key is that <code class="docutils literal notranslate"><span class="pre">df.name</span> <span class="pre">==</span> <span class="pre">'CA'</span></code> is interpreted as a
 selection array, and it contains 0s and 1s. So it selects the first two atoms of
 every residue (not all residues have more than 1 atom, though, which is why the
 number of atoms is not double the number of residues).</p>
-<p><strong>Now let&#8217;s look at selection arrays and slices of chains, residues, and/or
+<p><strong>Now let’s look at selection arrays and slices of chains, residues, and/or
 atoms</strong></p>
-<p><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instances can take between 1
-and 3 &#8220;slots&#8221; in their indexing scheme, corresponding to atom, residue, and
+<p><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instances can take between 1
+and 3 “slots” in their indexing scheme, corresponding to atom, residue, and
 chain selections.  If one slot is used, that selection applies to the list of
 atoms.  If two slots are used, the first slot applies to the list of residues
 while the second slot refers to the list of atoms <em>within the selected
@@ -514,23 +651,23 @@ those residues</em>.</p>
 <p>Slots can be assigned either an index, string, slice, or selection array. Each
 is defined below:</p>
 <ul class="simple">
-<li>An <em>index</em> is a number between 0 and the number of elements in either the
-residue or atom list (depending on which slot is found in).</li>
-<li>A <em>string</em> is interpreted as a single name that must match every chain,
-residue, or atom name (as determined by the slot it is found in).</li>
-<li>A <em>slice</em> is a standard Python slice (e.g., <code class="docutils literal"><span class="pre">iterable[10:20:2]</span></code>) and can be
-used for either the residue or atom selections. A raw <code class="docutils literal"><span class="pre">:</span></code> in any slot means
-a &#8220;full slice&#8221; that selects everything according to its slot.</li>
-<li>A <em>selection array</em> is an array of indexes or strings (interpreted as names),
+<li><p>An <em>index</em> is a number between 0 and the number of elements in either the
+residue or atom list (depending on which slot is found in).</p></li>
+<li><p>A <em>string</em> is interpreted as a single name that must match every chain,
+residue, or atom name (as determined by the slot it is found in).</p></li>
+<li><p>A <em>slice</em> is a standard Python slice (e.g., <code class="docutils literal notranslate"><span class="pre">iterable[10:20:2]</span></code>) and can be
+used for either the residue or atom selections. A raw <code class="docutils literal notranslate"><span class="pre">:</span></code> in any slot means
+a “full slice” that selects everything according to its slot.</p></li>
+<li><p>A <em>selection array</em> is an array of indexes or strings (interpreted as names),
 and can have as many elements as you want (including negative numbers to count
 from the <em>end</em> of the atom list). but no atom index can be outside the range
-of the atom list (or you will get an <code class="docutils literal"><span class="pre">IndexError</span></code>). So practically speaking,
+of the atom list (or you will get an <code class="docutils literal notranslate"><span class="pre">IndexError</span></code>). So practically speaking,
 there is no use-case for a selection array to have the same length as a mask
-array, since that would either include duplicates <em>or</em> select every atom.</li>
+array, since that would either include duplicates <em>or</em> select every atom.</p></li>
 </ul>
-<p>Let&#8217;s have a look at some examples, again continuing with the <code class="docutils literal"><span class="pre">struct</span></code> object
+<p>Let’s have a look at some examples, again continuing with the <code class="docutils literal notranslate"><span class="pre">struct</span></code> object
 we defined above:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
 <span class="go">&lt;Structure 5 atoms; 2 residues; 0 bonds; NOT parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">struct</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">:</span><span class="mi">20</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># note, this is the 10th to 20th atom of the 1st residue!</span>
 <span class="go">&lt;Structure 0 atoms; 0 residues; 0 bonds; NOT parametrized&gt;</span>
@@ -542,7 +679,7 @@ we defined above:</p>
 <span class="go">&lt;Structure 129 atoms; 129 residues; 0 bonds; NOT parametrized&gt;</span>
 </pre></div>
 </div>
-<p>There is so much flexibility in the Atom selection here that we can&#8217;t possibly
+<p>There is so much flexibility in the Atom selection here that we can’t possibly
 cover everything. You are encouraged to try things out!</p>
 </div>
 <div class="section" id="structure-views">
@@ -551,9 +688,9 @@ cover everything. You are encouraged to try things out!</p>
 obtain a <em>view</em> of a structure, rather than a full copy of the subset of
 selected atoms. You still need to familiarize yourself with the selection
 syntax, as it is the same when you are trying to take a view.</p>
-<p>However, instead of selecting directly from the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance, you instead select from
-<code class="docutils literal"><span class="pre">Structure.view</span></code>, as demonstrated below on a downloaded PDB:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+<p>However, instead of selecting directly from the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance, you instead select from
+<code class="docutils literal notranslate"><span class="pre">Structure.view</span></code>, as demonstrated below on a downloaded PDB:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">download_PDB</span><span class="p">(</span><span class="s1">&#39;4lzt&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pdb</span><span class="o">.</span><span class="n">residues</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="go">&lt;Residue LYS[1]; chain=A&gt;</span>
@@ -570,17 +707,17 @@ syntax, as it is the same when you are trying to take a view.</p>
 </div>
 <div class="section" id="structure-combining">
 <h3>Structure Combining<a class="headerlink" href="#structure-combining" title="Permalink to this headline">¶</a></h3>
-<p>Two structures can be <em>combined</em> in the sense that a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance can be created by taking the atoms,
-residues, and parameters of one <code class="docutils literal"><span class="pre">Structure</span></code> and tacking it on to the end of
+<p>Two structures can be <em>combined</em> in the sense that a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance can be created by taking the atoms,
+residues, and parameters of one <code class="docutils literal notranslate"><span class="pre">Structure</span></code> and tacking it on to the end of
 another one.</p>
-<p>This can naturally be thought of as a <em>sum</em> of two <code class="docutils literal"><span class="pre">Structure</span></code> instances, so
+<p>This can naturally be thought of as a <em>sum</em> of two <code class="docutils literal notranslate"><span class="pre">Structure</span></code> instances, so
 it was implemented via the addition operator.  This can be done both in-place
-(in a way that modifies the first <code class="docutils literal"><span class="pre">Structure</span></code>) as well as creating a new copy
+(in a way that modifies the first <code class="docutils literal notranslate"><span class="pre">Structure</span></code>) as well as creating a new copy
 that is the sum of the originals. This is demonstrated below using AMBER
 topology files of two small molecules, phenol and biphenyl, which can be found
-in the <code class="docutils literal"><span class="pre">test/files</span></code> directory of the ParmEd distribution (<code class="docutils literal"><span class="pre">phenol.prmtop</span></code>
-and <code class="docutils literal"><span class="pre">biphenyl.prmtop</span></code>):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+in the <code class="docutils literal notranslate"><span class="pre">test/files</span></code> directory of the ParmEd distribution (<code class="docutils literal notranslate"><span class="pre">phenol.prmtop</span></code>
+and <code class="docutils literal notranslate"><span class="pre">biphenyl.prmtop</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;biphenyl.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
@@ -596,9 +733,9 @@ and <code class="docutils literal"><span class="pre">biphenyl.prmtop</span></cod
 </pre></div>
 </div>
 <p>Note that the order of addition controls the order that the atoms are added to
-the resulting <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a>, as you would
+the resulting <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a>, as you would
 probably expect:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phenol</span> <span class="o">+</span> <span class="n">biphenyl</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
 <span class="go">[13, 22]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">residue</span><span class="p">)</span> <span class="k">for</span> <span class="n">residue</span> <span class="ow">in</span> <span class="p">(</span><span class="n">biphenyl</span> <span class="o">+</span> <span class="n">phenol</span><span class="p">)</span><span class="o">.</span><span class="n">residues</span><span class="p">]</span>
 <span class="go">[22, 13]</span>
@@ -609,7 +746,7 @@ combining using standard addition, particularly for large systems. Note, if you
 are adding a large and a small structure together, adding the small one to the
 large one in-place is the most efficient way to do that. In-place combination is
 demonstrated below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span>
 <span class="go">&lt;AmberParm 22 atoms; 1 residues; 23 bonds; parametrized&gt;</span>
@@ -619,25 +756,25 @@ demonstrated below:</p>
 </pre></div>
 </div>
 <p>The addition preserves both the valence terms and the parameters from both
-structures.  All of the parameter <em>type</em> arrays (e.g., <code class="docutils literal"><span class="pre">bond_types</span></code>) will be
+structures.  All of the parameter <em>type</em> arrays (e.g., <code class="docutils literal notranslate"><span class="pre">bond_types</span></code>) will be
 the sum of the type arrays from the two structures (you will see why this is
 important in the next section about <em>replicating</em> structures).</p>
 <p>One final comment to make is in regards to the type of the resulting
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance.  You can add any
-two <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instances together,
-including instances of subclasses (such as <code class="xref py py-class docutils literal"><span class="pre">AmberParm</span></code>). The result will take the type of the
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance.  You can add any
+two <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instances together,
+including instances of subclasses (such as <code class="xref py py-class docutils literal notranslate"><span class="pre">AmberParm</span></code>). The result will take the type of the
 <em>first</em> operand.</p>
 </div>
 <div class="section" id="structure-replicating">
 <h3>Structure Replicating<a class="headerlink" href="#structure-replicating" title="Permalink to this headline">¶</a></h3>
 <p>There are times when you also want to model several copies of the same
 structure. Like with structure combining (described above), <em>replicating</em> is
-implemented by overloading the natural mathematical operator &#8211; the
-multiplication operator (<code class="docutils literal"><span class="pre">*</span></code>).</p>
-<p>The only mode supported here is multiplying a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance by an integer, which indicates the
+implemented by overloading the natural mathematical operator – the
+multiplication operator (<code class="docutils literal notranslate"><span class="pre">*</span></code>).</p>
+<p>The only mode supported here is multiplying a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance by an integer, which indicates the
 number of copies of the original structure will be added to the result.  And
 like with combination, replication can be done both in-place and not:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">*</span> <span class="mi">2</span>
@@ -653,13 +790,13 @@ like with combination, replication can be done both in-place and not:</p>
 <span class="go">&lt;AmberParm 130 atoms; 10 residues; 130 bonds; parametrized&gt;</span>
 </pre></div>
 </div>
-<p>One comment about the parameter <em>type</em> arrays (e.g., <code class="docutils literal"><span class="pre">bond_type</span></code>) &#8211; unlike
+<p>One comment about the parameter <em>type</em> arrays (e.g., <code class="docutils literal notranslate"><span class="pre">bond_type</span></code>) – unlike
 structure combination, all replicates have the <em>same</em> parameters, so there is no
 reason to enlarge the type arrays. As a result, all valence terms in each
 replicate points to the <em>same</em> parameter type as that same valence term in the
 other replicates.</p>
 <p>As a result, adding a structure to itself will result in an <em>equivalent</em>
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance (in that it will
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance (in that it will
 have the same atom and residue order, valence terms and their order, and each
 parameter will have the same type), but combining a structure with itself will
 double the size of its type arrays, while replicating it will not.</p>
@@ -667,20 +804,20 @@ double the size of its type arrays, while replicating it will not.</p>
 nature of replicating a structure than combining two different ones.</p>
 </div>
 <div class="section" id="structure-splitting">
-<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> splitting<a class="headerlink" href="#structure-splitting" title="Permalink to this headline">¶</a></h3>
+<h3><a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> splitting<a class="headerlink" href="#structure-splitting" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes you want to be able to manipulate individual <em>molecules</em> inside a
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance individually. The
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure.split" title="parmed.structure.Structure.split"><code class="xref py py-meth docutils literal"><span class="pre">Structure.split</span></code></a> method does just
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance individually. The
+<a class="reference internal" href="api/parmed/parmed.structure.html#parmed.structure.Structure.split" title="parmed.structure.Structure.split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.split</span></code></a> method does just
 this.  It uses the bond graph in order to identify which atoms belong to which
 molecules and then return a list of molecules along with how many times that
-molecule occurs in the original <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance.</p>
+molecule occurs in the original <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance.</p>
 <p>It only returns one copy of each molecule due to the cost of splitting off
 potentially thousands of solvent molecules in larger solvated systems.  As a
-result, the return value is a list of <code class="docutils literal"><span class="pre">tuple</span></code> instances where each tuple is
-the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> (or subclass) instances
+result, the return value is a list of <code class="docutils literal notranslate"><span class="pre">tuple</span></code> instances where each tuple is
+the <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> (or subclass) instances
 followed by the number of times that structure occurs.  Using our phenol and
 biphenyl examples from earlier:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/phenol.prmtop&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/phenol.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">biphenyl</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;test/files/biphenyl.prmtop&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">phenol</span>
 <span class="go">&lt;AmberParm 13 atoms; 1 residues; 13 bonds; parametrized&gt;</span>
@@ -693,36 +830,36 @@ biphenyl examples from earlier:</p>
 </div>
 </div>
 <div class="section" id="load-file">
-<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file</span></code></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<h2><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file</span></code></a><a class="headerlink" href="#load-file" title="Permalink to this headline">¶</a></h2>
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal"><span class="pre">load_file</span></code></a>(filename,&nbsp;\*args,&nbsp;\*\*kwargs)</td>
-<td>Identifies the file format of the specified file and returns its parsed contents.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_file</span></code></a>(filename, *args, **kwargs)</p></td>
+<td><p>Identifies the file format of the specified file and returns its parsed contents.</p></td>
 </tr>
 </tbody>
 </table>
-<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal"><span class="pre">load_file()</span></code></a> function automatically determines the format of the file
+<p>The <a class="reference internal" href="structobj/parmed.formats.registry.load_file.html#parmed.formats.registry.load_file" title="parmed.formats.registry.load_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_file()</span></code></a> function automatically determines the format of the file
 whose name is passed as an argument. The following formats are currently
-recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> or one of its subclasses:</p>
+recognized and result in the instantiation of either a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> or one of its subclasses:</p>
 <ol class="arabic simple">
-<li>PDB</li>
-<li>PDBx/mmCIF</li>
-<li>PQR</li>
-<li>Gromacs GRO</li>
-<li>Gromacs topology file</li>
-<li>Amber topology file</li>
-<li>CHARMM PSF file</li>
-<li>CHARMM coordinate file</li>
-<li>Mol2 file</li>
-<li>PyRosetta pose</li>
-<li>OpenMM Topology object</li>
-<li>Tinker XYZ file</li>
+<li><p>PDB</p></li>
+<li><p>PDBx/mmCIF</p></li>
+<li><p>PQR</p></li>
+<li><p>Gromacs GRO</p></li>
+<li><p>Gromacs topology file</p></li>
+<li><p>Amber topology file</p></li>
+<li><p>CHARMM PSF file</p></li>
+<li><p>CHARMM coordinate file</p></li>
+<li><p>Mol2 file</p></li>
+<li><p>PyRosetta pose</p></li>
+<li><p>OpenMM Topology object</p></li>
+<li><p>Tinker XYZ file</p></li>
 </ol>
-<p>Here, we will focus on instantiating a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance from PDB and
+<p>Here, we will focus on instantiating a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance from PDB and
 mmCIF files.  PDB files and mmCIF files downloaded from the RCSB Protein Data
 Bank or the world wide Protein Data Bank often contain a large amount of
 metadata describing the structure, such as the citation information,
@@ -731,7 +868,7 @@ and related database entries (such as BMRB entries for NMR-solved structures).
 This information is extracted from both PDB and PDBx/mmCIF files when available,
 along with anisotropic B-factors.</p>
 <p>The following sections will briefly demonstrate parsing a PDB file and a mmCIF
-file to a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> instance.</p>
+file to a <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance.</p>
 </div>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
@@ -740,7 +877,7 @@ PDB file and a CIF file. These structures are both used in the ParmEd unittest
 suite, so you can get the files from there, or <a class="reference external" href="http://www.rcsb.org/pdb/explore/explore.do?structureId=4LZT">download them from here.</a></p>
 <hr class="docutils" />
 <p>The first example demonstrates reading the PDB file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_pdb</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4lzt.pdb&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_pdb</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
@@ -771,7 +908,7 @@ suite, so you can get the files from there, or <a class="reference external" hre
 </pre></div>
 </div>
 <p>The second example demonstrates reading the CIF file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">lzt_cif</span> <span class="o">=</span> <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">lzt_cif</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
 <span class="go">1164</span>
@@ -805,22 +942,22 @@ suite, so you can get the files from there, or <a class="reference external" hre
 <hr class="docutils" />
 <div class="section" id="converting-pdbx-mmcif-files-to-pdb-files">
 <h2>Converting PDBx/mmCIF files to PDB files<a class="headerlink" href="#converting-pdbx-mmcif-files-to-pdb-files" title="Permalink to this headline">¶</a></h2>
-<p>If you noticed the <code class="docutils literal"><span class="pre">write_cif</span></code> and <code class="docutils literal"><span class="pre">write_pdb</span></code> methods attached to the
-<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class, you may have deduced
+<p>If you noticed the <code class="docutils literal notranslate"><span class="pre">write_cif</span></code> and <code class="docutils literal notranslate"><span class="pre">write_pdb</span></code> methods attached to the
+<a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class, you may have deduced
 that you can very simply convert a PDBx/mmCIF file to a PDB file.</p>
 <p>This is likely to be increasingly popular, since the PDB is moving to the mmCIF
 format, but many programs in the field of computational parmed and physics
 has decades worth of legacy code built around PDB files. Not to worry!  A quick
 1-liner will seamlessly convert PDBx to PDB:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">load_file</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">load_file</span>
 <span class="n">load_file</span><span class="p">(</span><span class="s1">&#39;4LZT.cif&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write_pdb</span><span class="p">(</span><span class="s1">&#39;4lzt_converted.pdb&#39;</span><span class="p">,</span> <span class="n">write_anisou</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                 <span class="n">renumber</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In this case, the metadata is <em>not</em> copied (i.e., the <code class="docutils literal"><span class="pre">EXPTL</span></code>, <code class="docutils literal"><span class="pre">JRNL</span></code>,
-and <code class="docutils literal"><span class="pre">AUTHOR</span></code> records, to name a few). Only the coordinates, unit cell
-(<code class="docutils literal"><span class="pre">CYRST1</span></code> record), and optionally anisotropic B-factor lines are translated.</p>
-<p>The <code class="docutils literal"><span class="pre">renumber</span></code> argument tells <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> to use the original PDB numbers, rather than
+<p>In this case, the metadata is <em>not</em> copied (i.e., the <code class="docutils literal notranslate"><span class="pre">EXPTL</span></code>, <code class="docutils literal notranslate"><span class="pre">JRNL</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">AUTHOR</span></code> records, to name a few). Only the coordinates, unit cell
+(<code class="docutils literal notranslate"><span class="pre">CYRST1</span></code> record), and optionally anisotropic B-factor lines are translated.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">renumber</span></code> argument tells <a class="reference internal" href="structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> to use the original PDB numbers, rather than
 its internal number scheme that numbers sequentially from 1 to N, where N is
 the number of residues.</p>
 <p>If your system has more than 99,999 atoms (and/or more than 9,999 residues), the
@@ -831,74 +968,59 @@ the numbering starts again.</p>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">The <code class="docutils literal"><span class="pre">structure</span></code> module</a><ul>
-<li><a class="reference internal" href="#structure-class"><code class="docutils literal"><span class="pre">Structure</span></code> class</a><ul>
-<li><a class="reference internal" href="#attributes-of-structure-instances">Attributes of <code class="docutils literal"><span class="pre">Structure</span></code> instances</a></li>
-<li><a class="reference internal" href="#automated-bookkeeping">Automated Bookkeeping</a></li>
-<li><a class="reference internal" href="#coordinate-handling">Coordinate handling</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#structure-manipulation-slicing-combining-replicating-and-splitting">Structure manipulation: slicing, combining, replicating, and splitting</a><ul>
-<li><a class="reference internal" href="#structure-slicing-and-selections"><code class="docutils literal"><span class="pre">Structure</span></code> Slicing and Selections</a></li>
-<li><a class="reference internal" href="#structure-views">Structure views</a></li>
-<li><a class="reference internal" href="#structure-combining">Structure Combining</a></li>
-<li><a class="reference internal" href="#structure-replicating">Structure Replicating</a></li>
-<li><a class="reference internal" href="#structure-splitting"><code class="docutils literal"><span class="pre">Structure</span></code> splitting</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#load-file"><code class="docutils literal"><span class="pre">load_file</span></code></a></li>
-<li><a class="reference internal" href="#examples">Examples</a></li>
-<li><a class="reference internal" href="#converting-pdbx-mmcif-files-to-pdb-files">Converting PDBx/mmCIF files to PDB files</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="structobj/parmed.structure.Structure.html" class="btn btn-neutral float-right" title="parmed.structure.Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="topobj/parmed.topologyobjects.NonbondedExceptionType.html" class="btn btn-neutral float-left" title="parmed.topologyobjects.NonbondedExceptionType" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/structure.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="structobj/parmed.structure.Structure.html" title="parmed.structure.Structure"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

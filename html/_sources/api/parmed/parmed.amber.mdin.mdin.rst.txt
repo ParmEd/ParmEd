@@ -2,6 +2,6 @@ parmed.amber.mdin.mdin module
 =============================
 
 .. automodule:: parmed.amber.mdin.mdin
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,5 +1,5 @@
-parmed.formats.registry.load_file
-=================================
+parmed.formats.registry.load\_file
+==================================
 
 .. currentmodule:: parmed.formats.registry
 

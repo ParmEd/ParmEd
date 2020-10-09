@@ -1,7 +1,7 @@
-parmed.unit.unit_math module
-============================
+parmed.unit.unit\_math module
+=============================
 
 .. automodule:: parmed.unit.unit_math
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

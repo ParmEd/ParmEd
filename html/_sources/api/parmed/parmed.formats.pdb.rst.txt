@@ -2,6 +2,6 @@ parmed.formats.pdb module
 =========================
 
 .. automodule:: parmed.formats.pdb
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

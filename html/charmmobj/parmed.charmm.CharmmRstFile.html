@@ -1,264 +1,346 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.charmm.CharmmRstFile &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.charmm.CharmmRstFile &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../charmm.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The parmed.gromacs package" href="../gromacs.html" />
+    <link rel="prev" title="parmed.charmm.CharmmCrdFile" href="parmed.charmm.CharmmCrdFile.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charmm.html#the-protein-structure-file-psf">The Protein Structure File (PSF)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../charmm.html#charmm-parameter-sets">CHARMM Parameter Sets</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../charmm.html#charmm-coordinate-files">CHARMM coordinate files</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.charmm.CharmmCrdFile.html">parmed.charmm.CharmmCrdFile</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.charmm.CharmmRstFile</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../charmm.html">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.charmm</span></code> package</a> &raquo;</li>
+        
+      <li>parmed.charmm.CharmmRstFile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/charmmobj/parmed.charmm.CharmmRstFile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-charmm-charmmrstfile">
 <h1>parmed.charmm.CharmmRstFile<a class="headerlink" href="#parmed-charmm-charmmrstfile" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.charmm.CharmmRstFile">
-<em class="property">class </em><code class="descclassname">parmed.charmm.</code><code class="descname">CharmmRstFile</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmRstFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.charmm.</code><code class="sig-name descname">CharmmRstFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmRstFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads and parses data, velocities and coordinates from a CHARMM restart
-file (.rst) of file name &#8216;fname&#8217; into class attributes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fname</strong> : str</p>
-<blockquote class="last">
-<div><p>Name of the restart file to parse</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.velocities" title="parmed.charmm.CharmmRstFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
-<td>Atomic velocities in Angstroms/picoseconds</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positions" title="parmed.charmm.CharmmRstFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
-<td>Atomic positions with units</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positionsold" title="parmed.charmm.CharmmRstFile.positionsold"><code class="xref py py-obj docutils literal"><span class="pre">positionsold</span></code></a></td>
-<td>Old atomic positions with units</td>
-</tr>
-</tbody>
-</table>
-<table border="1" class="docutils">
-<colgroup>
-<col width="12%" />
-<col width="88%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>natom</td>
-<td>(int) Number of atoms in the system</td>
-</tr>
-<tr class="row-even"><td>resname</td>
-<td>(list of str) Names of all residues in the system</td>
-</tr>
-<tr class="row-odd"><td>coordinates</td>
-<td>(np.ndarray shape(1, natom, 3)) List of all coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
-</tr>
-<tr class="row-even"><td>coordinatesold</td>
-<td>(np.ndarray shape(1, natom, 3)) List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, ...]</td>
-</tr>
-</tbody>
-</table>
+file (.rst) of file name ‘fname’ into class attributes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Name of the restart file to parse</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>natom</strong><span class="classifier">int</span></dt><dd><p>Number of atoms in the system</p>
+</dd>
+<dt><strong>resname</strong><span class="classifier">list of str</span></dt><dd><p>Names of all residues in the system</p>
+</dd>
+<dt><strong>coordinates</strong><span class="classifier">np.ndarray shape(1, natom, 3)</span></dt><dd><p>List of all coordinates in the format [x1, y1, z1, x2, y2, z2, …]</p>
+</dd>
+<dt><strong>coordinatesold</strong><span class="classifier">np.ndarray shape(1, natom, 3)</span></dt><dd><p>List of all old coordinates in the format [x1, y1, z1, x2, y2, z2, …]</p>
+</dd>
+<dt><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.velocities" title="parmed.charmm.CharmmRstFile.velocities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">velocities</span></code></a><span class="classifier">np.ndarray shape(1, natom, 3)</span></dt><dd><p>Atomic velocities in Angstroms/picoseconds</p>
+</dd>
+<dt><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.positions" title="parmed.charmm.CharmmRstFile.positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positions</span></code></a><span class="classifier">natom x 3 distance Quantity</span></dt><dd><p>Atomic positions with units</p>
+</dd>
+<dt><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.positionsold" title="parmed.charmm.CharmmRstFile.positionsold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positionsold</span></code></a><span class="classifier">natom x 3 distance Quantity</span></dt><dd><p>Old atomic positions with units</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.id_format" title="parmed.charmm.CharmmRstFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as a CHARMM restart file</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.id_format" title="parmed.charmm.CharmmRstFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as a CHARMM restart file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.scan" title="parmed.charmm.CharmmRstFile.scan"><code class="xref py py-obj docutils literal"><span class="pre">scan</span></code></a>(handle,&nbsp;str[,&nbsp;r])</td>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 56%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>scan</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.charmm.CharmmRstFile.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmRstFile.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmRstFile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.__init__" title="parmed.charmm.CharmmRstFile.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(fname)</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.charmm.CharmmRstFile.__init__" title="parmed.charmm.CharmmRstFile.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(fname)</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.id_format" title="parmed.charmm.CharmmRstFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as a CHARMM restart file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.id_format" title="parmed.charmm.CharmmRstFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as a CHARMM restart file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.scan" title="parmed.charmm.CharmmRstFile.scan"><code class="xref py py-obj docutils literal"><span class="pre">scan</span></code></a>(handle,&nbsp;str[,&nbsp;r])</td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.scan" title="parmed.charmm.CharmmRstFile.scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scan</span></code></a>(handle, str[, r])</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.box" title="parmed.charmm.CharmmRstFile.box"><code class="xref py py-obj docutils literal"><span class="pre">box</span></code></a></td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.box" title="parmed.charmm.CharmmRstFile.box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">box</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.coordinates" title="parmed.charmm.CharmmRstFile.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.coordinates" title="parmed.charmm.CharmmRstFile.coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coordinates</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.coordinatesold" title="parmed.charmm.CharmmRstFile.coordinatesold"><code class="xref py py-obj docutils literal"><span class="pre">coordinatesold</span></code></a></td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.coordinatesold" title="parmed.charmm.CharmmRstFile.coordinatesold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coordinatesold</span></code></a></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positions" title="parmed.charmm.CharmmRstFile.positions"><code class="xref py py-obj docutils literal"><span class="pre">positions</span></code></a></td>
-<td>Atomic positions with units</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.positions" title="parmed.charmm.CharmmRstFile.positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positions</span></code></a></p></td>
+<td><p>Atomic positions with units</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.positionsold" title="parmed.charmm.CharmmRstFile.positionsold"><code class="xref py py-obj docutils literal"><span class="pre">positionsold</span></code></a></td>
-<td>Old atomic positions with units</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.positionsold" title="parmed.charmm.CharmmRstFile.positionsold"><code class="xref py py-obj docutils literal notranslate"><span class="pre">positionsold</span></code></a></p></td>
+<td><p>Old atomic positions with units</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmRstFile.velocities" title="parmed.charmm.CharmmRstFile.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
-<td>Atomic velocities in Angstroms/picoseconds</td>
-</tr>
-</tbody>
-</table>
-<dl class="staticmethod">
-<dt id="parmed.charmm.CharmmRstFile.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/charmmcrds.html#CharmmRstFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmRstFile.id_format" title="Permalink to this definition">¶</a></dt>
-<dd><p>Identifies the file type as a CHARMM restart file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to check format for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>True if it is a CHARMM restart file</p>
-</div></blockquote>
-</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmRstFile.velocities" title="parmed.charmm.CharmmRstFile.velocities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">velocities</span></code></a></p></td>
+<td><p>Atomic velocities in Angstroms/picoseconds</p></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.charmm.CharmmRstFile.positions">
-<code class="descname">positions</code><a class="headerlink" href="#parmed.charmm.CharmmRstFile.positions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomic positions with units</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.charmm.CharmmRstFile.positionsold">
-<code class="descname">positionsold</code><a class="headerlink" href="#parmed.charmm.CharmmRstFile.positionsold" title="Permalink to this definition">¶</a></dt>
-<dd><p>Old atomic positions with units</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.charmm.CharmmRstFile.velocities">
-<code class="descname">velocities</code><a class="headerlink" href="#parmed.charmm.CharmmRstFile.velocities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Atomic velocities in Angstroms/picoseconds</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../gromacs.html" class="btn btn-neutral float-right" title="The parmed.gromacs package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.charmm.CharmmCrdFile.html" class="btn btn-neutral float-left" title="parmed.charmm.CharmmCrdFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/charmmobj/parmed.charmm.CharmmRstFile.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../charmm.html" >The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

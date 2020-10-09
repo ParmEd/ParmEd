@@ -1,188 +1,303 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils.pandautils module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils.pandautils module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.utils.pandautils module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.utils.pandautils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.utils.pandautils">
 <span id="parmed-utils-pandautils-module"></span><h1>parmed.utils.pandautils module<a class="headerlink" href="#module-parmed.utils.pandautils" title="Permalink to this headline">¶</a></h1>
 <p>A collection of utilities for use with Pandas objects</p>
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.pandautils.create_dataframe">
-<code class="descclassname">parmed.utils.pandautils.</code><code class="descname">create_dataframe</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.create_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.pandautils.</code><code class="sig-name descname">create_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#create_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.create_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a pandas.DataFrame object from the current instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>dataframe</strong> : <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl>
+<dt><strong>dataframe</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>The DataFrame will be over all atoms. The columns will be the attributes
 of the atom (as well as its containing residue). Some columns will
 <em>always</em> exist. Others will only exist if those attributes have been set
-on the Atom instances (see the <code class="xref py py-class docutils literal"><span class="pre">Atom</span></code> docs for possible
+on the Atom instances (see the <code class="xref py py-class docutils literal notranslate"><span class="pre">Atom</span></code> docs for possible
 attributes and their meaning). The columns that will always be present
 are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>number : int</li>
-<li>name : str</li>
-<li>type : str</li>
-<li>atomic_number : int</li>
-<li>charge : float</li>
-<li>mass : float</li>
-<li>nb_idx : int</li>
-<li>solvent_radius : float</li>
-<li>screen : float</li>
-<li>occupancy : float</li>
-<li>bfactor : float</li>
-<li>altloc : str</li>
-<li>tree : str</li>
-<li>join : int</li>
-<li>irotat : int</li>
-<li>rmin : float</li>
-<li>epsilon : float</li>
-<li>rmin_14 : float</li>
-<li>epsilon_14 : float</li>
-<li>resname : str (name of the containing residue)</li>
-<li>resid : int (Sequential index of the containing residue)</li>
-<li>resnum : int (original residue number in the input structure)</li>
-<li>chain : str (chain ID that the containing residue belongs to)</li>
+<li><p>number : int</p></li>
+<li><p>name : str</p></li>
+<li><p>type : str</p></li>
+<li><p>atomic_number : int</p></li>
+<li><p>charge : float</p></li>
+<li><p>mass : float</p></li>
+<li><p>nb_idx : int</p></li>
+<li><p>solvent_radius : float</p></li>
+<li><p>screen : float</p></li>
+<li><p>occupancy : float</p></li>
+<li><p>bfactor : float</p></li>
+<li><p>altloc : str</p></li>
+<li><p>tree : str</p></li>
+<li><p>join : int</p></li>
+<li><p>irotat : int</p></li>
+<li><p>rmin : float</p></li>
+<li><p>epsilon : float</p></li>
+<li><p>rmin_14 : float</p></li>
+<li><p>epsilon_14 : float</p></li>
+<li><p>resname : str (name of the containing residue)</p></li>
+<li><p>resid : int (Sequential index of the containing residue)</p></li>
+<li><p>resnum : int (original residue number in the input structure)</p></li>
+<li><p>chain : str (chain ID that the containing residue belongs to)</p></li>
 </ul>
 </div></blockquote>
 <p>The following attributes are optionally present if they were present in
 the original file defining the structure:</p>
 <blockquote>
 <div><ul class="simple">
-<li>xx : float (x-coordinate position)</li>
-<li>xy : float (y-coordinate position)</li>
-<li>xz : float (z-coordinate position)</li>
-<li>vx : float (x-coordinate velocity)</li>
-<li>vy : float (y-coordinate velocity)</li>
-<li>vz : float (z-coordinate velocity)</li>
-<li>type_idx : int (integer type index for AMOEBA)</li>
-<li>class_idx : int (integer class type index for AMOEBA)</li>
-<li>multipole_111 : float (Monopole)</li>
-<li>multipole_211 : float (1,1 Dipole component)</li>
-<li>multipole_212 : float (1,2 Dipole component)</li>
-<li>multipole_222 : float (2,2 Dipole component)</li>
-<li>multipole_411 : float (1,1 Quadrupole component)</li>
-<li>multipole_412 : float (1,2 Quadrupole component)</li>
-<li>multipole_422 : float (2,2 Quadrupole component)</li>
-<li>multipole_413 : float (1,3 Quadrupole component)</li>
-<li>multipole_423 : float (2,3 Quadrupole component)</li>
-<li>multipole_433 : float (3,3 Quadrupole component)</li>
-<li>polarizability : float (dipole polarizability)</li>
-<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
-<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
-<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
-<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
-<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
-<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
-<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+<li><p>xx : float (x-coordinate position)</p></li>
+<li><p>xy : float (y-coordinate position)</p></li>
+<li><p>xz : float (z-coordinate position)</p></li>
+<li><p>vx : float (x-coordinate velocity)</p></li>
+<li><p>vy : float (y-coordinate velocity)</p></li>
+<li><p>vz : float (z-coordinate velocity)</p></li>
+<li><p>type_idx : int (integer type index for AMOEBA)</p></li>
+<li><p>class_idx : int (integer class type index for AMOEBA)</p></li>
+<li><p>multipole_111 : float (Monopole)</p></li>
+<li><p>multipole_211 : float (1,1 Dipole component)</p></li>
+<li><p>multipole_212 : float (1,2 Dipole component)</p></li>
+<li><p>multipole_222 : float (2,2 Dipole component)</p></li>
+<li><p>multipole_411 : float (1,1 Quadrupole component)</p></li>
+<li><p>multipole_412 : float (1,2 Quadrupole component)</p></li>
+<li><p>multipole_422 : float (2,2 Quadrupole component)</p></li>
+<li><p>multipole_413 : float (1,3 Quadrupole component)</p></li>
+<li><p>multipole_423 : float (2,3 Quadrupole component)</p></li>
+<li><p>multipole_433 : float (3,3 Quadrupole component)</p></li>
+<li><p>polarizability : float (dipole polarizability)</p></li>
+<li><p>vdw_parent : int (index of the vdW parent atom of this atom)</p></li>
+<li><p>U11 : float (U[1][1] of anisotropic b-factor tensor)</p></li>
+<li><p>U22 : float (U[2][2] of anisotropic b-factor tensor)</p></li>
+<li><p>U33 : float (U[3][3] of anisotropic b-factor tensor)</p></li>
+<li><p>U12 : float (U[1][2] of anisotropic b-factor tensor)</p></li>
+<li><p>U13 : float (U[1][3] of anisotropic b-factor tensor)</p></li>
+<li><p>U23 : float (U[2][3] of anisotropic b-factor tensor)</p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.pandautils.load_dataframe">
-<code class="descclassname">parmed.utils.pandautils.</code><code class="descname">load_dataframe</code><span class="sig-paren">(</span><em>obj</em>, <em>dataframe</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#load_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.load_dataframe" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.pandautils.</code><code class="sig-name descname">load_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">dataframe</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pandautils.html#load_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.pandautils.load_dataframe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads a DataFrame into the current object, setting atomic properties based
 on the entries of the DataFrame.  Supported atomic properties are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>number : int</li>
-<li>name : str</li>
-<li>type : str</li>
-<li>atomic_number : int</li>
-<li>charge : float</li>
-<li>mass : float</li>
-<li>nb_idx : int</li>
-<li>solvent_radius : float</li>
-<li>screen : float</li>
-<li>occupancy : float</li>
-<li>bfactor : float</li>
-<li>altloc : str</li>
-<li>tree : str</li>
-<li>join : int</li>
-<li>irotat : int</li>
-<li>rmin : float</li>
-<li>epsilon : float</li>
-<li>rmin_14 : float</li>
-<li>epsilon_14 : float</li>
-<li>xx : float (x-coordinate position)</li>
-<li>xy : float (y-coordinate position)</li>
-<li>xz : float (z-coordinate position)</li>
-<li>vx : float (x-coordinate velocity)</li>
-<li>vy : float (y-coordinate velocity)</li>
-<li>vz : float (z-coordinate velocity)</li>
-<li>type_idx : int (integer type index for AMOEBA)</li>
-<li>class_idx : int (integer class type index for AMOEBA)</li>
-<li>multipole_111 : float (Monopole)</li>
-<li>multipole_211 : float (1,1 Dipole component)</li>
-<li>multipole_212 : float (1,2 Dipole component)</li>
-<li>multipole_222 : float (2,2 Dipole component)</li>
-<li>multipole_411 : float (1,1 Quadrupole component)</li>
-<li>multipole_412 : float (1,2 Quadrupole component)</li>
-<li>multipole_422 : float (2,2 Quadrupole component)</li>
-<li>multipole_413 : float (1,3 Quadrupole component)</li>
-<li>multipole_423 : float (2,3 Quadrupole component)</li>
-<li>multipole_433 : float (3,3 Quadrupole component)</li>
-<li>polarizability : float (dipole polarizability)</li>
-<li>vdw_parent : int (index of the vdW parent atom of this atom)</li>
-<li>segid : segment ID (similar to chain, but for CHARMM)</li>
-<li>U11 : float (U[1][1] of anisotropic b-factor tensor)</li>
-<li>U22 : float (U[2][2] of anisotropic b-factor tensor)</li>
-<li>U33 : float (U[3][3] of anisotropic b-factor tensor)</li>
-<li>U12 : float (U[1][2] of anisotropic b-factor tensor)</li>
-<li>U13 : float (U[1][3] of anisotropic b-factor tensor)</li>
-<li>U23 : float (U[2][3] of anisotropic b-factor tensor)</li>
+<li><p>number : int</p></li>
+<li><p>name : str</p></li>
+<li><p>type : str</p></li>
+<li><p>atomic_number : int</p></li>
+<li><p>charge : float</p></li>
+<li><p>mass : float</p></li>
+<li><p>nb_idx : int</p></li>
+<li><p>solvent_radius : float</p></li>
+<li><p>screen : float</p></li>
+<li><p>occupancy : float</p></li>
+<li><p>bfactor : float</p></li>
+<li><p>altloc : str</p></li>
+<li><p>tree : str</p></li>
+<li><p>join : int</p></li>
+<li><p>irotat : int</p></li>
+<li><p>rmin : float</p></li>
+<li><p>epsilon : float</p></li>
+<li><p>rmin_14 : float</p></li>
+<li><p>epsilon_14 : float</p></li>
+<li><p>xx : float (x-coordinate position)</p></li>
+<li><p>xy : float (y-coordinate position)</p></li>
+<li><p>xz : float (z-coordinate position)</p></li>
+<li><p>vx : float (x-coordinate velocity)</p></li>
+<li><p>vy : float (y-coordinate velocity)</p></li>
+<li><p>vz : float (z-coordinate velocity)</p></li>
+<li><p>type_idx : int (integer type index for AMOEBA)</p></li>
+<li><p>class_idx : int (integer class type index for AMOEBA)</p></li>
+<li><p>multipole_111 : float (Monopole)</p></li>
+<li><p>multipole_211 : float (1,1 Dipole component)</p></li>
+<li><p>multipole_212 : float (1,2 Dipole component)</p></li>
+<li><p>multipole_222 : float (2,2 Dipole component)</p></li>
+<li><p>multipole_411 : float (1,1 Quadrupole component)</p></li>
+<li><p>multipole_412 : float (1,2 Quadrupole component)</p></li>
+<li><p>multipole_422 : float (2,2 Quadrupole component)</p></li>
+<li><p>multipole_413 : float (1,3 Quadrupole component)</p></li>
+<li><p>multipole_423 : float (2,3 Quadrupole component)</p></li>
+<li><p>multipole_433 : float (3,3 Quadrupole component)</p></li>
+<li><p>polarizability : float (dipole polarizability)</p></li>
+<li><p>vdw_parent : int (index of the vdW parent atom of this atom)</p></li>
+<li><p>segid : segment ID (similar to chain, but for CHARMM)</p></li>
+<li><p>U11 : float (U[1][1] of anisotropic b-factor tensor)</p></li>
+<li><p>U22 : float (U[2][2] of anisotropic b-factor tensor)</p></li>
+<li><p>U33 : float (U[3][3] of anisotropic b-factor tensor)</p></li>
+<li><p>U12 : float (U[1][2] of anisotropic b-factor tensor)</p></li>
+<li><p>U13 : float (U[1][3] of anisotropic b-factor tensor)</p></li>
+<li><p>U23 : float (U[2][3] of anisotropic b-factor tensor)</p></li>
 </ul>
 </div></blockquote>
 <p>The resname, resid, chain, and resnum attributes are ignored. Other
@@ -192,47 +307,50 @@ attributes emit a ParameterWarning</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.utils.pandautils.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

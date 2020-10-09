@@ -35,15 +35,24 @@ parmed.topologyobjects.Atom
       ~Atom.charge
       ~Atom.dihedral_partners
       ~Atom.element
+      ~Atom.element_name
       ~Atom.epsilon
       ~Atom.epsilon_14
       ~Atom.exclusion_partners
       ~Atom.idx
       ~Atom.rmin
       ~Atom.rmin_14
-      ~Atom.segid
       ~Atom.sigma
       ~Atom.sigma_14
       ~Atom.tortor_partners
+      ~Atom.ucharge
+      ~Atom.uepsilon
+      ~Atom.uepsilon_14
+      ~Atom.umass
+      ~Atom.urmin
+      ~Atom.urmin_14
+      ~Atom.usigma
+      ~Atom.usigma_14
+      ~Atom.usolvent_radius
    
    

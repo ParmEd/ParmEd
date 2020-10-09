@@ -24,5 +24,7 @@ parmed.topologyobjects.ImproperType
    .. autosummary::
    
       ~ImproperType.idx
+      ~ImproperType.upsi_eq
+      ~ImproperType.upsi_k
    
    

@@ -1,368 +1,404 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.topologyobjects.DihedralTypeList &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.topologyobjects.DihedralTypeList &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.topologyobjects.ImproperType" href="parmed.topologyobjects.ImproperType.html" />
+    <link rel="prev" title="parmed.topologyobjects.DihedralType" href="parmed.topologyobjects.DihedralType.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Atom.html">parmed.topologyobjects.Atom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Residue.html">parmed.topologyobjects.Residue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AtomList.html">parmed.topologyobjects.AtomList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.ResidueList.html">parmed.topologyobjects.ResidueList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Bond.html">parmed.topologyobjects.Bond</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Angle.html">parmed.topologyobjects.Angle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.UreyBradley.html">parmed.topologyobjects.UreyBradley</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Dihedral.html">parmed.topologyobjects.Dihedral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Improper.html">parmed.topologyobjects.Improper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Cmap.html">parmed.topologyobjects.Cmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AtomType.html">parmed.topologyobjects.AtomType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.BondType.html">parmed.topologyobjects.BondType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AngleType.html">parmed.topologyobjects.AngleType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.DihedralType.html">parmed.topologyobjects.DihedralType</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">parmed.topologyobjects.DihedralTypeList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.ImproperType.html">parmed.topologyobjects.ImproperType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#using-the-atom-class">Using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Atom</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#using-the-residue-class">Using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Residue</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-atomlist-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">AtomList</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-residuelist-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">ResidueList</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-bond-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-angle-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Angle</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-ureybradley-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">UreyBradley</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-dihedral-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Dihedral</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-improper-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Improper</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-cmap-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Cmap</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-xyztype-classes">The <code class="docutils literal notranslate"><span class="pre">XyzType</span></code> classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#amoeba-specific-terms">Amoeba-specific terms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../topologyobjects.html">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li>
+        
+      <li>parmed.topologyobjects.DihedralTypeList</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/topobj/parmed.topologyobjects.DihedralTypeList.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-topologyobjects-dihedraltypelist">
 <h1>parmed.topologyobjects.DihedralTypeList<a class="headerlink" href="#parmed-topologyobjects-dihedraltypelist" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.topologyobjects.DihedralTypeList">
-<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">DihedralTypeList</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.topologyobjects.</code><code class="sig-name descname">DihedralTypeList</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dihedral types are a Fourier expansion of terms. In some cases, they are
 stored in a list like this one inside another TrackedList. In other cases,
-each term is a separate entry in the <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a>.</p>
+each term is a separate entry in the <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackedList</span></code></a>.</p>
 <p>In cases where <cite>DihedralType`s are stored with every term in the same
 container, this object supports list assignment and indexing like
 :class:`DihedralType</cite>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>*args</strong> : objects</p>
-<blockquote>
-<div><p>Any arguments that <code class="docutils literal"><span class="pre">list</span></code> would take.</p>
-</div></blockquote>
-<p><strong>list</strong> : TrackedList, optional</p>
-<blockquote>
-<div><p>A list that &#8220;contains&#8221; this DihedralTypeList instance. This is a
-keyword-only argument. Default is <code class="docutils literal"><span class="pre">None</span></code> (i.e., belonging to no list)</p>
-</div></blockquote>
-<p><strong>**kwargs</strong> : keyword argument list</p>
-<blockquote class="last">
-<div><p>All other keyword arguments passed directly to the <code class="docutils literal"><span class="pre">list</span></code> constructor</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.idx" title="parmed.topologyobjects.DihedralTypeList.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.penalty" title="parmed.topologyobjects.DihedralTypeList.penalty"><code class="xref py py-obj docutils literal"><span class="pre">penalty</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>*args</strong><span class="classifier">objects</span></dt><dd><p>Any arguments that <code class="docutils literal notranslate"><span class="pre">list</span></code> would take.</p>
+</dd>
+<dt><strong>list</strong><span class="classifier">TrackedList, optional</span></dt><dd><p>A list that “contains” this DihedralTypeList instance. This is a
+keyword-only argument. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> (i.e., belonging to no list)</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">keyword argument list</span></dt><dd><p>All other keyword arguments passed directly to the <code class="docutils literal notranslate"><span class="pre">list</span></code> constructor</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>idx</strong></dt><dd></dd>
+<dt><strong>penalty</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(other[,&nbsp;override])</td>
-<td>Adds a DihedralType to the DihedralTypeList</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a>(other[, override])</p></td>
+<td><p>Adds a DihedralType to the DihedralTypeList</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.clear" title="parmed.topologyobjects.DihedralTypeList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>(/)</p></td>
+<td><p>Remove all items from list.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.copy" title="parmed.topologyobjects.DihedralTypeList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>(/)</p></td>
+<td><p>Return a shallow copy of the list.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.count" title="parmed.topologyobjects.DihedralTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code>(iterable, /)</p></td>
+<td><p>Extend list by appending elements from the iterable.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="parmed.topologyobjects.DihedralTypeList.from_rbtorsion"><code class="xref py py-obj docutils literal"><span class="pre">from_rbtorsion</span></code></a>(rbtorsion)</td>
-<td>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans torsion.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="parmed.topologyobjects.DihedralTypeList.from_rbtorsion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_rbtorsion</span></code></a>(rbtorsion)</p></td>
+<td><p>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans torsion.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.insert" title="parmed.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code>(index, object, /)</p></td>
+<td><p>Insert object before index.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>([index])</p></td>
+<td><p>Remove and return item at index (default last).</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code>(value, /)</p></td>
+<td><p>Remove first occurrence of value.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>(/)</p></td>
+<td><p>Reverse <em>IN PLACE</em>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>(*[, key, reverse])</p></td>
+<td><p>Stable sort <em>IN PLACE</em>.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.topologyobjects.DihedralTypeList.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.__init__" title="parmed.topologyobjects.DihedralTypeList.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.__init__" title="parmed.topologyobjects.DihedralTypeList.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(other[,&nbsp;override])</td>
-<td>Adds a DihedralType to the DihedralTypeList</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.append" title="parmed.topologyobjects.DihedralTypeList.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a>(other[, override])</p></td>
+<td><p>Adds a DihedralType to the DihedralTypeList</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.clear" title="parmed.topologyobjects.DihedralTypeList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>(/)</p></td>
+<td><p>Remove all items from list.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.copy" title="parmed.topologyobjects.DihedralTypeList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>(/)</p></td>
+<td><p>Return a shallow copy of the list.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.count" title="parmed.topologyobjects.DihedralTypeList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.extend" title="parmed.topologyobjects.DihedralTypeList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code>(iterable, /)</p></td>
+<td><p>Extend list by appending elements from the iterable.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="parmed.topologyobjects.DihedralTypeList.from_rbtorsion"><code class="xref py py-obj docutils literal"><span class="pre">from_rbtorsion</span></code></a>(rbtorsion)</td>
-<td>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans torsion.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="parmed.topologyobjects.DihedralTypeList.from_rbtorsion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_rbtorsion</span></code></a>(rbtorsion)</p></td>
+<td><p>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans torsion.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.index" title="parmed.topologyobjects.DihedralTypeList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.insert" title="parmed.topologyobjects.DihedralTypeList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code>(index, object, /)</p></td>
+<td><p>Insert object before index.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.pop" title="parmed.topologyobjects.DihedralTypeList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>([index])</p></td>
+<td><p>Remove and return item at index (default last).</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.remove" title="parmed.topologyobjects.DihedralTypeList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code>(value, /)</p></td>
+<td><p>Remove first occurrence of value.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.reverse" title="parmed.topologyobjects.DihedralTypeList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>(/)</p></td>
+<td><p>Reverse <em>IN PLACE</em>.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.DihedralTypeList.sort" title="parmed.topologyobjects.DihedralTypeList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>((key=None[,&nbsp;reverse])</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code>(*[, key, reverse])</p></td>
+<td><p>Stable sort <em>IN PLACE</em>.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.idx" title="parmed.topologyobjects.DihedralTypeList.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idx</span></code></p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.penalty" title="parmed.topologyobjects.DihedralTypeList.penalty"><code class="xref py py-obj docutils literal"><span class="pre">penalty</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>other</em>, <em>override=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.append" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a DihedralType to the DihedralTypeList</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>other</strong> : <a class="reference internal" href="parmed.topologyobjects.DihedralType.html#parmed.topologyobjects.DihedralType" title="parmed.topologyobjects.DihedralType"><code class="xref py py-class docutils literal"><span class="pre">DihedralType</span></code></a></p>
-<blockquote>
-<div><p>The DihedralType instance to add to this list. It cannot have the
-same periodicity as any other DihedralType in the list</p>
-</div></blockquote>
-<p><strong>override</strong> : bool, optional, default=False</p>
-<blockquote>
-<div><p>If True, this will override an existing torsion, but will raise a
-warning if it does so</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError if other is not an instance of :class:`DihedralTypeList`</strong></p>
-<p><strong>ParameterError if other has the same periodicity as another member in</strong></p>
-<p><strong>this list and override is False</strong></p>
-<p><strong>ParameterWarning if other has same periodicit as another member in this</strong></p>
-<p class="last"><strong>list and override is True</strong></p>
-</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.DihedralTypeList.penalty" title="parmed.topologyobjects.DihedralTypeList.penalty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">penalty</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.clear">
-<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.count">
-<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.extend" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="parmed.topologyobjects.DihedralTypeList.from_rbtorsion">
-<em class="property">classmethod </em><code class="descname">from_rbtorsion</code><span class="sig-paren">(</span><em>rbtorsion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#DihedralTypeList.from_rbtorsion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.from_rbtorsion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a Fourier series of proper torsions from a Ryckaerts-Bellemans
-torsion.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rbtorsion</strong> : RBTorsionType</p>
-<blockquote>
-<div><p>The R-B torsion type to convert to a series of proper torsions</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if all terms in rbtorsion are zero except for c0</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.pop">
-<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.reverse">
-<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.topologyobjects.DihedralTypeList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><em>key=None</em>, <em>reverse=False</em><span class="sig-paren">)</span> &rarr; None -- stable sort *IN PLACE*<a class="headerlink" href="#parmed.topologyobjects.DihedralTypeList.sort" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.topologyobjects.ImproperType.html" class="btn btn-neutral float-right" title="parmed.topologyobjects.ImproperType" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.topologyobjects.DihedralType.html" class="btn btn-neutral float-left" title="parmed.topologyobjects.DihedralType" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/topobj/parmed.topologyobjects.DihedralTypeList.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

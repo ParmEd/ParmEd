@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.unit.unit module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.unit.unit module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.unit.unit module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.unit.unit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.unit.unit">
 <span id="parmed-unit-unit-module"></span><h1>parmed.unit.unit module<a class="headerlink" href="#module-parmed.unit.unit" title="Permalink to this headline">¶</a></h1>
@@ -59,139 +175,155 @@ Medical Research, grant U54 GM072970. See <a class="reference external" href="ht
 Authors: Christopher M. Bruns
 Contributors: Peter Eastman</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the &#8220;Software&#8221;),
+copy of this software and associated documentation files (the “Software”),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED &#8220;AS IS&#8221;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.unit.unit.ScaledUnit">
-<em class="property">class </em><code class="descclassname">parmed.unit.unit.</code><code class="descname">ScaledUnit</code><span class="sig-paren">(</span><em>factor</em>, <em>master</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.unit.unit.</code><code class="sig-name descname">ScaledUnit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">factor</span></em>, <em class="sig-param"><span class="n">master</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>ScaledUnit is like a BaseUnit, but it is based on another Unit.</p>
 <p>ScaledUnit and BaseUnit are both used in the internals of Unit.  They
 should only be used during the construction of Units.</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.conversion_factor_to" title="parmed.unit.unit.ScaledUnit.conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></code></a>(other)</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.get_dimension_tuple" title="parmed.unit.unit.ScaledUnit.get_dimension_tuple"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dimension_tuple</span></code></a>()</p></td>
+<td><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.iter_base_dimensions" title="parmed.unit.unit.ScaledUnit.iter_base_dimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_base_dimensions</span></code></a>()</p></td>
+<td><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, describing the dimension of this unit.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 80%" />
+<col style="width: 20%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>conversion_factor_to</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.get_conversion_factor_to_base_units" title="parmed.unit.unit.ScaledUnit.get_conversion_factor_to_base_units"><code class="xref py py-obj docutils literal"><span class="pre">get_conversion_factor_to_base_units</span></code></a>()</td>
+<tr class="row-even"><td><p><strong>get_conversion_factor_to_base_units</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.get_dimension_tuple" title="parmed.unit.unit.ScaledUnit.get_dimension_tuple"><code class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></code></a>()</td>
-<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.iter_base_dimensions" title="parmed.unit.unit.ScaledUnit.iter_base_dimensions"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></code></a>()</td>
-<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, describing the dimension of this unit.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.ScaledUnit.iter_base_units" title="parmed.unit.unit.ScaledUnit.iter_base_units"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></code></a>()</td>
+<tr class="row-odd"><td><p><strong>iter_base_units</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.ScaledUnit.conversion_factor_to">
-<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conversion_factor_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.ScaledUnit.get_conversion_factor_to_base_units">
-<code class="descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.ScaledUnit.get_dimension_tuple">
-<code class="descname">get_dimension_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_dimension_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.ScaledUnit.iter_base_dimensions">
-<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, describing the dimension of this unit.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.ScaledUnit.iter_base_units">
-<code class="descname">iter_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.iter_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.iter_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#ScaledUnit.iter_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.ScaledUnit.iter_base_units" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.unit.unit.Unit">
-<em class="property">class </em><code class="descclassname">parmed.unit.unit.</code><code class="descname">Unit</code><span class="sig-paren">(</span><em>base_or_scaled_units</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.unit.unit.</code><code class="sig-name descname">Unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_or_scaled_units</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Physical unit such as meter or ampere.</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.conversion_factor_to" title="parmed.unit.unit.Unit.conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></code></a>(other)</td>
-<td>Returns conversion factor for computing all of the common dimensions between self and other from self base units to other base units.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.conversion_factor_to" title="parmed.unit.unit.Unit.conversion_factor_to"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conversion_factor_to</span></code></a>(other)</p></td>
+<td><p>Returns conversion factor for computing all of the common dimensions between self and other from self base units to other base units.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.create_unit" title="parmed.unit.unit.Unit.create_unit"><code class="xref py py-obj docutils literal"><span class="pre">create_unit</span></code></a>(scale,&nbsp;name,&nbsp;symbol)</td>
-<td>Convenience method for creating a new simple unit from another simple unit.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.create_unit" title="parmed.unit.unit.Unit.create_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_unit</span></code></a>(scale, name, symbol)</p></td>
+<td><p>Convenience method for creating a new simple unit from another simple unit.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.get_conversion_factor_to_base_units" title="parmed.unit.unit.Unit.get_conversion_factor_to_base_units"><code class="xref py py-obj docutils literal"><span class="pre">get_conversion_factor_to_base_units</span></code></a>()</td>
-<td>There may be ScaleUnit components to this Unit.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.get_conversion_factor_to_base_units" title="parmed.unit.unit.Unit.get_conversion_factor_to_base_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_conversion_factor_to_base_units</span></code></a>()</p></td>
+<td><p>There may be ScaleUnit components to this Unit.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.get_name" title="parmed.unit.unit.Unit.get_name"><code class="xref py py-obj docutils literal"><span class="pre">get_name</span></code></a>()</td>
-<td>Returns a unit name (string) for this Unit, composed of its various BaseUnit symbols.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.get_name" title="parmed.unit.unit.Unit.get_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_name</span></code></a>()</p></td>
+<td><p>Returns a unit name (string) for this Unit, composed of its various BaseUnit symbols.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.get_symbol" title="parmed.unit.unit.Unit.get_symbol"><code class="xref py py-obj docutils literal"><span class="pre">get_symbol</span></code></a>()</td>
-<td>Returns a unit symbol (string) for this Unit, composed of its various BaseUnit symbols.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.get_symbol" title="parmed.unit.unit.Unit.get_symbol"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_symbol</span></code></a>()</p></td>
+<td><p>Returns a unit symbol (string) for this Unit, composed of its various BaseUnit symbols.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.in_unit_system" title="parmed.unit.unit.Unit.in_unit_system"><code class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></code></a>(system)</td>
-<td>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.in_unit_system" title="parmed.unit.unit.Unit.in_unit_system"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_unit_system</span></code></a>(system)</p></td>
+<td><p>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.is_compatible" title="parmed.unit.unit.Unit.is_compatible"><code class="xref py py-obj docutils literal"><span class="pre">is_compatible</span></code></a>(other)</td>
-<td>Returns True if two Units share the same dimension.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.is_compatible" title="parmed.unit.unit.Unit.is_compatible"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_compatible</span></code></a>(other)</p></td>
+<td><p>Returns True if two Units share the same dimension.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.is_dimensionless" title="parmed.unit.unit.Unit.is_dimensionless"><code class="xref py py-obj docutils literal"><span class="pre">is_dimensionless</span></code></a>()</td>
-<td>Returns True if this Unit has no dimensions.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.is_dimensionless" title="parmed.unit.unit.Unit.is_dimensionless"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_dimensionless</span></code></a>()</p></td>
+<td><p>Returns True if this Unit has no dimensions.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.iter_all_base_units" title="parmed.unit.unit.Unit.iter_all_base_units"><code class="xref py py-obj docutils literal"><span class="pre">iter_all_base_units</span></code></a>()</td>
-<td>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits found within ScaledUnits.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.iter_all_base_units" title="parmed.unit.unit.Unit.iter_all_base_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_all_base_units</span></code></a>()</p></td>
+<td><p>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits found within ScaledUnits.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.iter_base_dimensions" title="parmed.unit.unit.Unit.iter_base_dimensions"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></code></a>()</td>
-<td>Yields (BaseDimension, exponent) tuples comprising this unit.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.iter_base_dimensions" title="parmed.unit.unit.Unit.iter_base_dimensions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_base_dimensions</span></code></a>()</p></td>
+<td><p>Yields (BaseDimension, exponent) tuples comprising this unit.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.iter_base_or_scaled_units" title="parmed.unit.unit.Unit.iter_base_or_scaled_units"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_or_scaled_units</span></code></a>()</td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.iter_top_base_units" title="parmed.unit.unit.Unit.iter_top_base_units"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_top_base_units</span></code></a>()</p></td>
+<td><p>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.iter_scaled_units" title="parmed.unit.unit.Unit.iter_scaled_units"><code class="xref py py-obj docutils literal"><span class="pre">iter_scaled_units</span></code></a>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.Unit.iter_top_base_units" title="parmed.unit.unit.Unit.iter_top_base_units"><code class="xref py py-obj docutils literal"><span class="pre">iter_top_base_units</span></code></a>()</td>
-<td>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.unit.Unit.sqrt" title="parmed.unit.unit.Unit.sqrt"><code class="xref py py-obj docutils literal"><span class="pre">sqrt</span></code></a>()</td>
-<td>Returns square root of a unit.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.unit.Unit.sqrt" title="parmed.unit.unit.Unit.sqrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqrt</span></code></a>()</p></td>
+<td><p>Returns square root of a unit.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 26%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>iter_base_or_scaled_units</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>iter_scaled_units</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.conversion_factor_to">
-<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">conversion_factor_to</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns conversion factor for computing all of the common dimensions
 between self and other from self base units to other base units.</p>
 <p>The two units need not share all of the same dimensions.  In case they
@@ -200,96 +332,95 @@ that correspond to different BaseUnits in other.</p>
 <p>This method requires strict compatibility between the two units.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.create_unit">
-<code class="descname">create_unit</code><span class="sig-paren">(</span><em>scale</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.create_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.create_unit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">create_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scale</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.create_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.create_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience method for creating a new simple unit from another simple unit.
 Both units must consist of a single BaseUnit.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.get_conversion_factor_to_base_units">
-<code class="descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_conversion_factor_to_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_conversion_factor_to_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_conversion_factor_to_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>There may be ScaleUnit components to this Unit.
 Returns conversion factor to the set of BaseUnits returned by iter_all_base_units().</p>
 <p>Units comprised of only BaseUnits return 1.0</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.get_name">
-<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_name" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a unit name (string) for this Unit, composed of its various
-BaseUnit symbols.  e.g. &#8216;kilogram meter**2 secon**-1&#8217;.</p>
+BaseUnit symbols.  e.g. ‘kilogram meter**2 secon**-1’.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.get_symbol">
-<code class="descname">get_symbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_symbol" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_symbol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.get_symbol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.get_symbol" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a unit symbol (string) for this Unit, composed of its various
-BaseUnit symbols.  e.g. &#8216;kg m**2 s**-1&#8217;</p>
+BaseUnit symbols.  e.g. ‘kg m**2 s**-1’</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.in_unit_system">
-<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_unit_system</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new Unit with the same dimensions as this one, expressed in a particular unit system.</p>
 <p>Strips off any ScaledUnits in the Unit, leaving only BaseUnits.</p>
-<dl class="docutils">
-<dt>Parameters</dt>
-<dd><ul class="first last simple">
-<li>system: a dictionary of (BaseDimension, BaseUnit) pairs</li>
+<dl class="simple">
+<dt>Parameters</dt><dd><ul class="simple">
+<li><p>system: a dictionary of (BaseDimension, BaseUnit) pairs</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.is_compatible">
-<code class="descname">is_compatible</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.is_compatible" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_compatible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.is_compatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if two Units share the same dimension.
 Returns False otherwise.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.is_dimensionless">
-<code class="descname">is_dimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.is_dimensionless" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_dimensionless</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.is_dimensionless" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if this Unit has no dimensions.
 Returns False otherwise.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.iter_all_base_units">
-<code class="descname">iter_all_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_all_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_all_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_all_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_all_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_all_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseUnit, exponent) tuples comprising this unit, including those BaseUnits
 found within ScaledUnits.</p>
 <p>There might be multiple BaseUnits with the same dimension.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.iter_base_dimensions">
-<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseDimension, exponent) tuples comprising this unit.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.iter_base_or_scaled_units">
-<code class="descname">iter_base_or_scaled_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_base_or_scaled_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_base_or_scaled_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_base_or_scaled_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_base_or_scaled_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_base_or_scaled_units" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.iter_scaled_units">
-<code class="descname">iter_scaled_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_scaled_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_scaled_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_scaled_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_scaled_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_scaled_units" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.iter_top_base_units">
-<code class="descname">iter_top_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_top_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_top_base_units" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iter_top_base_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.iter_top_base_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.iter_top_base_units" title="Permalink to this definition">¶</a></dt>
 <dd><p>Yields (BaseUnit, exponent) tuples in this Unit, excluding those within BaseUnits.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.Unit.sqrt">
-<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.sqrt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#Unit.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.Unit.sqrt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns square root of a unit.</p>
 <p>Raises ArithmeticError if component exponents are not even.
 This behavior can be changed if you present a reasonable real life case to me.</p>
@@ -297,48 +428,44 @@ This behavior can be changed if you present a reasonable real life case to me.</
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.unit.unit.UnitSystem">
-<em class="property">class </em><code class="descclassname">parmed.unit.unit.</code><code class="descname">UnitSystem</code><span class="sig-paren">(</span><em>units</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#UnitSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.UnitSystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.unit.unit.</code><code class="sig-name descname">UnitSystem</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">units</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#UnitSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.UnitSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A complete system of units defining the <em>base</em> unit in each dimension</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>units: ``list``</strong></p>
-<blockquote class="last">
-<div><p>List of base units from which to construct the unit system</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>units: ``list``</strong></dt><dd><p>List of base units from which to construct the unit system</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 62%" />
+<col style="width: 38%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.unit.UnitSystem.express_unit" title="parmed.unit.unit.UnitSystem.express_unit"><code class="xref py py-obj docutils literal"><span class="pre">express_unit</span></code></a>(old_unit)</td>
+<tbody>
+<tr class="row-odd"><td><p><strong>express_unit</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.unit.UnitSystem.express_unit">
-<code class="descname">express_unit</code><span class="sig-paren">(</span><em>old_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#UnitSystem.express_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.UnitSystem.express_unit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">express_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">old_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#UnitSystem.express_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.UnitSystem.express_unit" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.unit.unit.is_unit">
-<code class="descclassname">parmed.unit.unit.</code><code class="descname">is_unit</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#is_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.is_unit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.unit.unit.</code><code class="sig-name descname">is_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/unit.html#is_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.unit.is_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if x is a Unit, False otherwise.</p>
 <p>Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_unit</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">is_unit</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
 <span class="go">False</span>
 </pre></div>
 </div>
@@ -347,47 +474,50 @@ This behavior can be changed if you present a reasonable real life case to me.</
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.unit.unit.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

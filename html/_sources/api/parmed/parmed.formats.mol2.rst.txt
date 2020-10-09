@@ -2,6 +2,6 @@ parmed.formats.mol2 module
 ==========================
 
 .. automodule:: parmed.formats.mol2
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

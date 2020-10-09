@@ -2,6 +2,6 @@ parmed.tools.changeradii module
 ===============================
 
 .. automodule:: parmed.tools.changeradii
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

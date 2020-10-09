@@ -2,6 +2,6 @@ parmed.formats.pdbx.PdbxWriter module
 =====================================
 
 .. automodule:: parmed.formats.pdbx.PdbxWriter
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

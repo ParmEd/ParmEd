@@ -13,6 +13,7 @@ parmed.openmm.XmlFile
 
    .. autosummary::
    
+      ~XmlFile.__init__
       ~XmlFile.id_format
       ~XmlFile.parse
    

@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.rosetta.pose
 
@@ -12,6 +13,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.rosetta
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

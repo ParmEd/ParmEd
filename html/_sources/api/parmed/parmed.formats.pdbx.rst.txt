@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.formats.pdbx.PdbxContainers
    parmed.formats.pdbx.PdbxReader
@@ -14,6 +15,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.formats.pdbx
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

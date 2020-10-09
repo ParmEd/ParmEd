@@ -1,64 +1,193 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dimensional Analysis (working with parmed.unit) &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>Dimensional Analysis (working with parmed.unit) &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="parmed.unit.Quantity" href="unitobj/parmed.unit.Quantity.html" />
     <link rel="prev" title="parmed.formats.registry.load_file" href="structobj/parmed.formats.registry.load_file.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="unitobj/parmed.unit.Quantity.html" title="parmed.unit.Quantity"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="structobj/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">The core Structure class</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Working with units</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-does-parmed-unit-do">What does <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code> do?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="unitobj/parmed.unit.Quantity.html">parmed.unit.Quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unitobj/parmed.unit.is_quantity.html">parmed.unit.is_quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unitobj/parmed.unit.Unit.html">parmed.unit.Unit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unitobj/parmed.unit.BaseUnit.html">parmed.unit.BaseUnit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html">parmed.unit.UnitSystem</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#how-do-i-use-units">How do I use <code class="docutils literal notranslate"><span class="pre">units</span></code>?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#checking-to-see-if-an-object-is-a-quantity">Checking to see if an object is a <code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-units">Creating units</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#converting-to-another-unit">Converting to another unit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#converting-units-in-batch-the-unitsystem">Converting units in batch – the <code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#a-warning-about-unitsystem">A warning about <code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#available-unitsystem-options">Available <code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code> options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Dimensional Analysis (working with <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code>)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/dimensional_analysis.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="dimensional-analysis-working-with-parmed-unit">
-<h1>Dimensional Analysis (working with <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><code class="xref py py-mod docutils literal"><span class="pre">parmed.unit</span></code></a>)<a class="headerlink" href="#dimensional-analysis-working-with-parmed-unit" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> package was originally developed by Christopher M. Bruns at
-SimTK (Stanford University) for the <code class="docutils literal"><span class="pre">simtk</span></code> Python package in <a class="reference external" href="http://simtk.org/home/openmm">OpenMM</a>.</p>
+<h1>Dimensional Analysis (working with <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code></a>)<a class="headerlink" href="#dimensional-analysis-working-with-parmed-unit" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> package was originally developed by Christopher M. Bruns at
+SimTK (Stanford University) for the <code class="docutils literal notranslate"><span class="pre">simtk</span></code> Python package in <a class="reference external" href="http://simtk.org/home/openmm">OpenMM</a>.</p>
 <p>Different programs use different systems of units internally while performing
 calculations on quantities with specific dimensions. For instance, the <em>Amber</em>
 and <em>CHARMM</em> programs deal with energies in <em>kcal/mol</em> and lengths in
@@ -68,45 +197,45 @@ tend to use so-called <em>atomic</em> units, with energies in Hartrees and lengt
 Bohrs.</p>
 <p>Comparing the results between these programs requires that the results be
 converted to a common set of units beforehand. More
-importantly&#8212;interconverting these packages, or preparing common input for
+importantly—interconverting these packages, or preparing common input for
 both, requires that the input for each program conform to its expected system of
 units. Not doing so can result in <a class="reference external" href="http://www.wired.com/2010/11/1110mars-climate-observer-report/">a very costly mistake</a></p>
-<p>In all of the examples below, I will assume that the <code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> package has
+<p>In all of the examples below, I will assume that the <code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> package has
 been imported as follows:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 </pre></div>
 </div>
 <div class="section" id="what-does-parmed-unit-do">
-<h2>What does <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><code class="xref py py-mod docutils literal"><span class="pre">parmed.unit</span></code></a> do?<a class="headerlink" href="#what-does-parmed-unit-do" title="Permalink to this headline">¶</a></h2>
-<p>The main classes in the <code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> module are shown below:</p>
-<table border="1" class="longtable docutils">
+<h2>What does <a class="reference internal" href="api/parmed/parmed.unit.html#module-parmed.unit" title="parmed.unit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code></a> do?<a class="headerlink" href="#what-does-parmed-unit-do" title="Permalink to this headline">¶</a></h2>
+<p>The main classes in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> module are shown below:</p>
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-obj docutils literal"><span class="pre">Quantity</span></code></a>([value,&nbsp;unit])</td>
-<td>Physical quantity, such as 1.3 meters per second.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Quantity</span></code></a>([value, unit])</p></td>
+<td><p>Physical quantity, such as 1.3 meters per second.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><code class="xref py py-obj docutils literal"><span class="pre">is_quantity</span></code></a>(x)</td>
-<td>Returns True if x is a Quantity, False otherwise.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_quantity</span></code></a>(x)</p></td>
+<td><p>Returns True if x is a Quantity, False otherwise.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.Unit.html#parmed.unit.Unit" title="parmed.unit.Unit"><code class="xref py py-obj docutils literal"><span class="pre">Unit</span></code></a>(base_or_scaled_units)</td>
-<td>Physical unit such as meter or ampere.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="unitobj/parmed.unit.Unit.html#parmed.unit.Unit" title="parmed.unit.Unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Unit</span></code></a>(base_or_scaled_units)</p></td>
+<td><p>Physical unit such as meter or ampere.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="unitobj/parmed.unit.BaseUnit.html#parmed.unit.BaseUnit" title="parmed.unit.BaseUnit"><code class="xref py py-obj docutils literal"><span class="pre">BaseUnit</span></code></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
-<td>Physical unit expressed in exactly one BaseDimension.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="unitobj/parmed.unit.BaseUnit.html#parmed.unit.BaseUnit" title="parmed.unit.BaseUnit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseUnit</span></code></a>(base_dim, name, symbol)</p></td>
+<td><p>Physical unit expressed in exactly one BaseDimension.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-obj docutils literal"><span class="pre">UnitSystem</span></code></a>(units)</td>
-<td>A complete system of units defining the <em>base</em> unit in each dimension</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UnitSystem</span></code></a>(units)</p></td>
+<td><p>A complete system of units defining the <em>base</em> unit in each dimension</p></td>
 </tr>
 </tbody>
 </table>
-<p>The <code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> package allows you to turn <em>numbers</em> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a>,
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> package allows you to turn <em>numbers</em> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a>,
 that has both a value and a unit.  It allows you to do basic math with units and
 it automatically performs the requisite dimensional analysis, raising an
 exception if you try to illegally combine incompatible units.  For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">angstroms</span>
 <span class="go">Quantity(value=1.1, unit=nanometer)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Find the volume of a cube with side 1 cm</span>
@@ -122,10 +251,10 @@ exception if you try to illegally combine incompatible units.  For example:</p>
 </pre></div>
 </div>
 <p>Two units can be multiplied together to form a composite unit with the
-corresponding dimensionality&#8212;in the example above, cubing 1 centimeter
+corresponding dimensionality—in the example above, cubing 1 centimeter
 resulted in a volume, which is a cubic length dimension. This works for much
 more complex units as well:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilograms</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">seconds</span><span class="o">**</span><span class="mi">2</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilograms</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">seconds</span><span class="o">**</span><span class="mi">2</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span>
 <span class="go">Quantity(value=1, unit=kilogram*meter**2/(second**2))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">joule</span>
@@ -134,17 +263,17 @@ more complex units as well:</p>
 </div>
 </div>
 <div class="section" id="how-do-i-use-units">
-<h2>How do I use <code class="docutils literal"><span class="pre">units</span></code>?<a class="headerlink" href="#how-do-i-use-units" title="Permalink to this headline">¶</a></h2>
-<p>There are a variety of tasks you may want to do with units &#8211; the more popular
+<h2>How do I use <code class="docutils literal notranslate"><span class="pre">units</span></code>?<a class="headerlink" href="#how-do-i-use-units" title="Permalink to this headline">¶</a></h2>
+<p>There are a variety of tasks you may want to do with units – the more popular
 of which is shown in the sections below.</p>
 <div class="section" id="checking-to-see-if-an-object-is-a-quantity">
-<h3>Checking to see if an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a><a class="headerlink" href="#checking-to-see-if-an-object-is-a-quantity" title="Permalink to this headline">¶</a></h3>
+<h3>Checking to see if an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a><a class="headerlink" href="#checking-to-see-if-an-object-is-a-quantity" title="Permalink to this headline">¶</a></h3>
 <p>There may be times when you want to see if a Python object is a
-<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> instance, or if it is just a raw number. Many functions in
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> instance, or if it is just a raw number. Many functions in
 ParmEd do this when taking user input, converting to its internal AKMA unit
-system (see below). Checking that an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> is done using
-the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><code class="xref py py-func docutils literal"><span class="pre">is_quantity()</span></code></a> function in the <code class="docutils literal"><span class="pre">parmed.unit</span></code> namespace:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+system (see below). Checking that an object is a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> is done using
+the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#parmed.unit.is_quantity" title="parmed.unit.is_quantity"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_quantity()</span></code></a> function in the <code class="docutils literal notranslate"><span class="pre">parmed.unit</span></code> namespace:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">is_quantity</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="go">False</span>
@@ -158,16 +287,16 @@ the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#par
 <p>You can create a unit in one of two ways:</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">Use the <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> constructor, as shown below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
+<li><p>Use the <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> constructor, as shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span><span class="p">)</span>
 <span class="go">Quantity(1, nanometer)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">u</span><span class="o">.</span><span class="n">Quantity</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**-</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># You can raise units to exponents</span>
 <span class="go">Quantity(value=1, unit=/(meter**3))</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Multiply (or divide!) by a specific unit, as shown below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
+<li><p>Multiply (or divide!) by a specific unit, as shown below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">nanometers</span>
 <span class="go">Quantity(1, nanometer)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">meters</span><span class="o">**</span><span class="mi">3</span> <span class="c1"># You can raise units to exponents</span>
 <span class="go">Quantity(value=1, unit=/(meter**3))</span>
@@ -176,29 +305,29 @@ the <a class="reference internal" href="unitobj/parmed.unit.is_quantity.html#par
 </li>
 </ol>
 </div></blockquote>
-<p>Seems easy enough, and I usually use method 2 when turning a <code class="docutils literal"><span class="pre">float</span></code>, <code class="docutils literal"><span class="pre">int</span></code>,
-<code class="docutils literal"><span class="pre">list</span></code>, or <code class="docutils literal"><span class="pre">tuple</span></code> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a>.</p>
+<p>Seems easy enough, and I usually use method 2 when turning a <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>,
+<code class="docutils literal notranslate"><span class="pre">list</span></code>, or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> into a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a>.</p>
 </div>
 <div class="section" id="converting-to-another-unit">
 <h3>Converting to another unit<a class="headerlink" href="#converting-to-another-unit" title="Permalink to this headline">¶</a></h3>
 <p>Aside from using units as a type-checker to make sure you are not making an
 arithmetic mistake with your transformations, the most common reason to use the
-<code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> package is to handle unit conversions for you. The <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a>
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> package is to handle unit conversions for you. The <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a>
 class defines two functions for this:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><code class="docutils literal"><span class="pre">in_units_of(unit)</span></code>: This method returns a new <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a>
-instance with the specified <code class="docutils literal"><span class="pre">unit</span></code> (a <code class="docutils literal"><span class="pre">TypeError</span></code> is raised).</li>
-<li><code class="docutils literal"><span class="pre">value_in_unit(unit)</span></code>: This method returns a copy of the underlying
-data <em>without</em> an attached <code class="docutils literal"><span class="pre">unit</span></code> (i.e., it is <em>not</em> a
-<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> instance). This should be used when a scalar is needed
+<li><p><code class="docutils literal notranslate"><span class="pre">in_units_of(unit)</span></code>: This method returns a new <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a>
+instance with the specified <code class="docutils literal notranslate"><span class="pre">unit</span></code> (a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> is raised).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value_in_unit(unit)</span></code>: This method returns a copy of the underlying
+data <em>without</em> an attached <code class="docutils literal notranslate"><span class="pre">unit</span></code> (i.e., it is <em>not</em> a
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> instance). This should be used when a scalar is needed
 from a quantity for use in a particular API, or if the performance hit
-from the dimensional analysis is unacceptable.</li>
+from the dimensional analysis is unacceptable.</p></li>
 </ol>
 </div></blockquote>
 <p>The following example shows both of the above in action, demonstrating their
 differences:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">in_units_of</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoule</span><span class="p">)</span>
 <span class="go">Quantity(value=4.184, unit=kilojoule)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">kilojoule</span><span class="p">)</span>
@@ -207,26 +336,26 @@ differences:</p>
 </div>
 </div>
 <div class="section" id="converting-units-in-batch-the-unitsystem">
-<h3>Converting units in batch &#8211; the <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a><a class="headerlink" href="#converting-units-in-batch-the-unitsystem" title="Permalink to this headline">¶</a></h3>
-<p>The previous section described how to convert a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> into another
-<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> in a different, but <em>compatible</em> unit. The argument to
-<code class="docutils literal"><span class="pre">in_units_of</span></code> and <code class="docutils literal"><span class="pre">value_in_unit</span></code> methods <em>must</em> be a compatible unit, which
+<h3>Converting units in batch – the <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a><a class="headerlink" href="#converting-units-in-batch-the-unitsystem" title="Permalink to this headline">¶</a></h3>
+<p>The previous section described how to convert a <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> into another
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> in a different, but <em>compatible</em> unit. The argument to
+<code class="docutils literal notranslate"><span class="pre">in_units_of</span></code> and <code class="docutils literal notranslate"><span class="pre">value_in_unit</span></code> methods <em>must</em> be a compatible unit, which
 can be limiting if you want to write a function that changes the units of an
 argument with unknown dimensionality into a particular system of units.</p>
-<p>This is where <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a> comes in. Each <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> instance also
+<p>This is where <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a> comes in. Each <a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> instance also
 has a corresponding methods for conversion to units compatible within a
-particular <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a>:</p>
+particular <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a>:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><code class="docutils literal"><span class="pre">in_unit_system(UnitSystem)</span></code>: This method returns a new
-<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal"><span class="pre">Quantity</span></code></a> instance composed of the base units defined in that
-unit system.</li>
-<li><code class="docutils literal"><span class="pre">value_in_unit_system(UnitSystem)</span></code>: This method returns a scalar of the
-value in that particular unit system.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">in_unit_system(UnitSystem)</span></code>: This method returns a new
+<a class="reference internal" href="unitobj/parmed.unit.Quantity.html#parmed.unit.Quantity" title="parmed.unit.Quantity"><code class="xref py py-class docutils literal notranslate"><span class="pre">Quantity</span></code></a> instance composed of the base units defined in that
+unit system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value_in_unit_system(UnitSystem)</span></code>: This method returns a scalar of the
+value in that particular unit system.</p></li>
 </ol>
 </div></blockquote>
 <p>For example:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">u</span><span class="o">.</span><span class="n">kilocalorie</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
 <span class="go">Quantity(value=4.184, unit=nanometer**2*mole*dalton/(picosecond**2))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span><span class="o">.</span><span class="n">value_in_unit_system</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">md_unit_system</span><span class="p">)</span>
@@ -238,11 +367,11 @@ units, but it comes with some drawbacks (see below), so you should avoid unit
 system conversions when you can.</p>
 </div>
 <div class="section" id="a-warning-about-unitsystem">
-<h3>A warning about <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a><a class="headerlink" href="#a-warning-about-unitsystem" title="Permalink to this headline">¶</a></h3>
+<h3>A warning about <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a><a class="headerlink" href="#a-warning-about-unitsystem" title="Permalink to this headline">¶</a></h3>
 <p>Note that this method does not provide the added security of checking that the
-<em>dimensions</em> are correct &#8211; it simply converts all base dimensions to the ones
+<em>dimensions</em> are correct – it simply converts all base dimensions to the ones
 defining the unit system. For instance, consider the two functions below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Computes the area of a rectangle</span>
 
 <span class="sd">    Parameters</span>
@@ -267,99 +396,99 @@ defining the unit system. For instance, consider the two functions below:</p>
 </div>
 <p>As long as you provide the correct dimensions in the arguments, both functions
 yield the same result:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
 <span class="go">100000.0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">area2</span><span class="p">(</span><span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
 <span class="go">100000.0</span>
 </pre></div>
 </div>
 <p>Consider what happens if you make a small mistake, though:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">area</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
 <span class="go">9999999.999999998</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">area2</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">u</span><span class="o">.</span><span class="n">angstroms</span><span class="p">,</span> <span class="mi">1</span><span class="o">*</span><span class="n">u</span><span class="o">.</span><span class="n">millimeters</span><span class="p">)</span>
 <span class="go">TypeError: Unit &quot;/angstrom&quot; is not compatible with Unit &quot;nanometer&quot;.</span>
 </pre></div>
 </div>
-<p>Converting <code class="docutils literal"><span class="pre">1/angstrom</span></code> to the <code class="docutils literal"><span class="pre">md_unit_system</span></code> converts the value to
-<code class="docutils literal"><span class="pre">10/nanometer</span></code> (rather than <code class="docutils literal"><span class="pre">1</span> <span class="pre">angstrom</span></code> to <code class="docutils literal"><span class="pre">0.1</span> <span class="pre">nanometer</span></code>), leading to a
-result that is 2 orders of magnitude larger than expected! The <code class="docutils literal"><span class="pre">area2</span></code>
+<p>Converting <code class="docutils literal notranslate"><span class="pre">1/angstrom</span></code> to the <code class="docutils literal notranslate"><span class="pre">md_unit_system</span></code> converts the value to
+<code class="docutils literal notranslate"><span class="pre">10/nanometer</span></code> (rather than <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">angstrom</span></code> to <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">nanometer</span></code>), leading to a
+result that is 2 orders of magnitude larger than expected! The <code class="docutils literal notranslate"><span class="pre">area2</span></code>
 function catches the error and raises an exception, though, thereby making the
 mistake easier to find.</p>
 </div>
 </div>
 <div class="section" id="available-unitsystem-options">
-<h2>Available <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a> options<a class="headerlink" href="#available-unitsystem-options" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="xref py py-mod docutils literal"><span class="pre">unit</span></code> module contains a number of <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a> instances
-available in the <code class="docutils literal"><span class="pre">parmed.unit</span></code> namespace. They are summarized in the table
+<h2>Available <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a> options<a class="headerlink" href="#available-unitsystem-options" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="xref py py-mod docutils literal notranslate"><span class="pre">unit</span></code> module contains a number of <a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a> instances
+available in the <code class="docutils literal notranslate"><span class="pre">parmed.unit</span></code> namespace. They are summarized in the table
 below, along with the units defining them (the energy unit is a composite of the
 mass unit times the square of the ratio of the length-to-time units):</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="19%" />
-<col width="10%" />
-<col width="9%" />
-<col width="12%" />
-<col width="14%" />
-<col width="15%" />
-<col width="10%" />
-<col width="10%" />
+<col style="width: 19%" />
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 14%" />
+<col style="width: 15%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head"><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal"><span class="pre">UnitSystem</span></code></a></th>
-<th class="head">Length unit</th>
-<th class="head">Mass unit</th>
-<th class="head">Time unit</th>
-<th class="head">Charge unit [1]</th>
-<th class="head">Temperature unit</th>
-<th class="head">Amount unit</th>
-<th class="head">Energy unit</th>
+<thead>
+<tr class="row-odd"><th class="head"><p><a class="reference internal" href="unitobj/parmed.unit.UnitSystem.html#parmed.unit.UnitSystem" title="parmed.unit.UnitSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code></a></p></th>
+<th class="head"><p>Length unit</p></th>
+<th class="head"><p>Mass unit</p></th>
+<th class="head"><p>Time unit</p></th>
+<th class="head"><p>Charge unit [1]</p></th>
+<th class="head"><p>Temperature unit</p></th>
+<th class="head"><p>Amount unit</p></th>
+<th class="head"><p>Energy unit</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">si_unit_system</span></code></td>
-<td>meters</td>
-<td>kilograms</td>
-<td>second</td>
-<td>Ampere</td>
-<td>kelvin</td>
-<td>mole</td>
-<td>joule</td>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">si_unit_system</span></code></p></td>
+<td><p>meters</p></td>
+<td><p>kilograms</p></td>
+<td><p>second</p></td>
+<td><p>Ampere</p></td>
+<td><p>kelvin</p></td>
+<td><p>mole</p></td>
+<td><p>joule</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">cgs_unit_system</span></code></td>
-<td>centimeters</td>
-<td>gram</td>
-<td>second</td>
-<td>Ampere</td>
-<td>kelvin</td>
-<td>mole</td>
-<td>1e-7 joule</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cgs_unit_system</span></code></p></td>
+<td><p>centimeters</p></td>
+<td><p>gram</p></td>
+<td><p>second</p></td>
+<td><p>Ampere</p></td>
+<td><p>kelvin</p></td>
+<td><p>mole</p></td>
+<td><p>1e-7 joule</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">md_unit_system</span></code></td>
-<td>nanometers</td>
-<td>daltons</td>
-<td>picosecond</td>
-<td>q electron</td>
-<td>kelvin</td>
-<td>mole</td>
-<td>kilojoule</td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">md_unit_system</span></code></p></td>
+<td><p>nanometers</p></td>
+<td><p>daltons</p></td>
+<td><p>picosecond</p></td>
+<td><p>q electron</p></td>
+<td><p>kelvin</p></td>
+<td><p>mole</p></td>
+<td><p>kilojoule</p></td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">planck_unit_system</span></code></td>
-<td>pl. length</td>
-<td>pl. mass</td>
-<td>pl. time</td>
-<td>pl. charge</td>
-<td>pl. temperature</td>
-<td>item</td>
-<td>pl. energy</td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">planck_unit_system</span></code></p></td>
+<td><p>pl. length</p></td>
+<td><p>pl. mass</p></td>
+<td><p>pl. time</p></td>
+<td><p>pl. charge</p></td>
+<td><p>pl. temperature</p></td>
+<td><p>item</p></td>
+<td><p>pl. energy</p></td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
-<td>angstroms</td>
-<td>daltons</td>
-<td>akma time [2]</td>
-<td>q electron</td>
-<td>kelvin</td>
-<td>mole</td>
-<td>kilocalorie</td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
+<td><p>angstroms</p></td>
+<td><p>daltons</p></td>
+<td><p>akma time [2]</p></td>
+<td><p>q electron</p></td>
+<td><p>kelvin</p></td>
+<td><p>mole</p></td>
+<td><p>kilocalorie</p></td>
 </tr>
 </tbody>
 </table>
@@ -370,46 +499,46 @@ mass units) does not have an official name, and is roughly equal to 20.455
 picoseconds.</p>
 <p>Different programs tend to use different unit systems. As a general reference,
 the table below summarizes a subset of programs and the unit systems they use:</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="29%" />
-<col width="71%" />
+<col style="width: 29%" />
+<col style="width: 71%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Program</th>
-<th class="head">Unit System</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Program</p></th>
+<th class="head"><p>Unit System</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td>AMBER</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tbody>
+<tr class="row-even"><td><p>AMBER</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>CHARMM</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-odd"><td><p>CHARMM</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Tinker</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-even"><td><p>Tinker</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Desmond</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-odd"><td><p>Desmond</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-even"><td>LAMMPS</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-even"><td><p>LAMMPS</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>NAMD</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-odd"><td><p>NAMD</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-even"><td>AceMD</td>
-<td><code class="docutils literal"><span class="pre">akma_unit_system</span></code></td>
+<tr class="row-even"><td><p>AceMD</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">akma_unit_system</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>OpenMM</td>
-<td><code class="docutils literal"><span class="pre">md_unit_system</span></code></td>
+<tr class="row-odd"><td><p>OpenMM</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">md_unit_system</span></code></p></td>
 </tr>
-<tr class="row-even"><td>Gromacs</td>
-<td><code class="docutils literal"><span class="pre">md_unit_system</span></code></td>
+<tr class="row-even"><td><p>Gromacs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">md_unit_system</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>Gromos</td>
-<td><code class="docutils literal"><span class="pre">md_unit_system</span></code></td>
+<tr class="row-odd"><td><p>Gromos</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">md_unit_system</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -417,70 +546,59 @@ the table below summarizes a subset of programs and the unit systems they use:</
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Dimensional Analysis (working with <code class="docutils literal"><span class="pre">parmed.unit</span></code>)</a><ul>
-<li><a class="reference internal" href="#what-does-parmed-unit-do">What does <code class="docutils literal"><span class="pre">parmed.unit</span></code> do?</a></li>
-<li><a class="reference internal" href="#how-do-i-use-units">How do I use <code class="docutils literal"><span class="pre">units</span></code>?</a><ul>
-<li><a class="reference internal" href="#checking-to-see-if-an-object-is-a-quantity">Checking to see if an object is a <code class="docutils literal"><span class="pre">Quantity</span></code></a></li>
-<li><a class="reference internal" href="#creating-units">Creating units</a></li>
-<li><a class="reference internal" href="#converting-to-another-unit">Converting to another unit</a></li>
-<li><a class="reference internal" href="#converting-units-in-batch-the-unitsystem">Converting units in batch &#8211; the <code class="docutils literal"><span class="pre">UnitSystem</span></code></a></li>
-<li><a class="reference internal" href="#a-warning-about-unitsystem">A warning about <code class="docutils literal"><span class="pre">UnitSystem</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#available-unitsystem-options">Available <code class="docutils literal"><span class="pre">UnitSystem</span></code> options</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="unitobj/parmed.unit.Quantity.html" class="btn btn-neutral float-right" title="parmed.unit.Quantity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="structobj/parmed.formats.registry.load_file.html" class="btn btn-neutral float-left" title="parmed.formats.registry.load_file" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/dimensional_analysis.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="unitobj/parmed.unit.Quantity.html" title="parmed.unit.Quantity"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="structobj/parmed.formats.registry.load_file.html" title="parmed.formats.registry.load_file"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

@@ -1,229 +1,320 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.openmm.MdcrdReporter &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.openmm.MdcrdReporter &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.openmm.RestartReporter" href="parmed.openmm.RestartReporter.html" />
+    <link rel="prev" title="parmed.openmm.NetCDFReporter" href="parmed.openmm.NetCDFReporter.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#what-is-openmm">What is OpenMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#what-makes-openmm-so-awesome">What makes OpenMM so awesome?</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../openmm.html#how-does-parmed-enhance-openmm">How does ParmEd enhance OpenMM?</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.StateDataReporter.html">parmed.openmm.StateDataReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.NetCDFReporter.html">parmed.openmm.NetCDFReporter</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.openmm.MdcrdReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.RestartReporter.html">parmed.openmm.RestartReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.ProgressReporter.html">parmed.openmm.ProgressReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.XmlFile.html">parmed.openmm.XmlFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.load_topology.html">parmed.openmm.load_topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.energy_decomposition.html">parmed.openmm.energy_decomposition</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#loading-openmm-objects">Loading OpenMM Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#taking-openmm-topology-and-system-to-a-parmed-structure">Taking OpenMM <code class="docutils literal notranslate"><span class="pre">Topology</span></code> and <code class="docutils literal notranslate"><span class="pre">System</span></code> to a ParmEd <code class="docutils literal notranslate"><span class="pre">Structure</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../openmm.html">OpenMM Functionality</a> &raquo;</li>
+        
+      <li>parmed.openmm.MdcrdReporter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/openmmobj/parmed.openmm.MdcrdReporter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-openmm-mdcrdreporter">
 <h1>parmed.openmm.MdcrdReporter<a class="headerlink" href="#parmed-openmm-mdcrdreporter" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.openmm.MdcrdReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">MdcrdReporter</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.openmm.</code><code class="sig-name descname">MdcrdReporter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>MdcrdReporter prints a trajectory in ASCII Amber format. This reporter will
 be significantly slower than binary file reporters (like DCDReporter or
 NetCDFReporter).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to write the trajectory to</p>
-</div></blockquote>
-<p><strong>reportInterval</strong> : int</p>
-<blockquote>
-<div><p>Number of steps between writing trajectory frames</p>
-</div></blockquote>
-<p><strong>crds</strong> : bool=True</p>
-<blockquote>
-<div><p>Write coordinates to this trajectory file?</p>
-</div></blockquote>
-<p><strong>vels</strong> : bool=False</p>
-<blockquote>
-<div><p>Write velocities to this trajectory file?</p>
-</div></blockquote>
-<p><strong>frcs</strong> : bool=False</p>
-<blockquote class="last">
-<div><p>Write forces to this trajectory file?</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file</strong><span class="classifier">str</span></dt><dd><p>Name of the file to write the trajectory to</p>
+</dd>
+<dt><strong>reportInterval</strong><span class="classifier">int</span></dt><dd><p>Number of steps between writing trajectory frames</p>
+</dd>
+<dt><strong>crds</strong><span class="classifier">bool=True</span></dt><dd><p>Write coordinates to this trajectory file?</p>
+</dd>
+<dt><strong>vels</strong><span class="classifier">bool=False</span></dt><dd><p>Write velocities to this trajectory file?</p>
+</dd>
+<dt><strong>frcs</strong><span class="classifier">bool=False</span></dt><dd><p>Write forces to this trajectory file?</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>You can only write one of coordinates, forces, or velocities to a mdcrd
 file.</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.describeNextReport" title="parmed.openmm.MdcrdReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>
-<td>Get information about the next report this object will generate.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.describeNextReport" title="parmed.openmm.MdcrdReporter.describeNextReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describeNextReport</span></code></a>(simulation)</p></td>
+<td><p>Get information about the next report this object will generate.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.finalize" title="parmed.openmm.MdcrdReporter.finalize"><code class="xref py py-obj docutils literal"><span class="pre">finalize</span></code></a>()</td>
-<td>Closes any open file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.finalize" title="parmed.openmm.MdcrdReporter.finalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize</span></code></a>()</p></td>
+<td><p>Closes any open file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.report" title="parmed.openmm.MdcrdReporter.report"><code class="xref py py-obj docutils literal"><span class="pre">report</span></code></a>(simulation,&nbsp;state)</td>
-<td>Generate a report.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.report" title="parmed.openmm.MdcrdReporter.report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></a>(simulation, state)</p></td>
+<td><p>Generate a report.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.openmm.MdcrdReporter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>file</em>, <em>reportInterval</em>, <em>crds=True</em>, <em>vels=False</em>, <em>frcs=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span></em>, <em class="sig-param"><span class="n">reportInterval</span></em>, <em class="sig-param"><span class="n">crds</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">vels</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">frcs</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.__init__" title="parmed.openmm.MdcrdReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(file,&nbsp;reportInterval[,&nbsp;crds,&nbsp;vels,&nbsp;...])</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.openmm.MdcrdReporter.__init__" title="parmed.openmm.MdcrdReporter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(file, reportInterval[, crds, vels, …])</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.describeNextReport" title="parmed.openmm.MdcrdReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>
-<td>Get information about the next report this object will generate.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.describeNextReport" title="parmed.openmm.MdcrdReporter.describeNextReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describeNextReport</span></code></a>(simulation)</p></td>
+<td><p>Get information about the next report this object will generate.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.finalize" title="parmed.openmm.MdcrdReporter.finalize"><code class="xref py py-obj docutils literal"><span class="pre">finalize</span></code></a>()</td>
-<td>Closes any open file</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.finalize" title="parmed.openmm.MdcrdReporter.finalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize</span></code></a>()</p></td>
+<td><p>Closes any open file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.MdcrdReporter.report" title="parmed.openmm.MdcrdReporter.report"><code class="xref py py-obj docutils literal"><span class="pre">report</span></code></a>(simulation,&nbsp;state)</td>
-<td>Generate a report.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.openmm.MdcrdReporter.describeNextReport">
-<code class="descname">describeNextReport</code><span class="sig-paren">(</span><em>simulation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get information about the next report this object will generate.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <code class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></code></p>
-<blockquote>
-<div><p>The Simulation to generate a report for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
-<blockquote class="last">
-<div><p>nsteps is the number of steps until the next report
-pos, vel, frc, and ene are flags indicating whether positions,
-velocities, forces, and/or energies are needed from the Context</p>
-</div></blockquote>
-</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.MdcrdReporter.report" title="parmed.openmm.MdcrdReporter.report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></a>(simulation, state)</p></td>
+<td><p>Generate a report.</p></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.openmm.MdcrdReporter.finalize">
-<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter.finalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter.finalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes any open file</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.openmm.MdcrdReporter.report">
-<code class="descname">report</code><span class="sig-paren">(</span><em>simulation</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#MdcrdReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.MdcrdReporter.report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a report.</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd><ul class="first last simple">
-<li>simulation (Simulation) The Simulation to generate a report for</li>
-<li>state (State) The current state of the simulation</li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.openmm.RestartReporter.html" class="btn btn-neutral float-right" title="parmed.openmm.RestartReporter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.openmm.NetCDFReporter.html" class="btn btn-neutral float-left" title="parmed.openmm.NetCDFReporter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/openmmobj/parmed.openmm.MdcrdReporter.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../openmm.html" >OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

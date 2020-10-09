@@ -1,7 +1,7 @@
-parmed.unit.unit_operators module
-=================================
+parmed.unit.unit\_operators module
+==================================
 
 .. automodule:: parmed.unit.unit_operators
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

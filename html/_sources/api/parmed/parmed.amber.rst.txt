@@ -5,13 +5,15 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    parmed.amber.mdin
+   parmed.amber.mdin
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.amber.amberformat
    parmed.amber.asciicrd
@@ -26,6 +28,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.amber
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

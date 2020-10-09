@@ -1,84 +1,197 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.openmm.topsystem &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.openmm.topsystem &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>parmed.openmm.topsystem</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.openmm.topsystem</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Convert an OpenMM Topology into a Structure instance, optionally filling in</span>
 <span class="sd">parameters from a System</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
-<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">OpenMMWarning</span>
-<span class="kn">from</span> <span class="nn">..formats</span> <span class="k">import</span> <span class="n">load_file</span>
-<span class="kn">from</span> <span class="nn">..geometry</span> <span class="k">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
-<span class="kn">from</span> <span class="nn">..periodic_table</span> <span class="k">import</span> <span class="n">Element</span>
-<span class="kn">from</span> <span class="nn">..structure</span> <span class="k">import</span> <span class="n">Structure</span>
-<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="k">import</span> <span class="p">(</span><span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="kn">import</span> <span class="n">OpenMMWarning</span>
+<span class="kn">from</span> <span class="nn">..formats</span> <span class="kn">import</span> <span class="n">load_file</span>
+<span class="kn">from</span> <span class="nn">..geometry</span> <span class="kn">import</span> <span class="n">box_vectors_to_lengths_and_angles</span>
+<span class="kn">from</span> <span class="nn">..periodic_table</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">..structure</span> <span class="kn">import</span> <span class="n">Structure</span>
+<span class="kn">from</span> <span class="nn">..topologyobjects</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Angle</span><span class="p">,</span> <span class="n">AngleType</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">AtomType</span><span class="p">,</span> <span class="n">Bond</span><span class="p">,</span> <span class="n">BondType</span><span class="p">,</span> <span class="n">Cmap</span><span class="p">,</span> <span class="n">CmapType</span><span class="p">,</span>
                                <span class="n">Dihedral</span><span class="p">,</span> <span class="n">DihedralType</span><span class="p">,</span> <span class="n">ExtraPoint</span><span class="p">,</span> <span class="n">Improper</span><span class="p">,</span> <span class="n">ImproperType</span><span class="p">,</span>
                                <span class="n">NonbondedException</span><span class="p">,</span> <span class="n">NonbondedExceptionType</span><span class="p">,</span> <span class="n">RBTorsionType</span><span class="p">,</span>
                                <span class="n">UreyBradley</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">..utils.decorators</span> <span class="k">import</span> <span class="n">needs_openmm</span>
-<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="k">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
-<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="k">import</span> <span class="nb">range</span>
+<span class="kn">from</span> <span class="nn">..utils.decorators</span> <span class="kn">import</span> <span class="n">needs_openmm</span>
+<span class="kn">from</span> <span class="nn">..utils.six</span> <span class="kn">import</span> <span class="n">integer_types</span><span class="p">,</span> <span class="n">iteritems</span><span class="p">,</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">..utils.six.moves</span> <span class="kn">import</span> <span class="nb">range</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;load_topology&#39;</span><span class="p">]</span>
 
 
-<span class="nd">@needs_openmm</span>
-<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.load_topology.html#parmed.openmm.load_topology">[docs]</a><span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="load_topology"><a class="viewcode-back" href="../../../openmmobj/parmed.openmm.load_topology.html#parmed.openmm.load_topology">[docs]</a><span class="nd">@needs_openmm</span>
+<span class="k">def</span> <span class="nf">load_topology</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xyz</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condense_atom_types</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a :class:`parmed.structure.Structure` instance from an OpenMM</span>
 <span class="sd">    Topology, optionally filling in parameters from a System</span>
@@ -98,6 +211,10 @@
 <span class="sd">        information unless ``box`` (below) is also specified</span>
 <span class="sd">    box : array of 6 floats</span>
 <span class="sd">        Unit cell dimensions</span>
+<span class="sd">    condense_atom_types : bool, default=True</span>
+<span class="sd">        If True, create unique atom types based on de-duplicating properties. If False,</span>
+<span class="sd">        create one atom type for each atom in the system, even if its properties match</span>
+<span class="sd">        an existing atom type.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -141,7 +258,11 @@
                 <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">element</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">atom</span> <span class="o">=</span> <span class="n">ExtraPoint</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">atype</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">aid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="n">aid</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span>
+                    <span class="n">atype</span> <span class="o">=</span> <span class="n">aid</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">aid</span><span class="p">,</span> <span class="n">integer_types</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
                     <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">(</span><span class="n">atomic_number</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">,</span>
                                 <span class="n">name</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">mass</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">atype</span><span class="p">)</span>
                 <span class="n">struct</span><span class="o">.</span><span class="n">add_atom</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">residue</span><span class="p">,</span> <span class="n">resid</span><span class="p">,</span> <span class="n">chain</span><span class="p">)</span>
@@ -226,12 +347,12 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">CMAPTorsionForce</span><span class="p">):</span>
             <span class="n">_process_cmap</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">mm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="p">):</span>
-            <span class="n">_process_nonbonded</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">)</span>
+            <span class="n">_process_nonbonded</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">condense_atom_types</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">force</span><span class="p">,</span> <span class="n">ignored_forces</span><span class="p">):</span>
             <span class="k">continue</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unsupported Force type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unsupported Force type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
         <span class="n">processed_forces</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">force</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">struct</span></div>
@@ -419,7 +540,7 @@
             <span class="n">struct</span><span class="o">.</span><span class="n">cmap_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmap_type</span><span class="p">)</span>
     <span class="n">struct</span><span class="o">.</span><span class="n">cmap_types</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">_process_nonbonded</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_process_nonbonded</span><span class="p">(</span><span class="n">struct</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">condense_atom_types</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Adds nonbonded parameters to the structure &quot;&quot;&quot;</span>
     <span class="n">typemap</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="n">element_typemap</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
@@ -430,7 +551,7 @@
         <span class="n">atype_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span>
                       <span class="k">else</span> <span class="n">Element</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">atomic_number</span><span class="p">])</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">atype_name</span><span class="p">,</span> <span class="n">sig</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">eps</span><span class="o">.</span><span class="n">_value</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typemap</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typemap</span> <span class="ow">and</span> <span class="n">condense_atom_types</span><span class="p">:</span>
             <span class="n">atom_type</span> <span class="o">=</span> <span class="n">typemap</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
@@ -472,56 +593,77 @@
         <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">q</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t scale charge product 0 to match </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">q</span><span class="p">)</span>
-            <span class="n">chgscale</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">chgscale</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">nbtype</span> <span class="o">=</span> <span class="n">NonbondedExceptionType</span><span class="p">(</span><span class="n">sig</span><span class="o">*</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">),</span> <span class="n">eps</span><span class="p">,</span> <span class="n">chgscale</span><span class="p">)</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">adjusts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">NonbondedException</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">nbtype</span><span class="p">))</span>
         <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nbtype</span><span class="p">)</span>
     <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="o">.</span><span class="n">claim</span><span class="p">()</span>
+    <span class="c1"># Go through all adjust_types and replace any chgscale values that are None with the first</span>
+    <span class="c1"># non-None value present. If all are None, set all to 1.0. This way we maximize the likelihood</span>
+    <span class="c1"># that all generated systems have 1 scaling factor which makes it easier to translate to other</span>
+    <span class="c1"># formats that may not support multiple scaling factors in electrostatic scaling (like GROMACS)</span>
+    <span class="n">first_scaling_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">adjust_type</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">adjust_type</span><span class="o">.</span><span class="n">chgscale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">first_scaling_factor</span> <span class="o">=</span> <span class="n">adjust_type</span><span class="o">.</span><span class="n">chgscale</span>
+            <span class="k">break</span>
+    <span class="c1"># Now go through and set all Nones to first_scaling_factor</span>
+    <span class="k">for</span> <span class="n">adjust_type</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">adjust_types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">adjust_type</span><span class="o">.</span><span class="n">chgscale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">adjust_type</span><span class="o">.</span><span class="n">chgscale</span> <span class="o">=</span> <span class="n">first_scaling_factor</span>
 
     <span class="c1"># Check that all of our exceptions are accounted for</span>
     <span class="k">for</span> <span class="n">ai</span><span class="p">,</span> <span class="n">exceptions</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">bond_graph_exceptions</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">exceptions</span> <span class="o">-</span> <span class="n">explicit_exceptions</span><span class="p">[</span><span class="n">ai</span><span class="p">]:</span>
             <span class="n">struct</span><span class="o">.</span><span class="n">unknown_functional</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Detected incomplete exceptions. Not supported.&#39;</span><span class="p">,</span>
-                          <span class="n">OpenMMWarning</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Detected incomplete exceptions. Not supported.&#39;</span><span class="p">,</span> <span class="n">OpenMMWarning</span><span class="p">)</span>
             <span class="k">break</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

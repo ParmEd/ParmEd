@@ -1,52 +1,165 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.periodic_table &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.periodic_table &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>parmed.periodic_table</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.periodic_table</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
@@ -89,8 +202,8 @@
               <span class="s1">&#39;Pa&#39;</span> <span class="p">:</span> <span class="mi">91</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span>  <span class="p">:</span> <span class="mi">92</span><span class="p">,</span> <span class="s1">&#39;Np&#39;</span> <span class="p">:</span> <span class="mi">93</span><span class="p">,</span> <span class="s1">&#39;Pu&#39;</span> <span class="p">:</span> <span class="mi">94</span><span class="p">,</span> <span class="s1">&#39;Am&#39;</span> <span class="p">:</span> <span class="mi">95</span><span class="p">,</span> <span class="s1">&#39;Cm&#39;</span> <span class="p">:</span> <span class="mi">96</span><span class="p">,</span>
               <span class="s1">&#39;Bk&#39;</span> <span class="p">:</span> <span class="mi">97</span><span class="p">,</span> <span class="s1">&#39;Cf&#39;</span> <span class="p">:</span> <span class="mi">98</span><span class="p">,</span> <span class="s1">&#39;Es&#39;</span> <span class="p">:</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">&#39;Fm&#39;</span> <span class="p">:</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;Md&#39;</span> <span class="p">:</span><span class="mi">101</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span> <span class="p">:</span><span class="mi">102</span><span class="p">,</span>
               <span class="s1">&#39;Lr&#39;</span> <span class="p">:</span><span class="mi">103</span><span class="p">,</span> <span class="s1">&#39;Rf&#39;</span> <span class="p">:</span><span class="mi">104</span><span class="p">,</span> <span class="s1">&#39;Db&#39;</span> <span class="p">:</span><span class="mi">105</span><span class="p">,</span> <span class="s1">&#39;Sg&#39;</span> <span class="p">:</span><span class="mi">106</span><span class="p">,</span> <span class="s1">&#39;Bh&#39;</span> <span class="p">:</span><span class="mi">107</span><span class="p">,</span> <span class="s1">&#39;Hs&#39;</span> <span class="p">:</span><span class="mi">108</span><span class="p">,</span>
-              <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span><span class="mi">109</span><span class="p">,</span> <span class="s1">&#39;Ds&#39;</span> <span class="p">:</span><span class="mi">110</span><span class="p">,</span> <span class="s1">&#39;Rg&#39;</span> <span class="p">:</span><span class="mi">111</span><span class="p">,</span> <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span><span class="mi">112</span><span class="p">,</span> <span class="s1">&#39;Uut&#39;</span><span class="p">:</span><span class="mi">113</span><span class="p">,</span> <span class="s1">&#39;Uuq&#39;</span><span class="p">:</span><span class="mi">114</span><span class="p">,</span>
-              <span class="s1">&#39;Uup&#39;</span><span class="p">:</span><span class="mi">115</span><span class="p">,</span> <span class="s1">&#39;Uuh&#39;</span><span class="p">:</span><span class="mi">116</span><span class="p">,</span> <span class="s1">&#39;Uus&#39;</span><span class="p">:</span><span class="mi">117</span><span class="p">,</span> <span class="s1">&#39;Uuo&#39;</span><span class="p">:</span><span class="mi">118</span><span class="p">,</span> <span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">,</span> <span class="s1">&#39;LP&#39;</span> <span class="p">:</span>  <span class="mi">0</span><span class="p">,</span>
+              <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span><span class="mi">109</span><span class="p">,</span> <span class="s1">&#39;Ds&#39;</span> <span class="p">:</span><span class="mi">110</span><span class="p">,</span> <span class="s1">&#39;Rg&#39;</span> <span class="p">:</span><span class="mi">111</span><span class="p">,</span> <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span><span class="mi">112</span><span class="p">,</span> <span class="s1">&#39;Nh&#39;</span> <span class="p">:</span><span class="mi">113</span><span class="p">,</span> <span class="s1">&#39;Fl&#39;</span> <span class="p">:</span><span class="mi">114</span><span class="p">,</span>
+              <span class="s1">&#39;Mc&#39;</span> <span class="p">:</span><span class="mi">115</span><span class="p">,</span> <span class="s1">&#39;Lv&#39;</span> <span class="p">:</span><span class="mi">116</span><span class="p">,</span> <span class="s1">&#39;Ts&#39;</span> <span class="p">:</span><span class="mi">117</span><span class="p">,</span> <span class="s1">&#39;Og&#39;</span> <span class="p">:</span><span class="mi">118</span><span class="p">,</span> <span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="mi">0</span> <span class="p">,</span> <span class="s1">&#39;LP&#39;</span> <span class="p">:</span>  <span class="mi">0</span><span class="p">,</span>
               <span class="s1">&#39;Lp&#39;</span> <span class="p">:</span>  <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Ep&#39;</span> <span class="p">:</span>  <span class="mi">0</span><span class="p">}</span>
 
 <span class="n">Element</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;EP&#39;</span><span class="p">,</span>
@@ -103,7 +216,7 @@
             <span class="s1">&#39;Ta&#39;</span><span class="p">,</span><span class="s1">&#39;W&#39;</span> <span class="p">,</span><span class="s1">&#39;Re&#39;</span><span class="p">,</span><span class="s1">&#39;Os&#39;</span><span class="p">,</span><span class="s1">&#39;Ir&#39;</span><span class="p">,</span><span class="s1">&#39;Pt&#39;</span><span class="p">,</span><span class="s1">&#39;Au&#39;</span><span class="p">,</span><span class="s1">&#39;Hg&#39;</span><span class="p">,</span><span class="s1">&#39;Tl&#39;</span><span class="p">,</span><span class="s1">&#39;Pb&#39;</span><span class="p">,</span><span class="s1">&#39;Bi&#39;</span><span class="p">,</span><span class="s1">&#39;Po&#39;</span><span class="p">,</span>
             <span class="s1">&#39;At&#39;</span><span class="p">,</span><span class="s1">&#39;Rn&#39;</span><span class="p">,</span><span class="s1">&#39;Fr&#39;</span><span class="p">,</span><span class="s1">&#39;Ra&#39;</span><span class="p">,</span><span class="s1">&#39;Ac&#39;</span><span class="p">,</span><span class="s1">&#39;Th&#39;</span><span class="p">,</span><span class="s1">&#39;Pa&#39;</span><span class="p">,</span><span class="s1">&#39;U&#39;</span> <span class="p">,</span><span class="s1">&#39;Np&#39;</span><span class="p">,</span><span class="s1">&#39;Pu&#39;</span><span class="p">,</span><span class="s1">&#39;Am&#39;</span><span class="p">,</span><span class="s1">&#39;Cm&#39;</span><span class="p">,</span>
             <span class="s1">&#39;Bk&#39;</span><span class="p">,</span><span class="s1">&#39;Cf&#39;</span><span class="p">,</span><span class="s1">&#39;Es&#39;</span><span class="p">,</span><span class="s1">&#39;Fm&#39;</span><span class="p">,</span><span class="s1">&#39;Md&#39;</span><span class="p">,</span><span class="s1">&#39;No&#39;</span><span class="p">,</span><span class="s1">&#39;Lr&#39;</span><span class="p">,</span><span class="s1">&#39;Rf&#39;</span><span class="p">,</span><span class="s1">&#39;Db&#39;</span><span class="p">,</span><span class="s1">&#39;Sg&#39;</span><span class="p">,</span><span class="s1">&#39;Bh&#39;</span><span class="p">,</span><span class="s1">&#39;Hs&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Mt&#39;</span><span class="p">,</span><span class="s1">&#39;Ds&#39;</span><span class="p">,</span><span class="s1">&#39;Rg&#39;</span><span class="p">,</span><span class="s1">&#39;Cn&#39;</span><span class="p">,</span><span class="s1">&#39;Uut&#39;</span><span class="p">,</span><span class="s1">&#39;Uuq&#39;</span><span class="p">,</span><span class="s1">&#39;Uup&#39;</span><span class="p">,</span><span class="s1">&#39;Uuh&#39;</span><span class="p">,</span><span class="s1">&#39;Uus&#39;</span><span class="p">,</span><span class="s1">&#39;Uuo&#39;</span> <span class="p">]</span>
+            <span class="s1">&#39;Mt&#39;</span><span class="p">,</span><span class="s1">&#39;Ds&#39;</span><span class="p">,</span><span class="s1">&#39;Rg&#39;</span><span class="p">,</span><span class="s1">&#39;Cn&#39;</span><span class="p">,</span><span class="s1">&#39;Nh&#39;</span><span class="p">,</span><span class="s1">&#39;Fl&#39;</span><span class="p">,</span><span class="s1">&#39;Mc&#39;</span><span class="p">,</span><span class="s1">&#39;Lv&#39;</span><span class="p">,</span><span class="s1">&#39;Ts&#39;</span><span class="p">,</span><span class="s1">&#39;Og&#39;</span> <span class="p">]</span>
 
 <span class="n">Mass</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;H&#39;</span>  <span class="p">:</span>   <span class="mf">1.0079</span> <span class="p">,</span> <span class="s1">&#39;He&#39;</span> <span class="p">:</span>   <span class="mf">4.0026</span> <span class="p">,</span> <span class="s1">&#39;Li&#39;</span> <span class="p">:</span>   <span class="mf">6.941</span>  <span class="p">,</span>
          <span class="s1">&#39;Be&#39;</span> <span class="p">:</span>   <span class="mf">9.0122</span> <span class="p">,</span> <span class="s1">&#39;B&#39;</span>  <span class="p">:</span>  <span class="mf">10.811</span>  <span class="p">,</span> <span class="s1">&#39;C&#39;</span>  <span class="p">:</span>  <span class="mf">12.0107</span> <span class="p">,</span>
@@ -142,9 +255,9 @@
          <span class="s1">&#39;Lr&#39;</span> <span class="p">:</span> <span class="mf">262.</span>     <span class="p">,</span> <span class="s1">&#39;Rf&#39;</span> <span class="p">:</span> <span class="mf">261.</span>     <span class="p">,</span> <span class="s1">&#39;Db&#39;</span> <span class="p">:</span> <span class="mf">262.</span>     <span class="p">,</span>
          <span class="s1">&#39;Sg&#39;</span> <span class="p">:</span> <span class="mf">266.</span>     <span class="p">,</span> <span class="s1">&#39;Bh&#39;</span> <span class="p">:</span> <span class="mf">264.</span>     <span class="p">,</span> <span class="s1">&#39;Hs&#39;</span> <span class="p">:</span> <span class="mf">277.</span>     <span class="p">,</span>
          <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span> <span class="mf">268.</span>     <span class="p">,</span> <span class="s1">&#39;Ds&#39;</span> <span class="p">:</span> <span class="mf">281.</span>     <span class="p">,</span> <span class="s1">&#39;Rg&#39;</span> <span class="p">:</span> <span class="mf">272.</span>     <span class="p">,</span>
-         <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="mf">285.</span>     <span class="p">,</span> <span class="s1">&#39;Uut&#39;</span><span class="p">:</span> <span class="mf">284.</span>     <span class="p">,</span> <span class="s1">&#39;Uuq&#39;</span><span class="p">:</span> <span class="mf">289.</span>     <span class="p">,</span>
-         <span class="s1">&#39;Uup&#39;</span><span class="p">:</span> <span class="mf">288.</span>     <span class="p">,</span> <span class="s1">&#39;Uuh&#39;</span><span class="p">:</span> <span class="mf">292.</span>     <span class="p">,</span> <span class="s1">&#39;Uus&#39;</span><span class="p">:</span> <span class="mf">291.</span>     <span class="p">,</span>
-         <span class="s1">&#39;Uuo&#39;</span><span class="p">:</span> <span class="mf">294.</span>     <span class="p">,</span> <span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="mf">0.000000</span> <span class="p">}</span>
+         <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="mf">285.</span>     <span class="p">,</span> <span class="s1">&#39;Nh&#39;</span> <span class="p">:</span> <span class="mf">286.</span>     <span class="p">,</span> <span class="s1">&#39;Fl&#39;</span> <span class="p">:</span> <span class="mf">289.</span>     <span class="p">,</span>
+         <span class="s1">&#39;Mc&#39;</span> <span class="p">:</span> <span class="mf">289.</span>     <span class="p">,</span> <span class="s1">&#39;Lv&#39;</span> <span class="p">:</span> <span class="mf">293.</span>     <span class="p">,</span> <span class="s1">&#39;Ts&#39;</span> <span class="p">:</span> <span class="mf">294.</span>     <span class="p">,</span>
+         <span class="s1">&#39;Og&#39;</span> <span class="p">:</span> <span class="mf">294.</span>     <span class="p">,</span> <span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="mf">0.000000</span> <span class="p">}</span>
 
 <span class="n">Name</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;H&#39;</span>  <span class="p">:</span> <span class="s1">&#39;Hydrogen&#39;</span>     <span class="p">,</span><span class="s1">&#39;He&#39;</span> <span class="p">:</span> <span class="s1">&#39;Helium&#39;</span>       <span class="p">,</span><span class="s1">&#39;Li&#39;</span> <span class="p">:</span> <span class="s1">&#39;Lithium&#39;</span>      <span class="p">,</span>
          <span class="s1">&#39;Be&#39;</span> <span class="p">:</span> <span class="s1">&#39;Beryllium&#39;</span>    <span class="p">,</span><span class="s1">&#39;B&#39;</span>  <span class="p">:</span> <span class="s1">&#39;Boron&#39;</span>        <span class="p">,</span><span class="s1">&#39;C&#39;</span>  <span class="p">:</span> <span class="s1">&#39;Carbon&#39;</span>       <span class="p">,</span>
@@ -183,9 +296,9 @@
          <span class="s1">&#39;Lr&#39;</span> <span class="p">:</span> <span class="s1">&#39;Lawrencium&#39;</span>   <span class="p">,</span><span class="s1">&#39;Rf&#39;</span> <span class="p">:</span> <span class="s1">&#39;Rutherfordium&#39;</span><span class="p">,</span><span class="s1">&#39;Db&#39;</span> <span class="p">:</span> <span class="s1">&#39;Dubnium&#39;</span>      <span class="p">,</span>
          <span class="s1">&#39;Sg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Seaborgium&#39;</span>   <span class="p">,</span><span class="s1">&#39;Bh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Bohrium&#39;</span>      <span class="p">,</span><span class="s1">&#39;Hs&#39;</span> <span class="p">:</span> <span class="s1">&#39;Hassium&#39;</span>      <span class="p">,</span>
          <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span> <span class="s1">&#39;Meitnerium&#39;</span>   <span class="p">,</span><span class="s1">&#39;Ds&#39;</span> <span class="p">:</span> <span class="s1">&#39;Darmstadtium&#39;</span> <span class="p">,</span><span class="s1">&#39;Rg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Roentgenium&#39;</span>  <span class="p">,</span>
-         <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Copernicium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Uut&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununtrium&#39;</span>    <span class="p">,</span><span class="s1">&#39;Uuq&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununquadium&#39;</span>  <span class="p">,</span>
-         <span class="s1">&#39;Uup&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununpentium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Uuh&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununhexium&#39;</span>   <span class="p">,</span><span class="s1">&#39;Uus&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununseptium&#39;</span>  <span class="p">,</span>
-         <span class="s1">&#39;Uuo&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununoctium&#39;</span>   <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span><span class="s1">&#39;LP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span>
+         <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Copernicium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Nh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Nihonium&#39;</span>     <span class="p">,</span><span class="s1">&#39;Fl&#39;</span> <span class="p">:</span> <span class="s1">&#39;Flerovium&#39;</span>    <span class="p">,</span>
+         <span class="s1">&#39;Mc&#39;</span> <span class="p">:</span> <span class="s1">&#39;Moscovium&#39;</span>    <span class="p">,</span><span class="s1">&#39;Lv&#39;</span> <span class="p">:</span> <span class="s1">&#39;Livermorium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Ts&#39;</span> <span class="p">:</span> <span class="s1">&#39;Tennessine&#39;</span>   <span class="p">,</span>
+         <span class="s1">&#39;Og&#39;</span> <span class="p">:</span> <span class="s1">&#39;Oganesson&#39;</span>    <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span><span class="s1">&#39;LP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span>
          <span class="s1">&#39;Ep&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span><span class="s1">&#39;Lp&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span><span class="p">}</span>
 
 <span class="n">OriginName</span> <span class="o">=</span> <span class="p">{</span>
@@ -226,9 +339,9 @@
         <span class="s1">&#39;Lr&#39;</span> <span class="p">:</span> <span class="s1">&#39;Lawrencium&#39;</span> <span class="p">,</span><span class="s1">&#39;Rf&#39;</span> <span class="p">:</span> <span class="s1">&#39;Rutherfordium&#39;</span><span class="p">,</span><span class="s1">&#39;Db&#39;</span> <span class="p">:</span> <span class="s1">&#39;Dubnium&#39;</span>      <span class="p">,</span>
         <span class="s1">&#39;Sg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Seaborgium&#39;</span> <span class="p">,</span><span class="s1">&#39;Bh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Bohrium&#39;</span>      <span class="p">,</span><span class="s1">&#39;Hs&#39;</span> <span class="p">:</span> <span class="s1">&#39;Hassium&#39;</span>      <span class="p">,</span>
         <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span> <span class="s1">&#39;Meitnerium&#39;</span> <span class="p">,</span><span class="s1">&#39;Ds&#39;</span> <span class="p">:</span> <span class="s1">&#39;Darmstadtium&#39;</span> <span class="p">,</span><span class="s1">&#39;Rg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Roentgenium&#39;</span>  <span class="p">,</span>
-        <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Copernicium&#39;</span><span class="p">,</span><span class="s1">&#39;Uut&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununtrium&#39;</span>    <span class="p">,</span><span class="s1">&#39;Uuq&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununquadium&#39;</span>  <span class="p">,</span>
-        <span class="s1">&#39;Uup&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununpentium&#39;</span><span class="p">,</span><span class="s1">&#39;Uuh&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununhexium&#39;</span>   <span class="p">,</span><span class="s1">&#39;Uus&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununseptium&#39;</span>  <span class="p">,</span>
-        <span class="s1">&#39;Uuo&#39;</span><span class="p">:</span> <span class="s1">&#39;Ununoctium&#39;</span> <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span><span class="s1">&#39;LP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span>
+        <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Copernicium&#39;</span><span class="p">,</span><span class="s1">&#39;Nh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Nihonium&#39;</span>     <span class="p">,</span><span class="s1">&#39;Fl&#39;</span> <span class="p">:</span> <span class="s1">&#39;Flerovium&#39;</span>    <span class="p">,</span>
+        <span class="s1">&#39;Mc&#39;</span> <span class="p">:</span> <span class="s1">&#39;Moscovium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Lv&#39;</span> <span class="p">:</span> <span class="s1">&#39;Livermorium&#39;</span>  <span class="p">,</span><span class="s1">&#39;Ts&#39;</span> <span class="p">:</span> <span class="s1">&#39;Tennessine&#39;</span>   <span class="p">,</span>
+        <span class="s1">&#39;Og&#39;</span> <span class="p">:</span> <span class="s1">&#39;Oganesson&#39;</span>  <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span><span class="s1">&#39;LP&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>  <span class="p">,</span>
         <span class="s1">&#39;Ep&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span><span class="p">,</span><span class="s1">&#39;Lp&#39;</span> <span class="p">:</span> <span class="s1">&#39;Extra Point&#39;</span>
 <span class="p">}</span>
 
@@ -269,9 +382,9 @@
           <span class="s1">&#39;Lr&#39;</span> <span class="p">:</span> <span class="s1">&#39;Solid&#39;</span>        <span class="p">,</span><span class="s1">&#39;Rf&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Db&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
           <span class="s1">&#39;Sg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Bh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Hs&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
           <span class="s1">&#39;Mt&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Ds&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Rg&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
-          <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Uut&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Uuq&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
-          <span class="s1">&#39;Uup&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Uuh&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Uus&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
-          <span class="s1">&#39;Uuo&#39;</span><span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>          <span class="p">,</span><span class="s1">&#39;Ep&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>          <span class="p">,</span>
+          <span class="s1">&#39;Cn&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Nh&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Fl&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
+          <span class="s1">&#39;Mc&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Lv&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;Ts&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span>
+          <span class="s1">&#39;Og&#39;</span> <span class="p">:</span> <span class="s1">&#39;Unknown&#39;</span>      <span class="p">,</span><span class="s1">&#39;EP&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>          <span class="p">,</span><span class="s1">&#39;Ep&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>          <span class="p">,</span>
           <span class="s1">&#39;LP&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>          <span class="p">,</span><span class="s1">&#39;Lp&#39;</span> <span class="p">:</span> <span class="s1">&#39;N/A&#39;</span>
 <span class="p">}</span>
 
@@ -350,43 +463,57 @@
             <span class="n">atomic_number</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># give up</span>
 
     <span class="k">return</span> <span class="n">Element</span><span class="p">[</span><span class="n">atomic_number</span><span class="p">]</span></div>
+
+<span class="c1"># Add some mass aliases here. We need to do it *after* _sorted_masses is created above, since</span>
+<span class="c1"># the element_by_mass routine which uses the _sorted_masses assumes that the masses are all</span>
+<span class="c1"># monotonically strictly increasing</span>
+<span class="n">Mass</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">Ep</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">LP</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">Lp</span><span class="o">=</span><span class="mf">0.0</span><span class="p">))</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

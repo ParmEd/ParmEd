@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.tinker.parameterfile
    parmed.tinker.system
@@ -15,6 +16,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.tinker
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

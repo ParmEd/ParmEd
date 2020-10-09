@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.openmm.parameters
    parmed.openmm.reporters
@@ -16,6 +17,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.openmm
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

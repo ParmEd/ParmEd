@@ -1,270 +1,331 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.amber.titratable_residues module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.amber.titratable_residues module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.amber.titratable_residues module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.amber.titratable_residues.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.amber.titratable_residues">
 <span id="parmed-amber-titratable-residues-module"></span><h1>parmed.amber.titratable_residues module<a class="headerlink" href="#module-parmed.amber.titratable_residues" title="Permalink to this headline">¶</a></h1>
 <p>This module contains all of the information for the titratable residues,
 including reference energies, model compound pKas, and charge vectors for every
 titratable residue treated.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.amber.titratable_residues.TitratableResidue">
-<em class="property">class </em><code class="descclassname">parmed.amber.titratable_residues.</code><code class="descname">TitratableResidue</code><span class="sig-paren">(</span><em>resname</em>, <em>atom_list</em>, <em>pka</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.amber.titratable_residues.</code><code class="sig-name descname">TitratableResidue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resname</span></em>, <em class="sig-param"><span class="n">atom_list</span></em>, <em class="sig-param"><span class="n">typ</span></em>, <em class="sig-param"><span class="n">pka</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">eo</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A residue with different protonation states defined for Amber for use in
 the Constant pH MD method implemented in sander</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.add_state" title="parmed.amber.titratable_residues.TitratableResidue.add_state"><code class="xref py py-obj docutils literal"><span class="pre">add_state</span></code></a>(protcnt,&nbsp;charges,&nbsp;refene)</td>
-<td>Add a single titratable state for this titratable residue</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.add_state" title="parmed.amber.titratable_residues.TitratableResidue.add_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_state</span></code></a>(charges, refene[, refene_old, …])</p></td>
+<td><p>Add a single titratable state for this titratable residue</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.add_states" title="parmed.amber.titratable_residues.TitratableResidue.add_states"><code class="xref py py-obj docutils literal"><span class="pre">add_states</span></code></a>(protcnts,&nbsp;charges,&nbsp;refenes)</td>
-<td>Add multiple titratable states for this titratable residue</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.add_states" title="parmed.amber.titratable_residues.TitratableResidue.add_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_states</span></code></a>(charges, refenes[, refenes_old, …])</p></td>
+<td><p>Add multiple titratable states for this titratable residue</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.check" title="parmed.amber.titratable_residues.TitratableResidue.check"><code class="xref py py-obj docutils literal"><span class="pre">check</span></code></a>()</td>
-<td>Checks that the charges are consistent w/ the protonation states</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.check" title="parmed.amber.titratable_residues.TitratableResidue.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code></a>()</p></td>
+<td><p>Checks that the charges are consistent w/ the protonation states</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.cpin_pointers" title="parmed.amber.titratable_residues.TitratableResidue.cpin_pointers"><code class="xref py py-obj docutils literal"><span class="pre">cpin_pointers</span></code></a>(first_atom)</td>
-<td>Sets and returns the cpin info</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.cpin_pointers" title="parmed.amber.titratable_residues.TitratableResidue.cpin_pointers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cpin_pointers</span></code></a>(first_atom)</p></td>
+<td><p>Sets and returns the cpin info</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.reset" title="parmed.amber.titratable_residues.TitratableResidue.reset"><code class="xref py py-obj docutils literal"><span class="pre">reset</span></code></a>()</td>
-<td>Resets the pointers</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.reset" title="parmed.amber.titratable_residues.TitratableResidue.reset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset</span></code></a>()</p></td>
+<td><p>Resets the pointers</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_charge" title="parmed.amber.titratable_residues.TitratableResidue.set_first_charge"><code class="xref py py-obj docutils literal"><span class="pre">set_first_charge</span></code></a>(index)</td>
-<td>Sets the first charge index</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_charge" title="parmed.amber.titratable_residues.TitratableResidue.set_first_charge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_first_charge</span></code></a>(index)</p></td>
+<td><p>Sets the first charge index</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_state" title="parmed.amber.titratable_residues.TitratableResidue.set_first_state"><code class="xref py py-obj docutils literal"><span class="pre">set_first_state</span></code></a>(index)</td>
-<td>Sets the first state index</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_state" title="parmed.amber.titratable_residues.TitratableResidue.set_first_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_first_state</span></code></a>(index)</p></td>
+<td><p>Sets the first state index</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.add_state">
-<code class="descname">add_state</code><span class="sig-paren">(</span><em>protcnt</em>, <em>charges</em>, <em>refene</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.add_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.add_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">charges</span></em>, <em class="sig-param"><span class="n">refene</span></em>, <em class="sig-param"><span class="n">refene_old</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">protcnt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pka_corr</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">eleccnt</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">eo_corr</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.add_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.add_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a single titratable state for this titratable residue</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.add_states">
-<code class="descname">add_states</code><span class="sig-paren">(</span><em>protcnts</em>, <em>charges</em>, <em>refenes</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.add_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.add_states" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_states</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">charges</span></em>, <em class="sig-param"><span class="n">refenes</span></em>, <em class="sig-param"><span class="n">refenes_old</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">protcnts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pka_corrs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">eleccnts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">eo_corrs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.add_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.add_states" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add multiple titratable states for this titratable residue</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.check">
-<code class="descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.check" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that the charges are consistent w/ the protonation states</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.cpin_pointers">
-<code class="descname">cpin_pointers</code><span class="sig-paren">(</span><em>first_atom</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.cpin_pointers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.cpin_pointers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cpin_pointers</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">first_atom</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.cpin_pointers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.cpin_pointers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets and returns the cpin info</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets the pointers</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.set_first_charge">
-<code class="descname">set_first_charge</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.set_first_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_charge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_first_charge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.set_first_charge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_charge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the first charge index</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidue.set_first_state">
-<code class="descname">set_first_state</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.set_first_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_state" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">set_first_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidue.set_first_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidue.set_first_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the first state index</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList">
-<em class="property">class </em><code class="descclassname">parmed.amber.titratable_residues.</code><code class="descname">TitratableResidueList</code><span class="sig-paren">(</span><em>system_name='Unknown'</em>, <em>solvated=False</em>, <em>first_solvent=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">list</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.amber.titratable_residues.</code><code class="sig-name descname">TitratableResidueList</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system_name</span><span class="o">=</span><span class="default_value">'Unknown'</span></em>, <em class="sig-param"><span class="n">solvated</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">first_solvent</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>List of all titratable residues</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.add_residue" title="parmed.amber.titratable_residues.TitratableResidueList.add_residue"><code class="xref py py-obj docutils literal"><span class="pre">add_residue</span></code></a>(residue,&nbsp;resnum,&nbsp;first_atom[,&nbsp;state])</td>
-<td>Adds a residue to the list</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.add_residue" title="parmed.amber.titratable_residues.TitratableResidueList.add_residue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_residue</span></code></a>(residue, resnum, first_atom[, state])</p></td>
+<td><p>Adds a residue to the list</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="parmed.amber.titratable_residues.TitratableResidueList.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>((object)&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;append&nbsp;object&nbsp;to&nbsp;end)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(object, /)</p></td>
+<td><p>Append object to the end of the list.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.clear" title="parmed.amber.titratable_residues.TitratableResidueList.clear"><code class="xref py py-obj docutils literal"><span class="pre">clear</span></code></a>(()&nbsp;-&gt;&nbsp;None&nbsp;&#8211;&nbsp;remove&nbsp;all&nbsp;items&nbsp;from&nbsp;L)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear</span></code>(/)</p></td>
+<td><p>Remove all items from list.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.copy" title="parmed.amber.titratable_residues.TitratableResidueList.copy"><code class="xref py py-obj docutils literal"><span class="pre">copy</span></code></a>(()&nbsp;-&gt;&nbsp;list&nbsp;&#8211;&nbsp;a&nbsp;shallow&nbsp;copy&nbsp;of&nbsp;L)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>(/)</p></td>
+<td><p>Return a shallow copy of the list.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.count" title="parmed.amber.titratable_residues.TitratableResidueList.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(...)</td>
-<td></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="parmed.amber.titratable_residues.TitratableResidueList.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(...)</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend</span></code>(iterable, /)</p></td>
+<td><p>Extend list by appending elements from the iterable.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.index" title="parmed.amber.titratable_residues.TitratableResidueList.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.insert" title="parmed.amber.titratable_residues.TitratableResidueList.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a></td>
-<td>L.insert(index, object) &#8211; insert object before index</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insert</span></code>(index, object, /)</p></td>
+<td><p>Insert object before index.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.pop" title="parmed.amber.titratable_residues.TitratableResidueList.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(...)</td>
-<td>Raises IndexError if list is empty or index is out of range.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pop</span></code>([index])</p></td>
+<td><p>Remove and return item at index (default last).</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="parmed.amber.titratable_residues.TitratableResidueList.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(...)</td>
-<td>Raises ValueError if the value is not present.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove</span></code>(value, /)</p></td>
+<td><p>Remove first occurrence of value.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.reverse" title="parmed.amber.titratable_residues.TitratableResidueList.reverse"><code class="xref py py-obj docutils literal"><span class="pre">reverse</span></code></a></td>
-<td>L.reverse() &#8211; reverse <em>IN PLACE</em></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse</span></code>(/)</p></td>
+<td><p>Reverse <em>IN PLACE</em>.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.set_states" title="parmed.amber.titratable_residues.TitratableResidueList.set_states"><code class="xref py py-obj docutils literal"><span class="pre">set_states</span></code></a>(statelist)</td>
-<td>Sets the initial protonation states from a list &#8211; make sure there are</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.set_states" title="parmed.amber.titratable_residues.TitratableResidueList.set_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_states</span></code></a>(statelist)</p></td>
+<td><p>Sets the initial protonation states from a list – make sure there are enough states in the list to set every residue, or emit a warning</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.sort" title="parmed.amber.titratable_residues.TitratableResidueList.sort"><code class="xref py py-obj docutils literal"><span class="pre">sort</span></code></a>()</td>
-<td>Sorts by residue number</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.sort" title="parmed.amber.titratable_residues.TitratableResidueList.sort"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sort</span></code></a>()</p></td>
+<td><p>Sorts by residue number</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.write_cpin" title="parmed.amber.titratable_residues.TitratableResidueList.write_cpin"><code class="xref py py-obj docutils literal"><span class="pre">write_cpin</span></code></a>(output[,&nbsp;igb,&nbsp;intdiel,&nbsp;coions])</td>
-<td>Writes the CPIN file based on the titrated residues</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.amber.titratable_residues.TitratableResidueList.write_cpin" title="parmed.amber.titratable_residues.TitratableResidueList.write_cpin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_cpin</span></code></a>(output[, igb, intdiel, oldfmt, …])</p></td>
+<td><p>Writes the CPIN file based on the titrated residues</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.add_residue">
-<code class="descname">add_residue</code><span class="sig-paren">(</span><em>residue</em>, <em>resnum</em>, <em>first_atom</em>, <em>state=0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.add_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.add_residue" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_residue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">residue</span></em>, <em class="sig-param"><span class="n">resnum</span></em>, <em class="sig-param"><span class="n">first_atom</span></em>, <em class="sig-param"><span class="n">state</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.add_residue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.add_residue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a residue to the list</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span> &rarr; None -- append object to end<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.append" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.clear">
-<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; None -- remove all items from L<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.clear" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.copy">
-<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; list -- a shallow copy of L<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.count">
-<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; integer -- return number of occurrences of value<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.count" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><em>iterable</em><span class="sig-paren">)</span> &rarr; None -- extend list by appending elements from the iterable<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.extend" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="optional">[</span>, <em>start</em><span class="optional">[</span>, <em>stop</em><span class="optional">]</span><span class="optional">]</span><span class="sig-paren">)</span> &rarr; integer -- return first index of value.<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.insert" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.insert(index, object) &#8211; insert object before index</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.pop">
-<code class="descname">pop</code><span class="sig-paren">(</span><span class="optional">[</span><em>index</em><span class="optional">]</span><span class="sig-paren">)</span> &rarr; item -- remove and return item at index (default last).<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises IndexError if list is empty or index is out of range.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span> &rarr; None -- remove first occurrence of value.<a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.remove" title="Permalink to this definition">¶</a></dt>
-<dd><p>Raises ValueError if the value is not present.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.amber.titratable_residues.TitratableResidueList.reverse">
-<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.reverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>L.reverse() &#8211; reverse <em>IN PLACE</em></p>
-</dd></dl>
-
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.set_states">
-<code class="descname">set_states</code><span class="sig-paren">(</span><em>statelist</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.set_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.set_states" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the initial protonation states from a list &#8211; make sure there are
+<code class="sig-name descname">set_states</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">statelist</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.set_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.set_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the initial protonation states from a list – make sure there are
 enough states in the list to set every residue, or emit a warning</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.sort">
-<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.sort" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.sort"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.sort" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sorts by residue number</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.amber.titratable_residues.TitratableResidueList.write_cpin">
-<code class="descname">write_cpin</code><span class="sig-paren">(</span><em>output</em>, <em>igb=2</em>, <em>intdiel=1.0</em>, <em>coions=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.write_cpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.write_cpin" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write_cpin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output</span></em>, <em class="sig-param"><span class="n">igb</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">intdiel</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">oldfmt</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">typ</span><span class="o">=</span><span class="default_value">'ph'</span></em>, <em class="sig-param"><span class="n">coions</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/amber/titratable_residues.html#TitratableResidueList.write_cpin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.amber.titratable_residues.TitratableResidueList.write_cpin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes the CPIN file based on the titrated residues</p>
 </dd></dl>
 
@@ -273,47 +334,50 @@ enough states in the list to set every residue, or emit a warning</p>
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.amber.titratable_residues.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

@@ -2,6 +2,6 @@ parmed.utils.pairlist module
 ============================
 
 .. automodule:: parmed.utils.pairlist
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

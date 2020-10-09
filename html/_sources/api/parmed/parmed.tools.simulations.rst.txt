@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.tools.simulations.openmm
    parmed.tools.simulations.sanderapi
@@ -13,6 +14,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.tools.simulations
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

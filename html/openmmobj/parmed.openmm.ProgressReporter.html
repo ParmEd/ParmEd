@@ -1,245 +1,332 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.openmm.ProgressReporter &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.openmm.ProgressReporter &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../openmm.html" accesskey="U">OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.openmm.XmlFile" href="parmed.openmm.XmlFile.html" />
+    <link rel="prev" title="parmed.openmm.RestartReporter" href="parmed.openmm.RestartReporter.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#what-is-openmm">What is OpenMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#what-makes-openmm-so-awesome">What makes OpenMM so awesome?</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../openmm.html#how-does-parmed-enhance-openmm">How does ParmEd enhance OpenMM?</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.StateDataReporter.html">parmed.openmm.StateDataReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.NetCDFReporter.html">parmed.openmm.NetCDFReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.MdcrdReporter.html">parmed.openmm.MdcrdReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.RestartReporter.html">parmed.openmm.RestartReporter</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.openmm.ProgressReporter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.XmlFile.html">parmed.openmm.XmlFile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.load_topology.html">parmed.openmm.load_topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.openmm.energy_decomposition.html">parmed.openmm.energy_decomposition</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#loading-openmm-objects">Loading OpenMM Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../openmm.html#taking-openmm-topology-and-system-to-a-parmed-structure">Taking OpenMM <code class="docutils literal notranslate"><span class="pre">Topology</span></code> and <code class="docutils literal notranslate"><span class="pre">System</span></code> to a ParmEd <code class="docutils literal notranslate"><span class="pre">Structure</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../openmm.html">OpenMM Functionality</a> &raquo;</li>
+        
+      <li>parmed.openmm.ProgressReporter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/openmmobj/parmed.openmm.ProgressReporter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-openmm-progressreporter">
 <h1>parmed.openmm.ProgressReporter<a class="headerlink" href="#parmed-openmm-progressreporter" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.openmm.ProgressReporter">
-<em class="property">class </em><code class="descclassname">parmed.openmm.</code><code class="descname">ProgressReporter</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.openmm.</code><code class="sig-name descname">ProgressReporter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class that prints out a progress report of how much MD (or minimization)
 has been done, how fast the simulation is running, and how much time is left
 (similar to the mdinfo file in Amber)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f</strong> : str</p>
-<blockquote>
-<div><p>The file name of the progress report file (overwritten each time)</p>
-</div></blockquote>
-<p><strong>reportInterval</strong> : int</p>
-<blockquote>
-<div><p>The step interval between which to write frames</p>
-</div></blockquote>
-<p><strong>totalSteps</strong> : int</p>
-<blockquote>
-<div><p>The total number of steps that will be run in the simulation (used to
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>f</strong><span class="classifier">str</span></dt><dd><p>The file name of the progress report file (overwritten each time)</p>
+</dd>
+<dt><strong>reportInterval</strong><span class="classifier">int</span></dt><dd><p>The step interval between which to write frames</p>
+</dd>
+<dt><strong>totalSteps</strong><span class="classifier">int</span></dt><dd><p>The total number of steps that will be run in the simulation (used to
 estimate time remaining)</p>
-</div></blockquote>
-<p><strong>potentialEnergy</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the potential energy (default True)</p>
-</div></blockquote>
-<p><strong>kineticEnergy</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the kinetic energy (default True)</p>
-</div></blockquote>
-<p><strong>totalEnergy</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the total energy (default True)</p>
-</div></blockquote>
-<p><strong>temperature</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the system temperature (default True)</p>
-</div></blockquote>
-<p><strong>volume</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the system volume (default False)</p>
-</div></blockquote>
-<p><strong>density</strong> : bool, optional</p>
-<blockquote>
-<div><p>Whether to print the system density (default False)</p>
-</div></blockquote>
-<p><strong>systemMass</strong> : float or <code class="xref py py-class docutils literal"><span class="pre">unit.Quantity</span></code></p>
-<blockquote class="last">
-<div><p>The mass of the system used when reporting density (useful in instances
+</dd>
+<dt><strong>potentialEnergy</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the potential energy (default True)</p>
+</dd>
+<dt><strong>kineticEnergy</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the kinetic energy (default True)</p>
+</dd>
+<dt><strong>totalEnergy</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the total energy (default True)</p>
+</dd>
+<dt><strong>temperature</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the system temperature (default True)</p>
+</dd>
+<dt><strong>volume</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the system volume (default False)</p>
+</dd>
+<dt><strong>density</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to print the system density (default False)</p>
+</dd>
+<dt><strong>systemMass</strong><span class="classifier">float or <code class="xref py py-class docutils literal notranslate"><span class="pre">unit.Quantity</span></code></span></dt><dd><p>The mass of the system used when reporting density (useful in instances
 where masses are set to 0 to constrain their positions)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><code class="xref py py-obj docutils literal"><span class="pre">In</span></code>, <a class="reference internal" href="#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><code class="xref py py-obj docutils literal"><span class="pre">ProgressReporter</span></code></a>, <a class="reference internal" href="parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-obj docutils literal"><span class="pre">StateDataReporter</span></code></a></p>
-</div>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>In addition to the above, <a class="reference internal" href="#parmed.openmm.ProgressReporter" title="parmed.openmm.ProgressReporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressReporter</span></code></a> also accepts arguments for
+<a class="reference internal" href="parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code></a></p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.describeNextReport" title="parmed.openmm.ProgressReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>
-<td>Get information about the next report this object will generate.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter.describeNextReport" title="parmed.openmm.ProgressReporter.describeNextReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describeNextReport</span></code></a>(simulation)</p></td>
+<td><p>Get information about the next report this object will generate.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.finalize" title="parmed.openmm.ProgressReporter.finalize"><code class="xref py py-obj docutils literal"><span class="pre">finalize</span></code></a>()</td>
-<td>Closes any open file</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize</span></code>()</p></td>
+<td><p>Closes any open file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.report" title="parmed.openmm.ProgressReporter.report"><code class="xref py py-obj docutils literal"><span class="pre">report</span></code></a>(simulation,&nbsp;state)</td>
-<td>Generate a report and predict the time to completion (and</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter.report" title="parmed.openmm.ProgressReporter.report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></a>(simulation, state)</p></td>
+<td><p>Generate a report and predict the time to completion (and current/overall MD performance)</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.openmm.ProgressReporter.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>f</em>, <em>reportInterval</em>, <em>totalSteps</em>, <em>potentialEnergy=True</em>, <em>kineticEnergy=True</em>, <em>totalEnergy=True</em>, <em>temperature=False</em>, <em>volume=False</em>, <em>density=False</em>, <em>systemMass=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">reportInterval</span></em>, <em class="sig-param"><span class="n">totalSteps</span></em>, <em class="sig-param"><span class="n">potentialEnergy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">kineticEnergy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">totalEnergy</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">temperature</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">volume</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">density</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">systemMass</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.__init__" title="parmed.openmm.ProgressReporter.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(f,&nbsp;reportInterval,&nbsp;totalSteps[,&nbsp;...])</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.openmm.ProgressReporter.__init__" title="parmed.openmm.ProgressReporter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(f, reportInterval, totalSteps[, …])</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.describeNextReport" title="parmed.openmm.ProgressReporter.describeNextReport"><code class="xref py py-obj docutils literal"><span class="pre">describeNextReport</span></code></a>(simulation)</td>
-<td>Get information about the next report this object will generate.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter.describeNextReport" title="parmed.openmm.ProgressReporter.describeNextReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describeNextReport</span></code></a>(simulation)</p></td>
+<td><p>Get information about the next report this object will generate.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.finalize" title="parmed.openmm.ProgressReporter.finalize"><code class="xref py py-obj docutils literal"><span class="pre">finalize</span></code></a>()</td>
-<td>Closes any open file</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize</span></code>()</p></td>
+<td><p>Closes any open file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.openmm.ProgressReporter.report" title="parmed.openmm.ProgressReporter.report"><code class="xref py py-obj docutils literal"><span class="pre">report</span></code></a>(simulation,&nbsp;state)</td>
-<td>Generate a report and predict the time to completion (and</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="parmed.openmm.ProgressReporter.describeNextReport">
-<code class="descname">describeNextReport</code><span class="sig-paren">(</span><em>simulation</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.describeNextReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.describeNextReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get information about the next report this object will generate.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>simulation</strong> : <code class="xref py py-class docutils literal"><span class="pre">app.Simulation</span></code></p>
-<blockquote>
-<div><p>The Simulation to generate a report for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nsteps, pos, vel, frc, ene</strong> : int, bool, bool, bool, bool</p>
-<blockquote class="last">
-<div><p>nsteps is the number of steps until the next report
-pos, vel, frc, and ene are flags indicating whether positions,
-velocities, forces, and/or energies are needed from the Context</p>
-</div></blockquote>
-</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.openmm.html#parmed.openmm.ProgressReporter.report" title="parmed.openmm.ProgressReporter.report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">report</span></code></a>(simulation, state)</p></td>
+<td><p>Generate a report and predict the time to completion (and current/overall MD performance)</p></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.openmm.ProgressReporter.finalize">
-<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.openmm.ProgressReporter.finalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes any open file</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.openmm.ProgressReporter.report">
-<code class="descname">report</code><span class="sig-paren">(</span><em>simulation</em>, <em>state</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/openmm/reporters.html#ProgressReporter.report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.openmm.ProgressReporter.report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a report and predict the time to completion (and
-current/overall MD performance)</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.openmm.XmlFile.html" class="btn btn-neutral float-right" title="parmed.openmm.XmlFile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.openmm.RestartReporter.html" class="btn btn-neutral float-left" title="parmed.openmm.RestartReporter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/openmmobj/parmed.openmm.ProgressReporter.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../openmm.html" >OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

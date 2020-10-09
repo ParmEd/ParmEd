@@ -2,6 +2,6 @@ parmed.namd.namdbinfiles module
 ===============================
 
 .. automodule:: parmed.namd.namdbinfiles
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

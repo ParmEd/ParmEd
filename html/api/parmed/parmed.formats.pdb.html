@@ -1,258 +1,344 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.formats.pdb module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.formats.pdb module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.formats.pdb module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.formats.pdb.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.formats.pdb">
 <span id="parmed-formats-pdb-module"></span><h1>parmed.formats.pdb module<a class="headerlink" href="#module-parmed.formats.pdb" title="Permalink to this headline">¶</a></h1>
 <p>This package contains classes responsible for reading and writing both PDB and
 PDBx/mmCIF files.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.formats.pdb.CIFFile">
-<em class="property">class </em><code class="descclassname">parmed.formats.pdb.</code><code class="descname">CIFFile</code><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.formats.pdb.</code><code class="sig-name descname">CIFFile</code><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Standard PDBx/mmCIF file format parser and writer</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.download" title="parmed.formats.pdb.CIFFile.download"><code class="xref py py-obj docutils literal"><span class="pre">download</span></code></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
-<td>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.formats.pdb.CIFFile.download" title="parmed.formats.pdb.CIFFile.download"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download</span></code></a>(pdb_id[, timeout, saveto])</p></td>
+<td><p>Goes to the wwPDB website and downloads the requested PDBx/mmCIF, loading it as a <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instance</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.id_format" title="parmed.formats.pdb.CIFFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as a PDBx/mmCIF file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.formats.pdb.CIFFile.id_format" title="parmed.formats.pdb.CIFFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as a PDBx/mmCIF file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.parse" title="parmed.formats.pdb.CIFFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
-<td>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.formats.pdb.CIFFile.parse" title="parmed.formats.pdb.CIFFile.parse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse</span></code></a>(filename[, skip_bonds])</p></td>
+<td><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.CIFFile.write" title="parmed.formats.pdb.CIFFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from the current Structure instance</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.formats.pdb.CIFFile.write" title="parmed.formats.pdb.CIFFile.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(struct, dest[, renumber, coordinates, …])</p></td>
+<td><p>Write a PDB file from the current Structure instance</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.CIFFile.download">
-<em class="property">static </em><code class="descname">download</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pdb_id</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">saveto</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDBx/mmCIF,
-loading it as a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pdb_id</strong> : str</p>
-<blockquote>
-<div><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
-</div></blockquote>
-<p><strong>timeout</strong> : float, optional</p>
-<blockquote>
-<div><p>The number of seconds to wait before raising a timeout error.
+loading it as a <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instance</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pdb_id</strong><span class="classifier">str</span></dt><dd><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float, optional</span></dt><dd><p>The number of seconds to wait before raising a timeout error.
 Default is 10 seconds</p>
-</div></blockquote>
-<p><strong>saveto</strong> : str, optional</p>
-<blockquote>
-<div><p>If provided, this will be treated as a file name to which the PDB
+</dd>
+<dt><strong>saveto</strong><span class="classifier">str, optional</span></dt><dd><p>If provided, this will be treated as a file name to which the PDB
 file will be saved. If None (default), no CIF file will be written.
 This will be a verbatim copy of the downloaded CIF file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><code class="xref py py-meth docutils literal"><span class="pre">Structure.write_cif</span></code></a></p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></p>
-<blockquote>
-<div><p>Structure instance populated by the requested PDBx/mmCIF</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>socket.timeout if the connection times out while trying to contact the</strong></p>
-<p><strong>FTP server</strong></p>
-<p><strong>IOError if there is a problem retrieving the requested PDB</strong></p>
-<p><strong>ImportError if the gzip module is not available</strong></p>
-<p class="last"><strong>TypeError if pdb_id is not a 4-character string</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_cif" title="parmed.structure.Structure.write_cif"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.write_cif</span></code></a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>struct</strong><span class="classifier"><a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a></span></dt><dd><p>Structure instance populated by the requested PDBx/mmCIF</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>socket.timeout if the connection times out while trying to contact the</dt><dd></dd>
+<dt>FTP server</dt><dd></dd>
+<dt>IOError if there is a problem retrieving the requested PDB</dt><dd></dd>
+<dt>ImportError if the gzip module is not available</dt><dd></dd>
+<dt>TypeError if pdb_id is not a 4-character string</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.CIFFile.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">id_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDBx/mmCIF file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to check format for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>True if it is a PDBx/mmCIF file</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str</span></dt><dd><p>Name of the file to check format for</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>is_fmt</strong><span class="classifier">bool</span></dt><dd><p>True if it is a PDBx/mmCIF file</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.CIFFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">skip_bonds</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDBx or mmCIF file and return a populated <cite>Structure</cite> class</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
-<blockquote>
-<div><p>Name of PDB file to read, or a file-like object that can iterate
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>filename</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></span></dt><dd><p>Name of PDB file to read, or a file-like object that can iterate
 over the lines of a PDB. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pdb.gz,
 file.pdb.bz2)</p>
-</div></blockquote>
-<p><strong>skip_bonds</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, skip trying to assign bonds. This can save substantial time
+</dd>
+<dt><strong>skip_bonds</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, skip trying to assign bonds. This can save substantial time
 when parsing large files with non-standard residue names. However,
 no bonds are assigned. This is OK if, for instance, the CIF file is
 being parsed simply for its coordinates. Default is False.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">structure1 [, structure2 [, structure3 [, ...] ] ]</p>
-<p><strong>structure#</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote>
-<div><p>The Structure object initialized with all of the information from
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt>structure1 [, structure2 [, structure3 [, …] ] ]</dt><dd></dd>
+<dt><strong>structure#</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></span></dt><dd><p>The Structure object initialized with all of the information from
 the PDBx/mmCIF file.  No bonds or other topological features are
 added by default. If multiple structures are defined in the CIF
 file, multiple Structure instances will be returned as a tuple.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError if the file severely violates the PDB format specification.</strong></p>
-<p><strong>If this occurs, check the formatting on each line and make sure it</strong></p>
-<p class="last"><strong>matches the others.</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError if the file severely violates the PDB format specification.</dt><dd></dd>
+<dt>If this occurs, check the formatting on each line and make sure it</dt><dd></dd>
+<dt>matches the others.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.CIFFile.write">
-<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">renumber</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">coordinates</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">altlocs</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">write_anisou</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">standard_resnames</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#CIFFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.CIFFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from the current Structure instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote>
-<div><p>The structure from which to write the PDBx/mmCIF file</p>
-</div></blockquote>
-<p><strong>dest</strong> : <code class="docutils literal"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></p>
-<blockquote>
-<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>struct</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></span></dt><dd><p>The structure from which to write the PDBx/mmCIF file</p>
+</dd>
+<dt><strong>dest</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">str</span> <span class="pre">or</span> <span class="pre">file-like</span></code></span></dt><dd><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
-</div></blockquote>
-<p><strong>renumber</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
-<blockquote>
-<div><p>If True, renumber the atoms and residues sequentially as they are
+</dd>
+<dt><strong>renumber</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">bool</span></code></span></dt><dd><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously</p>
-</div></blockquote>
-<p><strong>coordinates</strong> : <code class="docutils literal"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></p>
-<blockquote>
-<div><p>If provided, these coordinates will be written to the PDB file
+</dd>
+<dt><strong>coordinates</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">array-like</span> <span class="pre">of</span> <span class="pre">float</span></code></span></dt><dd><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
 coordinates should line up with the atom order in the structure
-(not necessarily the order of the &#8220;original&#8221; PDB file if they
+(not necessarily the order of the “original” PDB file if they
 differ)</p>
-</div></blockquote>
-<p><strong>altlocs</strong> : <code class="docutils literal"><span class="pre">str</span></code></p>
-<blockquote>
-<div><p>Keyword controlling which alternate locations are printed to the
+</dd>
+<dt><strong>altlocs</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">str</span></code></span></dt><dd><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>&#8216;all&#8217; : (default) print all alternate locations</li>
-<li>&#8216;first&#8217; : print only the first alternate locations</li>
-<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+<li><p>‘all’ : (default) print all alternate locations</p></li>
+<li><p>‘first’ : print only the first alternate locations</p></li>
+<li><p>‘occupancy’ : print the one with the largest occupancy. If two
 conformers have the same occupancy, the first one to occur is
-printed</li>
+printed</p></li>
 </ul>
 </div></blockquote>
 <p>Input is case-insensitive, and partial strings are permitted as long
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
-</div></blockquote>
-<p><strong>write_anisou</strong> : <code class="docutils literal"><span class="pre">bool</span></code></p>
-<blockquote>
-<div><p>If True, an ANISOU record is written for every atom that has one. If
+</dd>
+<dt><strong>write_anisou</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">bool</span></code></span></dt><dd><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written</p>
-</div></blockquote>
-<p><strong>standard_resnames</strong> : bool, optional</p>
-<blockquote class="last">
-<div><p>If True, common aliases for various amino and nucleic acid residues
+</dd>
+<dt><strong>standard_resnames</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, common aliases for various amino and nucleic acid residues
 will be converted into the PDB-standard values. Default is False</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If multiple coordinate frames are present, these will be written as
 separate models (but only the unit cell from the first model will be
@@ -262,210 +348,284 @@ shall be present).</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.formats.pdb.PDBFile">
-<em class="property">class </em><code class="descclassname">parmed.formats.pdb.</code><code class="descname">PDBFile</code><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.formats.pdb.</code><code class="sig-name descname">PDBFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fileobj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Standard PDB file format parser and writer</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.download" title="parmed.formats.pdb.PDBFile.download"><code class="xref py py-obj docutils literal"><span class="pre">download</span></code></a>(pdb_id[,&nbsp;timeout,&nbsp;saveto])</td>
-<td>Goes to the wwPDB website and downloads the requested PDB, loading it</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey" title="parmed.formats.pdb.PDBFile.AtomLookupKey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AtomLookupKey</span></code></a>(name, number, residue_name, …)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.id_format" title="parmed.formats.pdb.PDBFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file type as a PDB file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.formats.pdb.PDBFile.download" title="parmed.formats.pdb.PDBFile.download"><code class="xref py py-obj docutils literal notranslate"><span class="pre">download</span></code></a>(pdb_id[, timeout, saveto])</p></td>
+<td><p>Goes to the wwPDB website and downloads the requested PDB, loading it as a <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instance</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.parse" title="parmed.formats.pdb.PDBFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
-<td>Read a PDB file and return a populated <cite>Structure</cite> class</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.formats.pdb.PDBFile.id_format" title="parmed.formats.pdb.PDBFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file type as a PDB file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.formats.pdb.PDBFile.write" title="parmed.formats.pdb.PDBFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;renumber,&nbsp;coordinates,&nbsp;...])</td>
-<td>Write a PDB file from a Structure instance</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.formats.pdb.PDBFile.parse" title="parmed.formats.pdb.PDBFile.parse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse</span></code></a>(filename[, skip_bonds])</p></td>
+<td><p>Read a PDB file and return a populated <cite>Structure</cite> class</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.formats.pdb.PDBFile.write" title="parmed.formats.pdb.PDBFile.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(struct, dest[, renumber, coordinates, …])</p></td>
+<td><p>Write a PDB file from a Structure instance</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="staticmethod">
+<dl class="py class">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey">
+<em class="property">class </em><code class="sig-name descname">AtomLookupKey</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">number</span></em>, <em class="sig-param"><span class="n">residue_name</span></em>, <em class="sig-param"><span class="n">residue_number</span></em>, <em class="sig-param"><span class="n">chain</span></em>, <em class="sig-param"><span class="n">insertion_code</span></em>, <em class="sig-param"><span class="n">segment_id</span></em>, <em class="sig-param"><span class="n">alternate_location</span></em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.alternate_location" title="parmed.formats.pdb.PDBFile.AtomLookupKey.alternate_location"><code class="xref py py-obj docutils literal notranslate"><span class="pre">alternate_location</span></code></a></dt><dd><p>Alias for field number 7</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.chain" title="parmed.formats.pdb.PDBFile.AtomLookupKey.chain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chain</span></code></a></dt><dd><p>Alias for field number 4</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.insertion_code" title="parmed.formats.pdb.PDBFile.AtomLookupKey.insertion_code"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertion_code</span></code></a></dt><dd><p>Alias for field number 5</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.name" title="parmed.formats.pdb.PDBFile.AtomLookupKey.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></dt><dd><p>Alias for field number 0</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.number" title="parmed.formats.pdb.PDBFile.AtomLookupKey.number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">number</span></code></a></dt><dd><p>Alias for field number 1</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.residue_name" title="parmed.formats.pdb.PDBFile.AtomLookupKey.residue_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residue_name</span></code></a></dt><dd><p>Alias for field number 2</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.residue_number" title="parmed.formats.pdb.PDBFile.AtomLookupKey.residue_number"><code class="xref py py-obj docutils literal notranslate"><span class="pre">residue_number</span></code></a></dt><dd><p>Alias for field number 3</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.segment_id" title="parmed.formats.pdb.PDBFile.AtomLookupKey.segment_id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment_id</span></code></a></dt><dd><p>Alias for field number 6</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">count</span></code>(value, /)</p></td>
+<td><p>Return number of occurrences of value.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code>(value[, start, stop])</p></td>
+<td><p>Return first index of value.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.alternate_location">
+<em class="property">property </em><code class="sig-name descname">alternate_location</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.alternate_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 7</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.chain">
+<em class="property">property </em><code class="sig-name descname">chain</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.insertion_code">
+<em class="property">property </em><code class="sig-name descname">insertion_code</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.insertion_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.number">
+<em class="property">property </em><code class="sig-name descname">number</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.residue_name">
+<em class="property">property </em><code class="sig-name descname">residue_name</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.residue_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.residue_number">
+<em class="property">property </em><code class="sig-name descname">residue_number</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.residue_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.formats.pdb.PDBFile.AtomLookupKey.segment_id">
+<em class="property">property </em><code class="sig-name descname">segment_id</code><a class="headerlink" href="#parmed.formats.pdb.PDBFile.AtomLookupKey.segment_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 6</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
 <dt id="parmed.formats.pdb.PDBFile.download">
-<em class="property">static </em><code class="descname">download</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>timeout=10</em>, <em>saveto=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.download" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pdb_id</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">saveto</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Goes to the wwPDB website and downloads the requested PDB, loading it
-as a <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code> instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pdb_id</strong> : str</p>
-<blockquote>
-<div><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
-</div></blockquote>
-<p><strong>timeout</strong> : float, optional</p>
-<blockquote>
-<div><p>The number of seconds to wait before raising a timeout error.
+as a <code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code> instance</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>pdb_id</strong><span class="classifier">str</span></dt><dd><p>The 4-letter PDB ID to try and download from the RCSB PDB database</p>
+</dd>
+<dt><strong>timeout</strong><span class="classifier">float, optional</span></dt><dd><p>The number of seconds to wait before raising a timeout error.
 Default is 10 seconds</p>
-</div></blockquote>
-<p><strong>saveto</strong> : str, optional</p>
-<blockquote>
-<div><p>If provided, this will be treated as a file name to which the PDB
+</dd>
+<dt><strong>saveto</strong><span class="classifier">str, optional</span></dt><dd><p>If provided, this will be treated as a file name to which the PDB
 file will be saved. If None (default), no PDB file will be written.
 This will be a verbatim copy of the downloaded PDB file, unlike the
 somewhat-stripped version you would get by using
-<a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><code class="xref py py-meth docutils literal"><span class="pre">Structure.write_pdb</span></code></a></p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></p>
-<blockquote>
-<div><p>Structure instance populated by the requested PDB</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>socket.timeout if the connection times out while trying to contact the</strong></p>
-<p><strong>FTP server</strong></p>
-<p><strong>IOError if there is a problem retrieving the requested PDB or writing a</strong></p>
-<p><strong>requested ``saveto`` file</strong></p>
-<p><strong>ImportError if the gzip module is not available</strong></p>
-<p class="last"><strong>TypeError if pdb_id is not a 4-character string</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+<a class="reference internal" href="parmed.structure.html#parmed.structure.Structure.write_pdb" title="parmed.structure.Structure.write_pdb"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Structure.write_pdb</span></code></a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>struct</strong><span class="classifier"><a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a></span></dt><dd><p>Structure instance populated by the requested PDB</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>socket.timeout if the connection times out while trying to contact the</dt><dd></dd>
+<dt>FTP server</dt><dd></dd>
+<dt>IOError if there is a problem retrieving the requested PDB or writing a</dt><dd></dd>
+<dt>requested <code class="docutils literal notranslate"><span class="pre">saveto</span></code> file</dt><dd></dd>
+<dt>ImportError if the gzip module is not available</dt><dd></dd>
+<dt>TypeError if pdb_id is not a 4-character string</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.PDBFile.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">id_format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.id_format" title="Permalink to this definition">¶</a></dt>
 <dd><p>Identifies the file type as a PDB file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file object</p>
-<blockquote>
-<div><p>Name of the file to check format for</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>True if it is a PDB file</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str or file object</span></dt><dd><p>Name of the file to check format for</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>is_fmt</strong><span class="classifier">bool</span></dt><dd><p>True if it is a PDB file</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.PDBFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">skip_bonds</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a PDB file and return a populated <cite>Structure</cite> class</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
-<blockquote>
-<div><p>Name of the PDB file to read, or a file-like object that can iterate
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">str or file-like</span></dt><dd><p>Name of the PDB file to read, or a file-like object that can iterate
 over the lines of a PDB. Compressed file names can be specified and
 are determined by file-name extension (e.g., file.pdb.gz,
 file.pdb.bz2)</p>
-</div></blockquote>
-<p><strong>skip_bonds</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, skip trying to assign bonds. This can save substantial time
+</dd>
+<dt><strong>skip_bonds</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, skip trying to assign bonds. This can save substantial time
 when parsing large files with non-standard residue names. However,
 no bonds are assigned. This is OK if, for instance, the PDB file is
 being parsed simply for its coordinates. This may also reduce
 element assignment if element information is not present in the PDB
 file already. Default is False.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>structure</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote class="last">
-<div><p>The Structure object initialized with all of the information from
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>structure</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></span></dt><dd><p>The Structure object initialized with all of the information from
 the PDB file.  No bonds or other topological features are added by
 default.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="staticmethod">
+<dl class="py method">
 <dt id="parmed.formats.pdb.PDBFile.write">
-<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>renumber=True</em>, <em>coordinates=None</em>, <em>altlocs='all'</em>, <em>write_anisou=False</em>, <em>charmm=False</em>, <em>standard_resnames=False</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.write" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct</span></em>, <em class="sig-param"><span class="n">dest</span></em>, <em class="sig-param"><span class="n">renumber</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">coordinates</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">altlocs</span><span class="o">=</span><span class="default_value">'all'</span></em>, <em class="sig-param"><span class="n">write_anisou</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">charmm</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_hetatoms</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">standard_resnames</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">increase_tercount</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">write_links</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#PDBFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.PDBFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write a PDB file from a Structure instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote>
-<div><p>The structure from which to write the PDB file</p>
-</div></blockquote>
-<p><strong>dest</strong> : str or file-like</p>
-<blockquote>
-<div><p>Either a file name or a file-like object containing a <cite>write</cite>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>struct</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></span></dt><dd><p>The structure from which to write the PDB file</p>
+</dd>
+<dt><strong>dest</strong><span class="classifier">str or file-like</span></dt><dd><p>Either a file name or a file-like object containing a <cite>write</cite>
 method to which to write the PDB file. If it is a filename that
 ends with .gz or .bz2, a compressed version will be written using
 either gzip or bzip2, respectively.</p>
-</div></blockquote>
-<p><strong>renumber</strong> : bool, optional, default True</p>
-<blockquote>
-<div><p>If True, renumber the atoms and residues sequentially as they are
+</dd>
+<dt><strong>renumber</strong><span class="classifier">bool, optional, default True</span></dt><dd><p>If True, renumber the atoms and residues sequentially as they are
 stored in the structure.  If False, use the original numbering if
 it was assigned previously.</p>
-</div></blockquote>
-<p><strong>coordinates</strong> : array-like of float, optional</p>
-<blockquote>
-<div><p>If provided, these coordinates will be written to the PDB file
+</dd>
+<dt><strong>coordinates</strong><span class="classifier">array-like of float, optional</span></dt><dd><p>If provided, these coordinates will be written to the PDB file
 instead of the coordinates stored in the structure. These
 coordinates should line up with the atom order in the structure
-(not necessarily the order of the &#8220;original&#8221; PDB file if they
+(not necessarily the order of the “original” PDB file if they
 differ)</p>
-</div></blockquote>
-<p><strong>altlocs</strong> : str, optional, default &#8216;all&#8217;</p>
-<blockquote>
-<div><p>Keyword controlling which alternate locations are printed to the
+</dd>
+<dt><strong>altlocs</strong><span class="classifier">str, optional, default ‘all’</span></dt><dd><p>Keyword controlling which alternate locations are printed to the
 resulting PDB file. Allowable options are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>&#8216;all&#8217; : print all alternate locations</li>
-<li>&#8216;first&#8217; : print only the first alternate locations</li>
-<li>&#8216;occupancy&#8217; : print the one with the largest occupancy. If two
+<li><p>‘all’ : print all alternate locations</p></li>
+<li><p>‘first’ : print only the first alternate locations</p></li>
+<li><p>‘occupancy’ : print the one with the largest occupancy. If two
 conformers have the same occupancy, the first one to occur is
-printed</li>
+printed</p></li>
 </ul>
 </div></blockquote>
 <p>Input is case-insensitive, and partial strings are permitted as long
 as it is a substring of one of the above options that uniquely
 identifies the choice.</p>
-</div></blockquote>
-<p><strong>write_anisou</strong> : bool, optional, default False</p>
-<blockquote>
-<div><p>If True, an ANISOU record is written for every atom that has one. If
+</dd>
+<dt><strong>write_anisou</strong><span class="classifier">bool, optional, default False</span></dt><dd><p>If True, an ANISOU record is written for every atom that has one. If
 False, ANISOU records are not written.</p>
-</div></blockquote>
-<p><strong>charmm</strong> : bool, optional, default False</p>
-<blockquote>
-<div><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
+</dd>
+<dt><strong>charmm</strong><span class="classifier">bool, optional, default False</span></dt><dd><p>If True, SEGID will be written in columns 73 to 76 of the PDB file
 in the typical CHARMM-style PDB output. This will be omitted for any
 atom that does not contain a SEGID identifier.</p>
-</div></blockquote>
-<p><strong>standard_resnames</strong> : bool, optional, default False</p>
-<blockquote class="last">
-<div><p>If True, common aliases for various amino and nucleic acid residues
+</dd>
+<dt><strong>use_hetatoms: bool, optional, default True</strong></dt><dd><p>If True, certain atoms will have the HETATM tag instead of ATOM
+as per the PDB-standard.</p>
+</dd>
+<dt><strong>standard_resnames</strong><span class="classifier">bool, optional, default False</span></dt><dd><p>If True, common aliases for various amino and nucleic acid residues
 will be converted into the PDB-standard values.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt><strong>increase_tercount</strong><span class="classifier">bool, optional, default True</span></dt><dd><p>If True, the TER atom number field increased by one compared to
+atom card preceding it; this conforms to PDB standard.</p>
+</dd>
+<dt><strong>write_links</strong><span class="classifier">bool, optional, default False</span></dt><dd><p>If True, any LINK records stored in the Structure will be written to
+the LINK records near the top of the PDB file. If this is True, then
+renumber <em>must</em> be False or a ValueError will be thrown</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>If multiple coordinate frames are present, these will be written as
 separate models (but only the unit cell from the first model will be
@@ -475,50 +635,58 @@ shall be present).</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt id="parmed.formats.pdb.try_convert">
+<code class="sig-prename descclassname">parmed.formats.pdb.</code><code class="sig-name descname">try_convert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">cast_type</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/formats/pdb.html#try_convert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.formats.pdb.try_convert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.formats.pdb.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

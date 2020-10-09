@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.charmm.charmmcrds
    parmed.charmm.parameters
@@ -14,6 +15,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.charmm
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

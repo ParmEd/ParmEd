@@ -2,6 +2,6 @@ parmed.charmm.psf module
 ========================
 
 .. automodule:: parmed.charmm.psf
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

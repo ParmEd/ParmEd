@@ -1,53 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils.six &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils.six &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../utils.html" accesskey="U">parmed.utils</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../utils.html">parmed.utils</a> &raquo;</li>
+        
+      <li>parmed.utils.six</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for parmed.utils.six</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Utilities for writing code that runs on Python 2 and 3&quot;&quot;&quot;</span>
@@ -72,7 +186,7 @@
 <span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
 <span class="c1"># SOFTWARE.</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
@@ -109,7 +223,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># It&#39;s possible to have sizeof(long) != sizeof(Py_ssize_t).</span>
         <span class="k">class</span> <span class="nc">X</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-            <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 <span class="k">return</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">())</span>
@@ -124,7 +238,7 @@
 
 <span class="k">def</span> <span class="nf">_add_doc</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add documentation to a function.&quot;&quot;&quot;</span>
-    <span class="n">func</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+    <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
 
 
 <span class="k">def</span> <span class="nf">_import_module</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -135,16 +249,16 @@
 
 <span class="k">class</span> <span class="nc">_LazyDescr</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
-    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">tp</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">tp</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">()</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span> <span class="c1"># Invokes __set__.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># This is a bit ugly, but it avoids running this again by</span>
             <span class="c1"># removing this descriptor.</span>
-            <span class="nb">delattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">return</span> <span class="n">result</span>
@@ -152,8 +266,8 @@
 
 <div class="viewcode-block" id="MovedModule"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.MovedModule">[docs]</a><span class="k">class</span> <span class="nc">MovedModule</span><span class="p">(</span><span class="n">_LazyDescr</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MovedModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MovedModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">new</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">new</span> <span class="o">=</span> <span class="n">name</span>
@@ -164,7 +278,7 @@
     <span class="k">def</span> <span class="nf">_resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
         <span class="n">_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve</span><span class="p">()</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_module</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -173,11 +287,11 @@
 
 <span class="k">class</span> <span class="nc">_LazyModule</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__doc__</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__doc__</span>
 
-    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__doc__&quot;</span><span class="p">,</span> <span class="s2">&quot;__name__&quot;</span><span class="p">]</span>
         <span class="n">attrs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">attr</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_moved_attributes</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">attrs</span>
@@ -188,8 +302,8 @@
 
 <div class="viewcode-block" id="MovedAttribute"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.MovedAttribute">[docs]</a><span class="k">class</span> <span class="nc">MovedAttribute</span><span class="p">(</span><span class="n">_LazyDescr</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old_mod</span><span class="p">,</span> <span class="n">new_mod</span><span class="p">,</span> <span class="n">old_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MovedAttribute</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">old_mod</span><span class="p">,</span> <span class="n">new_mod</span><span class="p">,</span> <span class="n">old_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">new_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MovedAttribute</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">new_mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">new_mod</span> <span class="o">=</span> <span class="n">name</span>
@@ -218,7 +332,7 @@
 <span class="sd">    This class implements a PEP302 finder and loader. It should be compatible</span>
 <span class="sd">    with Python 2.5 and all existing versions of Python3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">six_module_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">six_module_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">six_module_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">known_modules</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -271,7 +385,7 @@
         <span class="k">return</span> <span class="kc">None</span>
     <span class="n">get_source</span> <span class="o">=</span> <span class="n">get_code</span>  <span class="c1"># same as get_code</span>
 
-<span class="n">_importer</span> <span class="o">=</span> <span class="n">_SixMetaPathImporter</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">_importer</span> <span class="o">=</span> <span class="n">_SixMetaPathImporter</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">_MovedItems</span><span class="p">(</span><span class="n">_LazyModule</span><span class="p">):</span>
@@ -338,9 +452,9 @@
     <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;tkinter_messagebox&quot;</span><span class="p">,</span> <span class="s2">&quot;tkMessageBox&quot;</span><span class="p">,</span> <span class="s2">&quot;tkinter.messagebox&quot;</span><span class="p">),</span>
     <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;tkinter_tksimpledialog&quot;</span><span class="p">,</span> <span class="s2">&quot;tkSimpleDialog&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;tkinter.simpledialog&quot;</span><span class="p">),</span>
-    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib_parse&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_parse&quot;</span><span class="p">,</span> <span class="s2">&quot;urllib.parse&quot;</span><span class="p">),</span>
-    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib_error&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_error&quot;</span><span class="p">,</span> <span class="s2">&quot;urllib.error&quot;</span><span class="p">),</span>
-    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">,</span> <span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib_parse&quot;</span><span class="p">,</span> <span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_parse&quot;</span><span class="p">,</span> <span class="s2">&quot;urllib.parse&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib_error&quot;</span><span class="p">,</span> <span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_error&quot;</span><span class="p">,</span> <span class="s2">&quot;urllib.error&quot;</span><span class="p">),</span>
+    <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib&quot;</span><span class="p">,</span> <span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">,</span> <span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">),</span>
     <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;urllib_robotparser&quot;</span><span class="p">,</span> <span class="s2">&quot;robotparser&quot;</span><span class="p">,</span> <span class="s2">&quot;urllib.robotparser&quot;</span><span class="p">),</span>
     <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;xmlrpc_client&quot;</span><span class="p">,</span> <span class="s2">&quot;xmlrpclib&quot;</span><span class="p">,</span> <span class="s2">&quot;xmlrpc.client&quot;</span><span class="p">),</span>
     <span class="n">MovedModule</span><span class="p">(</span><span class="s2">&quot;xmlrpc_server&quot;</span><span class="p">,</span> <span class="s2">&quot;SimpleXMLRPCServer&quot;</span><span class="p">,</span> <span class="s2">&quot;xmlrpc.server&quot;</span><span class="p">),</span>
@@ -354,7 +468,7 @@
 
 <span class="n">_MovedItems</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_moved_attributes</span>
 
-<span class="n">moves</span> <span class="o">=</span> <span class="n">_MovedItems</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves&quot;</span><span class="p">)</span>
+<span class="n">moves</span> <span class="o">=</span> <span class="n">_MovedItems</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves&quot;</span><span class="p">)</span>
 <span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">moves</span><span class="p">,</span> <span class="s2">&quot;moves&quot;</span><span class="p">)</span>
 
 
@@ -393,7 +507,7 @@
 
 <span class="n">Module_six_moves_urllib_parse</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_parse_moved_attributes</span>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_parse</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_parse&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_parse</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib_parse&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib_parse&quot;</span><span class="p">,</span> <span class="s2">&quot;moves.urllib.parse&quot;</span><span class="p">)</span>
 
 
@@ -412,7 +526,7 @@
 
 <span class="n">Module_six_moves_urllib_error</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_error_moved_attributes</span>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_error</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.error&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_error</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.error&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib_error&quot;</span><span class="p">,</span> <span class="s2">&quot;moves.urllib.error&quot;</span><span class="p">)</span>
 
 
@@ -461,7 +575,7 @@
 
 <span class="n">Module_six_moves_urllib_request</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_request_moved_attributes</span>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_request</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.request&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_request</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.request&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib_request&quot;</span><span class="p">,</span> <span class="s2">&quot;moves.urllib.request&quot;</span><span class="p">)</span>
 
 
@@ -481,7 +595,7 @@
 
 <span class="n">Module_six_moves_urllib_response</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_response_moved_attributes</span>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_response</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.response&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_response</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.response&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib_response&quot;</span><span class="p">,</span> <span class="s2">&quot;moves.urllib.response&quot;</span><span class="p">)</span>
 
 
@@ -498,7 +612,7 @@
 
 <span class="n">Module_six_moves_urllib_robotparser</span><span class="o">.</span><span class="n">_moved_attributes</span> <span class="o">=</span> <span class="n">_urllib_robotparser_moved_attributes</span>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_robotparser</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.robotparser&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib_robotparser</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib.robotparser&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib_robotparser&quot;</span><span class="p">,</span> <span class="s2">&quot;moves.urllib.robotparser&quot;</span><span class="p">)</span>
 
 
@@ -511,10 +625,10 @@
     <span class="n">response</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s2">&quot;moves.urllib_response&quot;</span><span class="p">)</span>
     <span class="n">robotparser</span> <span class="o">=</span> <span class="n">_importer</span><span class="o">.</span><span class="n">_get_module</span><span class="p">(</span><span class="s2">&quot;moves.urllib_robotparser&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;parse&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;request&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="s1">&#39;robotparser&#39;</span><span class="p">]</span></div>
 
-<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib</span><span class="p">(</span><span class="n">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">),</span>
+<span class="n">_importer</span><span class="o">.</span><span class="n">_add_module</span><span class="p">(</span><span class="n">Module_six_moves_urllib</span><span class="p">(</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s2">&quot;.moves.urllib&quot;</span><span class="p">),</span>
                       <span class="s2">&quot;moves.urllib&quot;</span><span class="p">)</span>
 
 
@@ -529,7 +643,7 @@
         <span class="nb">delattr</span><span class="p">(</span><span class="n">_MovedItems</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">moves</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">moves</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;no such move, </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,))</span></div>
 
@@ -564,7 +678,7 @@
     <span class="n">callable</span> <span class="o">=</span> <span class="n">callable</span>
 <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">callable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;__call__&quot;</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span> <span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">__mro__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;__call__&quot;</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">for</span> <span class="n">klass</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">PY3</span><span class="p">:</span>
@@ -579,12 +693,12 @@
         <span class="k">return</span> <span class="n">unbound</span><span class="o">.</span><span class="n">im_func</span></div>
 
     <span class="k">def</span> <span class="nf">create_bound_method</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Iterator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
         <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="n">callable</span> <span class="o">=</span> <span class="n">callable</span>
 <span class="n">_add_doc</span><span class="p">(</span><span class="n">get_unbound_function</span><span class="p">,</span>
@@ -670,7 +784,7 @@
         <span class="k">return</span> <span class="n">s</span></div>
     <span class="c1"># Workaround for standalone backslash</span>
 <div class="viewcode-block" id="u"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.u">[docs]</a>    <span class="k">def</span> <span class="nf">u</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">unicode</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">r&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">r&#39;</span><span class="se">\\\\</span><span class="s1">&#39;</span><span class="p">),</span> <span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">unicode</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">&#39;</span><span class="p">),</span> <span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span></div>
     <span class="n">unichr</span> <span class="o">=</span> <span class="n">unichr</span>
     <span class="n">int2byte</span> <span class="o">=</span> <span class="nb">chr</span>
     <span class="k">def</span> <span class="nf">byte2int</span><span class="p">(</span><span class="n">bs</span><span class="p">):</span>
@@ -826,15 +940,15 @@
     <span class="c1"># metaclass for one level of class instantiation that replaces itself with</span>
     <span class="c1"># the actual metaclass.</span>
     <span class="k">class</span> <span class="nc">metaclass</span><span class="p">(</span><span class="n">meta</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">this_bases</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">this_bases</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">meta</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="s1">&#39;temporary_class&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span></div>
+    <span class="k">return</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="s1">&#39;temporary_class&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="p">{})</span></div>
 
 
 <div class="viewcode-block" id="add_metaclass"><a class="viewcode-back" href="../../../api/parmed/parmed.utils.six.html#parmed.utils.six.add_metaclass">[docs]</a><span class="k">def</span> <span class="nf">add_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class decorator for creating a class with a metaclass.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
-        <span class="n">orig_vars</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">orig_vars</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">slots</span> <span class="o">=</span> <span class="n">orig_vars</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;__slots__&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">slots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slots</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -843,7 +957,7 @@
                 <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">slots_var</span><span class="p">)</span>
         <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__dict__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__weakref__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">metaclass</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__bases__</span><span class="p">,</span> <span class="n">orig_vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metaclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">,</span> <span class="n">orig_vars</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrapper</span></div>
 
 
@@ -856,12 +970,12 @@
 <span class="sd">    returning text and apply this decorator to the class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;__str__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;__str__&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">klass</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;@python_2_unicode_compatible cannot be applied &quot;</span>
                              <span class="s2">&quot;to </span><span class="si">%s</span><span class="s2"> because it doesn&#39;t define __str__().&quot;</span> <span class="o">%</span>
-                             <span class="n">klass</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
-        <span class="n">klass</span><span class="o">.</span><span class="n">__unicode__</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">__str__</span>
-        <span class="n">klass</span><span class="o">.</span><span class="n">__str__</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unicode__</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                             <span class="n">klass</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">klass</span><span class="o">.</span><span class="n">__unicode__</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="fm">__str__</span>
+        <span class="n">klass</span><span class="o">.</span><span class="fm">__str__</span> <span class="o">=</span> <span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unicode__</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">klass</span></div>
 
 
@@ -869,7 +983,7 @@
 <span class="c1"># This code is at the end of this module to speed up module loading.</span>
 <span class="c1"># Turn this module into a package.</span>
 <span class="n">__path__</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># required for PEP 302 and PEP 451</span>
-<span class="n">__package__</span> <span class="o">=</span> <span class="n">__name__</span>  <span class="c1"># see PEP 366 @ReservedAssignment</span>
+<span class="n">__package__</span> <span class="o">=</span> <span class="vm">__name__</span>  <span class="c1"># see PEP 366 @ReservedAssignment</span>
 <span class="k">if</span> <span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;__spec__&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
     <span class="n">__spec__</span><span class="o">.</span><span class="n">submodule_search_locations</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># PEP 451 @UndefinedVariable</span>
 <span class="c1"># Remove other six meta path importers, since they cause problems. This can</span>
@@ -881,8 +995,8 @@
         <span class="c1"># be floating around. Therefore, we can&#39;t use isinstance() to check for</span>
         <span class="c1"># the six meta path importer, since the other six instance will have</span>
         <span class="c1"># inserted an importer with different class.</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">importer</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;_SixMetaPathImporter&quot;</span> <span class="ow">and</span>
-            <span class="n">importer</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">__name__</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">importer</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;_SixMetaPathImporter&quot;</span> <span class="ow">and</span>
+            <span class="n">importer</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="vm">__name__</span><span class="p">):</span>
             <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">break</span>
     <span class="k">del</span> <span class="n">i</span><span class="p">,</span> <span class="n">importer</span>
@@ -890,42 +1004,50 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_importer</span><span class="p">)</span>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../utils.html" >parmed.utils</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

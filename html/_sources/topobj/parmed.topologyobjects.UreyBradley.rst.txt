@@ -17,6 +17,8 @@ parmed.topologyobjects.UreyBradley
       ~UreyBradley.delete
       ~UreyBradley.energy
       ~UreyBradley.measure
+      ~UreyBradley.uenergy
+      ~UreyBradley.umeasure
    
    
 

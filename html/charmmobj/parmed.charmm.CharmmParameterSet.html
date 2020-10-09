@@ -1,490 +1,381 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.charmm.CharmmParameterSet &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.charmm.CharmmParameterSet &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../charmm.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.charmm.CharmmCrdFile" href="parmed.charmm.CharmmCrdFile.html" />
+    <link rel="prev" title="parmed.charmm.CharmmPsfFile" href="parmed.charmm.CharmmPsfFile.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../charmm.html#the-protein-structure-file-psf">The Protein Structure File (PSF)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../charmm.html#charmm-parameter-sets">CHARMM Parameter Sets</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.charmm.CharmmParameterSet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../charmm.html#residue-topology-file-rtf">Residue Topology File (RTF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../charmm.html#parameter-file-par">Parameter File (PAR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../charmm.html#stream-files-str">Stream Files (STR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../charmm.html#add-to-an-existing-parameter-set">Add to an existing parameter set</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../charmm.html#charmm-coordinate-files">CHARMM coordinate files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../charmm.html">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.charmm</span></code> package</a> &raquo;</li>
+        
+      <li>parmed.charmm.CharmmParameterSet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/charmmobj/parmed.charmm.CharmmParameterSet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-charmm-charmmparameterset">
 <h1>parmed.charmm.CharmmParameterSet<a class="headerlink" href="#parmed-charmm-charmmparameterset" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.charmm.CharmmParameterSet">
-<em class="property">class </em><code class="descclassname">parmed.charmm.</code><code class="descname">CharmmParameterSet</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.charmm.</code><code class="sig-name descname">CharmmParameterSet</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stores a parameter set defined by CHARMM files. It stores the equivalent of
 the information found in the MASS section of the CHARMM topology file
 (TOP/RTF) and all of the information in the parameter files (PAR)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>*filenames</strong> : variable length arguments of str</p>
-<blockquote class="last">
-<div><p>The list of topology, parameter, and stream files to load into the
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>*filenames</strong><span class="classifier">variable length arguments of str</span></dt><dd><p>The list of topology, parameter, and stream files to load into the
 parameter set. The following file type suffixes are recognized:</p>
 <blockquote>
-<div><p>.rtf, .top &#8211; Residue topology file
-.par, .prm &#8211; Parameter file
-.str &#8211; Stream file
-.inp &#8211; If &#8220;par&#8221; is in the file name, it is a parameter file. If</p>
+<div><p>.rtf, .top – Residue topology file
+.par, .prm – Parameter file
+.str – Stream file
+.inp – If “par” is in the file name, it is a parameter file. If</p>
 <blockquote>
-<div><p>&#8220;top&#8221; is in the file name, it is a topology file.
+<div><p>“top” is in the file name, it is a topology file.
 Otherwise, ValueError is raised.</p>
 </div></blockquote>
 </div></blockquote>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></code></a></p>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.parameters.ParameterSet</span></code></a></dt><dd></dd>
+</dl>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.combining_rule" title="parmed.charmm.CharmmParameterSet.combining_rule"><code class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>combining_rule</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.condense" title="parmed.charmm.CharmmParameterSet.condense"><code class="xref py py-obj docutils literal"><span class="pre">condense</span></code></a>([do_dihedrals])</td>
-<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">condense</span></code>([do_dihedrals])</p></td>
+<td><p>This function goes through each of the parameter type dicts and eliminates duplicate types.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><code class="xref py py-obj docutils literal"><span class="pre">from_parameterset</span></code></a>(params[,&nbsp;copy])</td>
-<td>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_parameterset</span></code></a>(params[, copy])</p></td>
+<td><p>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct)</td>
-<td>Extracts known parameters from a Structure instance</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>(struct)</p></td>
+<td><p>Extracts known parameters from a Structure instance</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><code class="xref py py-obj docutils literal"><span class="pre">load_set</span></code></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
-<td>Instantiates a CharmmParameterSet from a Topology file and a Parameter</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_set</span></code></a>([tfile, pfile, sfiles])</p></td>
+<td><p>Instantiates a CharmmParameterSet from a Topology file and a Parameter file (or just a Parameter file if it has all information)</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><code class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></code></a>(pfile[,&nbsp;comments])</td>
-<td>Reads all of the parameters from a parameter file.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">match_improper_type</span></code>(a1, a2, a3, a4)</p></td>
+<td><p>Matches an improper type based on atom type names</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><code class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></code></a>(sfile)</td>
-<td>Reads RTF and PAR sections from a stream file and dispatches the</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_parameter_file</span></code></a>(pfile[, comments])</p></td>
+<td><p>Reads all of the parameters from a parameter file.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><code class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></code></a>(tfile)</td>
-<td>Reads _only_ the atom type definitions from a topology file.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_stream_file</span></code></a>(sfile)</p></td>
+<td><p>Reads RTF and PAR sections from a stream file and dispatches the sections to read_topology_file or read_parameter_file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.typeify_templates" title="parmed.charmm.CharmmParameterSet.typeify_templates"><code class="xref py py-obj docutils literal"><span class="pre">typeify_templates</span></code></a>()</td>
-<td>Assign atom types to atom names in templates</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_topology_file</span></code></a>(tfile)</p></td>
+<td><p>Reads _only_ the atom type definitions from a topology file.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>([top,&nbsp;par,&nbsp;str])</td>
-<td>Write a CHARMM parameter set to a file</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">typeify_templates</span></code>()</p></td>
+<td><p>Assign atom types to atom names in templates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>([top, par, str])</p></td>
+<td><p>Write a CHARMM parameter set to a file</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.charmm.CharmmParameterSet.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.__init__" title="parmed.charmm.CharmmParameterSet.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(\*args)</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.__init__" title="parmed.charmm.CharmmParameterSet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args)</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.condense" title="parmed.charmm.CharmmParameterSet.condense"><code class="xref py py-obj docutils literal"><span class="pre">condense</span></code></a>([do_dihedrals])</td>
-<td>This function goes through each of the parameter type dicts and eliminates duplicate types.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">condense</span></code>([do_dihedrals])</p></td>
+<td><p>This function goes through each of the parameter type dicts and eliminates duplicate types.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><code class="xref py py-obj docutils literal"><span class="pre">from_parameterset</span></code></a>(params[,&nbsp;copy])</td>
-<td>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.from_parameterset" title="parmed.charmm.CharmmParameterSet.from_parameterset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_parameterset</span></code></a>(params[, copy])</p></td>
+<td><p>Instantiates a CharmmParameterSet from another ParameterSet (or subclass).</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><code class="xref py py-obj docutils literal"><span class="pre">from_structure</span></code></a>(struct)</td>
-<td>Extracts known parameters from a Structure instance</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.from_structure" title="parmed.charmm.CharmmParameterSet.from_structure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_structure</span></code></a>(struct)</p></td>
+<td><p>Extracts known parameters from a Structure instance</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><code class="xref py py-obj docutils literal"><span class="pre">load_set</span></code></a>([tfile,&nbsp;pfile,&nbsp;sfiles])</td>
-<td>Instantiates a CharmmParameterSet from a Topology file and a Parameter</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.load_set" title="parmed.charmm.CharmmParameterSet.load_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_set</span></code></a>([tfile, pfile, sfiles])</p></td>
+<td><p>Instantiates a CharmmParameterSet from a Topology file and a Parameter file (or just a Parameter file if it has all information)</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><code class="xref py py-obj docutils literal"><span class="pre">read_parameter_file</span></code></a>(pfile[,&nbsp;comments])</td>
-<td>Reads all of the parameters from a parameter file.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">match_improper_type</span></code>(a1, a2, a3, a4)</p></td>
+<td><p>Matches an improper type based on atom type names</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><code class="xref py py-obj docutils literal"><span class="pre">read_stream_file</span></code></a>(sfile)</td>
-<td>Reads RTF and PAR sections from a stream file and dispatches the</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_parameter_file" title="parmed.charmm.CharmmParameterSet.read_parameter_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_parameter_file</span></code></a>(pfile[, comments])</p></td>
+<td><p>Reads all of the parameters from a parameter file.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><code class="xref py py-obj docutils literal"><span class="pre">read_topology_file</span></code></a>(tfile)</td>
-<td>Reads _only_ the atom type definitions from a topology file.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_stream_file" title="parmed.charmm.CharmmParameterSet.read_stream_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_stream_file</span></code></a>(sfile)</p></td>
+<td><p>Reads RTF and PAR sections from a stream file and dispatches the sections to read_topology_file or read_parameter_file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.typeify_templates" title="parmed.charmm.CharmmParameterSet.typeify_templates"><code class="xref py py-obj docutils literal"><span class="pre">typeify_templates</span></code></a>()</td>
-<td>Assign atom types to atom names in templates</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.read_topology_file" title="parmed.charmm.CharmmParameterSet.read_topology_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_topology_file</span></code></a>(tfile)</p></td>
+<td><p>Reads _only_ the atom type definitions from a topology file.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>([top,&nbsp;par,&nbsp;str])</td>
-<td>Write a CHARMM parameter set to a file</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">typeify_templates</span></code>()</p></td>
+<td><p>Assign atom types to atom names in templates</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.write" title="parmed.charmm.CharmmParameterSet.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>([top, par, str])</p></td>
+<td><p>Write a CHARMM parameter set to a file</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.charmm.html#parmed.charmm.CharmmParameterSet.combining_rule" title="parmed.charmm.CharmmParameterSet.combining_rule"><code class="xref py py-obj docutils literal"><span class="pre">combining_rule</span></code></a></td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">combining_rule</span></code></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.condense">
-<code class="descname">condense</code><span class="sig-paren">(</span><em>do_dihedrals=True</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.condense" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function goes through each of the parameter type dicts and
-eliminates duplicate types. After calling this function, every unique
-bond, angle, dihedral, improper, or cmap type will pair with EVERY key
-in the type mapping dictionaries that points to the equivalent type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>do_dihedrals</strong> : bool=True</p>
-<blockquote>
-<div><p>Dihedrals can take the longest time to compress since testing their
-equality takes the longest (this is complicated by the existence of
-multi-term torsions). This flag will allow you to <em>skip</em> condensing
-the dihedral parameter types (for large parameter sets, this can cut
-the compression time in half)</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">self</p>
-<blockquote class="last">
-<div><p>The instance that is being condensed</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The return value allows you to condense the types at construction time.</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="parmed.charmm.CharmmParameterSet.from_parameterset">
-<em class="property">classmethod </em><code class="descname">from_parameterset</code><span class="sig-paren">(</span><em>params</em>, <em>copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.from_parameterset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.from_parameterset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiates a CharmmParameterSet from another ParameterSet (or
-subclass). The main thing this feature is responsible for is converting
-lower-case atom type names into all upper-case and decorating the name
-to ensure each atom type name is unique.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>params</strong> : <a class="reference internal" href="../api/parmed/parmed.parameters.html#parmed.parameters.ParameterSet" title="parmed.parameters.ParameterSet"><code class="xref py py-class docutils literal"><span class="pre">parmed.parameters.ParameterSet</span></code></a></p>
-<blockquote>
-<div><p>ParameterSet containing the list of parameters to be converted to a
-CHARMM-compatible set</p>
-</div></blockquote>
-<p><strong>copy</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, the returned parameter set is a deep copy of <code class="docutils literal"><span class="pre">params</span></code>. If
-False, the returned parameter set is a shallow copy, and the
-original set may be modified if any lower-case atom type names are
-present. Default is False.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>new_params</strong> : CharmmParameterSet</p>
-<blockquote class="last">
-<div><p>The parameter set whose atom type names are converted to all
-upper-case</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="parmed.charmm.CharmmParameterSet.from_structure">
-<em class="property">classmethod </em><code class="descname">from_structure</code><span class="sig-paren">(</span><em>struct</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.from_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.from_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extracts known parameters from a Structure instance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
-<blockquote>
-<div><p>The parametrized <code class="docutils literal"><span class="pre">Structure</span></code> instance from which to extract
-parameters into a ParameterSet</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>params</strong> : <code class="xref py py-class docutils literal"><span class="pre">ParameterSet</span></code></p>
-<blockquote class="last">
-<div><p>The parameter set with all parameters defined in the Structure</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The parameters here are copies of the ones in the Structure, so
-modifying the generated ParameterSet will have no effect on <code class="docutils literal"><span class="pre">struct</span></code>.
-Furthermore, the <em>first</em> occurrence of each parameter will be used. If
-future ones differ, they will be silently ignored, since this is
-expected behavior in some instances (like with Gromacs topologies in the
-ff99sb-ildn force field).</p>
-<p>Dihedrals are a little trickier. They can be multi-term, which can be
-represented either as a <em>single</em> entry in dihedrals with a type of
-DihedralTypeList or multiple entries in dihedrals with a DihedralType
-parameter type. In this case, the parameter is constructed from either
-the first DihedralTypeList found or the first DihedralType of each
-periodicity found if no matching DihedralTypeList is found.</p>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="parmed.charmm.CharmmParameterSet.load_set">
-<em class="property">classmethod </em><code class="descname">load_set</code><span class="sig-paren">(</span><em>tfile=None</em>, <em>pfile=None</em>, <em>sfiles=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.load_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.load_set" title="Permalink to this definition">¶</a></dt>
-<dd><p>Instantiates a CharmmParameterSet from a Topology file and a Parameter
-file (or just a Parameter file if it has all information)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tfile</strong> : str</p>
-<blockquote>
-<div><p>The name of the Topology (RTF/TOP) file to parse</p>
-</div></blockquote>
-<p><strong>pfile</strong> : str</p>
-<blockquote>
-<div><p>The name of the Parameter (PAR/PRM) file to parse</p>
-</div></blockquote>
-<p><strong>sfiles</strong> : list(str)</p>
-<blockquote>
-<div><p>Iterable of stream (STR) file names</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New CharmmParameterSet populated with parameters found in the provided</p>
-<p class="last">files</p>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The RTF file is read first (if provided), followed by the PAR file,
-followed by the list of stream files (in the order they are provided).
-Parameters in each stream file will overwrite those that came before (or
-simply append to the existing set if they are different)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.read_parameter_file">
-<code class="descname">read_parameter_file</code><span class="sig-paren">(</span><em>pfile</em>, <em>comments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.read_parameter_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_parameter_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads all of the parameters from a parameter file. Versions 36 and
-later of the CHARMM force field files have an ATOMS section defining
-all of the atom types.  Older versions need to load this information
-from the RTF/TOP files.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>pfile</strong> : str or list of lines</p>
-<blockquote>
-<div><p>Name of the CHARMM parameter file to read or list of lines to parse
-as a file</p>
-</div></blockquote>
-<p><strong>comments</strong> : list of str, optional</p>
-<blockquote class="last">
-<div><p>List of comments on each of the pfile lines (if pfile is a list of
-lines)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Notes</p>
-<p>The atom types must all be loaded by the end of this routine.  Either
-supply a PAR file with atom definitions in them or read in a RTF/TOP
-file first. Failure to do so will result in a raised RuntimeError.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.read_stream_file">
-<code class="descname">read_stream_file</code><span class="sig-paren">(</span><em>sfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.read_stream_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_stream_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads RTF and PAR sections from a stream file and dispatches the
-sections to read_topology_file or read_parameter_file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sfile</strong> : str or CharmmStreamFile</p>
-<blockquote class="last">
-<div><p>Stream file to parse</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.read_topology_file">
-<code class="descname">read_topology_file</code><span class="sig-paren">(</span><em>tfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.read_topology_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.read_topology_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads _only_ the atom type definitions from a topology file. This is
-unnecessary for versions 36 and later of the CHARMM force field.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>tfile</strong> : str</p>
-<blockquote class="last">
-<div><p>Name of the CHARMM topology file to read</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.typeify_templates">
-<code class="descname">typeify_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.typeify_templates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assign atom types to atom names in templates</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.charmm.CharmmParameterSet.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>top=None</em>, <em>par=None</em>, <em>str=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/charmm/parameters.html#CharmmParameterSet.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.charmm.CharmmParameterSet.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a CHARMM parameter set to a file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>top</strong> : str or file-like object, optional</p>
-<blockquote>
-<div><p>If provided, the atom types will be written to this file in RTF
-format.</p>
-</div></blockquote>
-<p><strong>par</strong> : str or file-like object, optional</p>
-<blockquote>
-<div><p>If provided, the parameters will be written to this file in PAR
-format. Either this or the <code class="docutils literal"><span class="pre">str</span></code> argument <em>must</em> be provided</p>
-</div></blockquote>
-<p><strong>str</strong> : str or file-like object, optional</p>
-<blockquote>
-<div><p>If provided, the atom types and parameters will be written to this
-file as separate RTF and PAR cards that can be read as a CHARMM
-stream file. Either this or the <code class="docutils literal"><span class="pre">par</span></code> argument <em>must</em> be provided</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if both par and str are None</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.charmm.CharmmCrdFile.html" class="btn btn-neutral float-right" title="parmed.charmm.CharmmCrdFile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.charmm.CharmmPsfFile.html" class="btn btn-neutral float-left" title="parmed.charmm.CharmmPsfFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/charmmobj/parmed.charmm.CharmmParameterSet.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../charmm.html" >The <code class="docutils literal"><span class="pre">parmed.charmm</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

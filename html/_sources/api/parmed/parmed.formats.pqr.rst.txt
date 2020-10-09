@@ -2,6 +2,6 @@ parmed.formats.pqr module
 =========================
 
 .. automodule:: parmed.formats.pqr
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

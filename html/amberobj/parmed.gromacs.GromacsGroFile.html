@@ -1,240 +1,291 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.gromacs.GromacsGroFile &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.gromacs.GromacsGroFile &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../gromacs.html" accesskey="U">The <code class="docutils literal"><span class="pre">parmed.gromacs</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="PyRosetta Integration" href="../rosetta.html" />
+    <link rel="prev" title="parmed.gromacs.GromacsTopologyFile" href="parmed.gromacs.GromacsTopologyFile.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../gromacs.html#setting-up-gromacs">Setting up Gromacs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../gromacs.html#the-topology-file">The topology file</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../gromacs.html#the-gro-coordinate">The GRO coordinate</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.gromacs.GromacsTopologyFile.html">parmed.gromacs.GromacsTopologyFile</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.gromacs.GromacsGroFile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../gromacs.html#example-usage">Example usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../gromacs.html">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.gromacs</span></code> package</a> &raquo;</li>
+        
+      <li>parmed.gromacs.GromacsGroFile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/amberobj/parmed.gromacs.GromacsGroFile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-gromacs-gromacsgrofile">
 <h1>parmed.gromacs.GromacsGroFile<a class="headerlink" href="#parmed-gromacs-gromacsgrofile" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.gromacs.GromacsGroFile">
-<em class="property">class </em><code class="descclassname">parmed.gromacs.</code><code class="descname">GromacsGroFile</code><a class="reference internal" href="../_modules/parmed/gromacs/gromacsgro.html#GromacsGroFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsGroFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.gromacs.</code><code class="sig-name descname">GromacsGroFile</code><a class="reference internal" href="../_modules/parmed/gromacs/gromacsgro.html#GromacsGroFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsGroFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses and writes Gromacs GRO files</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.id_format" title="parmed.gromacs.GromacsGroFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file as a GROMACS GRO file</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.id_format" title="parmed.gromacs.GromacsGroFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file as a GROMACS GRO file</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.parse" title="parmed.gromacs.GromacsGroFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
-<td>Parses a Gromacs GRO file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.parse" title="parmed.gromacs.GromacsGroFile.parse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse</span></code></a>(filename[, skip_bonds])</p></td>
+<td><p>Parses a Gromacs GRO file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.write" title="parmed.gromacs.GromacsGroFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;precision,&nbsp;nobox])</td>
-<td>Write a Gromacs Topology File from a Structure</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.write" title="parmed.gromacs.GromacsGroFile.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(struct, dest[, precision, nobox, combine])</p></td>
+<td><p>Write a Gromacs Topology File from a Structure</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.gromacs.GromacsGroFile.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.GromacsGroFile.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.gromacs.GromacsGroFile.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.id_format" title="parmed.gromacs.GromacsGroFile.id_format"><code class="xref py py-obj docutils literal"><span class="pre">id_format</span></code></a>(filename)</td>
-<td>Identifies the file as a GROMACS GRO file</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.__init__" title="parmed.gromacs.GromacsGroFile.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.parse" title="parmed.gromacs.GromacsGroFile.parse"><code class="xref py py-obj docutils literal"><span class="pre">parse</span></code></a>(filename[,&nbsp;skip_bonds])</td>
-<td>Parses a Gromacs GRO file</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.id_format" title="parmed.gromacs.GromacsGroFile.id_format"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id_format</span></code></a>(filename)</p></td>
+<td><p>Identifies the file as a GROMACS GRO file</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="../gromacsobj/parmed.gromacs.GromacsGroFile.html#parmed.gromacs.GromacsGroFile.write" title="parmed.gromacs.GromacsGroFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(struct,&nbsp;dest[,&nbsp;precision,&nbsp;nobox])</td>
-<td>Write a Gromacs Topology File from a Structure</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.parse" title="parmed.gromacs.GromacsGroFile.parse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse</span></code></a>(filename[, skip_bonds])</p></td>
+<td><p>Parses a Gromacs GRO file</p></td>
 </tr>
-</tbody>
-</table>
-<dl class="staticmethod">
-<dt id="parmed.gromacs.GromacsGroFile.id_format">
-<em class="property">static </em><code class="descname">id_format</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/gromacs/gromacsgro.html#GromacsGroFile.id_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsGroFile.id_format" title="Permalink to this definition">¶</a></dt>
-<dd><p>Identifies the file as a GROMACS GRO file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str</p>
-<blockquote>
-<div><p>Name of the file to check if it is a Gromacs GRO file</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>is_fmt</strong> : bool</p>
-<blockquote class="last">
-<div><p>If it is identified as a Gromacs GRO file, return True. False
-otherwise</p>
-</div></blockquote>
-</td>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.gromacs.html#parmed.gromacs.GromacsGroFile.write" title="parmed.gromacs.GromacsGroFile.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(struct, dest[, precision, nobox, combine])</p></td>
+<td><p>Write a Gromacs Topology File from a Structure</p></td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="parmed.gromacs.GromacsGroFile.parse">
-<em class="property">static </em><code class="descname">parse</code><span class="sig-paren">(</span><em>filename</em>, <em>skip_bonds=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/gromacs/gromacsgro.html#GromacsGroFile.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsGroFile.parse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parses a Gromacs GRO file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : str or file-like</p>
-<blockquote>
-<div><p>Name of the file or the GRO file object</p>
-</div></blockquote>
-<p><strong>skip_bonds</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, skip trying to assign bonds. This can save substantial time
-when parsing large files with non-standard residue names. However,
-no bonds are assigned. This is OK if, for instance, the GRO file is
-being parsed simply for its coordinates. This will also reduce the
-accuracy of assigned atomic numbers for typical ions. Default is
-False.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote class="last">
-<div><p>The Structure instance instantiated with <em>just</em> residues and atoms
-populated (with coordinates)</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="parmed.gromacs.GromacsGroFile.write">
-<em class="property">static </em><code class="descname">write</code><span class="sig-paren">(</span><em>struct</em>, <em>dest</em>, <em>precision=3</em>, <em>nobox=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/gromacs/gromacsgro.html#GromacsGroFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.gromacs.GromacsGroFile.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a Gromacs Topology File from a Structure</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></p>
-<blockquote>
-<div><p>The structure to write to a Gromacs GRO file (must have coordinates)</p>
-</div></blockquote>
-<p><strong>dest</strong> : str or file-like</p>
-<blockquote>
-<div><p>The name of a file or a file object to write the Gromacs topology to</p>
-</div></blockquote>
-<p><strong>precision</strong> : int, optional</p>
-<blockquote>
-<div><p>The number of decimal places to print in the coordinates. Default 3</p>
-</div></blockquote>
-<p><strong>nobox</strong> : bool, optional</p>
-<blockquote class="last">
-<div><p>If the system does not have a periodic box defined, and this option
-is True, no box will be written. If False, the periodic box will be
-defined to enclose the solute with 0.5 nm clearance on all sides. If
-periodic box dimensions <em>are</em> defined, this variable has no effect.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../rosetta.html" class="btn btn-neutral float-right" title="PyRosetta Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.gromacs.GromacsTopologyFile.html" class="btn btn-neutral float-left" title="parmed.gromacs.GromacsTopologyFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/amberobj/parmed.gromacs.GromacsGroFile.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../gromacs.html" >The <code class="docutils literal"><span class="pre">parmed.gromacs</span></code> package</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

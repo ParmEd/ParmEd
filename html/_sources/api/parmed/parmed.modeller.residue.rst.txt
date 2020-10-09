@@ -2,6 +2,6 @@ parmed.modeller.residue module
 ==============================
 
 .. automodule:: parmed.modeller.residue
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

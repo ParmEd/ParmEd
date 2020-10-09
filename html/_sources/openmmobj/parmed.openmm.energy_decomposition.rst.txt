@@ -1,5 +1,5 @@
-parmed.openmm.energy_decomposition
-==================================
+parmed.openmm.energy\_decomposition
+===================================
 
 .. currentmodule:: parmed.openmm
 

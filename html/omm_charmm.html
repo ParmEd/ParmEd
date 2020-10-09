@@ -1,60 +1,188 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Examples using CHARMM Files &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>Examples using CHARMM Files &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Running OpenMM Simulation with GROMACS Files" href="omm_gromacs.html" />
     <link rel="prev" title="Running OpenMM Simulation with AMBER Files" href="omm_amber.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="omm_gromacs.html" title="Running OpenMM Simulation with GROMACS Files"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="openmm.html" accesskey="U">OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="openmm.html">OpenMM Functionality</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="openmm.html#what-is-openmm">What is OpenMM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openmm.html#what-makes-openmm-so-awesome">What makes OpenMM so awesome?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openmm.html#how-does-parmed-enhance-openmm">How does ParmEd enhance OpenMM?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openmm.html#loading-openmm-objects">Loading OpenMM Objects</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="openmm.html#examples">Examples</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="omm_amber.html">Starting from AMBER prmtop and inpcrd files</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Starting from CHARMM PSF and coordinate files</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#generalized-born-implicit-solvent">Generalized Born Implicit Solvent</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#explicit-solvent">Explicit solvent</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="omm_gromacs.html">Starting from Gromacs TOP and GRO files</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="openmm.html#taking-openmm-topology-and-system-to-a-parmed-structure">Taking OpenMM <code class="docutils literal notranslate"><span class="pre">Topology</span></code> and <code class="docutils literal notranslate"><span class="pre">System</span></code> to a ParmEd <code class="docutils literal notranslate"><span class="pre">Structure</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="openmm.html">OpenMM Functionality</a> &raquo;</li>
+        
+      <li>Examples using CHARMM Files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/omm_charmm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="examples-using-charmm-files">
 <h1>Examples using CHARMM Files<a class="headerlink" href="#examples-using-charmm-files" title="Permalink to this headline">¶</a></h1>
@@ -72,17 +200,17 @@ release.</p>
 <h2>Generalized Born Implicit Solvent<a class="headerlink" href="#generalized-born-implicit-solvent" title="Permalink to this headline">¶</a></h2>
 <p>For the purposes of this example, we are using an alanine pentapeptide. You can
 find the following files that you will need for this demonstration in the
-<code class="docutils literal"><span class="pre">examples/charmm</span></code> directory of the ParmEd distribution:</p>
+<code class="docutils literal notranslate"><span class="pre">examples/charmm</span></code> directory of the ParmEd distribution:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">ala5_autopsf.psf</span></code></li>
-<li><code class="docutils literal"><span class="pre">ala5_autopsf.pdb</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ala5_autopsf.psf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ala5_autopsf.pdb</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>The following sample script (<code class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
+<p>The following sample script (<code class="docutils literal notranslate"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
 distribution) will set up and run the simulation using OpenMM:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
@@ -91,9 +219,9 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="k">as</span> <span class="nn">app</span>
 
 <span class="c1"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="k">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="k">import</span> <span class="n">StateDataReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">parmed.openmm</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c1"># Load the CHARMM files</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
@@ -151,24 +279,24 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now we&#8217;ll dissect the script to help you understand what is happening at each
-step. We will divide the script into the sections following the <code class="docutils literal"><span class="pre">print</span></code>
+<p>Now we’ll dissect the script to help you understand what is happening at each
+step. We will divide the script into the sections following the <code class="docutils literal notranslate"><span class="pre">print</span></code>
 statements that announce when each stage begins.</p>
 <div class="section" id="loading-charmm-files">
 <h3>Loading CHARMM files<a class="headerlink" href="#loading-charmm-files" title="Permalink to this headline">¶</a></h3>
-<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></code></a> with the parameters we wish to use. In
+<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmParameterSet</span></code></a> with the parameters we wish to use. In
 this example we are using the CHARMM 36 force field, but be sure you check
 <a class="reference external" href="http://mackerell.umaryland.edu/CHARMM_ff_params.html">the CHARMM parameter website</a> to make sure you use
 the latest and greatest force fields for your own work.</p>
-<p>We also define the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></code></a>
+<p>We also define the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmPsfFile</span></code></a>
 object that stores all information about atom connectivity. The coordinates from
 PSF files generated by VMD are typically given in PDB format, so we use the
 OpenMM <cite>PDBFile</cite> object.</p>
 </div>
 <div class="section" id="create-the-openmm-system">
 <h3>Create the OpenMM system<a class="headerlink" href="#create-the-openmm-system" title="Permalink to this headline">¶</a></h3>
-<p>This command creates an OpenMM <code class="docutils literal"><span class="pre">System</span></code> object from the information stored in
-<code class="docutils literal"><span class="pre">ala5_gas</span></code>. It contains multiple <code class="docutils literal"><span class="pre">Force</span></code> instances for the bonds, angles,
+<p>This command creates an OpenMM <code class="docutils literal notranslate"><span class="pre">System</span></code> object from the information stored in
+<code class="docutils literal notranslate"><span class="pre">ala5_gas</span></code>. It contains multiple <code class="docutils literal notranslate"><span class="pre">Force</span></code> instances for the bonds, angles,
 periodic torsions, improper torsions, Urey-Bradley forces, CMAP potentials, and
 nonbonded (electrostatic and van der Waals) interactions.  It is in this
 function that we define the potential parameters we want to use. In this
@@ -176,21 +304,21 @@ example, we have chosen the default values for each parameter except the ones
 specified. In particular:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">params</span></code> is the parameter set we defined: this is necessary to apply
-parameters to your system.</li>
-<li><code class="docutils literal"><span class="pre">nonbondedMethod=app.NoCutoff</span></code> indicates we do not want to use a cutoff
-for nonbonded interactions</li>
-<li><code class="docutils literal"><span class="pre">constraints=app.HBonds</span></code> indicates that we want to constrain all bonds
-in which at least one atom is hydrogen</li>
-<li><code class="docutils literal"><span class="pre">implicitSolvent=app.HCT</span></code> indicates that we want to use the Hawkins
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code> is the parameter set we defined: this is necessary to apply
+parameters to your system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nonbondedMethod=app.NoCutoff</span></code> indicates we do not want to use a cutoff
+for nonbonded interactions</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constraints=app.HBonds</span></code> indicates that we want to constrain all bonds
+in which at least one atom is hydrogen</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">implicitSolvent=app.HCT</span></code> indicates that we want to use the Hawkins
 Cramer Truhlar GB model described in
-Hawkins et al., Chem. Phys. Lett., 1995, 51, p. 19824-19839.</li>
-<li><code class="docutils literal"><span class="pre">implicitSolventSaltConc=0.1*u.liters/u.mole</span></code> indicates that we want to
+Hawkins et al., Chem. Phys. Lett., 1995, 51, p. 19824-19839.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">implicitSolventSaltConc=0.1*u.liters/u.mole</span></code> indicates that we want to
 model a ca. 0.1 molar solution of monovalent ions using a Debye screening
-model.</li>
+model.</p></li>
 </ul>
 </div></blockquote>
-<p>See the API documentation for the <code class="docutils literal"><span class="pre">parmed</span></code> package for a full listing of
+<p>See the API documentation for the <code class="docutils literal notranslate"><span class="pre">parmed</span></code> package for a full listing of
 available options. If there are any other force objects you want to define, they
 can be added to the system after this step (like, for instance, positional
 restraints to a reference structure).</p>
@@ -198,10 +326,10 @@ restraints to a reference structure).</p>
 <div class="section" id="create-the-integrator-to-do-langevin-dynamics">
 <h3>Create the integrator to do Langevin Dynamics<a class="headerlink" href="#create-the-integrator-to-do-langevin-dynamics" title="Permalink to this headline">¶</a></h3>
 <p>In this stage we specify an integrator. Common choices are
-<code class="docutils literal"><span class="pre">LangevinIntegrator</span></code> (as we&#8217;ve chosen here) to do simulations in the NVT
-ensemble and <code class="docutils literal"><span class="pre">VerletIntegrator</span></code> that allows us to do simulations either at
-constant energy or temperature if using the <code class="docutils literal"><span class="pre">AndersenThermostat</span></code>.  In this
-example, we&#8217;ve chosen the Langevin integrator with a target temperature of
+<code class="docutils literal notranslate"><span class="pre">LangevinIntegrator</span></code> (as we’ve chosen here) to do simulations in the NVT
+ensemble and <code class="docutils literal notranslate"><span class="pre">VerletIntegrator</span></code> that allows us to do simulations either at
+constant energy or temperature if using the <code class="docutils literal notranslate"><span class="pre">AndersenThermostat</span></code>.  In this
+example, we’ve chosen the Langevin integrator with a target temperature of
 300 K, a friction coefficient of 1/ps and a time step of 2 fs.</p>
 </div>
 <div class="section" id="define-the-platform">
@@ -217,19 +345,19 @@ precision).</p>
 </div>
 <div class="section" id="create-the-simulation-object">
 <h3>Create the Simulation object<a class="headerlink" href="#create-the-simulation-object" title="Permalink to this headline">¶</a></h3>
-<p>This step creates a <code class="docutils literal"><span class="pre">Simulation</span></code> object that will be used to run the actual
+<p>This step creates a <code class="docutils literal notranslate"><span class="pre">Simulation</span></code> object that will be used to run the actual
 simulations. If we wanted OpenMM to simply pick the fastest platform for us
-(rather than specify one directly), we could omit the <code class="docutils literal"><span class="pre">platform</span></code> and
-<code class="docutils literal"><span class="pre">prop</span></code> arguments.</p>
+(rather than specify one directly), we could omit the <code class="docutils literal notranslate"><span class="pre">platform</span></code> and
+<code class="docutils literal notranslate"><span class="pre">prop</span></code> arguments.</p>
 </div>
 <div class="section" id="set-the-particle-positions">
 <h3>Set the particle positions<a class="headerlink" href="#set-the-particle-positions" title="Permalink to this headline">¶</a></h3>
 <p>This stage is very important. In this step, we set the particle positions stored
-in the <code class="docutils literal"><span class="pre">ala5_crds</span></code> object to our object. If you omit this step, you can get
+in the <code class="docutils literal notranslate"><span class="pre">ala5_crds</span></code> object to our object. If you omit this step, you can get
 strange results or other errors like segmentation violations. These particle
 positions have been parsed from the PDB file, but you could use a
-<a class="reference internal" href="charmmobj/parmed.charmm.CharmmCrdFile.html#parmed.charmm.CharmmCrdFile" title="parmed.charmm.CharmmCrdFile"><code class="xref py py-class docutils literal"><span class="pre">CharmmCrdFile</span></code></a> or
-<a class="reference internal" href="charmmobj/parmed.charmm.CharmmRstFile.html#parmed.charmm.CharmmRstFile" title="parmed.charmm.CharmmRstFile"><code class="xref py py-class docutils literal"><span class="pre">CharmmRstFile</span></code></a> (restart file) instead.</p>
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmCrdFile.html#parmed.charmm.CharmmCrdFile" title="parmed.charmm.CharmmCrdFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmCrdFile</span></code></a> or
+<a class="reference internal" href="charmmobj/parmed.charmm.CharmmRstFile.html#parmed.charmm.CharmmRstFile" title="parmed.charmm.CharmmRstFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmRstFile</span></code></a> (restart file) instead.</p>
 </div>
 <div class="section" id="minimize-the-energy">
 <h3>Minimize the energy<a class="headerlink" href="#minimize-the-energy" title="Permalink to this headline">¶</a></h3>
@@ -238,10 +366,10 @@ This particular invocation will perform at most 500 iterations.</p>
 </div>
 <div class="section" id="set-up-the-reporters">
 <h3>Set up the reporters<a class="headerlink" href="#set-up-the-reporters" title="Permalink to this headline">¶</a></h3>
-<p>This stage defines reporters that will &#8220;report&#8221; on the status of the simulation
+<p>This stage defines reporters that will “report” on the status of the simulation
 periodically throughout the simulation. The first is an
-<code class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></code> which will print out a summary of energies and
-temperatures every 100 steps.  Unlike the <code class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></code> in OpenMM,
+<code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code> which will print out a summary of energies and
+temperatures every 100 steps.  Unlike the <code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code> in OpenMM,
 this reporter prints values in the AKMA unit system (Angstrom, Kilocalorie per
 mole, and atomic mass units). This reporter directs the printout to standard
 output (the screen), <cite>sys.stdout</cite> can be replaced with a different file-like
@@ -252,7 +380,7 @@ standard DCD trajectory format.</p>
 <div class="section" id="running-dynamics">
 <h3>Running dynamics<a class="headerlink" href="#running-dynamics" title="Permalink to this headline">¶</a></h3>
 <p>This is the stage that actually runs the MD.  In this case, we are running
-10,000 steps of MD. The wiki page with &#8220;Common recipes&#8221; has information
+10,000 steps of MD. The wiki page with “Common recipes” has information
 regarding running a long simulation in chunks.</p>
 </div>
 </div>
@@ -260,17 +388,17 @@ regarding running a long simulation in chunks.</p>
 <h2>Explicit solvent<a class="headerlink" href="#explicit-solvent" title="Permalink to this headline">¶</a></h2>
 <p>For the purposes of this example, we are using an alanine dipeptide. You can
 find the following files that you will need for this demonstration in the
-<code class="docutils literal"><span class="pre">examples/charmm</span></code> directory of the ParmEd distribution:</p>
+<code class="docutils literal notranslate"><span class="pre">examples/charmm</span></code> directory of the ParmEd distribution:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">ala2_charmmgui.psf</span></code></li>
-<li><code class="docutils literal"><span class="pre">ala2_charmmgui.pdb</span></code></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ala2_charmmgui.psf</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ala2_charmmgui.pdb</span></code></p></li>
 </ul>
 </div></blockquote>
-<p>The following sample script (<code class="docutils literal"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
+<p>The following sample script (<code class="docutils literal notranslate"><span class="pre">simulate_charmm_gb.py</span></code> in the ParmEd
 distribution) will set up and run the simulation using OpenMM:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">sys</span>
 
@@ -279,9 +407,9 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="kn">import</span> <span class="nn">simtk.openmm.app</span> <span class="k">as</span> <span class="nn">app</span>
 
 <span class="c1"># ParmEd Imports</span>
-<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="k">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
-<span class="kn">from</span> <span class="nn">parmed.amber.openmmreporters</span> <span class="k">import</span> <span class="n">StateDataReporter</span>
-<span class="kn">from</span> <span class="nn">parmed</span> <span class="k">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">parmed.charmm</span> <span class="kn">import</span> <span class="n">CharmmPsfFile</span><span class="p">,</span> <span class="n">CharmmCrdFile</span><span class="p">,</span> <span class="n">CharmmParameterSet</span>
+<span class="kn">from</span> <span class="nn">parmed.amber.openmmreporters</span> <span class="kn">import</span> <span class="n">StateDataReporter</span>
+<span class="kn">from</span> <span class="nn">parmed</span> <span class="kn">import</span> <span class="n">unit</span> <span class="k">as</span> <span class="n">u</span>
 
 <span class="c1"># Load the CHARMM files</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Loading CHARMM files...&#39;</span><span class="p">)</span>
@@ -360,20 +488,20 @@ distribution) will set up and run the simulation using OpenMM:</p>
 <span class="n">sim</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now we&#8217;ll dissect the script to help you understand what is happening at each
-step. We will divide the script into the sections following the <code class="docutils literal"><span class="pre">print</span></code>
+<p>Now we’ll dissect the script to help you understand what is happening at each
+step. We will divide the script into the sections following the <code class="docutils literal notranslate"><span class="pre">print</span></code>
 statements that announce when each stage begins.</p>
 <div class="section" id="id1">
 <h3>Loading CHARMM files<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
-<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal"><span class="pre">CharmmParameterSet</span></code></a> with the parameters we wish to use. In
+<p>In this stage, we instantiate the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmParameterSet.html#parmed.charmm.CharmmParameterSet" title="parmed.charmm.CharmmParameterSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmParameterSet</span></code></a> with the parameters we wish to use. In
 this example we are using the CHARMM 36 force field, but be sure you check <a class="reference external" href="http://mackerell.umaryland.edu/CHARMM_ff_params.html">the
 CHARMM parameter website</a>
 to make sure you use the latest and greatest force fields for your own work.
 Note that we also need to load the stream file with the water and ion
 parameters. The file type detection (RTF, parameter, or stream) is done by
 file-name extension (or the beginning of the file name if the file names end in
-<code class="docutils literal"><span class="pre">.inp</span></code>).</p>
-<p>We also define the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><code class="xref py py-class docutils literal"><span class="pre">CharmmPsfFile</span></code></a>
+<code class="docutils literal notranslate"><span class="pre">.inp</span></code>).</p>
+<p>We also define the <a class="reference internal" href="charmmobj/parmed.charmm.CharmmPsfFile.html#parmed.charmm.CharmmPsfFile" title="parmed.charmm.CharmmPsfFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmPsfFile</span></code></a>
 object that stores all information about atom connectivity. The coordinates
 from PSF files generated by CHARMM GUI are given in the CHARMM coordinate
 format, so we use the <cite>CharmmCrdFile</cite> class to parse it.</p>
@@ -382,15 +510,15 @@ format, so we use the <cite>CharmmCrdFile</cite> class to parse it.</p>
 <h3>Compute the box dimensions<a class="headerlink" href="#compute-the-box-dimensions" title="Permalink to this headline">¶</a></h3>
 <p>In this step, we compute the box dimensions by calculating the extent of the
 coordinates in each of the X-, Y-, and Z-directions. Then the call to
-<code class="docutils literal"><span class="pre">ala2_solv.setBox</span></code> sets the periodic box vectors. You can optionally put the
-three angles between the lattice vectors (<code class="docutils literal"><span class="pre">alpha</span></code>, <code class="docutils literal"><span class="pre">beta</span></code>, and <code class="docutils literal"><span class="pre">gamma</span></code>)
+<code class="docutils literal notranslate"><span class="pre">ala2_solv.setBox</span></code> sets the periodic box vectors. You can optionally put the
+three angles between the lattice vectors (<code class="docutils literal notranslate"><span class="pre">alpha</span></code>, <code class="docutils literal notranslate"><span class="pre">beta</span></code>, and <code class="docutils literal notranslate"><span class="pre">gamma</span></code>)
 after the box lengths. The default angles are 90 degrees, since OpenMM only
 supports orthorhombic boxes.</p>
 </div>
 <div class="section" id="id3">
 <h3>Create the OpenMM system<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
-<p>This command creates an OpenMM <code class="docutils literal"><span class="pre">System</span></code> object from the information stored in
-<code class="docutils literal"><span class="pre">ala2_solv</span></code>. It contains multiple <code class="docutils literal"><span class="pre">Force</span></code> instances for the bonds, angles,
+<p>This command creates an OpenMM <code class="docutils literal notranslate"><span class="pre">System</span></code> object from the information stored in
+<code class="docutils literal notranslate"><span class="pre">ala2_solv</span></code>. It contains multiple <code class="docutils literal notranslate"><span class="pre">Force</span></code> instances for the bonds, angles,
 periodic torsions, improper torsions, Urey-Bradley forces, CMAP potentials, and
 nonbonded (electrostatic and van der Waals) interactions.  It is in this
 function that we define the potential parameters we want to use. In this
@@ -398,33 +526,33 @@ example, we have chosen the default values for each parameter except the ones
 specified. In particular:</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">params</span></code> is the parameter set we defined: this is necessary to apply
-parameters to your system.</li>
-<li><code class="docutils literal"><span class="pre">nonbondedMethod=app.PME</span></code> indicates we want to include the full
-electrostatic interactions using the Particle Mesh Ewald method</li>
-<li><code class="docutils literal"><span class="pre">nonbondedCutoff=12.0*u.angstroms</span></code> indicates we want to truncate van der
+<li><p><code class="docutils literal notranslate"><span class="pre">params</span></code> is the parameter set we defined: this is necessary to apply
+parameters to your system.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nonbondedMethod=app.PME</span></code> indicates we want to include the full
+electrostatic interactions using the Particle Mesh Ewald method</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nonbondedCutoff=12.0*u.angstroms</span></code> indicates we want to truncate van der
 Waals interactions and the direct-space sum in PME to 12 angstroms. (This
-is equivalent to the _ctofnb_ parameter in CHARMM)</li>
-<li><code class="docutils literal"><span class="pre">constraints=app.HBonds</span></code> indicates that we want to constrain all bonds
-in which at least one atom is hydrogen</li>
-<li><code class="docutils literal"><span class="pre">switchDistance=10.0*u.angstroms</span></code> indicates that we want to turn the
+is equivalent to the _ctofnb_ parameter in CHARMM)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">constraints=app.HBonds</span></code> indicates that we want to constrain all bonds
+in which at least one atom is hydrogen</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">switchDistance=10.0*u.angstroms</span></code> indicates that we want to turn the
 switching function <em>on</em> at 10 Angstroms (This is equivalent to the
-<em>ctonnb</em> parameter in CHARMM)</li>
+<em>ctonnb</em> parameter in CHARMM)</p></li>
 </ul>
 </div></blockquote>
-<p>See the API documentation for the <a class="reference internal" href="api/parmed/parmed.html#module-parmed" title="parmed"><code class="xref py py-mod docutils literal"><span class="pre">parmed</span></code></a> package for a full listing
+<p>See the API documentation for the <a class="reference internal" href="api/parmed/parmed.html#module-parmed" title="parmed"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed</span></code></a> package for a full listing
 of available options (such as using a switching function for van der Waals
-interactions with the <code class="docutils literal"><span class="pre">switchDistance</span></code> keyword). If there are any other force
+interactions with the <code class="docutils literal notranslate"><span class="pre">switchDistance</span></code> keyword). If there are any other force
 objects you want to define, they can be added to the system after this step
 (like, for instance, positional restraints to a reference structure).</p>
 </div>
 <div class="section" id="id4">
 <h3>Create the integrator to do Langevin Dynamics<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>In this stage we specify an integrator. Common choices are
-<code class="docutils literal"><span class="pre">LangevinIntegrator</span></code> (as we&#8217;ve chosen here) to do simulations in the NVT
-ensemble and <code class="docutils literal"><span class="pre">VerletIntegrator</span></code> that allows us to do simulations either at
-constant energy or temperature if using the <code class="docutils literal"><span class="pre">AndersenThermostat</span></code>. In this
-example, we&#8217;ve chosen the Langevin integrator with a target temperature of
+<code class="docutils literal notranslate"><span class="pre">LangevinIntegrator</span></code> (as we’ve chosen here) to do simulations in the NVT
+ensemble and <code class="docutils literal notranslate"><span class="pre">VerletIntegrator</span></code> that allows us to do simulations either at
+constant energy or temperature if using the <code class="docutils literal notranslate"><span class="pre">AndersenThermostat</span></code>. In this
+example, we’ve chosen the Langevin integrator with a target temperature of
 300 K, a friction coefficient of 1/ps and a time step of 2 fs.</p>
 </div>
 <div class="section" id="id5">
@@ -440,18 +568,18 @@ precision).</p>
 </div>
 <div class="section" id="id6">
 <h3>Create the Simulation object<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
-<p>This step creates a <code class="docutils literal"><span class="pre">Simulation</span></code> object that will be used to run the actual
+<p>This step creates a <code class="docutils literal notranslate"><span class="pre">Simulation</span></code> object that will be used to run the actual
 simulations. If we wanted OpenMM to simply pick the fastest platform for us
-(rather than specify one directly), we could omit the <code class="docutils literal"><span class="pre">platform</span></code> and <code class="docutils literal"><span class="pre">prop</span></code>
+(rather than specify one directly), we could omit the <code class="docutils literal notranslate"><span class="pre">platform</span></code> and <code class="docutils literal notranslate"><span class="pre">prop</span></code>
 arguments.</p>
 </div>
 <div class="section" id="id7">
 <h3>Set the particle positions<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
 <p>This stage is very important. In this step, we set the particle positions stored
-in the <code class="docutils literal"><span class="pre">ala2_crds</span></code> object to our object. If you omit this step, you can get
+in the <code class="docutils literal notranslate"><span class="pre">ala2_crds</span></code> object to our object. If you omit this step, you can get
 strange results or other errors like segmentation violations. These particle
 positions have been parsed from the CHARMM coordinate file, but you could use a
-<code class="docutils literal"><span class="pre">PDBFile</span></code> or <code class="xref py py-class docutils literal"><span class="pre">CharmmRstFile</span></code> (restart file) instead.</p>
+<code class="docutils literal notranslate"><span class="pre">PDBFile</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">CharmmRstFile</span></code> (restart file) instead.</p>
 </div>
 <div class="section" id="id8">
 <h3>Minimize the energy<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
@@ -460,14 +588,14 @@ This particular invocation will perform at most 500 iterations.</p>
 </div>
 <div class="section" id="id9">
 <h3>Set up the reporters<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
-<p>This stage defines reporters that will &#8220;report&#8221; on the status of the simulation
+<p>This stage defines reporters that will “report” on the status of the simulation
 periodically throughout the simulation. The first is an
-<a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></code></a> which will print
+<a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code></a> which will print
 out a summary of energies and temperatures every 100 steps. Unlike the
-<a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-class docutils literal"><span class="pre">StateDataReporter</span></code></a> in OpenMM, this
+<a class="reference internal" href="openmmobj/parmed.openmm.StateDataReporter.html#parmed.openmm.StateDataReporter" title="parmed.openmm.StateDataReporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code></a> in OpenMM, this
 reporter prints values in the AKMA unit system (Angstrom, Kilocalorie per mole,
 and atomic mass units). This reporter directs the printout to standard output
-(the screen), <code class="docutils literal"><span class="pre">sys.stdout</span></code> can be replaced with a different file-like object
+(the screen), <code class="docutils literal notranslate"><span class="pre">sys.stdout</span></code> can be replaced with a different file-like object
 or a file name.</p>
 <p>The second reporter is a DCD trajectory reporter, which is written in the
 standard DCD trajectory format.</p>
@@ -475,93 +603,66 @@ standard DCD trajectory format.</p>
 <div class="section" id="id10">
 <h3>Running dynamics<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
 <p>This is the stage that actually runs the MD. In this case, we are running 10,000
-steps of MD. The wiki page with &#8220;Common recipes&#8221; has information regarding
+steps of MD. The wiki page with “Common recipes” has information regarding
 running a long simulation in chunks.</p>
 </div>
 </div>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Examples using CHARMM Files</a><ul>
-<li><a class="reference internal" href="#generalized-born-implicit-solvent">Generalized Born Implicit Solvent</a><ul>
-<li><a class="reference internal" href="#loading-charmm-files">Loading CHARMM files</a></li>
-<li><a class="reference internal" href="#create-the-openmm-system">Create the OpenMM system</a></li>
-<li><a class="reference internal" href="#create-the-integrator-to-do-langevin-dynamics">Create the integrator to do Langevin Dynamics</a></li>
-<li><a class="reference internal" href="#define-the-platform">Define the platform</a></li>
-<li><a class="reference internal" href="#create-the-simulation-object">Create the Simulation object</a></li>
-<li><a class="reference internal" href="#set-the-particle-positions">Set the particle positions</a></li>
-<li><a class="reference internal" href="#minimize-the-energy">Minimize the energy</a></li>
-<li><a class="reference internal" href="#set-up-the-reporters">Set up the reporters</a></li>
-<li><a class="reference internal" href="#running-dynamics">Running dynamics</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#explicit-solvent">Explicit solvent</a><ul>
-<li><a class="reference internal" href="#id1">Loading CHARMM files</a></li>
-<li><a class="reference internal" href="#compute-the-box-dimensions">Compute the box dimensions</a></li>
-<li><a class="reference internal" href="#id3">Create the OpenMM system</a></li>
-<li><a class="reference internal" href="#id4">Create the integrator to do Langevin Dynamics</a></li>
-<li><a class="reference internal" href="#id5">Define the platform</a></li>
-<li><a class="reference internal" href="#id6">Create the Simulation object</a></li>
-<li><a class="reference internal" href="#id7">Set the particle positions</a></li>
-<li><a class="reference internal" href="#id8">Minimize the energy</a></li>
-<li><a class="reference internal" href="#id9">Set up the reporters</a></li>
-<li><a class="reference internal" href="#id10">Running dynamics</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="omm_gromacs.html" class="btn btn-neutral float-right" title="Running OpenMM Simulation with GROMACS Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="omm_amber.html" class="btn btn-neutral float-left" title="Running OpenMM Simulation with AMBER Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/omm_charmm.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="omm_gromacs.html" title="Running OpenMM Simulation with GROMACS Files"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="omm_amber.html" title="Running OpenMM Simulation with AMBER Files"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="openmm.html" >OpenMM Functionality</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

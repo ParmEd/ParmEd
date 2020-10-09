@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils.netcdf module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils.netcdf module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.utils.netcdf module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.utils.netcdf.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.utils.netcdf">
 <span id="parmed-utils-netcdf-module"></span><h1>parmed.utils.netcdf module<a class="headerlink" href="#module-parmed.utils.netcdf" title="Permalink to this headline">¶</a></h1>
@@ -58,36 +174,13 @@ as member variables of the <cite>netcdf_file</cite> and <cite>netcdf_variable</c
 NetCDF files. The same API is also used in the PyNIO and pynetcdf
 modules, allowing these modules to be used interchangeably when working
 with NetCDF files.</p>
-<p>This file is taken from the scipy source code. The scipy license is included
-below:</p>
-<p>Copyright (C) 2001, 2002 Enthought, Inc.
-All rights reserved.</p>
-<p>Copyright (C) 2003-2013 SciPy Developers.
-All rights reserved.
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:</p>
-<p>Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.
-Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-Neither the name of Enthought nor the names of the SciPy Developers may be
-used to endorse or promote products derived from this software without
-specific prior written permission.</p>
-<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#8220;AS IS&#8221;
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
-<dl class="class">
+<p>Only NetCDF3 is supported here; for NetCDF4 see
+<a class="reference external" href="http://unidata.github.io/netcdf4-python/">netCDF4-python</a>,
+which has a similar API.</p>
+<dl class="py class">
 <dt id="parmed.utils.netcdf.netcdf_file">
-<em class="property">class </em><code class="descclassname">parmed.utils.netcdf.</code><code class="descname">netcdf_file</code><span class="sig-paren">(</span><em>filename</em>, <em>mode='r'</em>, <em>mmap=None</em>, <em>version=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.netcdf.</code><code class="sig-name descname">netcdf_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em>, <em class="sig-param"><span class="n">mode</span><span class="o">=</span><span class="default_value">'r'</span></em>, <em class="sig-param"><span class="n">mmap</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">maskandscale</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A file object for NetCDF data.</p>
 <p>A <cite>netcdf_file</cite> object has two standard attributes: <cite>dimensions</cite> and
 <cite>variables</cite>. The values of both are dictionaries, mapping dimension
@@ -97,49 +190,42 @@ dictionaries.</p>
 <p>All other attributes correspond to global attributes defined in the
 NetCDF file. Global file attributes are created by assigning to an
 attribute of the <cite>netcdf_file</cite> object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : string or file-like</p>
-<blockquote>
-<div><p>string -&gt; filename</p>
-</div></blockquote>
-<p><strong>mode</strong> : {&#8216;r&#8217;, &#8216;w&#8217;, &#8216;a&#8217;}, optional</p>
-<blockquote>
-<div><p>read-write-append mode, default is &#8216;r&#8217;</p>
-</div></blockquote>
-<p><strong>mmap</strong> : None or bool, optional</p>
-<blockquote>
-<div><p>Whether to mmap <cite>filename</cite> when reading.  Default is True
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>filename</strong><span class="classifier">string or file-like</span></dt><dd><p>string -&gt; filename</p>
+</dd>
+<dt><strong>mode</strong><span class="classifier">{‘r’, ‘w’, ‘a’}, optional</span></dt><dd><p>read-write-append mode, default is ‘r’</p>
+</dd>
+<dt><strong>mmap</strong><span class="classifier">None or bool, optional</span></dt><dd><p>Whether to mmap <cite>filename</cite> when reading.  Default is True
 when <cite>filename</cite> is a file name, False when <cite>filename</cite> is a
 file-like object. Note that when mmap is in use, data arrays
 returned refer directly to the mmapped data on disk, and the
 file cannot be closed as long as references to it exist.</p>
-</div></blockquote>
-<p><strong>version</strong> : {1, 2}, optional</p>
-<blockquote class="last">
-<div><p>version of netcdf to read / write, where 1 means <em>Classic
+</dd>
+<dt><strong>version</strong><span class="classifier">{1, 2}, optional</span></dt><dd><p>version of netcdf to read / write, where 1 means <em>Classic
 format</em> and 2 means <em>64-bit offset format</em>.  Default is 1.  See
-<a class="reference external" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Which-Format.html">here</a>
+<a class="reference external" href="https://www.unidata.ucar.edu/software/netcdf/docs/netcdf_introduction.html#select_format">here</a>
 for more info.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt><strong>maskandscale</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to automatically scale and/or mask data based on attributes.
+Default is False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
-<p>The major advantage of this module over other modules is that it doesn&#8217;t
+<p>The major advantage of this module over other modules is that it doesn’t
 require the code to be linked to the NetCDF libraries. This module is
 derived from <a class="reference external" href="https://bitbucket.org/robertodealmeida/pupynere/">pupynere</a>.</p>
 <p>NetCDF files are a self-describing binary data format. The file contains
 metadata that describes the dimensions and variables in the file. More
-details about NetCDF files can be found <a class="reference external" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf.html">here</a>. There
+details about NetCDF files can be found <a class="reference external" href="https://www.unidata.ucar.edu/software/netcdf/guide_toc.html">here</a>. There
 are three main sections to a NetCDF data structure:</p>
 <ol class="arabic simple">
-<li>Dimensions</li>
-<li>Variables</li>
-<li>Attributes</li>
+<li><p>Dimensions</p></li>
+<li><p>Variables</p></li>
+<li><p>Attributes</p></li>
 </ol>
 <p>The dimensions section records the name and length of each dimension used
 by the variables. The variables would then indicate which dimensions it
@@ -150,14 +236,14 @@ that axes. Lastly, the attributes section would contain additional
 information such as the name of the file creator or the instrument used to
 collect the data.</p>
 <p>When writing data to a NetCDF file, there is often the need to indicate the
-&#8216;record dimension&#8217;. A record dimension is the unbounded dimension for a
+‘record dimension’. A record dimension is the unbounded dimension for a
 variable. For example, a temperature variable may have dimensions of
 latitude, longitude and time. If one wants to add more temperature data to
 the NetCDF file as time progresses, then the temperature variable should
 have the time dimension flagged as the record dimension.</p>
 <p>In addition, the NetCDF file header contains the position of the data in
 the file, so access can be done in an efficient manner without loading
-unnecessary data into memory. It uses the <code class="docutils literal"><span class="pre">mmap</span></code> module to create
+unnecessary data into memory. It uses the <code class="docutils literal notranslate"><span class="pre">mmap</span></code> module to create
 Numpy arrays mapped to the data on disk, for the same purpose.</p>
 <p>Note that when <cite>netcdf_file</cite> is used to open a file with mmap=True
 (default for read-only), arrays returned by it refer to data
@@ -167,7 +253,7 @@ obtained from mmapped Netcdf file if they are to be processed after the file
 is closed, see the example below.</p>
 <p class="rubric">Examples</p>
 <p>To create a NetCDF file:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">netcdf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">netcdf</span><span class="o">.</span><span class="n">netcdf_file</span><span class="p">(</span><span class="s1">&#39;simple.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="s1">&#39;Created for a test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">createDimension</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
@@ -177,17 +263,17 @@ is closed, see the example below.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>Note the assignment of <code class="docutils literal"><span class="pre">range(10)</span></code> to <code class="docutils literal"><span class="pre">time[:]</span></code>.  Exposing the slice
+<p>Note the assignment of <code class="docutils literal notranslate"><span class="pre">arange(10)</span></code> to <code class="docutils literal notranslate"><span class="pre">time[:]</span></code>.  Exposing the slice
 of the time variable allows for the data to be set in the object, rather
-than letting <code class="docutils literal"><span class="pre">range(10)</span></code> overwrite the <code class="docutils literal"><span class="pre">time</span></code> variable.</p>
+than letting <code class="docutils literal notranslate"><span class="pre">arange(10)</span></code> overwrite the <code class="docutils literal notranslate"><span class="pre">time</span></code> variable.</p>
 <p>To read the NetCDF file we just created:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">netcdf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">netcdf</span><span class="o">.</span><span class="n">netcdf_file</span><span class="p">(</span><span class="s1">&#39;simple.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
-<span class="go">Created for a test</span>
+<span class="go">b&#39;Created for a test&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">time</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">units</span><span class="p">)</span>
-<span class="go">days since 2008-01-01</span>
+<span class="go">b&#39;days since 2008-01-01&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="go">(10,)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">time</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -196,120 +282,110 @@ than letting <code class="docutils literal"><span class="pre">range(10)</span></
 </div>
 <p>NetCDF files, when opened read-only, return arrays that refer
 directly to memory-mapped data on disk:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">time</span><span class="p">[:]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">time</span><span class="p">[:]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">base</span>
 <span class="go">&lt;mmap.mmap object at 0x7fe753763180&gt;</span>
 </pre></div>
 </div>
 <p>If the data is to be processed after the file is closed, it needs
 to be copied to main memory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">time</span><span class="p">[:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">time</span><span class="p">[:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="go">4.5</span>
 </pre></div>
 </div>
 <p>A NetCDF file can also be used as context manager:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">netcdf</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">netcdf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">netcdf</span><span class="o">.</span><span class="n">netcdf_file</span><span class="p">(</span><span class="s1">&#39;simple.nc&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
-<span class="go">Created for a test</span>
+<span class="go">b&#39;Created for a test&#39;</span>
 </pre></div>
 </div>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.close" title="parmed.utils.netcdf.netcdf_file.close"><code class="xref py py-obj docutils literal"><span class="pre">close</span></code></a>()</td>
-<td>Closes the NetCDF file.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.close" title="parmed.utils.netcdf.netcdf_file.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>Closes the NetCDF file.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="parmed.utils.netcdf.netcdf_file.createDimension"><code class="xref py py-obj docutils literal"><span class="pre">createDimension</span></code></a>(name,&nbsp;length)</td>
-<td>Adds a dimension to the Dimension section of the NetCDF data structure.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="parmed.utils.netcdf.netcdf_file.createDimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createDimension</span></code></a>(name, length)</p></td>
+<td><p>Adds a dimension to the Dimension section of the NetCDF data structure.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="parmed.utils.netcdf.netcdf_file.createVariable"><code class="xref py py-obj docutils literal"><span class="pre">createVariable</span></code></a>(name,&nbsp;type,&nbsp;dimensions)</td>
-<td>Create an empty variable for the <cite>netcdf_file</cite> object, specifying its data type and the dimensions it uses.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="parmed.utils.netcdf.netcdf_file.createVariable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createVariable</span></code></a>(name, type, dimensions)</p></td>
+<td><p>Create an empty variable for the <cite>netcdf_file</cite> object, specifying its data type and the dimensions it uses.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.flush" title="parmed.utils.netcdf.netcdf_file.flush"><code class="xref py py-obj docutils literal"><span class="pre">flush</span></code></a>()</td>
-<td>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.flush" title="parmed.utils.netcdf.netcdf_file.flush"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flush</span></code></a>()</p></td>
+<td><p>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal"><span class="pre">sync</span></code></a>()</td>
-<td>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync</span></code></a>()</p></td>
+<td><p>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.utils.netcdf.netcdf_file.close">
-<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.close" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes the NetCDF file.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.utils.netcdf.netcdf_file.createDimension">
-<code class="descname">createDimension</code><span class="sig-paren">(</span><em>name</em>, <em>length</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.createDimension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">createDimension</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">length</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.createDimension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds a dimension to the Dimension section of the NetCDF data structure.</p>
 <p>Note that this function merely adds a new dimension that the variables can
-reference.  The values for the dimension, if desired, should be added as
+reference. The values for the dimension, if desired, should be added as
 a variable using <cite>createVariable</cite>, referring to this dimension.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
-<blockquote>
-<div><p>Name of the dimension (Eg, &#8216;lat&#8217; or &#8216;time&#8217;).</p>
-</div></blockquote>
-<p><strong>length</strong> : int</p>
-<blockquote class="last">
-<div><p>Length of the dimension.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the dimension (Eg, ‘lat’ or ‘time’).</p>
+</dd>
+<dt><strong>length</strong><span class="classifier">int</span></dt><dd><p>Length of the dimension.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="parmed.utils.netcdf.netcdf_file.createVariable"><code class="xref py py-obj docutils literal"><span class="pre">createVariable</span></code></a></p>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="parmed.utils.netcdf.netcdf_file.createVariable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createVariable</span></code></a></dt><dd></dd>
+</dl>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.utils.netcdf.netcdf_file.createVariable">
-<code class="descname">createVariable</code><span class="sig-paren">(</span><em>name</em>, <em>type</em>, <em>dimensions</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.createVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">createVariable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">type</span></em>, <em class="sig-param"><span class="n">dimensions</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.createVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.createVariable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create an empty variable for the <cite>netcdf_file</cite> object, specifying its data
 type and the dimensions it uses.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> : str</p>
-<blockquote>
-<div><p>Name of the new variable.</p>
-</div></blockquote>
-<p><strong>type</strong> : dtype or str</p>
-<blockquote>
-<div><p>Data type of the variable.</p>
-</div></blockquote>
-<p><strong>dimensions</strong> : sequence of str</p>
-<blockquote>
-<div><p>List of the dimension names used by the variable, in the desired order.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>variable</strong> : netcdf_variable</p>
-<blockquote class="last">
-<div><p>The newly created <code class="docutils literal"><span class="pre">netcdf_variable</span></code> object.
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Name of the new variable.</p>
+</dd>
+<dt><strong>type</strong><span class="classifier">dtype or str</span></dt><dd><p>Data type of the variable.</p>
+</dd>
+<dt><strong>dimensions</strong><span class="classifier">sequence of str</span></dt><dd><p>List of the dimension names used by the variable, in the desired order.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>variable</strong><span class="classifier">netcdf_variable</span></dt><dd><p>The newly created <code class="docutils literal notranslate"><span class="pre">netcdf_variable</span></code> object.
 This object has also been added to the <cite>netcdf_file</cite> object as well.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+</dl>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="parmed.utils.netcdf.netcdf_file.createDimension"><code class="xref py py-obj docutils literal"><span class="pre">createDimension</span></code></a></p>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.createDimension" title="parmed.utils.netcdf.netcdf_file.createDimension"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createDimension</span></code></a></dt><dd></dd>
+</dl>
 </div>
 <p class="rubric">Notes</p>
 <p>Any dimensions to be used by the variable should already exist in the
@@ -317,78 +393,248 @@ NetCDF data structure or should be created by <cite>createDimension</cite> prior
 creating the NetCDF variable.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.utils.netcdf.netcdf_file.flush">
-<code class="descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.flush" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_file.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.flush" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal"><span class="pre">sync</span></code></a></dt>
-<dd>Identical function</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync</span></code></a></dt><dd><p>Identical function</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.utils.netcdf.netcdf_file.sync">
-<code class="descname">sync</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.sync" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sync</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#parmed.utils.netcdf.netcdf_file.sync" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform a sync-to-disk flush if the <cite>netcdf_file</cite> object is in write mode.</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<dl class="last docutils">
-<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal"><span class="pre">sync</span></code></a></dt>
-<dd>Identical function</dd>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_file.sync" title="parmed.utils.netcdf.netcdf_file.sync"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sync</span></code></a></dt><dd><p>Identical function</p>
+</dd>
 </dl>
 </div>
 </dd></dl>
 
 </dd></dl>
 
+<dl class="py class">
+<dt id="parmed.utils.netcdf.netcdf_variable">
+<em class="property">class </em><code class="sig-prename descclassname">parmed.utils.netcdf.</code><code class="sig-name descname">netcdf_variable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">typecode</span></em>, <em class="sig-param"><span class="n">size</span></em>, <em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">dimensions</span></em>, <em class="sig-param"><span class="n">attributes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maskandscale</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A data object for netcdf files.</p>
+<p><cite>netcdf_variable</cite> objects are constructed by calling the method
+<cite>netcdf_file.createVariable</cite> on the <cite>netcdf_file</cite> object. <cite>netcdf_variable</cite>
+objects behave much like array objects defined in numpy, except that their
+data resides in a file. Data is read by indexing and written by assigning
+to an indexed subset; the entire array can be accessed by the index <code class="docutils literal notranslate"><span class="pre">[:]</span></code>
+or (for scalars) by using the methods <cite>getValue</cite> and <cite>assignValue</cite>.
+<cite>netcdf_variable</cite> objects also have attribute <cite>shape</cite> with the same meaning
+as for arrays, but the shape cannot be modified. There is another read-only
+attribute <cite>dimensions</cite>, whose value is the tuple of dimension names.</p>
+<p>All other attributes correspond to variable attributes defined in
+the NetCDF file. Variable attributes are created by assigning to an
+attribute of the <cite>netcdf_variable</cite> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">array_like</span></dt><dd><p>The data array that holds the values for the variable.
+Typically, this is initialized as empty, but with the proper shape.</p>
+</dd>
+<dt><strong>typecode</strong><span class="classifier">dtype character code</span></dt><dd><p>Desired data-type for the data array.</p>
+</dd>
+<dt><strong>size</strong><span class="classifier">int</span></dt><dd><p>Desired element size for the data array.</p>
+</dd>
+<dt><strong>shape</strong><span class="classifier">sequence of ints</span></dt><dd><p>The shape of the array. This should match the lengths of the
+variable’s dimensions.</p>
+</dd>
+<dt><strong>dimensions</strong><span class="classifier">sequence of strings</span></dt><dd><p>The names of the dimensions used by the variable. Must be in the
+same order of the dimension lengths given by <cite>shape</cite>.</p>
+</dd>
+<dt><strong>attributes</strong><span class="classifier">dict, optional</span></dt><dd><p>Attribute values (any type) keyed by string names. These attributes
+become attributes for the netcdf_variable object.</p>
+</dd>
+<dt><strong>maskandscale</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to automatically scale and/or mask data based on attributes.
+Default is False.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.isrec" title="parmed.utils.netcdf.netcdf_variable.isrec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isrec</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.shape" title="parmed.utils.netcdf.netcdf_variable.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></dt><dd></dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dimensions</strong><span class="classifier">list of str</span></dt><dd><p>List of names of dimensions used by the variable object.</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.isrec" title="parmed.utils.netcdf.netcdf_variable.isrec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">isrec</span></code></a></dt><dd><p>Returns whether the variable has a record dimension or not.</p>
+</dd>
+<dt><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.shape" title="parmed.utils.netcdf.netcdf_variable.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></dt><dd><p>Returns the shape tuple of the data variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.assignValue" title="parmed.utils.netcdf.netcdf_variable.assignValue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assignValue</span></code></a>(value)</p></td>
+<td><p>Assign a scalar value to a <cite>netcdf_variable</cite> of length one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.getValue" title="parmed.utils.netcdf.netcdf_variable.getValue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getValue</span></code></a>()</p></td>
+<td><p>Retrieve a scalar value from a <cite>netcdf_variable</cite> of length one.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.itemsize" title="parmed.utils.netcdf.netcdf_variable.itemsize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">itemsize</span></code></a>()</p></td>
+<td><p>Return the itemsize of the variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.utils.netcdf.netcdf_variable.typecode" title="parmed.utils.netcdf.netcdf_variable.typecode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">typecode</span></code></a>()</p></td>
+<td><p>Return the typecode of the variable.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.assignValue">
+<code class="sig-name descname">assignValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_variable.assignValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.assignValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign a scalar value to a <cite>netcdf_variable</cite> of length one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>value</strong><span class="classifier">scalar</span></dt><dd><p>Scalar value (of compatible type) to assign to a length-one netcdf
+variable. This value will be written to file.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input is not a scalar, or if the destination is not a length-one
+netcdf variable.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.getValue">
+<code class="sig-name descname">getValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_variable.getValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.getValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a scalar value from a <cite>netcdf_variable</cite> of length one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the netcdf variable is an array of length greater than one,
+this exception will be raised.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.isrec">
+<em class="property">property </em><code class="sig-name descname">isrec</code><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.isrec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the variable has a record dimension or not.</p>
+<p>A record dimension is a dimension along which additional data could be
+easily appended in the netcdf data structure without much rewriting of
+the data file. This attribute is a read-only property of the
+<cite>netcdf_variable</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.itemsize">
+<code class="sig-name descname">itemsize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_variable.itemsize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.itemsize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the itemsize of the variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>itemsize</strong><span class="classifier">int</span></dt><dd><p>The element size of the variable (e.g., 8 for float64).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.shape">
+<em class="property">property </em><code class="sig-name descname">shape</code><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the shape tuple of the data variable.</p>
+<p>This is a read-only attribute and can not be modified in the
+same manner of other numpy arrays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="parmed.utils.netcdf.netcdf_variable.typecode">
+<code class="sig-name descname">typecode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/netcdf.html#netcdf_variable.typecode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.netcdf.netcdf_variable.typecode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the typecode of the variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>typecode</strong><span class="classifier">char</span></dt><dd><p>The character typecode of the variable (e.g., ‘i’ for int).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.utils.netcdf.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

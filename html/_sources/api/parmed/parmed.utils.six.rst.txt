@@ -2,6 +2,6 @@ parmed.utils.six module
 =======================
 
 .. automodule:: parmed.utils.six
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

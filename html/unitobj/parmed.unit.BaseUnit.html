@@ -1,98 +1,236 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.unit.BaseUnit &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.unit.BaseUnit &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../dimensional_analysis.html" accesskey="U">Dimensional Analysis (working with <code class="docutils literal"><span class="pre">parmed.unit</span></code>)</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.unit.UnitSystem" href="parmed.unit.UnitSystem.html" />
+    <link rel="prev" title="parmed.unit.Unit" href="parmed.unit.Unit.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../dimensional_analysis.html#what-does-parmed-unit-do">What does <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code> do?</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.unit.Quantity.html">parmed.unit.Quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.unit.is_quantity.html">parmed.unit.is_quantity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.unit.Unit.html">parmed.unit.Unit</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.unit.BaseUnit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.unit.UnitSystem.html">parmed.unit.UnitSystem</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../dimensional_analysis.html#how-do-i-use-units">How do I use <code class="docutils literal notranslate"><span class="pre">units</span></code>?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dimensional_analysis.html#available-unitsystem-options">Available <code class="xref py py-class docutils literal notranslate"><span class="pre">UnitSystem</span></code> options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../dimensional_analysis.html">Dimensional Analysis (working with <code class="xref py py-mod docutils literal notranslate"><span class="pre">parmed.unit</span></code>)</a> &raquo;</li>
+        
+      <li>parmed.unit.BaseUnit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/unitobj/parmed.unit.BaseUnit.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-unit-baseunit">
 <h1>parmed.unit.BaseUnit<a class="headerlink" href="#parmed-unit-baseunit" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.unit.BaseUnit">
-<em class="property">class </em><code class="descclassname">parmed.unit.</code><code class="descname">BaseUnit</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.unit.</code><code class="sig-name descname">BaseUnit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_dim</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Physical unit expressed in exactly one BaseDimension.</p>
 <p>For example, meter_base_unit could be a BaseUnit for the length dimension.
 The BaseUnit class is used internally in the more general Unit class.</p>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.BaseUnit.conversion_factor_to" title="parmed.unit.BaseUnit.conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></code></a>(other)</td>
-<td>Returns a conversion factor from this BaseUnit to another BaseUnit.</td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conversion_factor_to</span></code>(other)</p></td>
+<td><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.BaseUnit.define_conversion_factor_to" title="parmed.unit.BaseUnit.define_conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">define_conversion_factor_to</span></code></a>(other,&nbsp;factor)</td>
-<td>Defines a conversion factor between two BaseUnits.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_conversion_factor_to</span></code>(other, factor)</p></td>
+<td><p>Defines a conversion factor between two BaseUnits.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.BaseUnit.get_dimension_tuple" title="parmed.unit.BaseUnit.get_dimension_tuple"><code class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></code></a>()</td>
-<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dimension_tuple</span></code>()</p></td>
+<td><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.BaseUnit.iter_base_dimensions" title="parmed.unit.BaseUnit.iter_base_dimensions"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></code></a>()</td>
-<td>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_base_dimensions</span></code>()</p></td>
+<td><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p></td>
 </tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></code>()</td>
+</tbody>
+</table>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>iter_base_units</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.BaseUnit.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>base_dim</em>, <em>name</em>, <em>symbol</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_dim</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">symbol</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/unit/baseunit.html#BaseUnit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a new BaseUnit.</p>
-<dl class="docutils">
-<dt>Parameters</dt>
-<dd><ul class="first last simple">
-<li>self: The newly created BaseUnit.</li>
-<li>base_dim: (BaseDimension) The dimension of the new unit, e.g. &#8216;mass&#8217;</li>
-<li>name: (string) Name of the unit, e.g. &#8220;kilogram&#8221;</li>
-<li><dl class="first docutils">
-<dt>symbol: (string) Symbol for the unit, e.g. &#8216;kg&#8217;.  This symbol will appear in</dt>
-<dd>Quantity string descriptions.</dd>
+<dl class="simple">
+<dt>Parameters</dt><dd><ul class="simple">
+<li><p>self: The newly created BaseUnit.</p></li>
+<li><p>base_dim: (BaseDimension) The dimension of the new unit, e.g. ‘mass’</p></li>
+<li><p>name: (string) Name of the unit, e.g. “kilogram”</p></li>
+<li><dl class="simple">
+<dt>symbol: (string) Symbol for the unit, e.g. ‘kg’.  This symbol will appear in</dt><dd><p>Quantity string descriptions.</p>
+</dd>
 </dl>
 </li>
 </ul>
@@ -101,123 +239,90 @@ The BaseUnit class is used internally in the more general Unit class.</p>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.BaseUnit.__init__" title="parmed.unit.BaseUnit.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(base_dim,&nbsp;name,&nbsp;symbol)</td>
-<td>Creates a new BaseUnit.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.BaseUnit.__init__" title="parmed.unit.BaseUnit.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(base_dim, name, symbol)</p></td>
+<td><p>Creates a new BaseUnit.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.BaseUnit.conversion_factor_to" title="parmed.unit.BaseUnit.conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">conversion_factor_to</span></code></a>(other)</td>
-<td>Returns a conversion factor from this BaseUnit to another BaseUnit.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">conversion_factor_to</span></code>(other)</p></td>
+<td><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.BaseUnit.define_conversion_factor_to" title="parmed.unit.BaseUnit.define_conversion_factor_to"><code class="xref py py-obj docutils literal"><span class="pre">define_conversion_factor_to</span></code></a>(other,&nbsp;factor)</td>
-<td>Defines a conversion factor between two BaseUnits.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_conversion_factor_to</span></code>(other, factor)</p></td>
+<td><p>Defines a conversion factor between two BaseUnits.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.BaseUnit.get_dimension_tuple" title="parmed.unit.BaseUnit.get_dimension_tuple"><code class="xref py py-obj docutils literal"><span class="pre">get_dimension_tuple</span></code></a>()</td>
-<td>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_dimension_tuple</span></code>()</p></td>
+<td><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.BaseUnit.iter_base_dimensions" title="parmed.unit.BaseUnit.iter_base_dimensions"><code class="xref py py-obj docutils literal"><span class="pre">iter_base_dimensions</span></code></a>()</td>
-<td>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_base_dimensions</span></code>()</p></td>
+<td><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p></td>
 </tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">iter_base_units</span></code>()</td>
-<td></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">iter_base_units</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="parmed.unit.BaseUnit.conversion_factor_to">
-<code class="descname">conversion_factor_to</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.conversion_factor_to" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a conversion factor from this BaseUnit to another BaseUnit.</p>
-<p>It does not matter which existing BaseUnit you define the conversion factor to.
-Conversions for all other known BaseUnits will be computed at the same time.</p>
-<p>Raises TypeError if dimension does not match.
-Raises LookupError if no conversion has been defined. (see define_conversion_factor_to).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.unit.BaseUnit.define_conversion_factor_to">
-<code class="descname">define_conversion_factor_to</code><span class="sig-paren">(</span><em>other</em>, <em>factor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.define_conversion_factor_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.define_conversion_factor_to" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines a conversion factor between two BaseUnits.</p>
-<p>self * factor = other</p>
-<dl class="docutils">
-<dt>Parameters:</dt>
-<dd><ul class="first last simple">
-<li>self: (BaseUnit) &#8216;From&#8217; unit in conversion.</li>
-<li>other: (BaseUnit) &#8216;To&#8217; unit in conversion.</li>
-<li>factor: (float) Conversion factor.</li>
-</ul>
-</dd>
-</dl>
-<p>After calling this method, both self and other will have stored
-conversion factors for one another, plus all other BaseUnits which
-self and other have previously defined.</p>
-<p>Both self and other must have the same dimension, otherwise a TypeError
-will be raised.</p>
-<p>Returns None.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.unit.BaseUnit.get_dimension_tuple">
-<code class="descname">get_dimension_tuple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.get_dimension_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.get_dimension_tuple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a sorted tuple of (BaseDimension, exponent) pairs, that can be used as a dictionary key.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.unit.BaseUnit.iter_base_dimensions">
-<code class="descname">iter_base_dimensions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/simtk/unit/baseunit.html#BaseUnit.iter_base_dimensions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.BaseUnit.iter_base_dimensions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary of BaseDimension:exponent pairs, describing the dimension of this unit.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.unit.UnitSystem.html" class="btn btn-neutral float-right" title="parmed.unit.UnitSystem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.unit.Unit.html" class="btn btn-neutral float-left" title="parmed.unit.Unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/unitobj/parmed.unit.BaseUnit.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../dimensional_analysis.html" >Dimensional Analysis (working with <code class="docutils literal"><span class="pre">parmed.unit</span></code>)</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

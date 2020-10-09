@@ -17,6 +17,8 @@ parmed.topologyobjects.Angle
       ~Angle.delete
       ~Angle.energy
       ~Angle.measure
+      ~Angle.uenergy
+      ~Angle.umeasure
    
    
 

@@ -2,6 +2,6 @@ parmed.gromacs.gromacstop module
 ================================
 
 .. automodule:: parmed.gromacs.gromacstop
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,79 +1,236 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.topologyobjects.OutOfPlaneBendType &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.topologyobjects.OutOfPlaneBendType &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" accesskey="U">The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="parmed.topologyobjects.PiTorsion" href="parmed.topologyobjects.PiTorsion.html" />
+    <link rel="prev" title="parmed.topologyobjects.OutOfPlaneBend" href="parmed.topologyobjects.OutOfPlaneBend.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../topologyobjects.html">Core classes used to represent topologies</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Atom.html">parmed.topologyobjects.Atom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Residue.html">parmed.topologyobjects.Residue</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AtomList.html">parmed.topologyobjects.AtomList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.ResidueList.html">parmed.topologyobjects.ResidueList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Bond.html">parmed.topologyobjects.Bond</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Angle.html">parmed.topologyobjects.Angle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.UreyBradley.html">parmed.topologyobjects.UreyBradley</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Dihedral.html">parmed.topologyobjects.Dihedral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Improper.html">parmed.topologyobjects.Improper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.Cmap.html">parmed.topologyobjects.Cmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AtomType.html">parmed.topologyobjects.AtomType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.BondType.html">parmed.topologyobjects.BondType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.AngleType.html">parmed.topologyobjects.AngleType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.DihedralType.html">parmed.topologyobjects.DihedralType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.DihedralTypeList.html">parmed.topologyobjects.DihedralTypeList</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parmed.topologyobjects.ImproperType.html">parmed.topologyobjects.ImproperType</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#using-the-atom-class">Using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Atom</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#using-the-residue-class">Using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Residue</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-atomlist-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">AtomList</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-residuelist-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">ResidueList</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-bond-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Bond</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-angle-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Angle</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-ureybradley-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">UreyBradley</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-dihedral-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Dihedral</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-improper-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Improper</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-cmap-class">The <code class="xref py py-class docutils literal notranslate"><span class="pre">Cmap</span></code> class</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../topologyobjects.html#the-xyztype-classes">The <code class="docutils literal notranslate"><span class="pre">XyzType</span></code> classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../topologyobjects.html#amoeba-specific-terms">Amoeba-specific terms</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.TrigonalAngle.html">parmed.topologyobjects.TrigonalAngle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.OutOfPlaneBend.html">parmed.topologyobjects.OutOfPlaneBend</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">parmed.topologyobjects.OutOfPlaneBendType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.PiTorsion.html">parmed.topologyobjects.PiTorsion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.StretchBend.html">parmed.topologyobjects.StretchBend</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.StretchBendType.html">parmed.topologyobjects.StretchBendType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.TorsionTorsion.html">parmed.topologyobjects.TorsionTorsion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.TorsionTorsionType.html">parmed.topologyobjects.TorsionTorsionType</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.ChiralFrame.html">parmed.topologyobjects.ChiralFrame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.MultipoleFrame.html">parmed.topologyobjects.MultipoleFrame</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.NonbondedException.html">parmed.topologyobjects.NonbondedException</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.topologyobjects.NonbondedExceptionType.html">parmed.topologyobjects.NonbondedExceptionType</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../topologyobjects.html">The <code class="xref py py-mod docutils literal notranslate"><span class="pre">topologyobjects</span></code> module</a> &raquo;</li>
+        
+      <li>parmed.topologyobjects.OutOfPlaneBendType</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/topobj/parmed.topologyobjects.OutOfPlaneBendType.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-topologyobjects-outofplanebendtype">
 <h1>parmed.topologyobjects.OutOfPlaneBendType<a class="headerlink" href="#parmed-topologyobjects-outofplanebendtype" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.topologyobjects.OutOfPlaneBendType">
-<em class="property">class </em><code class="descclassname">parmed.topologyobjects.</code><code class="descname">OutOfPlaneBendType</code><span class="sig-paren">(</span><em>k</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.topologyobjects.</code><code class="sig-name descname">OutOfPlaneBendType</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#OutOfPlaneBendType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneBendType" title="Permalink to this definition">¶</a></dt>
 <dd><p>An angle type with a set of angle parameters</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>k</strong> : <code class="docutils literal"><span class="pre">float</span></code></p>
-<blockquote>
-<div><p>Force constant in kcal/mol/radians^2</p>
-</div></blockquote>
-<p><strong>list</strong> : <a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal"><span class="pre">TrackedList</span></code></a></p>
-<blockquote class="last">
-<div><p>A list of <a href="#id1"><span class="problematic" id="id2">`</span></a>OutOfPlaneBendType`s in which this is a member</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>k</strong><span class="classifier"><code class="docutils literal notranslate"><span class="pre">float</span></code></span></dt><dd><p>Force constant in kcal/mol/radians^2</p>
+</dd>
+<dt><strong>list</strong><span class="classifier"><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.TrackedList" title="parmed.topologyobjects.TrackedList"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrackedList</span></code></a></span></dt><dd><p>A list of <a href="#id1"><span class="problematic" id="id2">`</span></a>OutOfPlaneBendType`s in which this is a member</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>Two <cite>OutOfPlaneBendType`s are equal if their `k</cite> attribute is equal</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ot2</span> <span class="o">=</span> <span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ot1</span> <span class="ow">is</span> <span class="n">ot2</span>
 <span class="go">False</span>
@@ -84,7 +241,7 @@
 </pre></div>
 </div>
 <p>As part of a list, they can be indexed</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">OutOfPlaneBendType</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="nb">list</span><span class="o">=</span><span class="n">oopbend_list</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">oopbend_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">idx</span>
@@ -93,44 +250,44 @@
 <span class="go">1</span>
 </pre></div>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBendType.idx" title="parmed.topologyobjects.OutOfPlaneBendType.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>idx</strong></dt><dd></dd>
+<dt><strong>uk</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
 <dt id="parmed.topologyobjects.OutOfPlaneBendType.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>k</em>, <em>list=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#OutOfPlaneBendType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneBendType.__init__" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">list</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parmed/topologyobjects.html#OutOfPlaneBendType.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.topologyobjects.OutOfPlaneBendType.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
 
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.topologyobjects.OutOfPlaneBendType.__init__" title="parmed.topologyobjects.OutOfPlaneBendType.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(k[,&nbsp;list])</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.topologyobjects.OutOfPlaneBendType.__init__" title="parmed.topologyobjects.OutOfPlaneBendType.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(k[, list])</p></td>
+<td><p>Initialize self.</p></td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBendType.idx" title="parmed.topologyobjects.OutOfPlaneBendType.idx"><code class="xref py py-obj docutils literal"><span class="pre">idx</span></code></a></td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">idx</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/parmed/parmed.topologyobjects.html#parmed.topologyobjects.OutOfPlaneBendType.uk" title="parmed.topologyobjects.OutOfPlaneBendType.uk"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uk</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -139,48 +296,59 @@
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parmed.topologyobjects.PiTorsion.html" class="btn btn-neutral float-right" title="parmed.topologyobjects.PiTorsion" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parmed.topologyobjects.OutOfPlaneBend.html" class="btn btn-neutral float-left" title="parmed.topologyobjects.OutOfPlaneBend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../_sources/topobj/parmed.topologyobjects.OutOfPlaneBendType.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">ParmEd  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../topologyobjects.html" >The <code class="docutils literal"><span class="pre">topologyobjects</span></code> module</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

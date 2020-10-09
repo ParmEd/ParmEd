@@ -1,5 +1,5 @@
-parmed.load_rosetta
-===================
+parmed.load\_rosetta
+====================
 
 .. currentmodule:: parmed
 

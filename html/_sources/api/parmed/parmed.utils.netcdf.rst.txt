@@ -2,6 +2,6 @@ parmed.utils.netcdf module
 ==========================
 
 .. automodule:: parmed.utils.netcdf
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

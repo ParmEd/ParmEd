@@ -24,5 +24,10 @@ parmed.topologyobjects.StretchBendType
    .. autosummary::
    
       ~StretchBendType.idx
+      ~StretchBendType.uk1
+      ~StretchBendType.uk2
+      ~StretchBendType.ureq1
+      ~StretchBendType.ureq2
+      ~StretchBendType.utheteq
    
    

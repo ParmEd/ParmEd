@@ -2,6 +2,6 @@ parmed.amber.mdin.ewald module
 ==============================
 
 .. automodule:: parmed.amber.mdin.ewald
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

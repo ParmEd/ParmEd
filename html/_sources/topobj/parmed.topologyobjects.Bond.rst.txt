@@ -17,6 +17,8 @@ parmed.topologyobjects.Bond
       ~Bond.delete
       ~Bond.energy
       ~Bond.measure
+      ~Bond.uenergy
+      ~Bond.umeasure
    
    
 

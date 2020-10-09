@@ -24,5 +24,7 @@ parmed.topologyobjects.AngleType
    .. autosummary::
    
       ~AngleType.idx
+      ~AngleType.uk
+      ~AngleType.utheteq
    
    

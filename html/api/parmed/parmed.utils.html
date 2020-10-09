@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.utils package &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.utils package &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="parmed-utils-package">
 <h1>parmed.utils package<a class="headerlink" href="#parmed-utils-package" title="Permalink to this headline">¶</a></h1>
@@ -55,12 +171,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.fortranformat.html">parmed.utils.fortranformat package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="parmed.utils.fortranformat.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="parmed.utils.fortranformat.FortranRecordReader.html">parmed.utils.fortranformat.FortranRecordReader module</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="parmed.utils.fortranformat.FortranRecordWriter.html">parmed.utils.fortranformat.FortranRecordWriter module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.utils.fortranformat.FortranRecordReader.html">parmed.utils.fortranformat.FortranRecordReader module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parmed.utils.fortranformat.FortranRecordWriter.html">parmed.utils.fortranformat.FortranRecordWriter module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="parmed.utils.fortranformat.config.html">parmed.utils.fortranformat.config module</a></li>
 </ul>
 </li>
@@ -76,205 +188,168 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.decorators.html">parmed.utils.decorators module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.io.html">parmed.utils.io module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parmed.utils.netcdf.html">parmed.utils.netcdf module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.utils.netcdf.html">parmed.utils.netcdf module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.pairlist.html">parmed.utils.pairlist module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.pandautils.html">parmed.utils.pandautils module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parmed.utils.six.html">parmed.utils.six module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="parmed.utils.timer.html">parmed.utils.timer module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.utils.timer.html">parmed.utils.timer module</a></li>
 </ul>
 </div>
 </div>
 <div class="section" id="module-parmed.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-parmed.utils" title="Permalink to this headline">¶</a></h2>
-<p>Various utilities used by ParmEd that don&#8217;t really fit elsewhere</p>
-<dl class="function">
-<dt id="parmed.utils.which">
-<code class="descclassname">parmed.utils.</code><code class="descname">which</code><span class="sig-paren">(</span><em>prog</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#which"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.which" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the full path of a program if it exists in PATH</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>prog</strong> : str</p>
-<blockquote>
-<div><p>The name of a program to try and locate in PATH</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>path</strong> : str or None</p>
-<blockquote class="last">
-<div><p>The full path of the program. If it cannot be found, None</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="parmed.utils.tag_molecules">
-<code class="descclassname">parmed.utils.</code><code class="descname">tag_molecules</code><span class="sig-paren">(</span><em>struct</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#tag_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.tag_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets the <code class="docutils literal"><span class="pre">marked</span></code> attribute of every Atom in struct to the molecule number
-it is a part of. If no bonds are present, every atom is its own molecule.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.Structure</span></code></a></p>
-<blockquote class="last">
-<div><p>Input structure to tag the molecules for</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
+<p>Various utilities used by ParmEd that don’t really fit elsewhere</p>
+<dl class="py function">
 <dt id="parmed.utils.canonical_improper_order">
-<code class="descclassname">parmed.utils.</code><code class="descname">canonical_improper_order</code><span class="sig-paren">(</span><em>atom1</em>, <em>atom2</em>, <em>atom3</em>, <em>atom4</em>, <em>center=1</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#canonical_improper_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.canonical_improper_order" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.</code><code class="sig-name descname">canonical_improper_order</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">atom1</span></em>, <em class="sig-param"><span class="n">atom2</span></em>, <em class="sig-param"><span class="n">atom3</span></em>, <em class="sig-param"><span class="n">atom4</span></em>, <em class="sig-param"><span class="n">center</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#canonical_improper_order"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.canonical_improper_order" title="Permalink to this definition">¶</a></dt>
 <dd><p>Controls how improper torsion keys are generated from Structures.
 Different programs have different conventions as far as where the
-&#8220;central&#8221; atom is placed.</p>
-<p>Note, different programs use different conventions for where the &#8220;central&#8221;
+“central” atom is placed.</p>
+<p>Note, different programs use different conventions for where the “central”
 atom comes in the overall torsion ordering. CHARMM puts the central atom
 first, whereas AMBER puts the central atom third. A central atom is defined
 as the one that is bonded to the other 3.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atom1</strong> : <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Atom</span></code></a></p>
-<blockquote>
-<div><p>The first atom in the improper</p>
-</div></blockquote>
-<p><strong>atom2</strong> : <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Atom</span></code></a></p>
-<blockquote>
-<div><p>The second atom in the improper</p>
-</div></blockquote>
-<p><strong>atom3</strong> : <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Atom</span></code></a></p>
-<blockquote>
-<div><p>The third atom in the improper</p>
-</div></blockquote>
-<p><strong>atom4</strong> : <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Atom</span></code></a></p>
-<blockquote>
-<div><p>The fourth atom in the improper</p>
-</div></blockquote>
-<p><strong>center</strong> : int, optional</p>
-<blockquote>
-<div><p>Which location represents the <em>center</em> atom. Default is 1 (first
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>atom1</strong><span class="classifier"><a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.topologyobjects.Atom</span></code></a></span></dt><dd><p>The first atom in the improper</p>
+</dd>
+<dt><strong>atom2</strong><span class="classifier"><a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.topologyobjects.Atom</span></code></a></span></dt><dd><p>The second atom in the improper</p>
+</dd>
+<dt><strong>atom3</strong><span class="classifier"><a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.topologyobjects.Atom</span></code></a></span></dt><dd><p>The third atom in the improper</p>
+</dd>
+<dt><strong>atom4</strong><span class="classifier"><a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.topologyobjects.Atom</span></code></a></span></dt><dd><p>The fourth atom in the improper</p>
+</dd>
+<dt><strong>center</strong><span class="classifier">int, optional</span></dt><dd><p>Which location represents the <em>center</em> atom. Default is 1 (first
 location).</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>a1, a2, a3, a4</strong> : tuple of <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal"><span class="pre">parmed.topologyobjects.Atom</span></code></a></p>
-<blockquote class="last">
-<div><p>The atoms in the necessary parameter order</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl>
+<dt><strong>a1, a2, a3, a4</strong><span class="classifier">tuple of <a class="reference internal" href="../../topobj/parmed.topologyobjects.Atom.html#parmed.topologyobjects.Atom" title="parmed.topologyobjects.Atom"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.topologyobjects.Atom</span></code></a></span></dt><dd><p>The atoms in the necessary parameter order</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.utils.find_atom_pairs">
-<code class="descclassname">parmed.utils.</code><code class="descname">find_atom_pairs</code><span class="sig-paren">(</span><em>struct</em>, <em>dist</em>, <em>subset=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pairlist.html#find_atom_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.find_atom_pairs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.utils.</code><code class="sig-name descname">find_atom_pairs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct</span></em>, <em class="sig-param"><span class="n">dist</span></em>, <em class="sig-param"><span class="n">subset</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils/pairlist.html#find_atom_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.find_atom_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Finds all pairs of atoms in a structure within a requested distance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>struct</strong> : <a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal"><span class="pre">parmed.structure.Structure</span></code></a></p>
-<blockquote>
-<div><p>The structure for which to find all atom pairs</p>
-</div></blockquote>
-<p><strong>dist</strong> : float</p>
-<blockquote>
-<div><p>The maximum distance between identified pairs. No pairs separated by
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>struct</strong><span class="classifier"><a class="reference internal" href="../../structobj/parmed.structure.Structure.html#parmed.structure.Structure" title="parmed.structure.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.structure.Structure</span></code></a></span></dt><dd><p>The structure for which to find all atom pairs</p>
+</dd>
+<dt><strong>dist</strong><span class="classifier">float</span></dt><dd><p>The maximum distance between identified pairs. No pairs separated by
 less than dist will be omitted, although some pairs greater than dist
 will be identified.</p>
-</div></blockquote>
-<p><strong>subset</strong> : set of Atom, optional</p>
-<blockquote>
-<div><p>If specified, the pairlist will be built <em>only</em> considering these atoms</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pairs</strong> : list of set of Atom</p>
-<blockquote>
-<div><p>The list of set of atoms that may be pairs</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>ValueError if ``struct`` does not have any coordinates.</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt><strong>subset</strong><span class="classifier">set of Atom, optional</span></dt><dd><p>If specified, the pairlist will be built <em>only</em> considering these atoms</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>pairs</strong><span class="classifier">list of set of Atom</span></dt><dd><p>The list of set of atoms that may be pairs</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError if <code class="docutils literal notranslate"><span class="pre">struct</span></code> does not have any coordinates.</dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Notes</p>
 <p>This function does not do anything with periodic boundary conditions.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt id="parmed.utils.tag_molecules">
+<code class="sig-prename descclassname">parmed.utils.</code><code class="sig-name descname">tag_molecules</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">struct</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#tag_molecules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.tag_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the <code class="docutils literal notranslate"><span class="pre">marked</span></code> attribute of every Atom in struct to the molecule number
+it is a part of. If no bonds are present, every atom is its own molecule.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl>
+<dt><strong>struct</strong><span class="classifier"><a class="reference internal" href="parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.Structure</span></code></a></span></dt><dd><p>Input structure to tag the molecules for</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="parmed.utils.which">
+<code class="sig-prename descclassname">parmed.utils.</code><code class="sig-name descname">which</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prog</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/utils.html#which"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.utils.which" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the full path of a program if it exists in PATH</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>prog</strong><span class="classifier">str</span></dt><dd><p>The name of a program to try and locate in PATH</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>path</strong><span class="classifier">str or None</span></dt><dd><p>The full path of the program. If it cannot be found, None</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="../../index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">parmed.utils package</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-parmed.utils">Module contents</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.utils.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

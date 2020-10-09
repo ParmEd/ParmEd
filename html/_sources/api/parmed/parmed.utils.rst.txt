@@ -5,13 +5,15 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    parmed.utils.fortranformat
+   parmed.utils.fortranformat
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.utils.decorators
    parmed.utils.io
@@ -25,6 +27,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

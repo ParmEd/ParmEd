@@ -1,7 +1,7 @@
-parmed.tools.parmed_cmd module
-==============================
+parmed.tools.parmed\_cmd module
+===============================
 
 .. automodule:: parmed.tools.parmed_cmd
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

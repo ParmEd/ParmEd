@@ -1,51 +1,167 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.unit.quantity module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.unit.quantity module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.unit.quantity module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.unit.quantity.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.unit.quantity">
 <span id="parmed-unit-quantity-module"></span><h1>parmed.unit.quantity module<a class="headerlink" href="#module-parmed.unit.quantity" title="Permalink to this headline">¶</a></h1>
@@ -54,40 +170,38 @@
 to Boost.Units package in C++ (but with a runtime cost).
 Uses similar API as Scientific.Physics.PhysicalQuantities
 but different internals to satisfy our local requirements.
-In particular, there is no underlying set of &#8216;canonical&#8217; base
+In particular, there is no underlying set of ‘canonical’ base
 units, whereas in Scientific.Physics.PhysicalQuantities all
 units are secretly in terms of SI units.  Also, it is easier
 to add new fundamental dimensions to simtk.dimensions.  You
-might want to make new dimensions for, say, &#8220;currency&#8221; or
-&#8220;information&#8221;.</p>
-<dl class="docutils">
-<dt>Some features of this implementation:</dt>
-<dd><ul class="first last simple">
-<li>Quantities are a combination of a value and a unit.  The value
+might want to make new dimensions for, say, “currency” or
+“information”.</p>
+<dl class="simple">
+<dt>Some features of this implementation:</dt><dd><ul class="simple">
+<li><p>Quantities are a combination of a value and a unit.  The value
 part can be any python type, including numbers, lists, numpy
-arrays, and anything else.  The unit part must be a simtk.unit.Unit.</li>
-<li>Operations like adding incompatible units raises an error.</li>
-<li>Multiplying or dividing units/quantities creates new units.</li>
-<li>Users can create new Units and Dimensions, but most of the useful
-ones are predefined.</li>
-<li>Conversion factors between units are applied transitively, so all
-possible conversions are available.</li>
-<li>I want dimensioned Quantities that are compatible with numpy arrays,
+arrays, and anything else.  The unit part must be a simtk.unit.Unit.</p></li>
+<li><p>Operations like adding incompatible units raises an error.</p></li>
+<li><p>Multiplying or dividing units/quantities creates new units.</p></li>
+<li><p>Users can create new Units and Dimensions, but most of the useful
+ones are predefined.</p></li>
+<li><p>Conversion factors between units are applied transitively, so all
+possible conversions are available.</p></li>
+<li><p>I want dimensioned Quantities that are compatible with numpy arrays,
 but do not necessarily require the python numpy package. In other
 words, Quantities can be based on either numpy arrays or on built in
-python types.</li>
-<li>Units are NOT necessarily stored in terms of SI units internally.
+python types.</p></li>
+<li><p>Units are NOT necessarily stored in terms of SI units internally.
 This is very important for me, because one important application
 area for us is at the molecular scale. Using SI units internally
 can lead to exponent overflow in commonly used molecular force
 calculations. Internally, all unit systems are equally fundamental
-in SimTK.</li>
+in SimTK.</p></li>
 </ul>
 </dd>
-<dt>Two possible enhancements that have not been implemented are</dt>
-<dd><ol class="first last arabic simple">
-<li>Include uncertainties with propagation of errors</li>
-<li>Incorporate offsets for celsius &lt;-&gt; kelvin conversion</li>
+<dt>Two possible enhancements that have not been implemented are</dt><dd><ol class="arabic simple">
+<li><p>Include uncertainties with propagation of errors</p></li>
+<li><p>Incorporate offsets for celsius &lt;-&gt; kelvin conversion</p></li>
 </ol>
 </dd>
 </dl>
@@ -99,159 +213,167 @@ Medical Research, grant U54 GM072970. See <a class="reference external" href="ht
 Authors: Christopher M. Bruns
 Contributors: Peter Eastman</p>
 <p>Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the &#8220;Software&#8221;),
+copy of this software and associated documentation files (the “Software”),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:</p>
 <p>The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.</p>
-<p>THE SOFTWARE IS PROVIDED &#8220;AS IS&#8221;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 THE AUTHORS, CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.unit.quantity.Quantity">
-<em class="property">class </em><code class="descclassname">parmed.unit.quantity.</code><code class="descname">Quantity</code><span class="sig-paren">(</span><em>value=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.unit.quantity.</code><code class="sig-name descname">Quantity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Physical quantity, such as 1.3 meters per second.</p>
 <p>Quantities contain both a value, such as 1.3; and a unit,
-such as &#8216;meters per second&#8217;.</p>
-<dl class="docutils">
-<dt>Supported value types include:</dt>
-<dd><p class="first">1 - numbers (float, int, long)
+such as ‘meters per second’.</p>
+<dl>
+<dt>Supported value types include:</dt><dd><p>1 - numbers (float, int, long)
 2 - lists of numbers, e.g. [1,2,3]
 3 - tuples of numbers, e.g. (1,2,3)</p>
 <blockquote>
-<div>Note - unit conversions will cause tuples to be converted to lists</div></blockquote>
-<p class="last">4 - lists of tuples of numbers, lists of lists of ... etc. of numbers
+<div><p>Note - unit conversions will cause tuples to be converted to lists</p>
+</div></blockquote>
+<p>4 - lists of tuples of numbers, lists of lists of … etc. of numbers
 5 - numpy.arrays</p>
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.append" title="parmed.unit.quantity.Quantity.append"><code class="xref py py-obj docutils literal"><span class="pre">append</span></code></a>(item)</td>
-<td></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.in_unit_system" title="parmed.unit.quantity.Quantity.in_unit_system"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_unit_system</span></code></a>(system)</p></td>
+<td><p>Returns a new Quantity equal to this one, expressed in a particular unit system.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.count" title="parmed.unit.quantity.Quantity.count"><code class="xref py py-obj docutils literal"><span class="pre">count</span></code></a>(item)</td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.in_units_of" title="parmed.unit.quantity.Quantity.in_units_of"><code class="xref py py-obj docutils literal notranslate"><span class="pre">in_units_of</span></code></a>(other_unit)</p></td>
+<td><p>Returns an equal Quantity expressed in different units.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.extend" title="parmed.unit.quantity.Quantity.extend"><code class="xref py py-obj docutils literal"><span class="pre">extend</span></code></a>(rhs)</td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.max" title="parmed.unit.quantity.Quantity.max"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Computes the maximum value of the sequence, with the result having the same unit as the current sequence.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.format" title="parmed.unit.quantity.Quantity.format"><code class="xref py py-obj docutils literal"><span class="pre">format</span></code></a>(format_spec)</td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.mean" title="parmed.unit.quantity.Quantity.mean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Computes the mean of a sequence, with the result having the same unit as the current sequence.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.in_unit_system" title="parmed.unit.quantity.Quantity.in_unit_system"><code class="xref py py-obj docutils literal"><span class="pre">in_unit_system</span></code></a>(system)</td>
-<td>Returns a new Quantity equal to this one, expressed in a particular unit system.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.min" title="parmed.unit.quantity.Quantity.min"><code class="xref py py-obj docutils literal notranslate"><span class="pre">min</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Computes the minimum value of the sequence, with the result having the same unit as the current sequence.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.in_units_of" title="parmed.unit.quantity.Quantity.in_units_of"><code class="xref py py-obj docutils literal"><span class="pre">in_units_of</span></code></a>(other_unit)</td>
-<td>Returns an equal Quantity expressed in different units.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.reduce_unit" title="parmed.unit.quantity.Quantity.reduce_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reduce_unit</span></code></a>([guide_unit])</p></td>
+<td><p>Combine similar component units and scale, to form an equal Quantity in simpler units.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.index" title="parmed.unit.quantity.Quantity.index"><code class="xref py py-obj docutils literal"><span class="pre">index</span></code></a>(item)</td>
-<td></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.reshape" title="parmed.unit.quantity.Quantity.reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reshape</span></code></a>(shape[, order])</p></td>
+<td><p>Same as numpy.ndarray.reshape, except the result is a Quantity with the same units as the current object rather than a plain numpy.ndarray</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.insert" title="parmed.unit.quantity.Quantity.insert"><code class="xref py py-obj docutils literal"><span class="pre">insert</span></code></a>(index,&nbsp;item)</td>
-<td></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.sqrt" title="parmed.unit.quantity.Quantity.sqrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sqrt</span></code></a>()</p></td>
+<td><p>Returns square root of a Quantity.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.max" title="parmed.unit.quantity.Quantity.max"><code class="xref py py-obj docutils literal"><span class="pre">max</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Computes the maximum value of the sequence, with the result having the same unit as the current sequence.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.std" title="parmed.unit.quantity.Quantity.std"><code class="xref py py-obj docutils literal notranslate"><span class="pre">std</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Computes the square root of the variance of a sequence, with the result having the same unit as the current sequence.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.mean" title="parmed.unit.quantity.Quantity.mean"><code class="xref py py-obj docutils literal"><span class="pre">mean</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Computes the mean of a sequence, with the result having the same unit as the current sequence.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.sum" title="parmed.unit.quantity.Quantity.sum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sum</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Computes the sum of a sequence, with the result having the same unit as the current sequence.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.min" title="parmed.unit.quantity.Quantity.min"><code class="xref py py-obj docutils literal"><span class="pre">min</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Computes the minimum value of the sequence, with the result having the same unit as the current sequence.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.value_in_unit" title="parmed.unit.quantity.Quantity.value_in_unit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_in_unit</span></code></a>(unit)</p></td>
+<td><p>Returns underlying value, in the specified units.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.pop" title="parmed.unit.quantity.Quantity.pop"><code class="xref py py-obj docutils literal"><span class="pre">pop</span></code></a>(\*args)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.reduce_unit" title="parmed.unit.quantity.Quantity.reduce_unit"><code class="xref py py-obj docutils literal"><span class="pre">reduce_unit</span></code></a>([guide_unit])</td>
-<td>Combine similar component units and scale, to form an equal Quantity in simpler units.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.remove" title="parmed.unit.quantity.Quantity.remove"><code class="xref py py-obj docutils literal"><span class="pre">remove</span></code></a>(item)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.reshape" title="parmed.unit.quantity.Quantity.reshape"><code class="xref py py-obj docutils literal"><span class="pre">reshape</span></code></a>(shape[,&nbsp;order])</td>
-<td>Same as numpy.ndarray.reshape, except the result is a Quantity with the</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.sqrt" title="parmed.unit.quantity.Quantity.sqrt"><code class="xref py py-obj docutils literal"><span class="pre">sqrt</span></code></a>()</td>
-<td>Returns square root of a Quantity.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.std" title="parmed.unit.quantity.Quantity.std"><code class="xref py py-obj docutils literal"><span class="pre">std</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Computes the square root of the variance of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.sum" title="parmed.unit.quantity.Quantity.sum"><code class="xref py py-obj docutils literal"><span class="pre">sum</span></code></a>(\*args,&nbsp;\*\*kwargs)</td>
-<td>Computes the sum of a sequence, with the result having the same unit as the current sequence.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.value_in_unit" title="parmed.unit.quantity.Quantity.value_in_unit"><code class="xref py py-obj docutils literal"><span class="pre">value_in_unit</span></code></a>(unit)</td>
-<td>Returns underlying value, in the specified units.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.unit.quantity.Quantity.value_in_unit_system" title="parmed.unit.quantity.Quantity.value_in_unit_system"><code class="xref py py-obj docutils literal"><span class="pre">value_in_unit_system</span></code></a>(system)</td>
-<td>Returns the underlying value type, after conversion to a particular unit system.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.unit.quantity.Quantity.value_in_unit_system" title="parmed.unit.quantity.Quantity.value_in_unit_system"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value_in_unit_system</span></code></a>(system)</p></td>
+<td><p>Returns the underlying value type, after conversion to a particular unit system.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>append</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>count</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>extend</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>format</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>index</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>insert</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>pop</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>remove</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.append">
-<code class="descname">append</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.append" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">append</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.append" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.count">
-<code class="descname">count</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.count" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">count</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.count" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.extend">
-<code class="descname">extend</code><span class="sig-paren">(</span><em>rhs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.extend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rhs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.extend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.extend" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.format">
-<code class="descname">format</code><span class="sig-paren">(</span><em>format_spec</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.format" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">format</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format_spec</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.format" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.in_unit_system">
-<code class="descname">in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_unit_system</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new Quantity equal to this one, expressed in a particular unit system.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.in_units_of">
-<code class="descname">in_units_of</code><span class="sig-paren">(</span><em>other_unit</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.in_units_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">in_units_of</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">other_unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.in_units_of"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.in_units_of" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an equal Quantity expressed in different units.</p>
 <p>If the units are the same as those in self, a reference to self is returned.
 Raises a TypeError if the new unit is not compatible with the original unit.</p>
-<dl class="docutils">
-<dt>The post_multiply argument is used in case the multiplication operation is not commutative.</dt>
-<dd>i.e. result = factor * value when post_multiply is False
-and  result = value * factor when post_multiply is True</dd>
+<dl class="simple">
+<dt>The post_multiply argument is used in case the multiplication operation is not commutative.</dt><dd><p>i.e. result = factor * value when post_multiply is False
+and  result = value * factor when post_multiply is True</p>
+</dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.index">
-<code class="descname">index</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.insert">
-<code class="descname">insert</code><span class="sig-paren">(</span><em>index</em>, <em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.insert" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insert</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.insert"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.insert" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.max">
-<code class="descname">max</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.max" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">max</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.max"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.max" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the maximum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -260,9 +382,9 @@ same unit as the current sequence.</p>
 is raised</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.mean">
-<code class="descname">mean</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.mean" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">mean</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.mean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the mean of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -271,9 +393,9 @@ the current sequence.</p>
 is raised</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.min">
-<code class="descname">min</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.min" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">min</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.min"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.min" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the minimum value of the sequence, with the result having the
 same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -282,42 +404,42 @@ same unit as the current sequence.</p>
 is raised</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.pop">
-<code class="descname">pop</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.pop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">pop</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.pop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.reduce_unit">
-<code class="descname">reduce_unit</code><span class="sig-paren">(</span><em>guide_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.reduce_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reduce_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">guide_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.reduce_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.reduce_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Combine similar component units and scale, to form an
 equal Quantity in simpler units.</p>
 <p>Returns underlying value type if unit is dimensionless.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.remove">
-<code class="descname">remove</code><span class="sig-paren">(</span><em>item</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">item</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.remove" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.reshape">
-<code class="descname">reshape</code><span class="sig-paren">(</span><em>shape</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reshape</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">shape</span></em>, <em class="sig-param"><span class="n">order</span><span class="o">=</span><span class="default_value">'C'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.reshape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.reshape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as numpy.ndarray.reshape, except the result is a Quantity with the
 same units as the current object rather than a plain numpy.ndarray</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.sqrt">
-<code class="descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sqrt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.sqrt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.sqrt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns square root of a Quantity.</p>
 <p>Raises ArithmeticError if component exponents are not even.
 This behavior can be changed if you present a reasonable real life case to me.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.std">
-<code class="descname">std</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.std" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">std</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.std" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the square root of the variance of a sequence, with the result
 having the same unit as the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError</p>
@@ -326,9 +448,9 @@ having the same unit as the current sequence.</p>
 is raised</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.sum">
-<code class="descname">sum</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.sum" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sum</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.sum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.sum" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the sum of a sequence, with the result having the same unit as
 the current sequence.</p>
 <p>If the value is not iterable, it raises a TypeError (same behavior as if
@@ -338,75 +460,78 @@ you tried to iterate over, for instance, an integer).</p>
 is raised</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.value_in_unit">
-<code class="descname">value_in_unit</code><span class="sig-paren">(</span><em>unit</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.value_in_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">value_in_unit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">unit</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.value_in_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.value_in_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns underlying value, in the specified units.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.unit.quantity.Quantity.value_in_unit_system">
-<code class="descname">value_in_unit_system</code><span class="sig-paren">(</span><em>system</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.value_in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">value_in_unit_system</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#Quantity.value_in_unit_system"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.Quantity.value_in_unit_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the underlying value type, after conversion to a particular unit system.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.unit.quantity.is_dimensionless">
-<code class="descclassname">parmed.unit.quantity.</code><code class="descname">is_dimensionless</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.is_dimensionless" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.unit.quantity.</code><code class="sig-name descname">is_dimensionless</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#is_dimensionless"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.is_dimensionless" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="parmed.unit.quantity.is_quantity">
-<code class="descclassname">parmed.unit.quantity.</code><code class="descname">is_quantity</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#is_quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.is_quantity" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">parmed.unit.quantity.</code><code class="sig-name descname">is_quantity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/unit/quantity.html#is_quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.unit.quantity.is_quantity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns True if x is a Quantity, False otherwise.</p>
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.unit.quantity.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

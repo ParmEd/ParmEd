@@ -2,6 +2,6 @@ parmed.amber.mask module
 ========================
 
 .. automodule:: parmed.amber.mask
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.amber.mdin.cntrl
    parmed.amber.mdin.ewald
@@ -16,6 +17,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.amber.mdin
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

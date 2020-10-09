@@ -1,373 +1,404 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parmed.namd.namdbinfiles module &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>parmed.namd.namdbinfiles module &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rosetta.html">PyRosetta Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>parmed.namd.namdbinfiles module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/api/parmed/parmed.namd.namdbinfiles.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-parmed.namd.namdbinfiles">
 <span id="parmed-namd-namdbinfiles-module"></span><h1>parmed.namd.namdbinfiles module<a class="headerlink" href="#module-parmed.namd.namdbinfiles" title="Permalink to this headline">¶</a></h1>
 <p>This module contains classes for reading and writing (single frame) NAMD binary
 files.  The main functionality is currently aimed at manipulation rather than
 analysis.</p>
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.namd.namdbinfiles.NamdBinCoor">
-<em class="property">class </em><code class="descclassname">parmed.namd.namdbinfiles.</code><code class="descname">NamdBinCoor</code><span class="sig-paren">(</span><em>values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinCoor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile" title="parmed.namd.namdbinfiles.NamdBinFile"><code class="xref py py-class docutils literal"><span class="pre">parmed.namd.namdbinfiles.NamdBinFile</span></code></a></p>
-<p>Class to read or write NAMD &#8220;bincoordinates&#8221; files.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.coordinates" title="parmed.namd.namdbinfiles.NamdBinCoor.coordinates"><code class="xref py py-obj docutils literal"><span class="pre">coordinates</span></code></a></td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.natom" title="parmed.namd.namdbinfiles.NamdBinCoor.natom"><code class="xref py py-obj docutils literal"><span class="pre">natom</span></code></a></td>
-<td>The current number of atom entries.</td>
-</tr>
-</tbody>
-</table>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.namd.namdbinfiles.</code><code class="sig-name descname">NamdBinCoor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinCoor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile" title="parmed.namd.namdbinfiles.NamdBinFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.namd.namdbinfiles.NamdBinFile</span></code></a></p>
+<p>Class to read or write NAMD “bincoordinates” files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>coordinates</strong></dt><dd></dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">natom</span></code></dt><dd><p>The current number of atom entries.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.copyatoms" title="parmed.namd.namdbinfiles.NamdBinCoor.copyatoms"><code class="xref py py-obj docutils literal"><span class="pre">copyatoms</span></code></a>(start_index,&nbsp;natoms)</td>
-<td>Convenience function, same as insertatoms() but set &#8216;values&#8217; to be the same as the previous natoms&#8217; values (i.e.</td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copyatoms</span></code>(start_index, natoms)</p></td>
+<td><p>Convenience function, same as insertatoms() but set ‘values’ to be the same as the previous natoms’ values (i.e.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.delatoms" title="parmed.namd.namdbinfiles.NamdBinCoor.delatoms"><code class="xref py py-obj docutils literal"><span class="pre">delatoms</span></code></a>(indices)</td>
-<td>Delete entries corresponding to the given atom indices.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delatoms</span></code>(indices)</p></td>
+<td><p>Delete entries corresponding to the given atom indices.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.insertatoms" title="parmed.namd.namdbinfiles.NamdBinCoor.insertatoms"><code class="xref py py-obj docutils literal"><span class="pre">insertatoms</span></code></a>(start_index,&nbsp;natoms[,&nbsp;values])</td>
-<td>Insert space for natom entries beginning at start_index.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertatoms</span></code>(start_index, natoms[, values])</p></td>
+<td><p>Insert space for natom entries beginning at start_index.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.read" title="parmed.namd.namdbinfiles.NamdBinCoor.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(fname)</td>
-<td>Return an object from the values in a NAMD binary file.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(fname)</p></td>
+<td><p>Return an object from the values in a NAMD binary file.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor.write" title="parmed.namd.namdbinfiles.NamdBinCoor.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(fname)</td>
-<td>Write the current attributes to a file.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(fname)</p></td>
+<td><p>Write the current attributes to a file.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinCoor.coordinates">
-<code class="descname">coordinates</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.coordinates" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">coordinates</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.coordinates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.copyatoms">
-<code class="descname">copyatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.copyatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convenience function, same as insertatoms() but set &#8216;values&#8217; to
-be the same as the previous natoms&#8217; values (i.e. make a copy of them).</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.delatoms">
-<code class="descname">delatoms</code><span class="sig-paren">(</span><em>indices</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.delatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete entries corresponding to the given atom indices.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.insertatoms">
-<code class="descname">insertatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em>, <em>values=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.insertatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert space for natom entries beginning at start_index. If
-specified, give them the provided values, otherwise set them to zero.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.natom">
-<code class="descname">natom</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.natom" title="Permalink to this definition">¶</a></dt>
-<dd><p>The current number of atom entries.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an object from the values in a NAMD binary file.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinCoor.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinCoor.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the current attributes to a file.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile">
-<em class="property">class </em><code class="descclassname">parmed.namd.namdbinfiles.</code><code class="descname">NamdBinFile</code><span class="sig-paren">(</span><em>values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.namd.namdbinfiles.</code><code class="sig-name descname">NamdBinFile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>From the NAMD manual:</p>
 <blockquote>
-<div>NAMD uses a trivial double-precision binary file format for
-coordinates, velocities, and forces ... The file consists of the atom
+<div><p>NAMD uses a trivial double-precision binary file format for
+coordinates, velocities, and forces … The file consists of the atom
 count as a 32-bit integer followed by all three position or velocity
-components for each atom as 64-bit double-precision floating point ...</div></blockquote>
+components for each atom as 64-bit double-precision floating point …</p>
+</div></blockquote>
 <p>The main attributes are the number of atom entries (natom) and a (flat)
-numpy array of size 3*natom (values).  The meaning of &#8220;values&#8221; is
+numpy array of size 3*natom (values).  The meaning of “values” is
 effectively arbitrary, but for convenience derived classes are provided
-which alias the values to more descriptive names (e.g. &#8220;coordinates&#8221;).</p>
+which alias the values to more descriptive names (e.g. “coordinates”).</p>
 <div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor" title="parmed.namd.namdbinfiles.NamdBinCoor"><code class="xref py py-class docutils literal"><span class="pre">NamdBinCoor</span></code></a></p>
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinCoor" title="parmed.namd.namdbinfiles.NamdBinCoor"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamdBinCoor</span></code></a></dt><dd></dd>
+<dt><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel" title="parmed.namd.namdbinfiles.NamdBinVel"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamdBinVel</span></code></a></dt><dd></dd>
+</dl>
 </div>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.natom" title="parmed.namd.namdbinfiles.NamdBinFile.natom"><code class="xref py py-obj docutils literal"><span class="pre">natom</span></code></a></td>
-<td>The current number of atom entries.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.natom" title="parmed.namd.namdbinfiles.NamdBinFile.natom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">natom</span></code></a></dt><dd><p>The current number of atom entries.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.copyatoms" title="parmed.namd.namdbinfiles.NamdBinFile.copyatoms"><code class="xref py py-obj docutils literal"><span class="pre">copyatoms</span></code></a>(start_index,&nbsp;natoms)</td>
-<td>Convenience function, same as insertatoms() but set &#8216;values&#8217; to be the same as the previous natoms&#8217; values (i.e.</td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.copyatoms" title="parmed.namd.namdbinfiles.NamdBinFile.copyatoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copyatoms</span></code></a>(start_index, natoms)</p></td>
+<td><p>Convenience function, same as insertatoms() but set ‘values’ to be the same as the previous natoms’ values (i.e.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.delatoms" title="parmed.namd.namdbinfiles.NamdBinFile.delatoms"><code class="xref py py-obj docutils literal"><span class="pre">delatoms</span></code></a>(indices)</td>
-<td>Delete entries corresponding to the given atom indices.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.delatoms" title="parmed.namd.namdbinfiles.NamdBinFile.delatoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delatoms</span></code></a>(indices)</p></td>
+<td><p>Delete entries corresponding to the given atom indices.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.insertatoms" title="parmed.namd.namdbinfiles.NamdBinFile.insertatoms"><code class="xref py py-obj docutils literal"><span class="pre">insertatoms</span></code></a>(start_index,&nbsp;natoms[,&nbsp;values])</td>
-<td>Insert space for natom entries beginning at start_index.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.insertatoms" title="parmed.namd.namdbinfiles.NamdBinFile.insertatoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertatoms</span></code></a>(start_index, natoms[, values])</p></td>
+<td><p>Insert space for natom entries beginning at start_index.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.read" title="parmed.namd.namdbinfiles.NamdBinFile.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(fname)</td>
-<td>Return an object from the values in a NAMD binary file.</td>
+<tr class="row-even"><td><p><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.read" title="parmed.namd.namdbinfiles.NamdBinFile.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(fname)</p></td>
+<td><p>Return an object from the values in a NAMD binary file.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.write" title="parmed.namd.namdbinfiles.NamdBinFile.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(fname)</td>
-<td>Write the current attributes to a file.</td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile.write" title="parmed.namd.namdbinfiles.NamdBinFile.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(fname)</p></td>
+<td><p>Write the current attributes to a file.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.copyatoms">
-<code class="descname">copyatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.copyatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.copyatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convenience function, same as insertatoms() but set &#8216;values&#8217; to
-be the same as the previous natoms&#8217; values (i.e. make a copy of them).</p>
+<code class="sig-name descname">copyatoms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_index</span></em>, <em class="sig-param"><span class="n">natoms</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.copyatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.copyatoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function, same as insertatoms() but set ‘values’ to
+be the same as the previous natoms’ values (i.e. make a copy of them).</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.delatoms">
-<code class="descname">delatoms</code><span class="sig-paren">(</span><em>indices</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.delatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.delatoms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">delatoms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indices</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.delatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.delatoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete entries corresponding to the given atom indices.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.insertatoms">
-<code class="descname">insertatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em>, <em>values=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.insertatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.insertatoms" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">insertatoms</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">start_index</span></em>, <em class="sig-param"><span class="n">natoms</span></em>, <em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.insertatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.insertatoms" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert space for natom entries beginning at start_index. If
 specified, give them the provided values, otherwise set them to zero.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.natom">
-<code class="descname">natom</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.natom" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">natom</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.natom" title="Permalink to this definition">¶</a></dt>
 <dd><p>The current number of atom entries.</p>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.read">
-<em class="property">classmethod </em><code class="descname">read</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.read" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">read</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.read" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an object from the values in a NAMD binary file.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinFile.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.write" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinFile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinFile.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the current attributes to a file.</p>
 </dd></dl>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="parmed.namd.namdbinfiles.NamdBinVel">
-<em class="property">class </em><code class="descclassname">parmed.namd.namdbinfiles.</code><code class="descname">NamdBinVel</code><span class="sig-paren">(</span><em>values=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile" title="parmed.namd.namdbinfiles.NamdBinFile"><code class="xref py py-class docutils literal"><span class="pre">parmed.namd.namdbinfiles.NamdBinFile</span></code></a></p>
-<p>Class to read or write NAMD &#8220;binvelocities&#8221; files.</p>
-<p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.natom" title="parmed.namd.namdbinfiles.NamdBinVel.natom"><code class="xref py py-obj docutils literal"><span class="pre">natom</span></code></a></td>
-<td>The current number of atom entries.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.velocities" title="parmed.namd.namdbinfiles.NamdBinVel.velocities"><code class="xref py py-obj docutils literal"><span class="pre">velocities</span></code></a></td>
-<td></td>
-</tr>
-</tbody>
-</table>
+<em class="property">class </em><code class="sig-prename descclassname">parmed.namd.namdbinfiles.</code><code class="sig-name descname">NamdBinVel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/parmed/namd/namdbinfiles.html#NamdBinVel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinFile" title="parmed.namd.namdbinfiles.NamdBinFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">parmed.namd.namdbinfiles.NamdBinFile</span></code></a></p>
+<p>Class to read or write NAMD “binvelocities” files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">natom</span></code></dt><dd><p>The current number of atom entries.</p>
+</dd>
+<dt><strong>velocities</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
 <p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.copyatoms" title="parmed.namd.namdbinfiles.NamdBinVel.copyatoms"><code class="xref py py-obj docutils literal"><span class="pre">copyatoms</span></code></a>(start_index,&nbsp;natoms)</td>
-<td>Convenience function, same as insertatoms() but set &#8216;values&#8217; to be the same as the previous natoms&#8217; values (i.e.</td>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copyatoms</span></code>(start_index, natoms)</p></td>
+<td><p>Convenience function, same as insertatoms() but set ‘values’ to be the same as the previous natoms’ values (i.e.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.delatoms" title="parmed.namd.namdbinfiles.NamdBinVel.delatoms"><code class="xref py py-obj docutils literal"><span class="pre">delatoms</span></code></a>(indices)</td>
-<td>Delete entries corresponding to the given atom indices.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delatoms</span></code>(indices)</p></td>
+<td><p>Delete entries corresponding to the given atom indices.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.insertatoms" title="parmed.namd.namdbinfiles.NamdBinVel.insertatoms"><code class="xref py py-obj docutils literal"><span class="pre">insertatoms</span></code></a>(start_index,&nbsp;natoms[,&nbsp;values])</td>
-<td>Insert space for natom entries beginning at start_index.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">insertatoms</span></code>(start_index, natoms[, values])</p></td>
+<td><p>Insert space for natom entries beginning at start_index.</p></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.read" title="parmed.namd.namdbinfiles.NamdBinVel.read"><code class="xref py py-obj docutils literal"><span class="pre">read</span></code></a>(fname)</td>
-<td>Return an object from the values in a NAMD binary file.</td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code>(fname)</p></td>
+<td><p>Return an object from the values in a NAMD binary file.</p></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#parmed.namd.namdbinfiles.NamdBinVel.write" title="parmed.namd.namdbinfiles.NamdBinVel.write"><code class="xref py py-obj docutils literal"><span class="pre">write</span></code></a>(fname)</td>
-<td>Write the current attributes to a file.</td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code>(fname)</p></td>
+<td><p>Write the current attributes to a file.</p></td>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.copyatoms">
-<code class="descname">copyatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.copyatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convenience function, same as insertatoms() but set &#8216;values&#8217; to
-be the same as the previous natoms&#8217; values (i.e. make a copy of them).</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.delatoms">
-<code class="descname">delatoms</code><span class="sig-paren">(</span><em>indices</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.delatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete entries corresponding to the given atom indices.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.insertatoms">
-<code class="descname">insertatoms</code><span class="sig-paren">(</span><em>start_index</em>, <em>natoms</em>, <em>values=None</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.insertatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert space for natom entries beginning at start_index. If
-specified, give them the provided values, otherwise set them to zero.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.natom">
-<code class="descname">natom</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.natom" title="Permalink to this definition">¶</a></dt>
-<dd><p>The current number of atom entries.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.read">
-<code class="descname">read</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an object from the values in a NAMD binary file.</p>
-</dd></dl>
-
-<dl class="attribute">
+<dl class="py method">
 <dt id="parmed.namd.namdbinfiles.NamdBinVel.velocities">
-<code class="descname">velocities</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.velocities" title="Permalink to this definition">¶</a></dt>
+<em class="property">property </em><code class="sig-name descname">velocities</code><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.velocities" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="parmed.namd.namdbinfiles.NamdBinVel.write">
-<code class="descname">write</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="headerlink" href="#parmed.namd.namdbinfiles.NamdBinVel.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the current attributes to a file.</p>
-</dd></dl>
-
 </dd></dl>
 
 </div>
 
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/api/parmed/parmed.namd.namdbinfiles.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

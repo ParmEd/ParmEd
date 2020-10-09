@@ -1,5 +1,5 @@
-parmed.unit.is_quantity
-=======================
+parmed.unit.is\_quantity
+========================
 
 .. currentmodule:: parmed.unit
 

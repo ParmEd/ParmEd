@@ -5,25 +5,27 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    parmed.amber
-    parmed.charmm
-    parmed.formats
-    parmed.gromacs
-    parmed.modeller
-    parmed.namd
-    parmed.openmm
-    parmed.rdkit
-    parmed.rosetta
-    parmed.tinker
-    parmed.tools
-    parmed.unit
-    parmed.utils
+   parmed.amber
+   parmed.charmm
+   parmed.formats
+   parmed.gromacs
+   parmed.modeller
+   parmed.namd
+   parmed.openmm
+   parmed.rdkit
+   parmed.rosetta
+   parmed.tinker
+   parmed.tools
+   parmed.unit
+   parmed.utils
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.constants
    parmed.exceptions
@@ -41,6 +43,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

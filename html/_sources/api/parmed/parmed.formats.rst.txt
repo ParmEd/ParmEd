@@ -5,13 +5,15 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
-    parmed.formats.pdbx
+   parmed.formats.pdbx
 
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    parmed.formats.mol2
    parmed.formats.pdb
@@ -24,6 +26,6 @@ Module contents
 ---------------
 
 .. automodule:: parmed.formats
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

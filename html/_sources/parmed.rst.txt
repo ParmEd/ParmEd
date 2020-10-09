@@ -237,6 +237,15 @@ changeRadii
 Changes intrinsic GB radii to the specified set: Allowed values are
     amber6, bondi, mbondi, mbondi2, mbondi3
 
+changeRedoxState
+~~~~~~~~~~~~~~~~
+
+.. code-block:: none
+
+    changeRedoxState <mask> <state #>
+
+Changes the reduction state of a given titratable residue that can be treated via constant redox potential MD in Amber.
+
 checkValidity
 ~~~~~~~~~~~~~
 

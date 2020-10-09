@@ -2,6 +2,6 @@ parmed.tools.gui.guifiletools module
 ====================================
 
 .. automodule:: parmed.tools.gui.guifiletools
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

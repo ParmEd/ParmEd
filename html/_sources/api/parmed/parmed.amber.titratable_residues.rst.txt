@@ -1,7 +1,7 @@
-parmed.amber.titratable_residues module
-=======================================
+parmed.amber.titratable\_residues module
+========================================
 
 .. automodule:: parmed.amber.titratable_residues
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

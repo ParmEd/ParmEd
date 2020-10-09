@@ -1,62 +1,188 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PyRosetta Integration &mdash; ParmEd  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
     
-    <title>PyRosetta Integration &#8212; ParmEd  documentation</title>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
     
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" /> 
-  </head>
-  <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
-             accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    <link rel="next" title="parmed.load_rosetta" href="rosettaobj/parmed.load_rosetta.html" />
+    <link rel="prev" title="parmed.gromacs.GromacsGroFile" href="amberobj/parmed.gromacs.GromacsGroFile.html" /> 
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> ParmEd
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.3319.g7a6168d
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="topologyobjects.html">Core classes used to represent topologies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">The core Structure class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dimensional_analysis.html">Working with units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="readwrite.html">Reading and writing files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amber.html">The Amber file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charmm.html">The CHARMM file classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gromacs.html">The GROMACS file classes</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">PyRosetta Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-pyrosetta">What is PyRosetta</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-does-parmed-enhance-pyrosetta">How does ParmEd enhance PyRosetta?</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rosettaobj/parmed.load_rosetta.html">parmed.load_rosetta</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="omm_rosetta.html">Using PyRosetta and ParmEd to seed an OpenMM simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#warning">Warning</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html">Using <code class="docutils literal notranslate"><span class="pre">parmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed.html#using-xparmed">Using <code class="docutils literal notranslate"><span class="pre">xparmed</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="parmed_api.html">The ParmEd API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openmm.html">OpenMM Functionality</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization Functionality</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ParmEd</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>PyRosetta Integration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/rosetta.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="pyrosetta-integration">
 <h1>PyRosetta Integration<a class="headerlink" href="#pyrosetta-integration" title="Permalink to this headline">¶</a></h1>
 <p>ParmEd provides support for the <a class="reference external" href="http://www.pyrosetta.org/">PyRosetta</a>
 API. The ability to create a <em>de novo</em> molecular system
 and then seamlessly parameterize and simulate it, all within the Python
-environment, is powerful and fits right within ParmEd&#8217;s goal of easing
+environment, is powerful and fits right within ParmEd’s goal of easing
 the molecular modeling process.</p>
 <p>This page is not meant as a tutorial for the PyRosetta library. Instead, you
 should visit the <a class="reference external" href="http://www.pyrosetta.org/tutorials">PyRosetta website</a> for
@@ -74,29 +200,29 @@ protein folding using Rosetta sampling and scoring functions.
 Its features include:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Generating a nucleic or amino acid structure from a text string.</li>
-<li>Mutating residues in an existing structure.</li>
-<li>Manipulating residue positions and torsions in an algorithmic fashion.</li>
-<li>Monte Carlo sampling using the Rosetta force field.</li>
+<li><p>Generating a nucleic or amino acid structure from a text string.</p></li>
+<li><p>Mutating residues in an existing structure.</p></li>
+<li><p>Manipulating residue positions and torsions in an algorithmic fashion.</p></li>
+<li><p>Monte Carlo sampling using the Rosetta force field.</p></li>
 </ul>
 </div></blockquote>
 </div>
 <div class="section" id="how-does-parmed-enhance-pyrosetta">
 <h2>How does ParmEd enhance PyRosetta?<a class="headerlink" href="#how-does-parmed-enhance-pyrosetta" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
+<table class="longtable docutils align-default">
 <colgroup>
-<col width="10%" />
-<col width="90%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="rosettaobj/parmed.load_rosetta.html#parmed.load_rosetta" title="parmed.load_rosetta"><code class="xref py py-obj docutils literal"><span class="pre">load_rosetta</span></code></a>(pose)</td>
-<td>Load a <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object and return a populated <a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a></td>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rosettaobj/parmed.load_rosetta.html#parmed.load_rosetta" title="parmed.load_rosetta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_rosetta</span></code></a>(pose)</p></td>
+<td><p>Load a <code class="xref py py-class docutils literal notranslate"><span class="pre">Pose</span></code> object and return a populated <a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> instance</p></td>
 </tr>
 </tbody>
 </table>
-<p>ParmEd provides a simple function, <a class="reference internal" href="rosettaobj/parmed.load_rosetta.html#parmed.load_rosetta" title="parmed.load_rosetta"><code class="xref py py-func docutils literal"><span class="pre">load_rosetta()</span></code></a>, to load a PyRosetta
-<code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> object into ParmEd&#8217;s <a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> class. This
-<a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal"><span class="pre">Structure</span></code></a> can then be used to easily parameterize a molecular dynamics
+<p>ParmEd provides a simple function, <a class="reference internal" href="rosettaobj/parmed.load_rosetta.html#parmed.load_rosetta" title="parmed.load_rosetta"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_rosetta()</span></code></a>, to load a PyRosetta
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Pose</span></code> object into ParmEd’s <a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> class. This
+<a class="reference internal" href="api/parmed/parmed.html#parmed.Structure" title="parmed.Structure"><code class="xref py py-class docutils literal notranslate"><span class="pre">Structure</span></code></a> can then be used to easily parameterize a molecular dynamics
 simulation.</p>
 <p>One can imagine that this functionality would be useful to easily seed
 simulations  for <em>ab initio</em> structure predictions or studies of a mutant
@@ -105,7 +231,7 @@ protein using wildtype structures.</p>
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>For examples on how to run an simulation starting from a
-PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose</span></code> please refer to the following:</p>
+PyRosetta <code class="xref py py-class docutils literal notranslate"><span class="pre">Pose</span></code> please refer to the following:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="omm_rosetta.html">Using PyRosetta and ParmEd to seed an OpenMM simulation</a></li>
@@ -117,7 +243,7 @@ PyRosetta <code class="xref py py-class docutils literal"><span class="pre">Pose
 simulating with OpenMM is that proline residues have virtual sites that prevent
 it from being recognized by OpenMM. If you get an error that looks like the
 following:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
   <span class="n">File</span> <span class="s2">&quot;test.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">11</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
     <span class="n">positiveIon</span><span class="o">=</span><span class="s1">&#39;Na+&#39;</span><span class="p">,</span> <span class="n">negativeIon</span><span class="o">=</span><span class="s1">&#39;Cl-&#39;</span><span class="p">,</span> <span class="n">ionicStrength</span><span class="o">=</span><span class="mf">0.1</span><span class="o">*</span><span class="n">molar</span><span class="p">)</span>
   <span class="n">File</span> <span class="s2">&quot;.../python2.7/site-packages/simtk/openmm/app/modeller.py&quot;</span><span class="p">,</span> <span class="n">line</span> <span class="mi">372</span><span class="p">,</span> <span class="ow">in</span> <span class="n">addSolvent</span>
@@ -127,71 +253,67 @@ following:</p>
 <span class="ne">ValueError</span><span class="p">:</span> <span class="n">No</span> <span class="n">template</span> <span class="n">found</span> <span class="k">for</span> <span class="n">residue</span> <span class="mi">2</span> <span class="p">(</span><span class="n">PRO</span><span class="p">)</span><span class="o">.</span>  <span class="n">This</span> <span class="n">might</span> <span class="n">mean</span> <span class="n">your</span> <span class="nb">input</span> <span class="n">topology</span> <span class="ow">is</span> <span class="n">missing</span> <span class="n">some</span> <span class="n">atoms</span> <span class="ow">or</span> <span class="n">bonds</span><span class="p">,</span> <span class="ow">or</span> <span class="n">possibly</span> <span class="n">that</span> <span class="n">you</span> <span class="n">are</span> <span class="n">using</span> <span class="n">the</span> <span class="n">wrong</span> <span class="n">force</span> <span class="n">field</span><span class="o">.</span>
 </pre></div>
 </div>
-<p>then you know that you have to strip all <code class="docutils literal"><span class="pre">NV</span></code> atoms (which are proline virtual
-sites) from the <code class="docutils literal"><span class="pre">Structure</span></code>. You can do this by calling <code class="docutils literal"><span class="pre">.strip('&#64;NV')</span></code> on
-your <code class="docutils literal"><span class="pre">Structure</span></code> prior to building the OpenMM <code class="docutils literal"><span class="pre">System</span></code> object.</p>
+<p>then you know that you have to strip all <code class="docutils literal notranslate"><span class="pre">NV</span></code> atoms (which are proline virtual
+sites) from the <code class="docutils literal notranslate"><span class="pre">Structure</span></code>. You can do this by calling <code class="docutils literal notranslate"><span class="pre">.strip('&#64;NV')</span></code> on
+your <code class="docutils literal notranslate"><span class="pre">Structure</span></code> prior to building the OpenMM <code class="docutils literal notranslate"><span class="pre">System</span></code> object.</p>
 </div>
 </div>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">PyRosetta Integration</a><ul>
-<li><a class="reference internal" href="#what-is-pyrosetta">What is PyRosetta</a></li>
-<li><a class="reference internal" href="#how-does-parmed-enhance-pyrosetta">How does ParmEd enhance PyRosetta?</a></li>
-<li><a class="reference internal" href="#examples">Examples</a><ul>
-<li><a class="reference internal" href="#warning">Warning</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rosettaobj/parmed.load_rosetta.html" class="btn btn-neutral float-right" title="parmed.load_rosetta" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="amberobj/parmed.gromacs.GromacsGroFile.html" class="btn btn-neutral float-left" title="parmed.gromacs.GromacsGroFile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/rosetta.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2015, Jason Swails
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="rosettaobj/parmed.load_rosetta.html" title="parmed.load_rosetta"
-             >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">ParmEd  documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2015, Jason Swails.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

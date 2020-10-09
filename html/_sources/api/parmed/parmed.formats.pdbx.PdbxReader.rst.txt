@@ -2,6 +2,6 @@ parmed.formats.pdbx.PdbxReader module
 =====================================
 
 .. automodule:: parmed.formats.pdbx.PdbxReader
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
