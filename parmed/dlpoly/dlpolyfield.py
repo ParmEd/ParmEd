@@ -7,15 +7,15 @@ from collections import defaultdict
 import copy
 import math
 
-from parmed.exceptions import DlpolyError
-from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet
-from parmed.structure import Structure
-from parmed.topologyobjects import (ExtraPoint, DihedralType, DihedralTypeList,
+from ..exceptions import DlpolyError
+from ..formats.registry import FileFormatType
+from ..parameters import ParameterSet
+from ..structure import Structure
+from ..topologyobjects import (ExtraPoint, DihedralType, DihedralTypeList,
                                     UnassignedAtomType)
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
-from parmed.utils.six.moves import range
+from ..utils.io import genopen
+from ..utils.six import add_metaclass, string_types, iteritems
+from ..utils.six.moves import range
 
 
 # Dlpoly uses "funct" flags in its parameter files to indicate what kind of

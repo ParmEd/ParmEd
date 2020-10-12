@@ -4,12 +4,12 @@ This module contains functionality relevant to loading and parsing DLPOLY CONFIG
 """
 from __future__ import print_function, division, absolute_import
 
-from parmed.constants import TINY
-from parmed.formats.registry import FileFormatType
-from parmed.geometry import (box_lengths_and_angles_to_vectors,
+from ..constants import TINY
+from ..formats.registry import FileFormatType
+from ..geometry import (box_lengths_and_angles_to_vectors,
                              reduce_box_vectors)
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types
+from ..utils.io import genopen
+from ..utils.six import add_metaclass, string_types
 
 @add_metaclass(FileFormatType)
 class DlpolyConfigFile(object):
