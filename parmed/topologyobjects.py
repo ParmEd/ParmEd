@@ -1031,8 +1031,8 @@ class ExtraPoint(Atom):
 
     See Also
     --------
-    :class:`Atom` -- The ExtraPoint constructor also takes all `Atom` arguments
-    as well, and shares all of the same properties
+    :class:`Atom`: The ExtraPoint constructor also takes all `Atom` arguments
+                   as well, and shares all of the same properties
     """
     def __init__(self, *args, **kwargs):
         if 'weights' in kwargs:
