@@ -188,6 +188,20 @@ def main(opt):
     # Filter titratable residues based on min and max pKa
     new_reslist = []
     for res in titratable_residues:
+        # @jaimergp: If None values are not filtered out, comparisons
+        # will fail in Py3k. This patch was discussed and approved in
+        # GitLab issue 122 (@vwcruzeiro, @swails)
+        # Error obtained in serial tests in conda-forge builds:
+        #       Traceback (most recent call last):
+        #         File "/home/conda/amber/bin/cpinutil.py", line 325, in <module>
+        #           main(opt)
+        #         File "/home/conda/amber/bin/cpinutil.py", line 191, in main
+        #           if getattr(residues, res).pKa < minpka: continue
+        #       TypeError: '<' not supported between instances of 'NoneType' and 'int'
+        #         ./Run.cpin:  Program error
+        #       make[1]: *** [test.cpinutil] Error 1
+        if getattr(residues, res).pKa is None: continue
+        # /@jaimergp
         if getattr(residues, res).pKa < minpka: continue
         if getattr(residues, res).pKa > maxpka: continue
         new_reslist.append(res)
