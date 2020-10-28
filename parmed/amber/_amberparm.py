@@ -183,8 +183,7 @@ class AmberParm(AmberFormat, Structure):
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
         if 'RESIDUE_ICODE' in self.flag_list:
-            self._truncate_array('RESIDUE_ICODE',
-                                 self.parm_data['POINTERS'][NRES])
+            self._truncate_array('RESIDUE_ICODE', self.parm_data['POINTERS'][NRES])
         # Set up some of the attributes provided
         self.pointers = {}
         self.LJ_types = {}
