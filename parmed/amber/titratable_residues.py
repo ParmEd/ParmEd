@@ -8,9 +8,10 @@ from __future__ import print_function, division
 titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
                        'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN', 'TYX']
 
-from parmed.exceptions import AmberWarning, AmberError
-from parmed.utils.six.moves import range
 from math import log
+from io import StringIO
+from ..exceptions import AmberWarning, AmberError
+from ..utils.six.moves import range
 import warnings
 
 # Print all AmberWarning's
@@ -367,11 +368,17 @@ class TitratableResidueList(list):
 
     def write_cpin(self, output, igb=2, intdiel=1.0, oldfmt=False, typ="ph", coions=False):
         """ Writes the CPIN file based on the titrated residues """
+        end = StringIO()
         # Reset all residues
         for res in self: res.reset()
         # Sort our residue list
         self.sort()
-        buf = _LineBuffer(output)
+        limit_buf = _LineBuffer(output)
+        buf = _LineBuffer(end)
+        limit_buf.add_word('&CNSTPHE_LIMITS')
+        limit_buf.flush()
+        limit_buf.add_word(' ntres=%d,' % len(self))
+        limit_buf.add_word(' maxh=%d,' % max(len(r.states) for r in self))
         if (typ == "ph"):
             buf.add_word('&CNSTPH')
         elif (typ == "redox"):
@@ -436,6 +443,11 @@ class TitratableResidueList(list):
                 first_charge += len(new_charges)
             pointers.append(res.cpin_pointers(self.first_atoms[i]))
 
+        limit_buf.add_word(' natchrg=%d,' % len(charges))
+        limit_buf.add_word(' ntstates=%d' % max(len(protcnts), len(eleccnts)))
+        limit_buf.flush()
+        limit_buf.add_word('/')
+        limit_buf.flush()
         # Print the charges
         for charge in charges:
             buf.add_word('%s,' % charge)
@@ -466,10 +478,8 @@ class TitratableResidueList(list):
         buf.add_word(' ') # get a leading space
         for i, p in enumerate(pointers):
             buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i, p['FIRST_ATOM']))
-            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " %
-                         (i, p['FIRST_CHARGE']))
-            buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " %
-                         (i, p['FIRST_STATE']))
+            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " % (i, p['FIRST_CHARGE']))
+            buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " % (i, p['FIRST_STATE']))
             buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i, p['NUM_ATOMS']))
             buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i, p['NUM_STATES']))
         buf.flush()
@@ -477,8 +487,7 @@ class TitratableResidueList(list):
         buf.add_word(' STATENE=')
         for i, energy in enumerate(energies):
             if energy is None:
-                raise AmberError("%d'th reference energy not known for "
-                                 "igb = %d" % (i, igb))
+                raise AmberError("%d'th reference energy not known for igb = %d" % (i, igb))
             buf.add_word('%.6f,' % energy)
         buf.flush()
         # Print the pKa or Eo reference
@@ -508,7 +517,10 @@ class TitratableResidueList(list):
             buf.flush()
             # Now scan through all of the waters
         buf.flush()
-        buf.add_word('/'); buf.flush()
+        buf.add_word('/')
+        buf.flush()
+        end.seek(0)
+        output.write(end.read())
 
 # Now define all of the titratable residues
 
