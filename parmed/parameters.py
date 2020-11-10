@@ -219,7 +219,7 @@ class ParameterSet(object):
                         (rmin, epsilon, rmin14, epsilon14) = atom.atom_type.nbfix[other_atom]
                         if (other_atom, atom.type) in params.nbfix_types:
                             continue
-                        params.nbfix_types[(atom.type, other_atom)] = (rmin, epsilon)
+                        params.nbfix_types[(atom.type, other_atom)] = (epsilon, rmin)
         for bond in struct.bonds:
             if bond.type is None: continue
             key = (bond.atom1.type, bond.atom2.type)
