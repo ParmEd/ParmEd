@@ -79,7 +79,7 @@ def _bondi(atom):
 def _mbondi(atom):
     if atom.atomic_number == 1:
         bondeds = atom.bond_partners
-        if bondeds[0].atomic_number in (6, 7):
+        if not bondeds or bondeds[0].atomic_number in (6, 7):
             return 1.3
         if bondeds[0].atomic_number in (8, 16):
             return 0.8
@@ -88,7 +88,7 @@ def _mbondi(atom):
 
 def _mbondi2(atom):
     if atom.atomic_number == 1:
-        if atom.bond_partners[0].atomic_number == 7:
+        if not atom.bond_partners or atom.bond_partners[0].atomic_number == 7:
             return 1.3
         return 1.2
     return _bondi(atom)

@@ -173,6 +173,11 @@ def main(opt):
     # Filter titratable residues based on min and max pKa
     new_reslist = []
     for res in titratable_residues:
+        # @jaimergp: If None values are not filtered out, comparisons
+        # will fail in Py3k. This patch was discussed and approved in
+        # GitLab issue 122 (@vwcruzeiro, @swails)
+        if getattr(residues, res).Eo is None: continue
+        # /@jaimergp
         if getattr(residues, res).Eo < mineo: continue
         if getattr(residues, res).Eo > maxeo: continue
         new_reslist.append(res)
