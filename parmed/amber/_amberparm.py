@@ -646,7 +646,7 @@ class AmberParm(AmberFormat, Structure):
 
     #===================================================
 
-    def write_parm(self, name):
+    def write_parm(self, name, force_reorder=True):
         """
         Writes the current data in parm_data into a new topology file with a given name.
 
@@ -654,21 +654,32 @@ class AmberParm(AmberFormat, Structure):
         ----------
         name : str or file-like
             The name of the file to write the prmtop to or the file object to write to
+        force_reorder: bool
+            If True (default), atoms are forcibly reordered if molecules are not contiguous.
         """
-        self.remake_parm()
+        self.remake_parm(reorder_molecules=force_reorder)
         AmberFormat.write_parm(self, name)
 
     #===================================================
 
-    def remake_parm(self):
+    def remake_parm(self, reorder_molecules=True):
         """
         Fills :attr:`parm_data` from the data in the parameter and topology
         arrays (e.g., :attr:`atoms`, :attr:`bonds`, :attr:`bond_types`, ...)
+
+        Parameters
+        ----------
+        reorder_molecules : bool
+            If True, atoms are reordered if molecules are non-contiguous
         """
         # Get rid of terms containing deleted atoms and empty residues
         self.prune_empty_terms()
         self.residues.prune()
-        self.rediscover_molecules()
+        try:
+            self.rediscover_molecules(fix_broken=reorder_molecules)
+        except MoleculeError:
+            warn("Not reordering atoms in molecules. Use the setMolecules action "
+                 "or rediscover_molecules() explicitly to do that")
 
         # Transfer information from the topology lists
         self._xfer_atom_info()
