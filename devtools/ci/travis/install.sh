@@ -21,22 +21,13 @@ else # Otherwise, CPython... go through conda
     export PATH=$HOME/miniconda/bin:$PATH
     conda update -y --all
     conda install --yes conda-build jinja2 anaconda-client pip
-    # Omnia requires conda-forge
-    conda config --add channels omnia --add channels conda-forge
-    conda config --add channels omnia-dev
+    conda config --add channels conda-forge
 
     if [ -z "$MINIMAL_PACKAGES" ]; then
         # Install all prerequisites
-        conda create -y -n myenv python=$PYTHON_VERSION \
-            numpy scipy pandas nose openmm coverage nose-timer \
-            netCDF4
-        conda update -y -n myenv --all
-        conda install -y -n myenv rdkit==2018.09.1
-        conda install -y -n myenv boost==1.69.0
-        conda install -y -n myenv nglview
-        conda install -y -n myenv ambertools=18 -c ambermd
-        conda install -y -n myenv networkx
-        conda install -y -n myenv lxml
+        conda create -y -c conda-forge -n myenv python=$PYTHON_VERSION \
+            pandas nose openmm coverage nose-timer \
+            netCDF4 rdkit==2020.09.4 nglview ambertools networkx lxml
     else
         # Do not install the full numpy/scipy stack
         conda create -y -n myenv python=$PYTHON_VERSION numpy nose coverage \
