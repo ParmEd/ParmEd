@@ -26,17 +26,13 @@ jobs:
         environment-file: devtools/environment-dev.yaml
         activate-environment: parmed-dev
 
-    - name: Install and test
-      shell: bash -l {0}
-      run: python -m pip install . --no-deps
-
     - name: Environment Information
       shell: bash -l {0}
       run: |
         conda info
         conda list
 
-    - name: PyTest
-      shell: bash -l {0}
+    - name: Install and test
+      shell: bash -lex {0}
       run: |
-        pytest -rws -v --cov=codex --color=yes codex/
+        bash -ex devtools/ci/install.sh
