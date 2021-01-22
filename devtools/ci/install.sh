@@ -5,7 +5,7 @@ rm -fr ${py_bin_dir}/../lib/python${PYTHON_VERSION}/site-packages/ParmEd*
 rm -fr ${py_bin_dir}/../lib/python${PYTHON_VERSION}/site-packages/parmed/
 conda list
 
-pip install -e .
+pip install -Ie .
 python -c "import parmed; print(parmed.__version__)"
 
 do_coverage() {
