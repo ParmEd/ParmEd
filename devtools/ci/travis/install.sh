@@ -35,7 +35,11 @@ else # Otherwise, CPython... go through conda
     fi
     source activate myenv
     if [ -z "$MINIMAL_PACKAGES" ]; then
-        pip uninstall parmed -y # from ambertools
+        # Remove ParmEd from AmberTools
+        rm -f `which parmed` `which xparmed`
+        py_bin_dir=$(dirname `which python`)
+        rm -fr ${py_bin_dir}/../lib/python${PYTHON_VERSION}/site-packages/ParmEd*
+        rm -fr ${py_bin_dir}/../lib/python${PYTHON_VERSION}/site-packages/parmed/
     fi
     # DEBUG
     conda list
