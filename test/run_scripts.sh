@@ -5,7 +5,7 @@ if [ -z "`which coverage 2>/dev/null`" ]; then
     has_coverage="no"
     echo "No coverage module found..."
 else
-    run_cmd="coverage run --parallel-mode"
+    run_cmd="coverage run -a"
     has_coverage="yes"
     echo "coverage found and will be used..."
 fi
