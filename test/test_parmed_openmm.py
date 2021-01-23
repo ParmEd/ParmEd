@@ -28,12 +28,7 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         # Take one of the distributed OpenMM FF XML files as a test
         self.ffxml = os.path.join(os.path.split(app.__file__)[0], 'data',
                                   'amber99sbildn.xml')
-        warnings.filterwarnings('error', category=exceptions.OpenMMWarning)
         super(TestOpenMM, self).setUp()
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=exceptions.OpenMMWarning)
-        super(TestOpenMM, self).tearDown()
 
     def test_format_id(self):
         """ Tests automatic format determination of OpenMM XML files """
@@ -140,10 +135,8 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         for force in system.getForces():
             if isinstance(force, mm.HarmonicBondForce):
                 force.addBond(0, parm[-1].idx, 1, 500)
-        self.assertRaises(exceptions.OpenMMWarning, lambda:
-                openmm.load_topology(parm.topology, system))
-        warnings.filterwarnings('ignore', category=exceptions.OpenMMWarning)
-        top = openmm.load_topology(parm.topology, system)
+        with self.assertWarns(exceptions.OpenMMWarning):
+            top = openmm.load_topology(parm.topology, system)
         self.assertIn(top[-1], top[0].bond_partners)
         self.assertEqual(len(top.bonds), len(parm.bonds)+1)
 
@@ -182,8 +175,8 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         )
         system = parm.createSystem()
         system.addForce(mm.CustomTorsionForce('theta**2'))
-        self.assertRaises(exceptions.OpenMMWarning, lambda:
-                openmm.load_topology(parm.topology, system))
+        with self.assertWarns(exceptions.OpenMMWarning):
+            openmm.load_topology(parm.topology, system)
 
     def test_box_from_system(self):
         """ Tests loading box from System """
@@ -589,7 +582,6 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                   os.path.join(get_fn('parm'), 'frcmod.ionsjc_tip3p'))
         )
         ffxml = StringIO()
-        warnings.filterwarnings('ignore', category=exceptions.ParameterWarning)
         params.write(ffxml, write_unused=True)
         ffxml.seek(0)
         self.assertEqual(len(ffxml.readlines()), 222)
@@ -796,7 +788,6 @@ class TestWriteCHARMMParameters(FileIOTestCase):
     def test_explicit_improper(self):
         """ Test writing out the improper explicitly and reading it back into OpenMM ForceField """
 
-        warnings.filterwarnings('ignore', category=ParameterWarning)
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'))

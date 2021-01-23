@@ -1057,7 +1057,6 @@ class TestStructureSave(FileIOTestCase):
     """ Tests the universal "save" function in Structure """
 
     def setUp(self):
-        warnings.filterwarnings('ignore', category=CharmmWarning)
         self.sys1 = pmd.load_file(get_fn('ala3_solv.psf'))
         self.sys1.coordinates = pmd.load_file(get_fn('ala3_solv.crd')).coordinates
         self.sys1.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
@@ -1073,11 +1072,6 @@ class TestStructureSave(FileIOTestCase):
         self.sys4 = pmd.load_file(get_fn('ala_ala_ala.psf'))
         self.sys4.coordinates = np.random.rand(len(self.sys4.atoms), 3)
         super(TestStructureSave, self).setUp()
-
-    def tearDown(self):
-        warnings.filterwarnings('default', category=CharmmWarning)
-        warnings.filterwarnings('default', category=ParameterWarning)
-        super(TestStructureSave, self).tearDown()
 
     def test_save_pdb(self):
         """ Test saving various Structure instances as a PDB """
@@ -1329,7 +1323,6 @@ class TestStructureSave(FileIOTestCase):
 
     def test_save_gromacs(self):
         """ Test saving various Structure instances as GROMACS top files """
-        warnings.filterwarnings('ignore', category=ParameterWarning)
         self.sys1.save(get_fn('test.top', written=True))
         self.sys2.save(get_fn('test2.top', written=True))
         self.sys3.save(get_fn('test3.top', written=True))

@@ -1,0 +1,22 @@
+name: parmed-dev
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - pandas
+  - nose
+  - openmm ==7.5.0
+  - coverage
+  - nose-timer
+  - netCDF4
+  - rdkit ==2020.09.4
+  - nglview
+  - ambertools ==20.15
+  - networkx
+  - lxml
+  - nose-timer
+  - gromacs
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - pytest-sugar

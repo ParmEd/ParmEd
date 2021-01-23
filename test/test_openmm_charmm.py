@@ -31,9 +31,6 @@ import unittest
 from utils import get_fn, TestCaseRelative, mm, app, has_openmm, CPU
 import warnings
 
-# Suppress warning output from bad psf file... sigh.
-warnings.filterwarnings('ignore', category=CharmmWarning)
-
 # System
 charmm_gas = CharmmPsfFile(get_fn('ala_ala_ala.psf'))
 charmm_gas_crds = load_file(get_fn('ala_ala_ala.pdb'))
