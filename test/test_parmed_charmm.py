@@ -933,7 +933,7 @@ class TestCharmmParameters(TestCharmmBase):
         with self.assertWarns(exceptions.ParameterWarning):
             parameters.CharmmParameterSet(
                 get_fn('toppar_all36_prot_aldehydes.str'),
-                get_fn('toppar_all36_na_modifications.str'))
+                get_fn('toppar_all36_na_modifications.str'),
             )
 
 

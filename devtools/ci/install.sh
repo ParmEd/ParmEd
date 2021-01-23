@@ -18,10 +18,11 @@ do_coverage() {
 echo "Using ParmEd version `parmed --version`"
 cd test
 echo "Using nosetests...:"
+pwd
 ./run_scripts.sh
 # Run pytest under coverage, since that allows getting the full flexibility of
 # the coverage package without sacrificing nose functionality
-test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv
-coverage run --source=parmed --parallel-mode -m pytest --durations=0 --disable-warnings test
+pwd
+py.test --cov=parmed --durations=0 --disable-warnings test
 do_coverage
 echo "Done!"
