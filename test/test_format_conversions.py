@@ -341,7 +341,6 @@ class TestGromacsToAmber(FileIOTestCase, EnergyTestCase):
     @unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
     def test_energy_complicated(self):
         """ Check equal energies for Gmx -> Amber conversion of complex FF """
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(get_fn(os.path.join('12.DPPC', 'topol2.top')))
         gro = load_file(get_fn(os.path.join('12.DPPC', 'conf.gro')))
         parm = amber.AmberParm.from_structure(top)
@@ -358,9 +357,6 @@ class TestGromacsToAmber(FileIOTestCase, EnergyTestCase):
         cona.setPositions(gro.positions)
 
         self.check_energies(top, cong, parm, cona)
-
-        warnings.filterwarnings('always', category=GromacsWarning)
-
 
 class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
     """ Tests converting Amber files to CHARMM """

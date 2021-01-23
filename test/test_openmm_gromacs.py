@@ -62,9 +62,6 @@ def zero_ep_frc(frc, struct):
 class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
-    def setUp(self):
-        warnings.filterwarnings('always', category=GromacsWarning)
-
     def test_tiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
         # Load the top and gro files
@@ -250,7 +247,6 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
     def test_dppc(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
                         xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -330,7 +326,6 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
                         xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -338,10 +333,7 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
         system = top.createSystem()
         def bad_system():
             return openmm.load_topology(top.topology, system).createSystem()
-        warnings.filterwarnings('ignore', category=OpenMMWarning)
-        self.assertTrue(
-                openmm.load_topology(top.topology, system).unknown_functional
-        )
+        self.assertTrue(openmm.load_topology(top.topology, system).unknown_functional)
         self.assertRaises(ParmedError, bad_system)
         for i in range(len(system.getForces())):
             if isinstance(system.getForce(i), mm.CustomNonbondedForce):
