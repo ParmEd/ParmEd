@@ -22,6 +22,6 @@ echo "Using nosetests...:"
 # Run pytest under coverage, since that allows getting the full flexibility of
 # the coverage package without sacrificing nose functionality
 test -z "$MINIMAL_PACKAGES" && export AMBERHOME=$HOME/miniconda/envs/myenv
-coverage run --source=parmed --parallel-mode -m pytest --durations=0 test
+coverage run --source=parmed --parallel-mode -m pytest --durations=0 --disable-warnings test
 do_coverage
 echo "Done!"
