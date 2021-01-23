@@ -17,12 +17,9 @@ do_coverage() {
 
 echo "Using ParmEd version `parmed --version`"
 cd test
-echo "Using nosetests...:"
-pwd
 ./run_scripts.sh
 # Run pytest under coverage, since that allows getting the full flexibility of
 # the coverage package without sacrificing nose functionality
-pwd
-py.test --cov=parmed --durations=0 --disable-warnings test
+py.test --cov=parmed --durations=0 --disable-warnings .
 do_coverage
 echo "Done!"
