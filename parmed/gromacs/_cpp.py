@@ -286,8 +286,8 @@ class CPreProcessor(object):
         else:
             if self._notfound_fatal:
                 raise PreProcessorError('Could not find %s' % includefile)
-            warnings.warn('Could not find %s; skipping' % includefile,
-                          PreProcessorWarning)
+            warnings.warn('Could not find %s; skipping' % includefile, PreProcessorWarning)
+            return
         self._includefile = CPreProcessor(testfile,
                                           defines=self.defines,
                                           includes=self._includes,

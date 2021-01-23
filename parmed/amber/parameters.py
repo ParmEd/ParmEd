@@ -64,17 +64,14 @@ def _find_amber_file(fname, search_oldff):
     if len(fname) > 1 and {fname[0], fname[-1]} in ({'"'}, {"'"}):
         # Strip quotes
         fname = fname[1:-1]
-    if os.path.exists(fname):
-        return fname
     leapdir = os.path.join(AMBERHOME, 'dat', 'leap')
-    if os.path.exists(os.path.join(leapdir, 'lib', fname)):
-        return os.path.join(leapdir, 'lib', fname)
-    if os.path.exists(os.path.join(leapdir, 'parm', fname)):
-        return os.path.join(leapdir, 'parm', fname)
+    paths = [os.getcwd(), os.path.join(leapdir, 'lib'), os.path.join(leapdir, 'parm')]
     if search_oldff:
-        if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
-            return os.path.join(leapdir, 'lib', 'oldff', fname)
-    raise ValueError('Cannot find Amber file [%s]' % fname)
+        paths.append(os.path.join(leapdir, 'lib', 'oldff'))
+    for path in paths:
+        if os.path.exists(os.path.join(path, fname)):
+            return os.path.join(path, fname)
+    raise FileNotFoundError('Cannot find Amber file [%s] in paths %s' % (fname, paths))
 
 @add_metaclass(FileFormatType)
 class AmberParameterSet(ParameterSet):

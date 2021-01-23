@@ -392,10 +392,8 @@ class TestResidueTemplate(unittest.TestCase):
             self.assertEqual(res.idx, -1)
         self.assertGreater(len(residues), 0)
         # Check what should be a warning
-        warnings.filterwarnings('error', category=UserWarning)
-        self.assertRaises(UserWarning, lambda:
-                ResidueTemplate.from_residue(residues[1]))
-        warnings.filterwarnings('always', category=UserWarning)
+        with self.assertWarns(UserWarning):
+            ResidueTemplate.from_residue(residues[1])
 
     def _check_arbitrary_res(self, struct, res):
         orig_indices = [a.idx for a in res]
@@ -955,7 +953,6 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
     def test_read_solvents(self):
         """ Test reading solvent Amber OFF lib (multi-res units) """
         # Turn off warnings... the solvents.lib file is SO broken.
-        warnings.filterwarnings('ignore', module='.', category=AmberWarning)
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
         for name, res in iteritems(offlib):

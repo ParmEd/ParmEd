@@ -43,7 +43,6 @@ solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
-warnings.filterwarnings('error', category=exc.SeriousParmWarning)
 
 # Make sure default overwrite is False
 PT.Action.overwrite = False
@@ -73,9 +72,8 @@ class TestActionAPI(unittest.TestCase):
                 PT.changeRadii(None, 'mbondi2'))
         self.assertFalse(NewActionNoUsage(None).valid)
         self.assertFalse(NewActionWithUsage(None).valid)
-        warnings.filterwarnings('error', category=exc.UnhandledArgumentWarning)
-        self.assertRaises(exc.UnhandledArgumentWarning, lambda:
-                PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments'))
+        with self.assertWarns(exc.UnhandledArgumentWarning):
+            PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments')
         str(NewActionNoUsage(None)) # Make sure it doesn't crash
 
 class TestActionAPI(unittest.TestCase):
@@ -109,8 +107,8 @@ class TestNonParmActions(FileIOTestCase):
         self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
         PT.setOverwrite(None, False).execute() # Turn it back off
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.setOverwrite(None, 'badarg'))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.setOverwrite(None, 'badarg')
 
     def test_list_parms(self):
         """ Test listing of the prmtop files in the ParmEd interpreter """
@@ -123,9 +121,6 @@ class TestNonParmActions(FileIOTestCase):
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_chamber(self):
         """ Test the chamber action with a basic protein """
-        # To keep stderr clean
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'), '-top',
                        get_fn('top_all22_prot.inp'), '-param', get_fn('par_all22_prot.inp'))
         str(a)
@@ -230,9 +225,6 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_model(self):
         """ Test the chamber action with a model compound """
-        # To keep stderr clean
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('propane.psf'), '-top',
                        get_fn('top_all36_prot.rtf'), '-param', get_fn('par_all36_prot.prm'),
                        '-str', get_fn('toppar_all36_prot_model.str'), '-str',
@@ -247,8 +239,6 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_globbing(self):
         """ Test globbing in the chamber action """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
                        '-toppar', get_fn('*_all22_prot.inp'),
                        '-crd', get_fn('ala_ala_ala.pdb'))
@@ -263,8 +253,6 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_nbfix(self):
         """ Test the chamber action with a complex system using NBFIX """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('ala3_solv.psf'), '-toppar',
                        get_fn('???_all36_prot.???'), '-toppar', get_fn('toppar_water_ions.str'),
                        '-crd', get_fn('ala3_solv.crd'), '-box', 'bounding')
@@ -300,8 +288,6 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_bug2(self):
         """ Test that chamber sets the box angles for triclinics correctly """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
         a = PT.chamber(self.parm, '-psf', get_fn('ala3_solv.psf'),
                        '-param', get_fn('par_all36_prot.prm'),
                        '-str', get_fn('toppar_water_ions.str'),
@@ -447,10 +433,6 @@ class TestNonParmActions(FileIOTestCase):
 class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     @unittest.skipIf(PYPY, 'Cannot test with NetCDF on pypy')
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
@@ -515,10 +497,8 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertRaises(exc.FileExists, act.execute)
         # Make sure 10-12 prmtops fail
         parm = load_file(get_fn('ff91.parm7'))
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.writeFrcmod(load_file(get_fn('ff91.parm7')),
-                               get_fn('test2.frcmod', written=True))
-        )
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.writeFrcmod(load_file(get_fn('ff91.parm7')), get_fn('test2.frcmod', written=True))
         # Make sure string does not error
         str(act)
 
@@ -806,16 +786,13 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
             if atom.residue.idx < 2:
                 self.assertEqual(atom.tree, 'ABC')
         # Check if we try to add strings that are too long
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning, lambda:
-                PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute())
-        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
         # Make sure the strings get truncated
         PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
         for atom in parm.atoms:
             self.assertEqual(atom.name, 'LALA')
             self.assertEqual(parm.parm_data['ATOM_NAME'][atom.idx], 'LALA')
-        warnings.filterwarnings('always', category=exc.ParmWarning)
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
@@ -838,8 +815,8 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                repr(PT.printInfo(gasparm, 'NOTAFLAG')))
+        with self.assertWarns(exc.SeriousParmWarning):
+            repr(PT.printInfo(gasparm, 'NOTAFLAG'))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on AmberParm """
@@ -980,10 +957,10 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_DETAILS)
         act = PT.printDetails(gasparm, '@1', parm=str(gasparm))
         self.assertEqual(str(act), saved.PRINT_DETAILS)
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.printDetails(gasparm, '@1', parm='DNE'))
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.printDetails(gasparm, '@1', parm=10))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.printDetails(gasparm, '@1', parm='DNE')
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.printDetails(gasparm, '@1', parm=10)
 
     def test_print_flags(self):
         """ Test printFlags on AmberParm """
@@ -1093,7 +1070,6 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(parm.ptr('NSPM'), 718)
         self.assertEqual(parm.ptr('NSPSOL'), 23)
         # To keep the output clean
-        warnings.filterwarnings('ignore', category=AmberWarning)
         PT.setMolecules(parm).execute()
         self.assertFalse(all([x is y for x,y in zip(parm.atoms,atoms)]))
         # Now check that setMolecules can apply another time.
@@ -1108,15 +1084,12 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         act.execute()
         str(act)
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.setMolecules(parm, solute_ions='foo'))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.setMolecules(parm, solute_ions='foo')
 
         # Make sure we warn if reordering was required
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning,
-                PT.setMolecules(pmd.load_file(get_fn('things.parm7')),
-                    solute_ions=True).execute)
-        warnings.filterwarnings('always', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.setMolecules(pmd.load_file(get_fn('things.parm7')), solute_ions=True).execute()
 
     def test_net_charge(self):
         """ Test netCharge on AmberParm """
@@ -1256,8 +1229,8 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
             PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1, 10).execute())
         self.assertRaises(exc.DeleteDihedralError, lambda:
             PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
-        self.assertRaises(exc.SeriousParmWarning,
-            PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5', '@6-7').execute)
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5', '@6-7').execute()
         self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35', '@45').execute(), 0)
 
     def test_set_bond(self):
@@ -1470,9 +1443,8 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertRaises(exc.IncompatibleParmsError, lambda:
                 PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute())
         act.parm_list[0].atoms[0].name = 'FOO'
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly', parm=0,
-                    parm2=1).execute())
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.interpolate(act.parm_list, 10, 'eleconly', parm=0, parm2=1).execute()
 
     def test_prot_state_interpolate_2(self):
         """ Test interpolate actions on AmberParm with more parm selection """
@@ -2115,10 +2087,6 @@ Basic MD simulation
 
 class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
-
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
 
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
@@ -3047,10 +3015,6 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
 class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
@@ -3530,10 +3494,6 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
 class TestOtherParm(FileIOTestCase):
     """ Tests the use of other parms as the main parm """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     def test_summary(self):
         """ Tests the use of a PDB file with the summary action """
         parm = load_file(get_fn('4lzt.pdb'))
@@ -3620,16 +3580,16 @@ class TestOtherParm(FileIOTestCase):
                 PT.parm(parms, 'notafile').execute())
         act = PT.parm(parms, select='notafile')
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, select=100)
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, copy='notafile')
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, copy=100)
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
 
         # Catch permissions error, but only on Linux
         import platform
@@ -3640,7 +3600,7 @@ class TestOtherParm(FileIOTestCase):
         # Change the permissions to remove read perms
         os.chmod(fn, int('333', 8))
         act = PT.parm(parms, fn)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
 
         # Now check that listParms works
         info = repr(PT.listParms(parms))
@@ -3663,10 +3623,8 @@ class TestOtherParm(FileIOTestCase):
         struct.bonds.append(pmd.Bond(struct[3], struct[4]))
         total_mass = sum(a.mass for a in struct.atoms)
 
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning, lambda:
-                PT.HMassRepartition(struct).execute())
-        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.HMassRepartition(struct).execute()
         PT.HMassRepartition(struct).execute()
         self.assertEqual(struct[0].mass, 1.001)
         self.assertEqual(struct[1].mass, 1.001)
@@ -3674,9 +3632,8 @@ class TestOtherParm(FileIOTestCase):
         self.assertEqual(struct[3].mass, 3.024)
         self.assertAlmostEqual(sum(a.mass for a in struct.atoms), total_mass)
         # Now what happens if we make our Hs *too* heavy?
-        self.assertRaises(exc.HMassRepartitionError, lambda:
-                PT.HMassRepartition(struct, 100).execute())
-        warnings.filterwarnings('always', category=exc.ParmWarning)
+        with self.assertRaises(exc.HMassRepartitionError):
+            PT.HMassRepartition(struct, 100).execute()
 
     def test_delete_bond(self):
         """ Tests deleteBond on arbitrary Structure instances """

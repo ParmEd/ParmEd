@@ -175,7 +175,7 @@ def load_file(filename, *args, **kwargs):
         try:
             if cls.id_format(filename):
                 break
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, SyntaxError):
             continue
     else:
         # We found no file format

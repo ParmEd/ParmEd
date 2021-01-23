@@ -139,4 +139,4 @@ def minimize(parm, igb, saltcon, cutoff, tol, maxcyc, disp=True, callback=None):
         parm.coordinates = results.x
     if not results.success:
         LOGGER.error('Problem minimizing structure with scipy and sander: %s',
-                     results.message.decode())
+                     results.message)

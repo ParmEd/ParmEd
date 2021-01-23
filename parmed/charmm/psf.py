@@ -600,8 +600,7 @@ class CharmmPsfFile(Structure):
                 # Check for wild-cards
                 key = ('X', a2.type, a3.type, 'X')
                 if not key in parmset.dihedral_types:
-                    raise ParameterError('No dihedral parameters found for '
-                                         '%r' % dih)
+                    raise ParameterError('No dihedral parameters found for %r' % dih)
             dih.type = parmset.dihedral_types[key]
             dih.type.used = False
             pair = (dih.atom1.idx, dih.atom4.idx) # To determine exclusions

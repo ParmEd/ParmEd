@@ -29,14 +29,6 @@ import utils
 class TestGromacsTop(FileIOTestCase):
     """ Tests the Gromacs topology file parser """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=GromacsWarning)
-        FileIOTestCase.setUp(self)
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=GromacsWarning)
-        FileIOTestCase.tearDown(self)
-
     def _charmm27_checks(self, top):
         # Check that the number of terms are correct
         self.assertEqual(len(top.atoms), 1960)
@@ -322,7 +314,6 @@ class TestGromacsTop(FileIOTestCase):
         self.assertEqual(len(top.residues), 40)
 
         # Now test this when we use "combine"
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
         fn = get_fn('samename.top', written=True)
         parm.residues[3].name = 'SOL' # Rename a DPPC to SOL
@@ -428,22 +419,21 @@ class TestGromacsTop(FileIOTestCase):
         f = StringIO('\n[ defaults ]\n; not enough data\n 1\n\n')
         self.assertRaises(GromacsError, lambda: GromacsTopologyFile(f))
         f = StringIO('\n[ defaults ]\n; unsupported function type\n 2 1 yes\n')
-        self.assertRaises(GromacsWarning, lambda: GromacsTopologyFile(f))
-        warnings.filterwarnings('ignore', category=GromacsWarning)
+        with self.assertWarns(GromacsWarning):
+            GromacsTopologyFile(f)
         f.seek(0)
         self.assertTrue(GromacsTopologyFile(f).unknown_functional)
-        warnings.filterwarnings('error', category=GromacsWarning)
         fn = os.path.join(get_fn('gmxtops'), 'bad_vsites3.top')
         self.assertRaises(GromacsError, lambda: load_file(fn))
         self.assertRaises(ValueError, lambda: load_file(fn, defines=dict()))
         f = StringIO('\n[ defaults ]\n1 1 yes\n\n[ system ]\nname\n[ molecules ]\nNOMOL  2\n')
         self.assertRaises(GromacsError, lambda: GromacsTopologyFile(f))
         fn = os.path.join(get_fn('gmxtops'), 'bad_nrexcl.top')
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             GromacsTopologyFile(fn, defines=dict(SMALL_NREXCL=1))
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             GromacsTopologyFile(fn)
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning), self.assertRaises(GromacsError):
             GromacsTopologyFile(wfn, defines=dict(NODUP=1))
         with self.assertRaises(GromacsError):
             GromacsTopologyFile(wfn, defines=dict(NODUP=1, BADNUM=1))
@@ -451,11 +441,9 @@ class TestGromacsTop(FileIOTestCase):
 
     def test_top_parsing_missing_types(self):
         """ Test GROMACS topology files with missing types """
-        warnings.filterwarnings('error', category=GromacsWarning)
         fn = os.path.join(get_fn('gmxtops'), 'missing_atomtype.top')
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             GromacsTopologyFile(fn, parametrize=False)
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = GromacsTopologyFile(fn, parametrize=False)
         self.assertIs(top[0].atom_type, UnassignedAtomType)
         self.assertEqual(top[0].mass, -1)
@@ -468,7 +456,6 @@ class TestGromacsTop(FileIOTestCase):
 
     def test_molecule_ordering(self):
         """ Tests non-contiguous atoms in Gromacs topology file writes """
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
         parm.write(get_fn('topol3.top', written=True))
         parm2 = load_file(get_fn('topol3.top', written=True))
@@ -500,7 +487,6 @@ class TestGromacsTop(FileIOTestCase):
 
     def test_molecule_combine(self):
         """ Tests selective molecule combination in Gromacs topology files """
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         parm = load_file(os.path.join(get_fn('12.DPPC'), 'topol3.top'))
         fname = get_fn('combined.top', written=True)
         # Make sure that combining non-adjacent molecules fails
@@ -827,12 +813,7 @@ class TestGromacsMissingParameters(FileIOTestCase):
 
     def setUp(self):
         self.top = load_file(get_fn('ildn.solv.top'), parametrize=False)
-        warnings.filterwarnings('error', category=GromacsWarning)
         FileIOTestCase.setUp(self)
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=GromacsWarning)
-        FileIOTestCase.tearDown(self)
 
     def test_missing_pairtypes(self):
         """ Tests handling of missing pairtypes parameters """
@@ -849,7 +830,8 @@ class TestGromacsMissingParameters(FileIOTestCase):
     def test_extra_pairs(self):
         """ Tests warning if "extra" exception pair found """
         self.top.adjusts.append(NonbondedException(self.top[0], self.top[-1]))
-        self.assertRaises(GromacsWarning, self.top.parametrize)
+        with self.assertWarns(GromacsWarning):
+            self.top.parametrize()
 
     def test_missing_angletypes(self):
         """ Tests handling of missing angletypes parameters """
@@ -1006,31 +988,26 @@ class TestGromacsTopHelperFunctions(FileIOTestCase):
         self.top.add_atom(Atom(name='C1'), 'JKL', 4)
         self.top.add_atom(Atom(name='C1'), 'MNO', 5)
         self.top.add_atom(Atom(name='C1'), 'PQR', 5)
-        warnings.filterwarnings('error', category=GromacsWarning)
         FileIOTestCase.setUp(self)
 
     def test_parse_pairs(self):
         """ Test GromacsTopologyFile._parse_pairs """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_pairs('1  2  3\n', dict(), self.top.atoms)
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_pairs('1  2  3\n', dict(), self.top.atoms)
         self.assertTrue(self.top.unknown_functional)
 
     def test_parse_angles(self):
         """ Test GromacsTopologyFile._parse_angles """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_angles('1  2  3  2\n', dict(), dict(), self.top.atoms)
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_angles('1  2  3  2\n', dict(), dict(), self.top.atoms)
         self.assertTrue(self.top.unknown_functional)
 
     def test_parse_dihedrals(self):
         """ Test GromacsTopologyFile._parse_dihedrals """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_dihedrals('1 2 3 4 100\n', dict(), dict(), self.top)
-        warnings.filterwarnings('ignore', category=GromacsWarning)
-        self.top._parse_dihedrals('1 2 3 4 100\n', dict(), dict(), self.top)
         self.assertTrue(self.top.unknown_functional)
         self.assertEqual(len(self.top.dihedrals), 1)
         dih = self.top.dihedrals[0]
@@ -1049,9 +1026,8 @@ class TestGromacsTopHelperFunctions(FileIOTestCase):
 
     def test_parse_cmaps(self):
         """ Test GromacsTopologyFile._parse_cmaps """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_cmaps('1 2 3 4 5 2\n', self.top.atoms)
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_cmaps('1 2 3 4 5 2\n', self.top.atoms)
         self.assertTrue(self.top.unknown_functional)
 
@@ -1087,17 +1063,15 @@ class TestGromacsTopHelperFunctions(FileIOTestCase):
 
     def test_parse_bondtypes(self):
         """ Test GromacsTopologyFile._parse_bondtypes """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_bondtypes('CA CB 2 0.1 5000')
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_bondtypes('CA CB 2 0.1 5000')
         self.assertTrue(self.top.unknown_functional)
 
     def test_parse_angletypes(self):
         """ Test GromacsTopologyFile._parse_angletypes """
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_angletypes('CA CB CC 2 120 5000')
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_angletypes('CA CB CC 2 120 5000')
         self.assertTrue(self.top.unknown_functional)
 
@@ -1110,9 +1084,8 @@ class TestGromacsTopHelperFunctions(FileIOTestCase):
         self.assertEqual(ptype.phase, 180)
         self.assertEqual(ptype.phi_k, 50/4.184)
         self.assertEqual(ptype.per, 2)
-        with self.assertRaises(GromacsWarning):
+        with self.assertWarns(GromacsWarning):
             self.top._parse_dihedraltypes('CX CA CA CX 10 180 50.0 2')
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         self.top._parse_dihedraltypes('CX CA CA CX 10 180 50.0 2')
         self.assertTrue(self.top.unknown_functional)
 
