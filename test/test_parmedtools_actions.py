@@ -1786,7 +1786,7 @@ Basic MD simulation
             pmd.tools.minimize(parm, igb=8, maxcyc=10).execute()
         self.assertRaises(exc.SimulationError, test_coordinates_is_None)
 
-    @unittest.skipIf(True) # Need to figure out why this is segfaulting in parallel
+    @unittest.skipIf(True, "OpenMM minimization test is currently failing") # Need to figure out why this is segfaulting in parallel
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
     def test_minimize_openmm(self):
         """ Tests the minimize action with OpenMM """
