@@ -18,13 +18,10 @@ from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTy
 import parmed.unit as u
 import random
 import unittest
-import utils
-from utils import HAS_GROMACS
+from utils import HAS_GROMACS, FileIOTestCase, get_fn, create_random_structure
 import warnings
 
-get_fn = utils.get_fn
-
-class TestCharmmBase(utils.FileIOTestCase):
+class TestCharmmBase(FileIOTestCase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,7 +38,7 @@ class TestCharmmCoords(TestCharmmBase):
         self._check_crd(charmmcrds.CharmmCrdFile(get_fn('1tnm.crd')))
         # Make sure format ID is good
         # Skipped whitespace
-        fn = get_fn('test.crd', written=True)
+        fn = self.get_fn('test.crd', written=True)
         with open(fn, 'w') as f, open(get_fn('1tnm.crd'), 'r') as f2:
             f.write('\n\n\n\n')
             f.write(f2.read())
@@ -76,16 +73,16 @@ class TestCharmmCoords(TestCharmmBase):
     def test_write_crd(self):
         """ Test CHARMM coordinate writing capabilities """
         struct = load_file(get_fn('4lzt.pdb'))
-        charmmcrds.CharmmCrdFile.write(struct, get_fn('test.crd', written=True))
-        crd = charmmcrds.CharmmCrdFile(get_fn('test.crd', written=True))
+        charmmcrds.CharmmCrdFile.write(struct, self.get_fn('test.crd', written=True))
+        crd = charmmcrds.CharmmCrdFile(self.get_fn('test.crd', written=True))
         np.testing.assert_allclose(struct.coordinates,
                                    crd.coordinates.reshape((len(struct.atoms), 3)))
         fd = StringIO()
         charmmcrds.CharmmCrdFile.write(struct, fd)
         fd.seek(0)
-        with open(get_fn('test2.crd', written=True), 'w') as f:
+        with open(self.get_fn('test2.crd', written=True), 'w') as f:
             f.write(fd.read())
-        crd = charmmcrds.CharmmCrdFile(get_fn('test2.crd', written=True))
+        crd = charmmcrds.CharmmCrdFile(self.get_fn('test2.crd', written=True))
         np.testing.assert_allclose(struct.coordinates,
                                    crd.coordinates.reshape((len(struct.atoms), 3)))
 
@@ -117,7 +114,7 @@ class TestCharmmCoords(TestCharmmBase):
         self.assertEqual(crd.nsavv, 10)
         self.assertIs(crd.box, None)
         # Check proper handling of truncated files
-        fn = get_fn('test.rst', written=True)
+        fn = self.get_fn('test.rst', written=True)
         with open(fn, 'w') as f, open(get_fn('sample-charmm.rst'), 'r') as f2:
             for i in range(200):
                 f.write(f2.readline())
@@ -520,7 +517,7 @@ class TestCharmmPsf(TestCharmmBase):
         )
         # Print some atoms out-of-order
         with open(get_fn('ala_ala_ala.psf'), 'r') as f, \
-                open(get_fn('ala_ala_ala2.psf', written=True), 'w') as f2:
+                open(self.get_fn('ala_ala_ala2.psf', written=True), 'w') as f2:
             for i in range(15):
                 f2.write(f.readline())
             tmp = f.readline()
@@ -528,11 +525,10 @@ class TestCharmmPsf(TestCharmmBase):
             f2.write(tmp)
             for line in f:
                 f2.write(line)
-        self.assertRaises(exceptions.CharmmError, lambda:
-                psf.CharmmPsfFile(get_fn('ala_ala_ala2.psf', written=True))
-        )
+        with self.assertRaises(exceptions.CharmmError):
+            psf.CharmmPsfFile(self.get_fn('ala_ala_ala2.psf', written=True))
         # CHARMM can't handle all potential energy functions
-        struct = utils.create_random_structure(True)
+        struct = create_random_structure(True)
         self.assertRaises(ValueError, lambda:
                 psf.CharmmPsfFile.from_structure(struct)
         )
@@ -756,27 +752,19 @@ class TestCharmmParameters(TestCharmmBase):
 
     def test_write_params(self):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
-        params = parameters.CharmmParameterSet(
-                                get_fn('top_all22_prot.inp'),
-                                get_fn('par_all22_prot.inp'),
-        )
-        params.write(top=get_fn('test.rtf', written=True),
-                     par=get_fn('test.par', written=True))
-        params.write(str=get_fn('test.str', written=True))
+        params = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp'))
+        params.write(top=self.get_fn('test.rtf', written=True),
+                     par=self.get_fn('test.par', written=True))
+        params.write(str=self.get_fn('test.str', written=True))
         # Check bad options
         self.assertRaises(ValueError, lambda: params.write())
 
         params2 = parameters.CharmmParameterSet(
-                                get_fn('test.rtf', written=True),
-                                get_fn('test.par', written=True)
+            self.get_fn('test.rtf', written=True), self.get_fn('test.par', written=True)
         )
-        params3 = parameters.CharmmParameterSet(get_fn('test.str', written=True))
-        params4 = parameters.CharmmParameterSet.load_set(
-                sfiles=get_fn('test.str', written=True)
-        )
-        params5 = parameters.CharmmParameterSet.load_set(
-                sfiles=[get_fn('test.str', written=True)]
-        )
+        params3 = parameters.CharmmParameterSet(self.get_fn('test.str', written=True))
+        params4 = parameters.CharmmParameterSet.load_set(sfiles=self.get_fn('test.str', written=True))
+        params5 = parameters.CharmmParameterSet.load_set(sfiles=[self.get_fn('test.str', written=True)])
 
         # Check that all of the params are equal
         self._compare_paramsets(params, params2, copy=True)
@@ -1054,9 +1042,9 @@ class TestFileWriting(TestCharmmBase):
         self.assertRaises(IOError, lambda:
                 CharmmFile(get_fn('file_does_not_exist'), 'r')
         )
-        with CharmmFile(get_fn('newfile.chm', written=True), 'w') as f:
+        with CharmmFile(self.get_fn('newfile.chm', written=True), 'w') as f:
             f.write('abc123\ndef456\nghi789!comment...\n')
-        with CharmmFile(get_fn('newfile.chm', written=True), 'r') as f:
+        with CharmmFile(self.get_fn('newfile.chm', written=True), 'r') as f:
             self.assertEqual(f.read(), 'abc123\ndef456\nghi789\n')
         with CharmmFile(get_fn('trx.prmtop')) as f1, open(get_fn('trx.prmtop')) as f2:
             firstline = f1.readline()
@@ -1071,12 +1059,12 @@ class TestFileWriting(TestCharmmBase):
             self.assertEqual(f1.readline(), firstline)
         # Now make sure that every way of opening/reading a file in CharmmFile
         # gets rid of ! comments
-        with open(get_fn('test.chm', written=True), 'w') as f:
+        with open(self.get_fn('test.chm', written=True), 'w') as f:
             f.write('First line ! first comment\n'
                     'Second line ! second comment\n'
                     'Third line ! third comment\n'
                     'Fourth line ! fourth comment\n')
-        with CharmmFile(get_fn('test.chm', written=True), 'r') as f:
+        with CharmmFile(self.get_fn('test.chm', written=True), 'r') as f:
             lines = []
             comments = []
             line = f.readline()
@@ -1110,7 +1098,7 @@ class TestFileWriting(TestCharmmBase):
         """ Test writing simple PSF files """
         cpsf = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         cpsf.flags = [f for f in cpsf.flags if f != 'EXT'] # NO EXT!
-        fn = get_fn('test.psf', written=True)
+        fn = self.get_fn('test.psf', written=True)
         cpsf.write_psf(fn)
         cpsf2 = psf.CharmmPsfFile(fn)
 
@@ -1125,7 +1113,7 @@ class TestFileWriting(TestCharmmBase):
                 else:
                     torsions[(d.atom1.idx, d.atom2.idx, d.atom3.idx, d.atom4.idx)] += 1
             return torsions
-        fn = get_fn('test.psf', written=True)
+        fn = self.get_fn('test.psf', written=True)
         parm = load_file(get_fn('trx.prmtop'))
         ptorsions = count_torsions(parm)
         parm.write_psf(fn)
@@ -1139,8 +1127,8 @@ class TestFileWriting(TestCharmmBase):
         """ Test writing CHARMM-style PSF files """
         # Test writing CHARMM-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
-        cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True))
-        cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
+        cpsf.write_psf(self.get_fn('dhfr_cmap_pbc.psf', written=True))
+        cpsf2 = psf.CharmmPsfFile(self.get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             # Skip descriptors
@@ -1153,7 +1141,7 @@ class TestFileWriting(TestCharmmBase):
                                  len(getattr(cpsf2, attr)))
             else:
                 self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
-        f = open(get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
+        f = open(self.get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
         try:
             has_key = False
             for line in f:
@@ -1168,8 +1156,8 @@ class TestFileWriting(TestCharmmBase):
         """ Test writing VMD-style PSF files """
         # Test writing VMD-style PSFs
         cpsf = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf'))
-        cpsf.write_psf(get_fn('dhfr_cmap_pbc.psf', written=True), vmd=True)
-        cpsf2 = psf.CharmmPsfFile(get_fn('dhfr_cmap_pbc.psf', written=True))
+        cpsf.write_psf(self.get_fn('dhfr_cmap_pbc.psf', written=True), vmd=True)
+        cpsf2 = psf.CharmmPsfFile(self.get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             if attr in ('topology', 'positions', 'box_vectors',
@@ -1181,7 +1169,7 @@ class TestFileWriting(TestCharmmBase):
                                  len(getattr(cpsf2, attr)))
             else:
                 self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
-        f = open(get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
+        f = open(self.get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
         try:
             has_key = False
             for line in f:
@@ -1195,7 +1183,7 @@ class TestFileWriting(TestCharmmBase):
     def test_write_xplor(self):
         """ Test that XPLOR-style CHARMM PSF files have XPLOR flag (#715) """
         parm = pmd.load_file(get_fn('trx.prmtop'))
-        fn = get_fn('test.psf', written=True)
+        fn = self.get_fn('test.psf', written=True)
         parm.save(fn, overwrite=True)
         cpsf = pmd.load_file(fn)
         self.assertIn('XPLOR', cpsf.flags)

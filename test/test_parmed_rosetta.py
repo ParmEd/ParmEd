@@ -27,8 +27,7 @@ class TestRosetta(unittest.TestCase):
 
         posexyz = list(
             chain(*[[tuple(atom.xyz()) for atom in res.atoms()]
-                    for res in [pose.residue(idx)
-                                for idx in range(1, len(seq)+1)]]))
+                    for res in [pose.residue(idx) for idx in range(1, len(seq)+1)]]))
 
         structxyz = [(atom.xx, atom.xy, atom.xz) for atom in struct.atoms]
 

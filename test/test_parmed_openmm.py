@@ -36,7 +36,7 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         self.assertTrue(openmm.XmlFile.id_format(get_fn('state_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('integrator.xml')))
         self.assertTrue(openmm.XmlFile.id_format(self.ffxml))
-        fn = get_fn('test.xml', written=True)
+        fn = self.get_fn('test.xml', written=True)
         with open(fn, 'w') as f:
             f.write('<NoRecognizedObject>\n <SomeElement attr="yes" '
                     '/>\n</NoRecognizedObject>\n')
@@ -508,7 +508,7 @@ CHIS = CHIE
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.amber.AmberParameterSet.from_leaprc(leaprc)
         )
-        ffxml_filename = get_fn('amber_conv.xml', written=True)
+        ffxml_filename = self.get_fn('amber_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(OriginalFile='leaprc.ff14SB',
                      Reference=['Maier and Simmerling', 'Simmerling and Maier'],
@@ -533,7 +533,7 @@ parm10 = loadamberparams gaff.dat
 Wang, J., Wang, W., Kollman P. A.; Case, D. A. "Automatic atom type and bond type perception in molecular mechanical calculations". Journal of Molecular Graphics and Modelling , 25, 2006, 247260.
 Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development and testing of a general AMBER force field". Journal of Computational Chemistry, 25, 2004, 1157-1174.
 """
-        ffxml_filename = get_fn('gaff.xml', written=True)
+        ffxml_filename = self.get_fn('gaff.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(OriginalFile='gaff.dat',
                      Reference=citations)
@@ -549,7 +549,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
                 pmd.amber.AmberParameterSet.from_leaprc(leaprc),
                 remediate_residues=False
         )
-        ffxml_filename = get_fn('residue.xml', written=True)
+        ffxml_filename = self.get_fn('residue.xml', written=True)
         params.write(ffxml_filename)
         try:
             forcefield = app.ForceField(ffxml_filename)
@@ -602,7 +602,7 @@ Wang, J., Wolf, R. M.; Caldwell, J. W.;Kollman, P. A.; Case, D. A. "Development 
         params = openmm.OpenMMParameterSet.from_parameterset(
                 load_file(os.path.join(get_fn('parm'), 'frcmod.constph'))
         )
-        ffxml_filename = get_fn('test.xml', written=True)
+        ffxml_filename = self.get_fn('test.xml', written=True)
         params.write(ffxml_filename)
         forcefield = app.ForceField(ffxml_filename)
 
@@ -656,7 +656,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
         params = openmm.OpenMMParameterSet.from_parameterset(
                 pmd.charmm.CharmmParameterSet(get_fn('toppar_water_ions_tip5p.str'))
         )
-        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        ffxml_filename = self.get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFile='toppar_water_ions_tip5p.str',
@@ -695,7 +695,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
             assert name not in params.patches, "Duplicate patch {} was expected to be pruned, but is present".format(name)
 
         del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
-        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        ffxml_filename = self.get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFile='par_all36_prot.prm, top_all36_prot.rtf',
@@ -723,7 +723,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                                               get_fn('toppar_water_ions.str')) # WARNING: contains duplicate water templates
         )
         del params.residues['TP3M'] # Delete to avoid duplicate water template topologies
-        ffxml_filename = get_fn('charmm_conv.xml', written=True)
+        ffxml_filename = self.get_fn('charmm_conv.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFile='par_all36_cgenff.prm, top_all36_cgenff.rtf, toppar_water_ions.str',
@@ -771,7 +771,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
 
         openmm_params = openmm.OpenMMParameterSet.from_parameterset(charmm_params)
 
-        #openmm_params.write(get_fn('charmm.xml', written=True),
+        #openmm_params.write(self.get_fn('charmm.xml', written=True),
         ffxml_filename = get_fn('charmm36.xml')
         openmm_params.write(ffxml_filename,
                             provenance=dict(
@@ -792,7 +792,7 @@ class TestWriteCHARMMParameters(FileIOTestCase):
                 pmd.charmm.CharmmParameterSet(get_fn('par_all36_prot.prm'),
                                               get_fn('top_all36_prot.rtf'))
         )
-        ffxml_filename = get_fn('charmm.xml', written=True)
+        ffxml_filename = self.get_fn('charmm.xml', written=True)
         params.write(ffxml_filename,
                      provenance=dict(
                          OriginalFiles='par_all36_prot.prm & top_all36_prot.rtf',
