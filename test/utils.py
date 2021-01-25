@@ -4,8 +4,11 @@ Useful functions for the test cases
 import os
 from os.path import join, split, abspath
 import random
+import tempfile
 import unittest
 import warnings
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 
@@ -101,28 +104,24 @@ class EnergyTestCase(TestCaseRelative):
 class FileIOTestCase(unittest.TestCase):
 
     def setUp(self):
-        self._empty_writes()
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
+        self._temporary_directory = tempfile.TemporaryDirectory(suffix="pmdtest")
 
     def tearDown(self):
-        self._empty_writes()
-        try:
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        self._temporary_directory.cleanup()
+
+    def get_fn(self, filename: str, written: bool = False, saved: bool = False):
+        assert not (written and saved), "Cannot get saved and written"
+        if written:
+            return join(self._temporary_directory.name, filename)
+        elif saved:
+            return str(Path(__file__).parent / "files" / "saved" / filename)
+        return get_fn(filename)
 
     def _empty_writes(self):
-        """ Empty the "writes" directory """
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-        except OSError:
-            pass
+        for fname in os.listdir(self._temporary_directory.name):
+            os.unlink(os.path.join(self._temporary_directory.name, fname))
 
-def get_fn(filename, written=False):
+def get_fn(filename):
     """
     Gets the full path of the file name for a particular test file
 
@@ -139,10 +138,7 @@ def get_fn(filename, written=False):
     str
         Name of the test file with the full path location
     """
-    if written:
-        return join(split(abspath(__file__))[0], 'files', 'writes', filename)
-    else:
-        return join(split(abspath(__file__))[0], 'files', filename)
+    return str(Path(__file__).parent / "files" / filename)
 
 def get_saved_fn(filename):
     """
@@ -159,7 +155,7 @@ def get_saved_fn(filename):
     str
         Name of the test file with the full path location
     """
-    return join(split(abspath(__file__))[0], 'files', 'saved', filename)
+    return str(Path(__file__).parent / "files" / "saved" / filename)
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
@@ -285,21 +281,23 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None, spacechar=No
             l2 = l2.replace(char, ' ')
     w1 = l1.split()
     w2 = l2.split()
-    if len(w1) != len(w2): return False
+    if len(w1) != len(w2):
+        return False
     for wx, wy in zip(w1, w2):
         try:
             wx = float(wx)
             wy = float(wy)
         except ValueError:
-            if isinstance(wx, float) or (wx != wy and not
-                    (wx.startswith(fdir) or wy.startswith(fdir))):
+            y_is_filename = wy.startswith(fdir) or wy.startswith(tempfile.tempdir)
+            x_is_filename = isinstance(wx, str) and (wx.startswith(fdir) or wx.startswith(tempfile.tempdir))
+            if isinstance(wx, float) or (wx != wy and not (y_is_filename and x_is_filename)):
                 return False
         else:
             if wx != wy:
-                if absolute_error is not None and abs(wx-wy) > absolute_error:
+                if absolute_error is not None and abs(wx - wy) > absolute_error:
                     return False
                 elif relative_error is not None:
-                    if wx == 0 or wy == 0 and abs(wx-wy) > relative_error:
+                    if wx == 0 or wy == 0 and abs(wx - wy) > relative_error:
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False

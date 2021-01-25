@@ -19,8 +19,7 @@ implementation these energies were computed by has already been validated.
 from __future__ import division, print_function, absolute_import
 
 from parmed.amber.readparm import Rst7
-from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
-                           CharmmParameterSet)
+from parmed.charmm import CharmmPsfFile, CharmmCrdFile, CharmmRstFile, CharmmParameterSet
 from parmed.exceptions import CharmmWarning, ParameterError
 from parmed.openmm.utils import energy_decomposition
 from parmed import unit as u, openmm, load_file, UreyBradley
@@ -39,10 +38,8 @@ charmm_nbfix_crds = CharmmCrdFile(get_fn('ala3_solv.crd'))
 charmm_nbfix.box = [3.271195e1, 3.299596e1, 3.300715e1, 90, 90, 90]
 
 # Parameter sets
-param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                             get_fn('par_all22_prot.inp'))
-param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'),
-                             get_fn('toppar_water_ions.str'))
+param22 = CharmmParameterSet(get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp'))
+param36 = CharmmParameterSet(get_fn('par_all36_prot.prm'), get_fn('toppar_water_ions.str'))
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
 class TestCharmmFiles(TestCaseRelative):

@@ -11,5 +11,5 @@ python -c "import parmed; print(parmed.__version__)"
 echo "Using ParmEd version `parmed --version`"
 cd test
 ./run_scripts.sh
-py.test --cov=parmed --durations=0 --disable-warnings --cov-append .
+py.test -n 4 --cov=parmed --durations-min=5 --disable-warnings --cov-append --cov-report=xml .
 echo "Done!"

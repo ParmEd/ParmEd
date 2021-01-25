@@ -367,6 +367,3 @@ class TestStructureDataFrame(unittest.TestCase):
         self.assertEqual(atom.irotat, 2.0)
         self.assertEqual(atom.rmin, 2*df_orig.loc[0, 'rmin'])
         self.assertEqual(atom.epsilon, df_orig.loc[0, 'epsilon']/2)
-
-if __name__ == '__main__':
-    unittest.main()

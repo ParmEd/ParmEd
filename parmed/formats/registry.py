@@ -146,7 +146,7 @@ def load_file(filename, *args, **kwargs):
 
     Raises
     ------
-    IOError
+    FileNotFoundError
         If ``filename`` does not exist
 
     parmed.exceptions.FormatNotFound
@@ -165,9 +165,9 @@ def load_file(filename, *args, **kwargs):
         with closing(genopen(filename)) as f:
             assert f
     elif not os.path.exists(filename):
-        raise IOError('%s does not exist' % filename)
+        raise FileNotFoundError('%s does not exist' % filename)
     elif not os.access(filename, os.R_OK):
-        raise IOError('%s does not have read permissions set' % filename)
+        raise FileNotFoundError('%s does not have read permissions set' % filename)
 
     for name, cls in iteritems(PARSER_REGISTRY):
         if not hasattr(cls, 'id_format'):
@@ -185,8 +185,7 @@ def load_file(filename, *args, **kwargs):
     other_args = PARSER_ARGUMENTS[name]
     for arg in other_args:
         if not arg in kwargs:
-            raise TypeError('%s constructor expects %s keyword argument' %
-                            name, arg)
+            raise TypeError('%s constructor expects %s keyword argument' % name, arg)
     # Pass on the following keywords IFF the target function accepts a target
     # keyword. Otherwise, get rid of it: structure, natom, hasbox, skip_bonds
     if hasattr(cls, 'parse'):

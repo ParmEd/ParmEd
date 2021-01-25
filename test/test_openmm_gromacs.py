@@ -1,18 +1,6 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division, print_function, absolute_import
-import utils
-
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    HAS_OPENMM = True
-    CPU = mm.Platform.getPlatformByName('CPU')
-except ImportError:
-    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
-    HAS_OPENMM = False
-
 from parmed import load_file, ExtraPoint, openmm, gromacs
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
@@ -23,8 +11,9 @@ from parmed.vec3 import Vec3
 import os
 import unittest
 import warnings
-from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
-                   run_all_tests)
+from utils import (
+    get_fn, CPU, has_openmm, mm, app, TestCaseRelative, run_all_tests, QuantityTestCase, HAS_GROMACS
+)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -57,9 +46,9 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
-@unittest.skipUnless(utils.HAS_GROMACS, "Cannot test without GROMACS")
-class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(HAS_GROMACS, "Cannot test without GROMACS")
+class TestGromacsTop(TestCaseRelative, QuantityTestCase):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
 
     def test_tiny(self):

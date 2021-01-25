@@ -23,9 +23,9 @@ class TestGenopen(FileIOTestCase):
 
     def test_write_normal(self):
         """ Tests genopen writing a normal text file """
-        with closing(genopen(get_fn('tmp.txt', written=True), 'w')) as f:
+        with closing(genopen(self.get_fn('tmp.txt', written=True), 'w')) as f:
             f.write(ALPHABET)
-        self.assertEqual(open(get_fn('tmp.txt', written=True), 'r').read(), ALPHABET)
+        self.assertEqual(open(self.get_fn('tmp.txt', written=True), 'r').read(), ALPHABET)
 
     def test_read_gzipped(self):
         """ Tests genopen reading a gzipped file """
@@ -35,9 +35,9 @@ class TestGenopen(FileIOTestCase):
 
     def test_write_gzipped(self):
         """ Tests genopen writing a gzipped file """
-        with closing(genopen(get_fn('test.gz', written=True), 'w')) as f:
+        with closing(genopen(self.get_fn('test.gz', written=True), 'w')) as f:
             f.write(ALPHABET)
-        text = gzip.open(get_fn('test.gz', written=True), 'r').read()
+        text = gzip.open(self.get_fn('test.gz', written=True), 'r').read()
         self.assertEqual(text.decode('ascii'), ALPHABET)
 
     def test_read_bzipped(self):
@@ -48,9 +48,9 @@ class TestGenopen(FileIOTestCase):
 
     def test_write_bzipped(self):
         """ Tests genopen writing a bzipped file """
-        with closing(genopen(get_fn('test.bz2', written=True), 'w')) as f:
+        with closing(genopen(self.get_fn('test.bz2', written=True), 'w')) as f:
             f.write(ALPHABET)
-        text = bz2.BZ2File(get_fn('test.bz2', written=True), 'r').read()
+        text = bz2.BZ2File(self.get_fn('test.bz2', written=True), 'r').read()
         self.assertEqual(text.decode('ascii'), ALPHABET)
 
     def test_read_normal_URL(self):
@@ -80,49 +80,35 @@ class TestGenopen(FileIOTestCase):
 
     def test_append_normal(self):
         """ Tests genopen appending a normal text file """
-        with closing(genopen(get_fn('test.txt', written=True), 'w')) as f:
+        with closing(genopen(self.get_fn('test.txt', written=True), 'w')) as f:
             f.write(ALPHABET)
-        with closing(genopen(get_fn('test.txt', written=True), 'a')) as f:
+        with closing(genopen(self.get_fn('test.txt', written=True), 'a')) as f:
             f.write(ALPHABET)
-        self.assertEqual(open(get_fn('test.txt', written=True)).read(), ALPHABET*2)
+        self.assertEqual(open(self.get_fn('test.txt', written=True)).read(), ALPHABET*2)
 
     def test_append_gzip(self):
         """ Tests genopen appending a gzipped file """
-        with closing(genopen(get_fn('test.txt.gz', written=True), 'a')) as f:
+        with closing(genopen(self.get_fn('test.txt.gz', written=True), 'a')) as f:
             f.write(ALPHABET)
-        with closing(genopen(get_fn('test.txt.gz', written=True), 'a')) as f:
+        with closing(genopen(self.get_fn('test.txt.gz', written=True), 'a')) as f:
             f.write(ALPHABET)
-        text = gzip.open(get_fn('test.txt.gz', written=True)).read()
+        text = gzip.open(self.get_fn('test.txt.gz', written=True)).read()
         self.assertEqual(text.decode('ascii'), ALPHABET*2)
 
     def test_append_bzip(self):
         """ Tests genopen appending a bzipped file """
-        with closing(genopen(get_fn('test.txt.bz2', written=True), 'a')) as f:
+        with closing(genopen(self.get_fn('test.txt.bz2', written=True), 'a')) as f:
             f.write(ALPHABET)
-        with closing(genopen(get_fn('test.txt.bz2', written=True), 'a')) as f:
+        with closing(genopen(self.get_fn('test.txt.bz2', written=True), 'a')) as f:
             f.write(ALPHABET)
-        text = bz2.BZ2File(get_fn('test.txt.bz2', written=True)).read()
+        text = bz2.BZ2File(self.get_fn('test.txt.bz2', written=True)).read()
         self.assertEqual(text.decode('ascii'), ALPHABET*2)
 
     def test_append_remote_file(self):
         """ Tests that genopen appending a remote file fails """
         url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
         self.assertRaises(ValueError, lambda: genopen(url, 'a'))
-        try:
-            genopen(url, 'a')
-            self.assertTrue(False)
-        except ValueError as e:
-            self.assertEqual(str(e), 'Cannot write or append a webpage')
-
-    def test_write_remote_file(self):
-        """ Tests that genopen writing a remote file fails """
-        url = 'http://q4md-forcefieldtools.org/REDDB/projects/W-73/tripos1.mol2'
         self.assertRaises(ValueError, lambda: genopen(url, 'w'))
-        try:
-            genopen(url, 'w')
-            self.assertTrue(False)
-        except ValueError as e:
-            self.assertEqual(str(e), 'Cannot write or append a webpage')
 
     def test_read_bad_URL(self):
         """ Tests proper exception handling of non-existent URL """

@@ -10,9 +10,7 @@ try:
 except ImportError:
     has_rdkit = False
 
-is_linux = sys.platform.startswith('linux')
-
-@unittest.skipUnless(has_rdkit and is_linux, "Only test load_rdkit module on Linux")
+@unittest.skipUnless(has_rdkit, "Only test load_rdkit module on Linux")
 class TestRDKit(unittest.TestCase):
     """ Tests loading of an rdkit Mol object """
 
