@@ -7,8 +7,7 @@ simulator engine.
 Badges
 ======
 
-[![Build/Test Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
-[![Coverage Status](https://coveralls.io/repos/github/ParmEd/ParmEd/badge.svg?branch=master)](https://coveralls.io/github/ParmEd/ParmEd?branch=master)
+![(Build/Test Status)](https://github.com/ParmEd/ParmEd/workflows/Tests/badge.svg)
 
 Description
 ===========
