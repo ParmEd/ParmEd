@@ -8,6 +8,7 @@ Badges
 ======
 
 ![(Build/Test Status)](https://github.com/ParmEd/ParmEd/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/ParmEd/ParmEd/branch/master/graph/badge.svg)](https://codecov.io/gh/ParmEd/ParmEd)
 
 Description
 ===========
