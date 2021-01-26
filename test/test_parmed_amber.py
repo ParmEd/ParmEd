@@ -2429,7 +2429,7 @@ class TestAmberMdin(FileIOTestCase):
         fn = self.get_fn('test.mdin', written=True)
         mdin1 = mdin.Mdin('sander')
         self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb'})
-        self.assertEqual(mdin1.title, 'mdin prepared by mdin.py')
+        self.assertEqual(mdin1.title, 'mdin prepared by ParmEd')
         self.assertEqual(mdin1.verbosity, 0)
         # What the heck was this for?
         self.assertTrue(mdin1.check())
