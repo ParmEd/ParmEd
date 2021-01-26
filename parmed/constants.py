@@ -4,7 +4,6 @@ List of all pointers and constants used in the Amber topology file.
 Can be used like:
    from parmed.constants import *
 """
-from __future__ import division
 from math import pi as _pi, sqrt as _sqrt, log10 as _log10, acos as _acos
 
 __all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH', 'MBONA', 'NTHETH',

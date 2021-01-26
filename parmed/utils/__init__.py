@@ -1,40 +1,17 @@
 """ Various utilities used by ParmEd that don't really fit elsewhere """
-from parmed.exceptions import MoleculeError as _MoleculeError
-from parmed.utils.pairlist import find_atom_pairs
+from ..exceptions import MoleculeError as _MoleculeError
+from .pairlist import find_atom_pairs
+from ..topologyobjects import Atom
+from . import six
+from shutil import which
+from typing import Tuple
 import sys
 
-__all__ = ['six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY',
-           'canonical_improper_order', 'find_atom_pairs']
+__all__ = [
+    'six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY', 'canonical_improper_order', 'find_atom_pairs'
+]
 
 PYPY = '__pypy__' in sys.builtin_module_names
-
-def which(prog):
-    """ Returns the full path of a program if it exists in PATH
-
-    Parameters
-    ----------
-    prog : str
-        The name of a program to try and locate in PATH
-
-    Returns
-    -------
-    path : str or None
-        The full path of the program. If it cannot be found, None
-    """
-    import os
-    def is_exe(fpath):
-        if os.path.isdir(fpath): return False
-        return os.path.exists(fpath) and os.access(fpath, os.X_OK)
-    fpath, fprog = os.path.split(prog)
-    if fpath:
-        if is_exe(prog):
-            return prog
-        return None
-    for fpath in os.environ['PATH'].split(os.pathsep):
-        trial = os.path.join(fpath, prog)
-        if is_exe(trial):
-            return trial
-    return None
 
 def tag_molecules(struct):
     """
@@ -58,22 +35,24 @@ def tag_molecules(struct):
     struct.atoms.unmark()
     mol_id = 1
     for atom in struct.atoms:
-        if atom.marked: continue
+        if atom.marked:
+            continue
         atom.marked = mol_id
         _set_owner(atom, mol_id)
         mol_id += 1
 
-def _set_owner(atm, mol_id):
+def _set_owner(atm: Atom, mol_id: int) -> None:
     """ Recursively sets ownership of given atom and all bonded partners """
     for partner in atm.bond_partners:
         if not partner.marked:
             partner.marked = mol_id
             _set_owner(partner, mol_id)
         elif partner.marked != mol_id:
-            raise _MoleculeError('Atom %d in multiple molecules' %
-                                 partner.idx)
+            raise _MoleculeError(f'Atom {partner.idx} in multiple molecules')
 
-def canonical_improper_order(atom1, atom2, atom3, atom4, center=1):
+def canonical_improper_order(
+    atom1: Atom, atom2: Atom, atom3: Atom, atom4: Atom, center: int = 1
+) -> Tuple[Atom, Atom, Atom, Atom]:
     """
     Controls how improper torsion keys are generated from Structures.
     Different programs have different conventions as far as where the
@@ -95,8 +74,7 @@ def canonical_improper_order(atom1, atom2, atom3, atom4, center=1):
     atom4 : :class:`parmed.topologyobjects.Atom`
         The fourth atom in the improper
     center : int, optional
-        Which location represents the *center* atom. Default is 1 (first
-        location).
+        Which location represents the *center* atom. Default is 1 (first location).
 
     Returns
     -------
