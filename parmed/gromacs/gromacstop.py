@@ -2027,7 +2027,7 @@ class GromacsTopologyFile(Structure):
                         a1, a2 = EP.frame_type.get_atoms()
                         dest.write('%-5d %-4d %-4d %-4d   %.6f\n' %
                                    (EP.idx+1, a1.idx+1, a2.idx+1, 1,
-                                    EP.get_weights()[0]))
+                                    EP.frame_type.get_weights()[0]))
                     dest.write('\n')
                 elif ftype in (ThreeParticleExtraPointFrame,
                                OutOfPlaneExtraPointFrame):

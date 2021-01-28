@@ -12,8 +12,7 @@ from copy import copy
 from functools import wraps
 
 from . import unit as u
-from .constants import TINY_DIGITS as _TINY_DIGITS
-from .constants import DEG_TO_RAD, RAD_TO_DEG, TINY
+from .constants import TINY_DIGITS as _TINY_DIGITS, DEG_TO_RAD, RAD_TO_DEG, TINY
 from .exceptions import MoleculeError, ParameterError, ParameterWarning
 from .geometry import angle, dihedral, distance2
 from .utils.decorators import deprecated

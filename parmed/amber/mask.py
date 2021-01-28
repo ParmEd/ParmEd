@@ -2,11 +2,8 @@
 Module for evaluating Amber Mask strings and translating them into lists in
 which a selected atom is 1 and one that's not is 0.
 """
-from __future__ import division, print_function, absolute_import
-
 from ..exceptions import MaskError
 from ..periodic_table import AtomicNum
-from ..utils.six.moves import range
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 

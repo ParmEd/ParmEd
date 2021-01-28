@@ -1170,15 +1170,6 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         for res in residue.RNAResidue.all_residues:
             self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
-    def test_deprecations(self):
-        """ Test functions that raise deprecation warnings """
-        fn = self.get_fn('blah', written=True)
-        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-        with self.assertWarns(DeprecationWarning):
-            write_PDB(parm, fn)
-        with self.assertWarns(DeprecationWarning):
-            write_CIF(parm, fn)
-
     def test_link(self):
         """ Tests proper handling and processing of LINK records in PDB files """
         parm = pmd.load_file(get_fn('5qk8.pdb'))

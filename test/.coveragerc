@@ -8,9 +8,9 @@ omit =
     */parmed/utils/netcdf.py
     */parmed/tinker/*
     */parmed/rosetta/*
-    */parmed/unit/*
     */parmed/tools/gui/*
     */parmed/tools/coarsegrain.py
+    */parmed/_version.py
 [paths]
 source =
     /home/*/site-packages/ParmEd-*.egg/

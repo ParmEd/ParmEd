@@ -2,41 +2,19 @@
 This module contains an amber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
-
-Copyright (C) 2010 - 2015  Jason Swails
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-   
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
 """
-from __future__ import absolute_import, division, print_function
-
 import numpy as np
 
-from ..constants import DEG_TO_RAD, IFBOX, NATOM, NRES, RAD_TO_DEG
+from ..constants import DEG_TO_RAD, PrmtopPointers, RAD_TO_DEG
 from ..exceptions import AmberError
 from ..formats.registry import load_file
-from ..topologyobjects import \
-    AmoebaNonbondedExceptionType as NonbondedExceptionType
+from ..topologyobjects import AmoebaNonbondedExceptionType as NonbondedExceptionType
 from ..topologyobjects import (Angle, AngleType, Bond, BondType, ChiralFrame,
                                Dihedral, DihedralType, MultipoleFrame,
                                NonbondedException, OutOfPlaneBend,
                                OutOfPlaneBendType, PiTorsion, StretchBend,
                                StretchBendType, TorsionTorsion,
                                TorsionTorsionType, TrigonalAngle, UreyBradley)
-from ..utils.six import string_types
-from ..utils.six.moves import range, zip
 from ._amberparm import AmberParm
 from .amberformat import AmberFormat
 
@@ -176,8 +154,7 @@ class AmoebaParm(AmberParm):
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
         if 'RESIDUE_ICODE' in self.parm_data:
-            self._truncate_array('RESIDUE_ICODE',
-                                 self.parm_data['POINTERS'][NRES])
+            self._truncate_array('RESIDUE_ICODE', self.parm_data['POINTERS'][PrmtopPointers.NRES])
 
         self.LJ_types = {}
         self.LJ_radius = []
@@ -189,7 +166,7 @@ class AmoebaParm(AmberParm):
         # Load the structure arrays
         self.load_structure()
 
-        if isinstance(xyz, string_types):
+        if isinstance(xyz, str):
             f = load_file(xyz)
             if not hasattr(f, 'coordinates') or f.coordinates is None:
                 raise TypeError('%s does not have coordinates' % xyz)
@@ -202,7 +179,7 @@ class AmoebaParm(AmberParm):
             self.box = box
 
         # If all else fails, set the box from the prmtop file
-        if self.parm_data['POINTERS'][IFBOX] > 0 and self.box is None:
+        if self.parm_data['POINTERS'][PrmtopPointers.IFBOX] > 0 and self.box is None:
             box = self.parm_data['BOX_DIMENSIONS']
             self.box = list(box[1:]) + [box[0], box[0], box[0]]
 
@@ -578,10 +555,14 @@ class AmoebaParm(AmberParm):
         it = iter(data['AMOEBA_TORSION_TORSION_LIST'])
         for i, j, k, l, m, n in zip(it, it, it, it, it, it):
             self.torsion_torsions.append(
-                    TorsionTorsion(self.atoms[i-1], self.atoms[j-1],
-                                   self.atoms[k-1], self.atoms[l-1],
-                                   self.atoms[m-1],
-                                   self.torsion_torsion_types[n-1])
+                TorsionTorsion(
+                    self.atoms[i-1],
+                    self.atoms[j-1],
+                    self.atoms[k-1],
+                    self.atoms[l-1],
+                    self.atoms[m-1],
+                    self.torsion_torsion_types[n-1],
+                )
             )
 
     #=============================================
@@ -594,14 +575,14 @@ class AmoebaParm(AmberParm):
             it = iter(data['AMOEBA_CHIRAL_FRAME_LIST'])
             for i, j, k in zip(it, it, it):
                 self.chiral_frames.append(
-                        ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
+                    ChiralFrame(self.atoms[i-1], self.atoms[j-1], k)
                 )
         del self.multipole_frames[:]
         if 'AMOEBA_FRAME_DEF_LIST' in data:
             it = iter(data['AMOEBA_FRAME_DEF_LIST'])
             for i, j, k, l, m in zip(it, it, it, it, it):
                 self.multipole_frames.append(
-                        MultipoleFrame(self.atoms[i-1], j, k, l, m)
+                    MultipoleFrame(self.atoms[i-1], j, k, l, m)
                 )
 
     #=============================================
@@ -618,13 +599,12 @@ class AmoebaParm(AmberParm):
                              data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'],
                              data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST']):
             self.adjust_types.append(
-                    NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
+                NonbondedExceptionType(a,b,c,d,e,list=self.adjust_types)
             )
         it = iter(data['AMOEBA_ADJUST_LIST'])
         for i, j, k in zip(it, it, it):
             self.adjusts.append(
-                    NonbondedException(self.atoms[i-1], self.atoms[j-1],
-                                        self.adjust_types[k-1])
+                NonbondedException(self.atoms[i-1], self.atoms[j-1], self.adjust_types[k-1])
             )
 
     #=============================================
@@ -632,7 +612,8 @@ class AmoebaParm(AmberParm):
     def _xfer_atom_info(self):
         """ Transfers atom info to the topology file data arrays """
         data = self.parm_data
-        data['POINTERS'][NATOM] = self.pointers['NATOM'] = len(self.atoms)
+        data['POINTERS'][PrmtopPointers.NATOM] = len(self.atoms)
+        self.pointers['NATOM'] = len(self.atoms)
         data['ATOM_NAME'] = [a.name for a in self.atoms]
         data['MASS'] = [a.mass for a in self.atoms]
         data['CHARGE'] = [0.0 for a in self.atoms] # charge is in multipoles
@@ -644,12 +625,9 @@ class AmoebaParm(AmberParm):
         data['AMOEBA_ATOMIC_NUMBER'] = [a.atomic_number for a in self.atoms]
         data['AMOEBA_ATOM_CLASS_INDEX'] = [a.class_idx for a in self.atoms]
         data['AMOEBA_VDW_ATOM_TYPES_LIST'] = [a.nb_idx for a in self.atoms]
-        data['AMOEBA_VDW_ATOM_PARENT_LIST'] = \
-                    [a.vdw_parent.idx+1 for a in self.atoms]
-        data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'] = \
-                    [a.vdw_weight for a in self.atoms]
-        data['AMOEBA_POLARIZABILITY_LIST'] = \
-                    [a.polarizability for a in self.atoms]
+        data['AMOEBA_VDW_ATOM_PARENT_LIST'] = [a.vdw_parent.idx+1 for a in self.atoms]
+        data['AMOEBA_VDW_PARENT_COORD_WEIGHT_LIST'] = [a.vdw_weight for a in self.atoms]
+        data['AMOEBA_POLARIZABILITY_LIST'] = [a.polarizability for a in self.atoms]
         data['AMOEBA_LOCAL_FRAME_MULTIPOLES_LIST'] = mpoles = []
         for atom in self.atoms:
             mpoles.extend(atom.multipoles)
@@ -677,17 +655,14 @@ class AmoebaParm(AmberParm):
             bond.type.used = True
         self.bond_types.prune_unused()
         data['AMOEBA_REGULAR_BOND_NUM_PARAMS'] = [len(self.bond_types)]
-        data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = \
-                    [bt.k for bt in self.bond_types]
-        data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = \
-                    [bt.req for bt in self.bond_types]
+        data['AMOEBA_REGULAR_BOND_FORCE_CONSTANT'] = [bt.k for bt in self.bond_types]
+        data['AMOEBA_REGULAR_BOND_EQUIL_VALUE'] = [bt.req for bt in self.bond_types]
         data['AMOEBA_REGULAR_BOND_FTAB_DEGREE'] = [self.bond_types.degree]
         data['AMOEBA_REGULAR_BOND_FTAB_COEFFS'] = self.bond_types.coeffs[:]
         data['AMOEBA_REGULAR_BOND_NUM_LIST'] = [len(self.bonds)]
         data['AMOEBA_REGULAR_BOND_LIST'] = bond_array = []
         for bond in self.bonds:
-            bond_array.extend([bond.atom1.idx+1, bond.atom2.idx+1,
-                               bond.type.idx+1])
+            bond_array.extend([bond.atom1.idx+1, bond.atom2.idx+1, bond.type.idx+1])
 
     #=============================================
 
@@ -712,10 +687,8 @@ class AmoebaParm(AmberParm):
             angle.type.used = True
         self.angle_types.prune_unused()
         data['AMOEBA_REGULAR_ANGLE_NUM_PARAMS'] = [len(self.angle_types)]
-        data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = \
-                    [at.k for at in self.angle_types]
-        data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = \
-                    [at.theteq for at in self.angle_types]
+        data['AMOEBA_REGULAR_ANGLE_FORCE_CONSTANT'] = [at.k for at in self.angle_types]
+        data['AMOEBA_REGULAR_ANGLE_EQUIL_VALUE'] = [at.theteq for at in self.angle_types]
         data['AMOEBA_REGULAR_ANGLE_FTAB_DEGREE'] = [self.angle_types.degree]
         data['AMOEBA_REGULAR_ANGLE_FTAB_COEFFS'] = self.angle_types.coeffs[:]
         data['AMOEBA_REGULAR_ANGLE_NUM_LIST'] = [len(self.angles)]
@@ -746,16 +719,11 @@ class AmoebaParm(AmberParm):
         for urey_bradley in self.urey_bradleys:
             urey_bradley.type.used = True
         self.urey_bradley_types.prune_unused()
-        data['AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS'] = \
-                [len(self.urey_bradley_types)]
-        data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = \
-                    [ut.k for ut in self.urey_bradley_types]
-        data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = \
-                    [ut.req for ut in self.urey_bradley_types]
-        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'] = \
-                [self.urey_bradley_types.degree]
-        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS'] = \
-                self.urey_bradley_types.coeffs[:]
+        data['AMOEBA_UREY_BRADLEY_BOND_NUM_PARAMS'] = [len(self.urey_bradley_types)]
+        data['AMOEBA_UREY_BRADLEY_BOND_FORCE_CONSTANT'] = [ut.k for ut in self.urey_bradley_types]
+        data['AMOEBA_UREY_BRADLEY_BOND_EQUIL_VALUE'] = [ut.req for ut in self.urey_bradley_types]
+        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_DEGREE'] = [self.urey_bradley_types.degree]
+        data['AMOEBA_UREY_BRADLEY_BOND_FTAB_COEFFS'] = self.urey_bradley_types.coeffs[:]
         data['AMOEBA_UREY_BRADLEY_BOND_NUM_LIST'] = [len(self.urey_bradleys)]
         data['AMOEBA_UREY_BRADLEY_BOND_LIST'] = urey_array = []
         for urey in self.urey_bradleys:
@@ -784,16 +752,11 @@ class AmoebaParm(AmberParm):
         for trigonal_angle in self.trigonal_angles:
             trigonal_angle.type.used = True
         self.trigonal_angle_types.prune_unused()
-        data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = \
-                    [len(self.trigonal_angle_types)]
-        data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = \
-                    [at.k for at in self.trigonal_angle_types]
-        data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = \
-                    [at.theteq for at in self.trigonal_angle_types]
-        data['AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE'] = \
-                    [self.trigonal_angle_types.degree]
-        data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'] = \
-                    self.trigonal_angle_types.coeffs[:]
+        data['AMOEBA_TRIGONAL_ANGLE_NUM_PARAMS'] = [len(self.trigonal_angle_types)]
+        data['AMOEBA_TRIGONAL_ANGLE_FORCE_CONSTANT'] = [at.k for at in self.trigonal_angle_types]
+        data['AMOEBA_TRIGONAL_ANGLE_EQUIL_VALUE'] = [at.theteq for at in self.trigonal_angle_types]
+        data['AMOEBA_TRIGONAL_ANGLE_FTAB_DEGREE'] = [self.trigonal_angle_types.degree]
+        data['AMOEBA_TRIGONAL_ANGLE_FTAB_COEFFS'] = self.trigonal_angle_types.coeffs[:]
         data['AMOEBA_TRIGONAL_ANGLE_NUM_LIST'] = [len(self.trigonal_angles)]
         data['AMOEBA_TRIGONAL_ANGLE_LIST'] = angle_array = []
         for angle in self.trigonal_angles:
@@ -822,14 +785,10 @@ class AmoebaParm(AmberParm):
         for out_of_plane_bend in self.out_of_plane_bends:
             out_of_plane_bend.type.used = True
         self.out_of_plane_bend_types.prune_unused()
-        data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = \
-                    [len(self.out_of_plane_bend_types)]
-        data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = \
-                    [at.k for at in self.out_of_plane_bend_types]
-        data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'] = \
-                    [self.out_of_plane_bend_types.degree]
-        data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'] = \
-                    self.out_of_plane_bend_types.coeffs[:]
+        data['AMOEBA_OPBEND_ANGLE_NUM_PARAMS'] = [len(self.out_of_plane_bend_types)]
+        data['AMOEBA_OPBEND_ANGLE_FORCE_CONSTANT'] = [at.k for at in self.out_of_plane_bend_types]
+        data['AMOEBA_OPBEND_ANGLE_FTAB_DEGREE'] = [self.out_of_plane_bend_types.degree]
+        data['AMOEBA_OPBEND_ANGLE_FTAB_COEFFS'] = self.out_of_plane_bend_types.coeffs[:]
         data['AMOEBA_OPBEND_ANGLE_NUM_LIST'] = [len(self.out_of_plane_bends)]
         data['AMOEBA_OPBEND_ANGLE_LIST'] = angle_array = []
         for angle in self.out_of_plane_bends:
@@ -859,12 +818,9 @@ class AmoebaParm(AmberParm):
             dihedral.type.used = True
         self.dihedral_types.prune_unused()
         data['AMOEBA_TORSION_NUM_PARAMS'] = [len(self.dihedral_types)]
-        data['AMOEBA_TORSION_FORCE_CONSTANT'] = \
-                    [dt.phi_k for dt in self.dihedral_types]
-        data['AMOEBA_TORSION_PEROIDICITY'] = \
-                    [dt.per for dt in self.dihedral_types]
-        data['AMOEBA_TORSION_PHASE'] = \
-                    [dt.phase*DEG_TO_RAD for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_FORCE_CONSTANT'] = [dt.phi_k for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_PEROIDICITY'] = [dt.per for dt in self.dihedral_types]
+        data['AMOEBA_TORSION_PHASE'] = [dt.phase*DEG_TO_RAD for dt in self.dihedral_types]
         data['AMOEBA_TORSION_NUM_LIST'] = [len(self.dihedrals)]
         data['AMOEBA_TORSION_LIST'] = dlist = []
         for dih in self.dihedrals:
@@ -893,12 +849,9 @@ class AmoebaParm(AmberParm):
             pi_torsion.type.used = True
         self.pi_torsion_types.prune_unused()
         data['AMOEBA_PI_TORSION_NUM_PARAMS'] = [len(self.pi_torsion_types)]
-        data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = \
-                    [dt.phi_k for dt in self.pi_torsion_types]
-        data['AMOEBA_PI_TORSION_PEROIDICITY'] = \
-                    [dt.per for dt in self.pi_torsion_types]
-        data['AMOEBA_PI_TORSION_PHASE'] = \
-                    [dt.phase*DEG_TO_RAD for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_FORCE_CONSTANT'] = [dt.phi_k for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_PEROIDICITY'] = [dt.per for dt in self.pi_torsion_types]
+        data['AMOEBA_PI_TORSION_PHASE'] = [dt.phase*DEG_TO_RAD for dt in self.pi_torsion_types]
         data['AMOEBA_PI_TORSION_NUM_LIST'] = [len(self.pi_torsions)]
         data['AMOEBA_PI_TORSION_LIST'] = dlist = []
         for pit in self.pi_torsions:
@@ -969,8 +922,9 @@ class AmoebaParm(AmberParm):
         topology arrays to the raw data arrays
         """
         if len(self.torsion_torsions) == 0:
-            delete_flags = set(flag for flag in self.flag_list
-                                if flag.startswith('AMOEBA_TORSION_TORSION'))
+            delete_flags = set(
+                flag for flag in self.flag_list if flag.startswith('AMOEBA_TORSION_TORSION')
+            )
             for flag in delete_flags:
                 self.delete_flag(flag)
             return
@@ -992,22 +946,17 @@ class AmoebaParm(AmberParm):
             self.add_flag(prefix+'DIMS', '2I8', data=list(tt.dims),
                           comments=['dimension = (2)'], after=after)
             self.add_flag(prefix+'ANGLE1', '5E16.8', data=tt.ang1[:],
-                          comments=['dimension = (%d)' % tt.dims[0]],
-                          after=prefix+'DIMS')
+                          comments=['dimension = (%d)' % tt.dims[0]], after=prefix+'DIMS')
             self.add_flag(prefix+'ANGLE2', '5E16.8', data=tt.ang2[:],
-                          comments=['dimension = (%d)' % tt.dims[1]],
-                          after=prefix+'ANGLE1')
+                          comments=['dimension = (%d)' % tt.dims[1]], after=prefix+'ANGLE1')
             self.add_flag(prefix+'FUNC', '5E16.8', data=tt.f.data[:],
                           comments=tblsize[:], after=prefix+'ANGLE2')
-            self.add_flag(prefix+'DFUNC_DANGLE1', '5E16.8',
-                          data=tt.dfda1.data[:], comments=tblsize[:],
-                          after=prefix+'FUNC')
-            self.add_flag(prefix+'DFUNC_DANGLE2', '5E16.8',
-                          data=tt.dfda2.data[:], comments=tblsize[:],
-                          after=prefix+'DFUNC_DANGLE1')
-            self.add_flag(prefix+'D2FUNC_DANGLE1_DANGLE2', '5E16.8',
-                          data=tt.d2fda1da2.data[:], comments=tblsize[:],
-                          after=prefix+'DFUNC_DANGLE2')
+            self.add_flag(prefix+'DFUNC_DANGLE1', '5E16.8', data=tt.dfda1.data[:],
+                          comments=tblsize[:], after=prefix+'FUNC')
+            self.add_flag(prefix+'DFUNC_DANGLE2', '5E16.8', data=tt.dfda2.data[:],
+                          comments=tblsize[:], after=prefix+'DFUNC_DANGLE1')
+            self.add_flag(prefix+'D2FUNC_DANGLE1_DANGLE2', '5E16.8', data=tt.d2fda1da2.data[:],
+                          comments=tblsize[:], after=prefix+'DFUNC_DANGLE2')
             after = prefix + 'D2FUNC_DANGLE1_DANGLE2'
         data['AMOEBA_TORSION_TORSION_NUM_LIST'] = [len(self.torsion_torsions)]
         data['AMOEBA_TORSION_TORSION_LIST'] = tlist = []
@@ -1037,8 +986,7 @@ class AmoebaParm(AmberParm):
             data['AMOEBA_FRAME_DEF_NUM_LIST'] = [len(self.multipole_frames)]
             data['AMOEBA_FRAME_DEF_LIST'] = flist = []
             for mf in self.multipole_frames:
-                flist.extend([mf.atom.idx+1, mf.frame_pt_num, mf.vectail,
-                              mf.vechead, mf.nvec])
+                flist.extend([mf.atom.idx+1, mf.frame_pt_num, mf.vectail, mf.vechead, mf.nvec])
         else:
             self.delete_flag('AMOEBA_FRAME_DEF_NUM_LIST')
             self.delete_flag('AMOEBA_FRAME_DEF_LIST')
@@ -1052,20 +1000,15 @@ class AmoebaParm(AmberParm):
         """
         # adjust type arrays hard-coded in length... do not purge unused.
         data = self.parm_data
-        data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'] = \
-                    [at.vdw_weight for at in self.adjust_types]
-        data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'] = \
-                    [at.multipole_weight for at in self.adjust_types]
-        data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'] = \
-                    [at.direct_weight for at in self.adjust_types]
-        data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'] = \
-                    [at.polar_weight for at in self.adjust_types]
-        data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST'] = \
-                    [at.mutual_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_VDW_WEIGHTS_LIST'] = [at.vdw_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_MPOLE_WEIGHTS_LIST'] = [at.multipole_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_DIRECT_WEIGHTS_LIST'] = [at.direct_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_POLAR_WEIGHTS_LIST'] = [at.polar_weight for at in self.adjust_types]
+        data['AMOEBA_ADJUST_MUTUAL_WEIGHTS_LIST'] = [at.mutual_weight for at in self.adjust_types]
         data['AMOEBA_ADJUST_NUM_LIST'] = [len(self.adjusts)]
         data['AMOEBA_ADJUST_LIST'] = alist = []
         for adj in self.adjusts:
-            alist.extend([adj.atom1.idx+1, adj.atom2.idx+1, adj.type.idx+1])
+            alist.extend([adj.atom1.idx + 1, adj.atom2.idx + 1, adj.type.idx + 1])
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1124,8 +1067,7 @@ class BeemanRestart(AmberFormat):
                 self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = new_data
             if 'OLD_ATOMIC_ACCELERATIONS_LIST' in self.parm_data:
                 new_data = zeros[:]
-                new_data[:old_natom3] = \
-                        self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']
+                new_data[:old_natom3] = self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']
                 self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = new_data
         else:
             # Getting smaller
@@ -1147,22 +1089,19 @@ class BeemanRestart(AmberFormat):
 
     @property
     def coordinates(self):
-        return np.array(self.parm_data['ATOMIC_COORDS_LIST']).reshape(
-                        (1, self.natom, 3))
+        return np.array(self.parm_data['ATOMIC_COORDS_LIST']).reshape((1, self.natom, 3))
 
     @coordinates.setter
     def coordinates(self, value):
         value = np.asarray(value).flatten()
         if value.shape != (3*self.natom,):
-            raise ValueError('Require %d-length sequence for coordinates' %
-                             (3*self.natom))
+            raise ValueError(f'Require {3 * self.natom}-length sequence for coordinates')
         self.parm_data['ATOMIC_COORDS_LIST'] = value.tolist()
 
     @property
     def velocities(self):
         try:
-            return np.array(self.parm_data['ATOMIC_VELOCITIES_LIST']).reshape(
-                            (1, self.natom, 3))
+            return np.array(self.parm_data['ATOMIC_VELOCITIES_LIST']).reshape((1, self.natom, 3))
         except KeyError:
             raise AttributeError('Beeman restart does not have velocities')
 
@@ -1170,12 +1109,10 @@ class BeemanRestart(AmberFormat):
     def velocities(self, value):
         value = np.asarray(value).flatten()
         if value.shape != (3*self.natom,):
-            raise ValueError('Require %d-length sequence for velocities' %
-                             (3*self.natom))
+            raise ValueError(f'Require {3 * self.natom}-length sequence for velocities')
         if not 'ATOMIC_VELOCITIES_LIST' in self.flag_list:
             self.add_flag('ATOMIC_VELOCITIES_NUM_LIST', 'i8', data=[self.natom])
-            self.add_flag('ATOMIC_VELOCITIES_LIST', '3e20.12',
-                          data=value.tolist())
+            self.add_flag('ATOMIC_VELOCITIES_LIST', '3e20.12', data=value.tolist())
         else:
             self.parm_data['ATOMIC_VELOCITIES_LIST'] = value.tolist()
 
@@ -1183,8 +1120,7 @@ class BeemanRestart(AmberFormat):
     def accelerations(self):
         try:
             return np.array(
-                    self.parm_data['ATOMIC_ACCELERATIONS_LIST']).reshape(
-                            (1, self.natom, 3)
+                self.parm_data['ATOMIC_ACCELERATIONS_LIST']).reshape((1, self.natom, 3)
             )
         except KeyError:
             raise AttributeError('Accelerations not present in Beeman restart')
@@ -1193,13 +1129,10 @@ class BeemanRestart(AmberFormat):
     def accelerations(self, value):
         value = np.asarray(value).flatten()
         if value.shape != (3*self.natom,):
-            raise ValueError('Require %d-length sequence for accelerations' %
-                             3*self.natom)
+            raise ValueError(f'Require {3 * self.natom}-length sequence for accelerations')
         if not 'ATOMIC_ACCELERATIONS_LIST' in self.flag_list:
-            self.add_flag('ATOMIC_ACCELERATIONS_NUM_LIST', 'i8',
-                          data=[self.natom])
-            self.add_flag('ATOMIC_ACCELERATIONS_LIST', '3e20.12',
-                          data=value.tolist())
+            self.add_flag('ATOMIC_ACCELERATIONS_NUM_LIST', 'i8', data=[self.natom])
+            self.add_flag('ATOMIC_ACCELERATIONS_LIST', '3e20.12', data=value.tolist())
         else:
             self.parm_data['ATOMIC_ACCELERATIONS_LIST'] = value.tolist()
 
@@ -1207,24 +1140,19 @@ class BeemanRestart(AmberFormat):
     def old_accelerations(self):
         try:
             return np.array(
-                    self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']).reshape(
-                        (1, self.natom, 3)
+                self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST']).reshape((1, self.natom, 3)
             )
         except KeyError:
-            raise AttributeError('Old accelerations not present in Beeman '
-                                 'restart')
+            raise AttributeError('Old accelerations not present in Beeman restart')
 
     @old_accelerations.setter
     def old_accelerations(self, value):
         value = np.asarray(value).flatten()
         if value.shape != (3*self.natom,):
-            raise ValueError('Require %d-length sequence for accelerations' %
-                             3*self.natom)
+            raise ValueError(f'Require {3 * self.natom}-length sequence for accelerations')
         if not 'OLD_ATOMIC_ACCELERATIONS_LIST' in self.flag_list:
-            self.add_flag('OLD_ATOMIC_ACCELERATIONS_NUM_LIST', 'i8',
-                          data=[self.natom])
-            self.add_flag('OLD_ATOMIC_ACCELERATIONS_LIST', '3e20.12',
-                          data=value.tolist())
+            self.add_flag('OLD_ATOMIC_ACCELERATIONS_NUM_LIST', 'i8', data=[self.natom])
+            self.add_flag('OLD_ATOMIC_ACCELERATIONS_LIST', '3e20.12', data=value.tolist())
         else:
             self.parm_data['OLD_ATOMIC_ACCELERATIONS_LIST'] = value.tolist()
 

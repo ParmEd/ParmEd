@@ -6,19 +6,14 @@ alternatives (like DCD and NetCDF, provided in netcdffiles.py) are strongly
 encouraged, but these are provided for more complete compatibility and for
 instances where the prequisites may not be installed.
 """
-from __future__ import division, print_function, absolute_import
-
 from math import ceil
 import numpy as np
-from parmed.formats.registry import FileFormatType
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass
-from parmed.utils.six.moves import range
-from parmed.utils.six import string_types
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom
-import parmed.unit as u
-from parmed.vec3 import Vec3
+from ..formats.registry import FileFormatType
+from ..utils.io import genopen
+from ..structure import Structure
+from ..topologyobjects import Atom
+from .. import unit as u
+from ..vec3 import Vec3
 import warnings as _warnings
 
 VELSCALE = 20.455
@@ -27,8 +22,7 @@ ONEVELSCALE = 1 / VELSCALE
 class _FileEOF(Exception):
     """ For control flow """
 
-@add_metaclass(FileFormatType)
-class _AmberAsciiCoordinateFile(object):
+class _AmberAsciiCoordinateFile(metaclass=FileFormatType):
     """
     Abstract base class for interacting with ASCII coordinate files.
     Opens a new ASCII coordinate file and either parses it (loading
@@ -61,23 +55,22 @@ class _AmberAsciiCoordinateFile(object):
             # be written as coordinates first, then box.
             self._writebox = False
         else:
-            raise ValueError("%s mode must be 'r' or 'w'" % type(self).__name__)
-        if isinstance(fname, string_types):
+            raise ValueError(f"{self.__class__.__name__} mode must be 'r' or 'w'")
+        if isinstance(fname, str):
             self._file = genopen(fname, mode)
             self._own_handle = True
         elif hasattr(fname, 'read'):
             self._file = fname
             self._own_handle = False
         else:
-            raise TypeError("Unsupported type for %s" % fname)
+            raise TypeError(f"Unsupported type for {fname}")
 
         self.natom = natom
         self.hasbox = hasbox
         if self.CRDS_PER_LINE is None:
-            raise NotImplementedError('This object must be subclassed')
+            raise NotImplementedError("CRDS_PER_LINE must be set by the subclass")
         self._full_lines_per_frame = self.natom * 3 // self.CRDS_PER_LINE
-        self._nextras = self.natom * 3 - (self._full_lines_per_frame *
-                                          self.CRDS_PER_LINE)
+        self._nextras = self.natom * 3 - (self._full_lines_per_frame * self.CRDS_PER_LINE)
         if self._own_handle:
             self.closed = False
         if self._status == 'old':
@@ -144,12 +137,11 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         is_fmt : bool
             True if it is an Amber restart/inpcrd file. False otherwise
         """
-        if isinstance(filename, string_types):
+        if isinstance(filename, str):
             f = genopen(filename, 'r')
             lines = [f.readline() for i in range(5)]
             f.close()
-        elif (hasattr(filename, 'readline') and hasattr(filename, 'seek')
-              and hasattr(filename, 'tell')):
+        elif all(hasattr(filename, attr) for attr in ['readline', 'seek', 'tell']):
             cur = filename.tell()
             lines = [filename.readline() for i in range(5)]
             filename.seek(cur)
@@ -197,8 +189,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     CRDS_PER_LINE = 6
     DEFAULT_TITLE = 'restart created by ParmEd'
 
-    def __init__(self, fname, mode='r', natom=0, hasbox=None, title=None,
-                 time=0.0):
+    def __init__(self, fname, mode='r', natom=0, hasbox=None, title=None, time=0.0):
         """
         For restart files, natom and hasbox are determined automatically for
         mode='r', and can be determined at write-time when the coordinates are
@@ -209,8 +200,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         self._cell_angles_written = False
         self._vels_written = False
         self.time = float(time)
-        super(AmberAsciiRestart, self).__init__(fname, natom, hasbox,
-                                                mode, title)
+        super().__init__(fname, natom, hasbox, mode, title)
 
     @classmethod
     def parse(cls, filename, structure=False):
@@ -260,8 +250,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         elif len(lines) == int(2 * ceil(self.natom / 2.0) + 3):
             self.hasbox = self.hasvels = True
         else:
-            raise RuntimeError('Badly formatted restart file. Has %d lines '
-                               'for %d atoms.' % (len(lines), self.natom))
+            raise RuntimeError(f'Badly formatted restart file. Has {len(lines)} lines for {self.natom} atoms.')
         self._coordinates = np.zeros((self.natom, 3))
         if self.hasvels:
             self._velocities = np.zeros((self.natom, 3))
@@ -315,12 +304,8 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         # Now it's time to parse the box info if we have it
         if self.hasbox:
             line = lines[startline]
-            self._cell_lengths[0:3] = [float(line[0:12]),
-                                       float(line[12:24]),
-                                       float(line[24:36])]
-            self._cell_angles[0:3] = [float(line[36:48]),
-                                      float(line[48:60]),
-                                      float(line[60:72])]
+            self._cell_lengths[0:3] = [float(line[0:12]), float(line[12:24]), float(line[24:36])]
+            self._cell_angles[0:3] = [float(line[36:48]), float(line[48:60]), float(line[60:72])]
 
     @property
     def coordinates(self):
@@ -334,8 +319,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Cannot set coordinates on an old restart')
         stuff = np.array(stuff, copy=False).ravel()
         if self.natom > 0 and len(stuff) != 3 * self.natom:
-            raise ValueError('Got %d coordinates for %d atoms' %
-                             (len(stuff), self.natom))
+            raise ValueError(f'Got {len(stuff)} coordinates for {self.natom} atoms')
         if self._coords_written:
             raise RuntimeError('Coordinates have already been written.')
         # Error checking done. If we didn't already set our number of atoms,
@@ -349,8 +333,10 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             i3 = i * 3
             self._file.write(fmt % (stuff[i3], stuff[i3+1], stuff[i3+2]))
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._coords_written = True
 
     @property
@@ -373,20 +359,18 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
         if self._vels_written:
             raise RuntimeError('Can only write velocities once')
         if len(stuff) != 3 * self.natom:
-            raise ValueError('Got %d velocities for %d atoms.' %
-                             (len(stuff), self.natom))
+            raise ValueError(f'Got {len(stuff)} velocities for {self.natom} atoms.')
         self._velocities = stuff.reshape((-1, self.natom, 3))
         fmt = '%12.7f%12.7f%12.7f'
         numwrit = 0
         for i in range(self.natom):
             i3 = i * 3
-            self._file.write(fmt % (stuff[i3  ]*ONEVELSCALE,
-                                    stuff[i3+1]*ONEVELSCALE,
-                                    stuff[i3+2]*ONEVELSCALE)
-            )
+            self._file.write(fmt % tuple(stuff[i3+i]*ONEVELSCALE for i in range(3)))
             numwrit += 1
-            if numwrit % 2 == 0: self._file.write('\n')
-        if self.natom % 2 == 1: self._file.write('\n')
+            if numwrit % 2 == 0:
+                self._file.write('\n')
+        if self.natom % 2 == 1:
+            self._file.write('\n')
         self._vels_written = self.hasvels = True
 
     @property
@@ -530,8 +514,7 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                     line = self._file.readline()
 
                 if self._nextras:
-                    frame[idx:idx+self._nextras] = \
-                            [float(line[j:j+8]) for j in extraiter]
+                    frame[idx:idx+self._nextras] = [float(line[j:j+8]) for j in extraiter]
 
                 if self.hasbox:
                     line = self._file.readline()
@@ -544,8 +527,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
                 self.cell_lengths = np.concatenate((self.cell_lengths, cell))
 
         except _FileEOF:
-            _warnings.warn('Unexpected EOF in parsing mdcrd. natom and/or '
-                           'hasbox are likely wrong', RuntimeWarning)
+            _warnings.warn('Unexpected EOF in parsing mdcrd. natom and/or hasbox are likely wrong',
+                           RuntimeWarning)
         except StopIteration:
             pass
 
@@ -597,9 +580,8 @@ class AmberMdcrd(_AmberAsciiCoordinateFile):
             pass
         if self._writebox:
             raise RuntimeError('Box information not written for last frame')
-        if len(stuff) != 3*self.natom:
-            raise ValueError('add_coordinates requires an array of length '
-                             'natom*3')
+        if len(stuff) != 3 * self.natom:
+            raise ValueError('add_coordinates requires an array of length natom*3')
 
         # If we can, write the coordinates
         i = 0

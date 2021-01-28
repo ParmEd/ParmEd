@@ -660,9 +660,14 @@ class PDBFile(object):
             self._atom_map_from_all_attributes[all_attribute_key] = atom
             self._atom_map_from_attributes[attribute_key] = atom
             self._atom_map_from_atom_number[atom_number] = atom
-            self.struct.add_atom(atom, atom_parts['residue_name'], residue_number,
-                                 atom_parts['chain'], atom_parts['insertion_code'],
-                                 atom_parts['segment_id'])
+            self.struct.add_atom(
+                atom,
+                atom_parts['residue_name'],
+                residue_number,
+                atom_parts['chain'],
+                atom_parts['insertion_code'],
+                atom_parts['segment_id'],
+            )
             self._model1_atoms_in_structure.add(atom)
             self._last_atom = atom
         else:
@@ -672,8 +677,9 @@ class PDBFile(object):
                 raise PDBError('Atom number mismatch between models')
             if (atom_from_first_model.residue.name != atom_parts['residue_name'] or
                 atom_from_first_model.name != atom_parts['name']):
-                raise PDBError('Atom/residue name mismatch in different models in model %d [%s]!' %
-                               (self._current_model_number, line.strip()))
+                raise PDBError(
+                    f'Atom/residue name mismatch in different models in model {self._current_model_number} [{line.strip()}]!'
+                )
         if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
             self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
 
@@ -681,8 +687,10 @@ class PDBFile(object):
         if self._current_model_number == 1 and len(self.struct.atoms) == 0:
             return # MODEL 1
         if self._model_open:
-            warnings.warn('%s begun before last model ended. Assuming it is ending' % line.strip(),
-                          PDBWarning)
+            warnings.warn(
+                f'{line.strip()} begun before last model ended. Assuming it is ending',
+                PDBWarning,
+            )
             self._end_model(line)
         self._coordinates.append([])
         self._model_atom_counts.append(0)
@@ -700,7 +708,7 @@ class PDBFile(object):
         if len(self._atom_map_from_attributes) == 0:
             raise PDBError('No atoms found in model')
         if len(self._coordinates[-1]) != 3 * len(self._atom_map_from_attributes):
-            raise PDBError('Coordinate mismatch in model %d' % self._current_model_number)
+            raise PDBError(f'Coordinate mismatch in model {self._current_model_number}')
 
     def _parse_connect_record(self, line):
         """
@@ -713,8 +721,9 @@ class PDBFile(object):
         index_3 = try_convert(line[21:26], int)
         index_4 = try_convert(line[26:31], int)
         if origin_index is None or index_1 is None:
-            warnings.warn('Bad CONECT record -- not enough atom indexes in line: %s' % line,
-                          PDBWarning)
+            warnings.warn(
+                f'Bad CONECT record -- not enough atom indexes in line: {line}', PDBWarning
+            )
             return
         origin_atom = self._atom_map_from_atom_number.get(origin_index, None)
         atom_1 = self._atom_map_from_atom_number.get(index_1, None)
@@ -722,8 +731,10 @@ class PDBFile(object):
         atom_3 = self._atom_map_from_atom_number.get(index_3, None)
         atom_4 = self._atom_map_from_atom_number.get(index_4, None)
         if origin_atom is None or atom_1 is None:
-            warnings.warn('CONECT record - could not find atoms %d and/or %d to connect. Line: %s' %
-                          (origin_index, index_1, line), PDBWarning)
+            warnings.warn(
+                f'CONECT record - could not find atoms {origin_index} and/or {index_1} to connect. Line: {line}',
+                PDBWarning,
+            )
             return
         origin_atom = self._atom_map_to_parent.get(origin_atom, origin_atom)
         for partner in (atom_1, atom_2, atom_3, atom_4):
@@ -751,7 +762,7 @@ class PDBFile(object):
             try:
                 length = float(line[73:78])
             except ValueError:
-                warnings.warn('Malformed LINK line (bad distance): %s' % line, PDBWarning)
+                warnings.warn(f'Malformed LINK line (bad distance): {line}', PDBWarning)
                 continue
 
             key1 = self._make_atom_key_from_parts(atom_1_parts)
@@ -760,7 +771,7 @@ class PDBFile(object):
                 a1 = self._atom_map_from_attributes[key1]
                 a2 = self._atom_map_from_attributes[key2]
             except KeyError:
-                warnings.warn('Could not find link atoms %s and %s' % (key1, key2), PDBWarning)
+                warnings.warn(f'Could not find link atoms {key1} and {key2}', PDBWarning)
             else:
                 self.struct.links.append(Link(a1, a2, length, symop1, symop2))
 
@@ -770,8 +781,10 @@ class PDBFile(object):
             try:
                 self._atom_map_from_all_attributes[key].anisou = anisou_tensor
             except KeyError:
-                warnings.warn('Could not find atom belonging to anisou tensor with key %s. '
-                              'Line: %s' % (key, line), PDBWarning)
+                warnings.warn(
+                    f'Could not find atom belonging to anisou tensor with key {key}. Line: {line}',
+                    PDBWarning
+                )
 
     def _postprocess_metadata(self):
         self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
