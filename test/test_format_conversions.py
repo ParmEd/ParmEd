@@ -364,7 +364,7 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         parm = load_file(self.get_fn('trx.prmtop'), self.get_fn('trx.inpcrd'))
         parm.save(self.get_fn('amber_to_charmm.psf', written=True))
         params = charmm.CharmmParameterSet.from_structure(parm)
-        params.write(str=self.get_fn('amber_to_charmm.str', written=True))
+        params.write(stream=self.get_fn('amber_to_charmm.str', written=True))
 
         self.assertTrue(
             diff_files(

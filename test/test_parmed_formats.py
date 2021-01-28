@@ -8,7 +8,7 @@ from copy import copy
 import numpy as np
 import parmed as pmd
 from parmed import (amber, charmm, exceptions, formats, gromacs, residue, Structure, read_PDB, Atom,
-                    read_CIF, download_PDB, download_CIF, topologyobjects, write_PDB, write_CIF)
+                    read_CIF, download_PDB, download_CIF, topologyobjects)
 from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY

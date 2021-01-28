@@ -14,8 +14,6 @@ try:
         HAS_OPENMM = False
 except ImportError:
     HAS_OPENMM = False
-else:
-    del mm, app, unitcell
 import warnings
 
 def needs_openmm(fcn):

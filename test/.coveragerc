@@ -10,6 +10,7 @@ omit =
     */parmed/rosetta/*
     */parmed/tools/gui/*
     */parmed/tools/coarsegrain.py
+    */parmed/unit/*
     */parmed/_version.py
 [paths]
 source =
