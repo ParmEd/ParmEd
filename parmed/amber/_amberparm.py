@@ -701,11 +701,12 @@ class AmberParm(AmberFormat, Structure):
         in terms of the 'old' atom indexes if re-ordering was necessary to fix
         the tleap bug. Returns None otherwise.
         """
+        from ..utils import tag_molecules
         # Bail out of we are not doing a solvated prmtop
         if self.parm_data['POINTERS'][PrmtopPointers.IFBOX] == 0 or self.box is None:
             return None
 
-        owner = set_molecules(self)
+        owner = tag_molecules(self)
         all_solvent = SOLVENT_NAMES
         if not solute_ions:
             all_solvent = all_solvent | ALLION_NAMES
@@ -2389,63 +2390,6 @@ class Rst7(object):
     def hasvels(self):
         """ Whether or not this Rst7 has velocities """
         return self.vels is not None
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def set_molecules(parm):
-    """
-    Correctly sets the ATOMS_PER_MOLECULE and SOLVENT_POINTERS sections of the
-    topology file.
-    """
-    from sys import setrecursionlimit, getrecursionlimit
-    # Since we use a recursive function here, we make sure that the recursion
-    # limit is large enough to handle the maximum possible recursion depth we'll
-    # need (NATOM). We don't want to shrink it, though, since we use list
-    # comprehensions in list constructors in some places that have an implicit
-    # (shallow) recursion, therefore, reducing the recursion limit too much here
-    # could raise a recursion depth exceeded exception during a _Type/Atom/XList
-    # creation. Therefore, set the recursion limit to the greater of the current
-    # limit or the number of atoms
-    setrecursionlimit(max(len(parm.atoms), getrecursionlimit()))
-
-    # Unmark all atoms so we can track which molecule each goes into
-    parm.atoms.unmark()
-
-    if not parm.ptr('ifbox'):
-        raise MoleculeError('Only periodic prmtops can have Molecule definitions')
-    # The molecule "ownership" list
-    owner = []
-    # The way I do this is via a recursive algorithm, in which
-    # the "set_owner" method is called for each bonded partner an atom
-    # has, which in turn calls set_owner for each of its partners and
-    # so on until everything has been assigned.
-    molecule_number = 1 # which molecule number we are on
-    for i, atom in enumerate(parm.atoms):
-        # If this atom has not yet been "owned", make it the next molecule
-        # However, we only increment which molecule number we're on if
-        # we actually assigned a new molecule (obviously)
-        if not atom.marked:
-            tmp = set()
-            tmp.add(i)
-            _set_owner(parm, tmp, i, molecule_number)
-            # Make sure the atom indexes are sorted
-            owner.append(tmp)
-            molecule_number += 1
-    return owner
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-def _set_owner(parm, owner_array, atm, mol_id):
-    """ Recursively sets ownership of given atom and all bonded partners """
-    parm.atoms[atm].marked = mol_id
-    for partner in parm.atoms[atm].bond_partners:
-        if not partner.marked:
-            owner_array.add(partner.idx)
-            _set_owner(parm, owner_array, partner.idx, mol_id)
-        elif partner.marked != mol_id:
-            raise MoleculeError(f'Atom {partner.idx} in multiple molecules')
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def _zeros(length):
     """ Returns an array of zeros of the given length """

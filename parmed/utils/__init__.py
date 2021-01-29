@@ -4,7 +4,7 @@ from .pairlist import find_atom_pairs
 from ..topologyobjects import Atom
 from . import six
 from shutil import which
-from typing import Tuple
+from typing import List, Set, Tuple
 import sys
 
 __all__ = [
@@ -13,7 +13,7 @@ __all__ = [
 
 PYPY = '__pypy__' in sys.builtin_module_names
 
-def tag_molecules(struct):
+def tag_molecules(struct) -> List[Set[int]]:
     """
     Sets the ``marked`` attribute of every Atom in struct to the molecule number
     it is a part of. If no bonds are present, every atom is its own molecule.
@@ -30,7 +30,8 @@ def tag_molecules(struct):
     if not struct.bonds:
         for i, atom in enumerate(struct.atoms):
             atom.marked = i + 1
-        return
+        return [{i + 1} for i in range(len(struct.atoms))]
+    owner = []
     # We do have bonds, this is the interesting part
     struct.atoms.unmark()
     mol_id = 1
@@ -38,15 +39,19 @@ def tag_molecules(struct):
         if atom.marked:
             continue
         atom.marked = mol_id
-        _set_owner(atom, mol_id)
+        owner.append({atom.idx})
+        _set_owner(atom, owner[-1], mol_id)
         mol_id += 1
 
-def _set_owner(atm: Atom, mol_id: int) -> None:
+    return owner
+
+def _set_owner(atm: Atom, owner: Set[int], mol_id: int) -> None:
     """ Recursively sets ownership of given atom and all bonded partners """
     for partner in atm.bond_partners:
         if not partner.marked:
+            owner.add(partner.idx)
             partner.marked = mol_id
-            _set_owner(partner, mol_id)
+            _set_owner(partner, owner, mol_id)
         elif partner.marked != mol_id:
             raise _MoleculeError(f'Atom {partner.idx} in multiple molecules')
 
