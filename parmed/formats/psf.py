@@ -17,7 +17,6 @@ class PSFFile(metaclass=FileFormatType):
     directly, use :class:`parmed.charmm.CharmmPsfFile` or the
     :func:`parmed.formats.load_file` function instead.
     """
-    #===================================================
 
     @staticmethod
     def id_format(filename):
@@ -36,8 +35,6 @@ class PSFFile(metaclass=FileFormatType):
         with closing(genopen(filename, 'r')) as f:
             return f.readline().strip().startswith("PSF")
 
-    #===================================================
-
     @staticmethod
     def parse(filename):
         """ Read a CHARMM- or XPLOR-style PSF file
@@ -53,8 +50,6 @@ class PSFFile(metaclass=FileFormatType):
             The PSF file instance with all information loaded
         """
         return CharmmPsfFile(filename)
-
-    #===================================================
 
     @staticmethod
     def write(struct, dest, vmd=False):
