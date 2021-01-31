@@ -25,7 +25,7 @@ class _ResidueType(object):
         self.name = name
 
     def __repr__(self):
-        return '<ResidueType %s>' % self.name
+        return f'<ResidueType {self.name}>'
 
     def __str__(self):
         return self.name

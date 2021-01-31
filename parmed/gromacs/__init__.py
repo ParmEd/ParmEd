@@ -13,8 +13,7 @@ if _os.getenv('GMXDATA') is not None and _os.path.isdir(
     GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXDATA'), 'top')
 elif _os.getenv('GMXBIN') is not None and _os.path.isdir(
         _os.path.join(_os.getenv('GMXBIN'), '..', 'share', 'gromacs', 'top')):
-    GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXBIN'), '..', 'share',
-                                  'gromacs', 'top')
+    GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXBIN'), '..', 'share', 'gromacs', 'top')
 else:
     for _testdir in ['/usr', '/usr/local', '/opt/local', '/opt']:
         if _os.path.isdir(_os.path.join(_testdir, 'share', 'gromacs')):
