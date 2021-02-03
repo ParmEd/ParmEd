@@ -2,14 +2,10 @@
 This package contains classes responsible for loading and dumping PyRosetta
 Pose objects.
 """
-
-from __future__ import print_function
-
-from parmed.exceptions import RosettaError
-from parmed.periodic_table import AtomicNum, Mass
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom, ExtraPoint, Bond
-from parmed.utils.six.moves import range
+from ..exceptions import RosettaError
+from ..periodic_table import AtomicNum, Mass
+from ..structure import Structure
+from ..topologyobjects import Atom, ExtraPoint, Bond
 
 try:
     from pyrosetta import Pose, AtomID
@@ -22,7 +18,7 @@ def _n_prior(pose, nbr):
         prior += pose.residue(i).natoms()
     return prior + nbr.atomno()
 
-class RosettaPose(object):
+class RosettaPose:
 
     @staticmethod
     def load(pose):
@@ -60,9 +56,8 @@ class RosettaPose(object):
                     epsilon = atinfo.lj_wdepth()
                     atomic_number = AtomicNum[atsym]
                     mass = Mass[atsym]
-                except KeyError:
-                    raise RosettaError('Could not recognize element: %s.'
-                                       % atsym)
+                except KeyError as err:
+                    raise RosettaError(f'Could not recognize element: {atsym}') from err
 
                 params = dict(atomic_number=atomic_number, name=atname,
                               charge=0.0, mass=mass, occupancy=0.0,
@@ -79,15 +74,11 @@ class RosettaPose(object):
                 struct.add_atom(atom, resname, resid, chain, '')
                 atnum += 1
                 try:
-                    for nbr in conf.bonded_neighbor_all_res(AtomID(atno,
-                                                                   resid)):
-                        if nbr.rsd() < resid or (nbr.rsd() == resid
-                                                 and nbr.atomno() < atno):
-                            struct.bonds.append(
-                                Bond(struct.atoms[_n_prior(pose, nbr)],
-                                     atom))
-                except:
-                    raise RosettaError('Could not add bonds.')
+                    for nbr in conf.bonded_neighbor_all_res(AtomID(atno, resid)):
+                        if nbr.rsd() < resid or (nbr.rsd() == resid and nbr.atomno() < atno):
+                            struct.bonds.append(Bond(struct.atoms[_n_prior(pose, nbr)], atom))
+                except Exception as err:
+                    raise RosettaError('Could not add bonds.') from err
 
         struct.unchange()
         return struct

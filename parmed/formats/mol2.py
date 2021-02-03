@@ -16,6 +16,8 @@ from ..utils.io import genopen
 from .registry import FileFormatType
 import warnings
 
+__all__ = ['Mol2File']
+
 class Mol2File(metaclass=FileFormatType):
     """ Class to read and write TRIPOS Mol2 files """
 
@@ -220,16 +222,14 @@ class Mol2File(metaclass=FileFormatType):
             if isinstance(struct, ResidueTemplateContainer):
                 try:
                     for res in struct:
-                        Mol2File.write(res, dest, mol3,
-                                       compress_whitespace=compress_whitespace)
+                        Mol2File.write(res, dest, mol3, compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
             elif isinstance(struct, Structure) and len(struct.residues) > 1:
                 try:
                     for res in ResidueTemplateContainer.from_structure(struct):
-                        Mol2File.write(res, dest, mol3,
-                                       compress_whitespace=compress_whitespace)
+                        Mol2File.write(res, dest, mol3, compress_whitespace=compress_whitespace)
                 finally:
                     if own_handle: dest.close()
                 return
@@ -247,21 +247,16 @@ class Mol2File(metaclass=FileFormatType):
                         bases[i+1] = bases[i] + len(res)
                 for i, res in enumerate(struct):
                     for bond in res.bonds:
-                        bonds.append((bond.atom1.idx+bases[i],
-                                      bond.atom2.idx+bases[i],
-                                      bond.order))
+                        bonds.append((bond.atom1.idx+bases[i], bond.atom2.idx+bases[i], bond.order))
                     if i < len(struct)-1 and (res.tail is not None and
                             struct[i+1].head is not None):
-                        bonds.append((res.tail.idx+bases[i],
-                                      struct[i+1].head.idx+bases[i+1],
-                                      bond.order))
+                        bonds.append((res.tail.idx+bases[i], struct[i+1].head.idx+bases[i+1], bond.order))
                     charges.extend([a.charge for a in res])
                 residues = struct
                 name = struct.name or struct[0].name
             else:
                 natom = len(struct.atoms)
-                bonds = [(b.atom1.idx+1, b.atom2.idx+1, b.order)
-                            for b in struct.bonds]
+                bonds = [(b.atom1.idx+1, b.atom2.idx+1, b.order) for b in struct.bonds]
                 if isinstance(struct, ResidueTemplate):
                     residues = [struct]
                     name = struct.name
@@ -270,8 +265,8 @@ class Mol2File(metaclass=FileFormatType):
                     name = struct.residues[0].name
                 charges = [a.charge for a in struct.atoms]
             dest.write('@<TRIPOS>MOLECULE\n')
-            dest.write('%s\n' % name)
-            dest.write('%d %d %d 0 1\n' % (natom, len(bonds), len(residues)))
+            dest.write(f'{name}\n')
+            dest.write(f'{natom:d} {len(bonds):d} {len(residues):d} 0 1\n')
             if len(residues) == 1:
                 dest.write('SMALL\n')
             else:
@@ -279,8 +274,7 @@ class Mol2File(metaclass=FileFormatType):
                     if AminoAcidResidue.has(residue.name):
                         dest.write('PROTEIN\n')
                         break
-                    if (RNAResidue.has(residue.name) or
-                            DNAResidue.has(residue.name)):
+                    if RNAResidue.has(residue.name) or DNAResidue.has(residue.name):
                         dest.write('NUCLEIC\n')
                         break
                 else:
@@ -296,10 +290,10 @@ class Mol2File(metaclass=FileFormatType):
                 box = struct.box
                 dest.write('@<TRIPOS>CRYSIN\n')
                 if compress_whitespace:
-                    fmt = '%.4f %.4f %.4f %.4f %.4f %.4f 1 1\n'
+                    fmt = '{0:.4f} {1:.4f} {2:.4f} {3:.4f} {4:.4f} {5:.4f} 1 1\n'
                 else:
-                    fmt = '%10.4f %10.4f %10.4f %10.4f %10.4f %10.4f  1  1\n'
-                dest.write(fmt % tuple(box))
+                    fmt = '{0:10.4f} {1:10.4f} {2:10.4f} {3:10.4f} {4:10.4f} {5:10.4f} 1 1\n'
+                dest.write(fmt.format(*box))
             # Now do ATOM section
             dest.write('@<TRIPOS>ATOM\n')
             j = 1
@@ -318,17 +312,16 @@ class Mol2File(metaclass=FileFormatType):
                     except AttributeError:
                         z = 0
                     if compress_whitespace:
-                        fmt = '%d %s %.4f %.4f %.4f %s %d %s'
+                        fmt = '{0:d} {1:s} {2:.4f} {3:.4f} {4:.4f} {5:s} {6:d} {7:s}'
                     else:
-                        fmt = '%8d %-8s %10.4f %10.4f %10.4f %-8s %6d %-8s'
-                    dest.write(fmt % (j, atom.name, x, y, z,
-                               atom.type.strip() or atom.name, i+1, res.name))
+                        fmt = '{0:8d} {1:<8s} {2:10.4f} {3:10.4f} {4:10.4f} {5:<8s} {6:6d} {7:<8s}'
+                    dest.write(fmt.format(j, atom.name, x, y, z, atom.type.strip() or atom.name, i+1, res.name))
                     if printchg:
                         if compress_whitespace:
-                            fmt = ' %.6f\n'
+                            fmt = ' {0:.6f}\n'
                         else:
-                            fmt = ' %10.6f\n'
-                        dest.write(fmt % atom.charge)
+                            fmt = ' {0:10.6f}\n'
+                        dest.write(fmt.format(atom.charge))
                     else:
                         dest.write('\n')
                     j += 1
@@ -339,10 +332,10 @@ class Mol2File(metaclass=FileFormatType):
                 else:
                     order = int(bond[2])
                 if compress_whitespace:
-                    fmt = '%d %d %d %s\n'
+                    fmt = '{0:d} {1:d} {2:d} {3:s}\n'
                 else:
-                    fmt = '%8d %8d %8d %s\n'
-                dest.write(fmt % (i+1, bond[0], bond[1], order))
+                    fmt = '{0:8d} {1:8d} {2:8d} {3:s}\n'
+                dest.write(fmt.format(i+1, bond[0], bond[1], str(order)))
             dest.write('@<TRIPOS>SUBSTRUCTURE\n')
             first_atom = 0
             for i, res in enumerate(residues):
@@ -352,8 +345,7 @@ class Mol2File(metaclass=FileFormatType):
                     chain = res.chain
                 intresbonds = 0
                 if isinstance(res, ResidueTemplate):
-                    if i != len(residues)-1 and (res.tail is not None and
-                            residues[i+1].head is not None):
+                    if i != len(residues)-1 and (res.tail is not None and residues[i+1].head is not None):
                         intresbonds += 1
                     if i != 0 and (res.head is not None and residues[i-1].tail is not None):
                         intresbonds += 1
@@ -363,21 +355,21 @@ class Mol2File(metaclass=FileFormatType):
                             if a2.residue is not res:
                                 intresbonds += 1
                 if compress_whitespace:
-                    fmt = '%d %s %d RESIDUE %d %s ROOT %d\n'
+                    fmt = '{0:d} {1:s} {2:d} RESIDUE {3:d} {4:s} ROOT {5:d}\n'
                 else:
-                    fmt = '%8d %-8s %8d RESIDUE %4d %-4s ROOT %6d\n'
-                dest.write(fmt % (i+1, res.name, first_atom+1, 0, chain[:4], intresbonds))
+                    fmt = '{0:8d} {1:<8s} {2:8d} RESIDUE {3:4d} {4:<4s} ROOT {5:6d}\n'
+                dest.write(fmt.format(i+1, res.name, first_atom+1, 0, chain[:4], intresbonds))
                 first_atom += len(res)
             if mol3:
                 dest.write('@<TRIPOS>HEADTAIL\n')
                 for i, res in enumerate(residues):
                     if isinstance(res, ResidueTemplate):
                         if res.head is not None:
-                            dest.write('%s %d\n' % (res.head.name, i+1))
+                            dest.write(f'{res.head.name} {i + 1}\n')
                         else:
                             dest.write('0 0\n')
                         if res.tail is not None:
-                            dest.write('%s %d\n' % (res.tail.name, i+1))
+                            dest.write(f'{res.tail.name} {i + 1}\n')
                         else:
                             dest.write('0 0\n')
                     else:
@@ -389,11 +381,11 @@ class Mol2File(metaclass=FileFormatType):
                                 if a2.residue.idx == res.idx + 1:
                                     tail = atom
                         if head is not None:
-                            dest.write('%s %d\n' % (head.name, i+1))
+                            dest.write(f'{head.name} {i + 1}\n')
                         else:
                             dest.write('0 0\n')
                         if tail is not None:
-                            dest.write('%s %d\n' % (tail.name, i+1))
+                            dest.write(f'{tail.name} {i + 1}\n')
                         else:
                             dest.write('0 0\n')
                 dest.write('@<TRIPOS>RESIDUECONNECT\n')
@@ -414,10 +406,10 @@ class Mol2File(metaclass=FileFormatType):
                                 elif a2.residue.idx != res.idx:
                                     con[ncon] = atom
                                     ncon += 1
-                    dest.write('%d' % (i+1))
+                    dest.write(str(i + 1))
                     for a in con:
                         if a is not None:
-                            dest.write(' %s' % a.name)
+                            dest.write(f' {a.name}')
                         else:
                             dest.write(' 0')
                     dest.write('\n')

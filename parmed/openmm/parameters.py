@@ -1,16 +1,17 @@
 """
 This module contains the class for storing and creating/converting/writing
 OpenMM-style ffxml files defining a force field
-
-Author(s): Jason Swails
 """
-from __future__ import absolute_import, print_function, division
-
-from copy import copy as _copy
-import math
-from functools import wraps
-from contextlib import closing
 import datetime
+import math
+import warnings
+from collections import OrderedDict
+from collections.abc import Sequence, Mapping
+from contextlib import closing
+from copy import copy
+from functools import wraps
+from itertools import product, chain
+
 from ..charmm.parameters import CharmmImproperMatchingMixin
 from ..constants import DEFAULT_ENCODING
 from ..formats.registry import FileFormatType
@@ -20,22 +21,16 @@ from ..periodic_table import Element
 from ..topologyobjects import NoUreyBradley
 from .. import unit as u
 from ..utils.io import genopen
-from ..utils.six import add_metaclass, string_types, iteritems
-from ..utils.six.moves import range
-import warnings
+from ..utils.six import iteritems
 from ..exceptions import ParameterWarning
-from itertools import product, chain
-from ..topologyobjects import (DihedralType, ImproperType, DrudeAtom)
+from ..topologyobjects import DihedralType, ImproperType, DrudeAtom
 
-
-from collections import OrderedDict
-
-_have_lxml = False
 try:
     from lxml import etree
     _have_lxml = True
 except ImportError:
     from xml.etree import ElementTree as etree
+    _have_lxml = False
 
 def _pretty_print_lxml(tree):
     return etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
@@ -65,8 +60,7 @@ def needs_lxml(func):
         return func(*args, **kwargs)
     return wrapper
 
-@add_metaclass(FileFormatType)
-class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
+class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=FileFormatType):
     """ Class storing parameters from an OpenMM parameter set
 
     Parameters
@@ -156,7 +150,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         # we're iterating over.
         for bond in list(residue.bonds):
             if (bond.atom1.atomic_number == 0) or (bond.atom2.atomic_number == 0):
-                LOGGER.debug('Deleting bonds to virtual sites in residue {}'.format(residue.name))
+                LOGGER.debug(f'Deleting bonds to virtual sites in residue {residue.name}')
                 residue.delete_bond(bond)
 
         # Check waters
@@ -165,10 +159,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             for bond in list(residue.bonds):
                 if (bond.atom1.element_name == 'H') and (bond.atom2.element_name == 'H'):
                     # Remove nonphysical H-H bonds
-                    LOGGER.debug('Deleting H-H bond from water residue {}'.format(residue.name))
+                    LOGGER.debug(f'Deleting H-H bond from water residue {residue.name}')
                     residue.delete_bond(bond)
                 else:
-                    LOGGER.debug('keeping %s to %s %s' %(bond.atom1, bond.atom2, bond.atom2.element_name))
+                    LOGGER.debug(f'keeping {bond.atom1} to {bond.atom2} {bond.atom2.element_name}')
         return True
 
     @classmethod
@@ -213,7 +207,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         new_params = cls()
         if copy:
             # Make a copy so we don't modify the original
-            params = _copy(params)
+            params = copy(params)
 
         new_params.atom_types = new_params.atom_types_str = params.atom_types
         new_params.atom_types_int = params.atom_types_int
@@ -242,39 +236,39 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             # Add only ResidueTemplate instances (no ResidueTemplateContainers)
             # Maintain original residue ordering
             remediated_residues = list()
-            for name, residue in iteritems(params.residues):
+            for name, residue in params.residues.items():
                 if isinstance(residue, ResidueTemplate):
                     # Don't discard the residue, but fix it if we need to
                     cls._remediate_residue_template(new_params, residue)
                     remediated_residues.append(residue)
             for residue in remediated_residues:
                 new_params.residues[residue.name] = residue
-            for name, patch in iteritems(params.patches):
+            for name, patch in params.patches.items():
                 cls._remediate_residue_template(new_params, patch)
                 new_params.patches[patch.name] = patch
         else:
             # Don't remediate residues; just copy
-            for name, residue in iteritems(params.residues):
+            for name, residue in params.residues.items():
                 new_params.residues[residue.name] = residue
-            for name, patch in iteritems(params.patches):
+            for name, patch in params.patches.items():
                 new_params.patches[patch.name] = patch
 
         # Only add unique patches
         unique_patches = OrderedDict()
         discarded_patches = []
-        for name, patch in iteritems(params.patches):
+        for name, patch in params.patches.items():
             if isinstance(patch, PatchTemplate):
-                templhash = OpenMMParameterSet._templhasher(patch)
+                templhash = cls._templhasher(patch)
                 if templhash not in unique_patches:
                     new_params.patches[name] = patch
                     unique_patches[templhash] = patch
                 else:
                     patch_collision = unique_patches[templhash]
-                    warnings.warn('Patch {} discarded because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                    warnings.warn(f'Patch {patch} discarded because OpenMM considers it identical to {patch_collision}')
                     discarded_patches.append(patch)
 
         if (len(discarded_patches) > 0):
-            warnings.warn('{} patches discarded, {} retained'.format(len(discarded_patches), len(new_params.patches)))
+            warnings.warn(f'{len(discarded_patches)} patches discarded, {len(new_params.patches)} retained')
         for patch in discarded_patches:
             del new_params.patches[patch.name]
 
@@ -295,16 +289,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         """
         if self.unique_atom_types:
             if drude:
-                return 'Drude-%s-%s' % (residue.name, atom.name)
-            return '%s-%s' % (residue.name, atom.name)
+                return f'Drude-{residue.name}-{atom.name}'
+            return f'{residue.name}-{atom.name}'
         if drude:
             return atom.drude_type
         return atom.type
 
     @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False,
-              skip_duplicates=True):
+              improper_dihedrals_ordering='default', charmm_imp=False, skip_duplicates=True):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -386,13 +379,13 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             try:
                 self.typeify_templates()
             except KeyError:
-                warnings.warn('Some residue templates are using unavailable '
-                              'AtomTypes', ParameterWarning)
+                warnings.warn('Some residue templates are using unavailable AtomTypes',
+                              ParameterWarning)
 
         [valid_residues_for_patch, valid_patches_for_residue] = self._determine_valid_patch_combinations(skip_residues)
         LOGGER.debug('Valid patch combinations:')
         for patch_name in self.patches:
-            LOGGER.debug('%8s : %s', patch_name, valid_residues_for_patch[patch_name])
+            LOGGER.debug(f'{patch_name:8s} : {valid_residues_for_patch[patch_name]}')
 
         if charmm_imp:
             self._find_explicit_impropers()
@@ -403,7 +396,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         self._write_omm_provenance(root, provenance)
         self._write_omm_atom_types(root, skip_types, skip_residues)
         self._write_omm_residues(root, skip_residues, skip_duplicates,
-            valid_patches_for_residue=valid_patches_for_residue)
+                                 valid_patches_for_residue=valid_patches_for_residue)
         self._write_omm_patches(root, valid_residues_for_patch)
         self._write_omm_bonds(root, skip_types)
         self._write_omm_angles(root, skip_types)
@@ -421,7 +414,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
         xml = pretty_print(tree)
 
-        if isinstance(dest, string_types):
+        if isinstance(dest, str):
             with closing(genopen(dest, 'w')) as f:
                 f.write(xml)
         else:
@@ -460,16 +453,16 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             elif atomname == '+N':
                 return N_types
             elif atomname[0] in ['-', '+']:
-                raise ValueError('Unknown atom name %s' % atomname)
+                raise ValueError(f'Unknown atom name {atomname}')
             else:
-                return [ a_types[a_names.index(atomname)] ]
+                return [a_types[a_names.index(atomname)]]
 
         # Iterate over all residues
         for name, residue in chain(iteritems(self.residues), iteritems(self.patches)):
             for impr in residue._impr:
                 # Get the list of types involved in this improper
                 try:
-                    types = [ get_types(residue, atomname) for atomname in impr ]
+                    types = [get_types(residue, atomname) for atomname in impr]
                 except ValueError:
                     continue
                 improper_found = False
@@ -486,11 +479,13 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                         improper_periodic[key] = improper
                         improper_found = True
                     else:
-                        raise Exception('Something went wrong with improper type for {} returning an unexpected object {}'.format(key, improper))
+                        raise RuntimeError(
+                            f'Something went wrong with improper type for {key} returning an unexpected object {improper}'
+                        )
 
                 # Warn if no improper was found
                 if not improper_found:
-                    raise Exception('No improper found for improper {} in residue {} (types were {})'.format(impr, name, types))
+                    raise RuntimeError(f'No improper found for improper {impr} in residue {name} (types were {types})')
 
         # Update our impropers
         self.improper_periodic_types = improper_periodic
@@ -498,12 +493,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
 
     def _compress_impropers(self):
         """
-        OpenMM's ForceField cannot handle impropers that match the same four atoms
-        in more than one order, so Peter Eastman wants us to compress duplicates
-        and increment the spring constant accordingly.
-
+        OpenMM's ForceField cannot handle impropers that match the same four atoms in more than
+        one order, so we should compress duplicates and aggregate spring constants accordingly.
         """
-        if not self.improper_types: return
+        if not self.improper_types:
+            return
 
         unique_keys = OrderedDict() # unique_keys[key] is the key to retrieve the improper from improper_types
         improper_types = OrderedDict() # replacement for self.improper_types with compressed impropers
@@ -512,10 +506,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             unique_key = tuple(sorted(atoms))
             if unique_key in unique_keys:
                 # Accumulate spring constant, discarding this contribution
-                # TODO: Do we need to check if `psi_eq` is the same?
                 atoms2 = unique_keys[unique_key]
+                if improper.psi_eq != improper_types[atoms2].psi_eq:
+                    warnings.warn(
+                        f"Two impropers for atom types {atoms2} found with different equilibrium "
+                        f"angles: {improper.psi_eq} != {improper_types[atoms2].psi_eq}",
+                        ParameterWarning,
+                    )
                 improper_types[atoms2].psi_k += improper.psi_k
-                warnings.warn('Compressing improper {} because it contains same atoms as {}'.format(improper, improper_types[atoms2]))
+                warnings.warn(f'Compressing improper {improper} because it contains same atoms as {improper_types[atoms2]}')
             else:
                 # Store this improper
                 unique_keys[unique_key] = atoms
@@ -552,7 +551,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             hash_info += tuple(sorted([atom_name for atom_name in residue.delete_atoms]))
         # Sort list of bonds by first bond name
         if len(residue.bonds) > 0:
-            hash_info += tuple(sorted( [(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds] ))
+            hash_info += tuple(sorted([(bond.atom1.name, bond.atom2.name) if (bond.atom1.name < bond.atom2.name) else (bond.atom2.name, bond.atom1.name) for bond in residue.bonds] ))
         # Add head and tail
         if residue.head:
             hash_info += (residue.head.name,)
@@ -566,29 +565,30 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         info = etree.SubElement(root, 'Info')
 
         date_generated = etree.SubElement(info, "DateGenerated")
-        date_generated.text = '%02d-%02d-%02d' % datetime.datetime.now().timetuple()[:3]
+        ttup = datetime.datetime.now().timetuple()
+        date_generated.text = f'{ttup[0]:02d}-{ttup[1]:02d}-{ttup[2]:02d}'
 
         provenance = provenance or OrderedDict()
         for tag, content in iteritems(provenance):
-            if tag == 'DateGenerated': continue
+            if tag == 'DateGenerated':
+                continue
             if not isinstance(content, list):
                 content = [content]
             for sub_content in content:
-                if isinstance(sub_content, string_types):
+                if isinstance(sub_content, str):
                     item = etree.Element(tag)
                     item.text = sub_content
                     info.append(item)
-                elif isinstance(sub_content, OrderedDict) or isinstance(sub_content, dict):
+                elif isinstance(sub_content, Mapping):
                     if tag not in sub_content:
-                        raise KeyError('Content of an attribute-containing element '
-                                       'specified incorrectly.')
+                        raise KeyError('Content of an attribute-containing element specified incorrectly.')
                     attributes = [key for key in sub_content if key != tag]
                     element_content = sub_content[tag]
                     attributes = { k : str(v) for (k,v) in sub_content.items() }
                     item = etree.SubElement(info, tag, **attributes)
                     item.text = str(element_content)
                 else:
-                    raise TypeError('Incorrect type of the %s element content' % tag)
+                    raise TypeError(f'Incorrect type of the {tag} element content')
 
     @needs_lxml
     def _write_omm_atom_types(self, xml_root, skip_types, skip_residues):
@@ -650,10 +650,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             if templhash in written_residues:
                 residue_collision = written_residues[templhash]
                 if skip_duplicates:
-                    warnings.warn('Skipping writing of residue {} because OpenMM considers it identical to {}'.format(residue, residue_collision))
+                    warnings.warn(f'Skipping writing of residue {residue} because OpenMM considers it identical to {residue_collision}')
                     continue
                 else:
-                    warnings.warn('Residue {} will be considered by OpenMM to be identical to {}.'.format(residue, residue_collision))
+                    warnings.warn(f'Residue {residue} will be considered by OpenMM to be identical to {residue_collision}.')
             written_residues[templhash] = residue
             # Write residue
             if residue.override_level == 0:
@@ -708,11 +708,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             valid_patches_for_residue[residue.name] = list()
 
         # Create list of residues to check compatibility against
-        residues = [ residue for residue in self.residues.values() if (residue not in skip_residues) ]
+        residues = [residue for residue in self.residues.values() if (residue not in skip_residues)]
 
         # Check patch compatibilities
         for patch in self.patches.values():
-            residue_compatibilities = [ residue.patch_is_compatible(patch) for residue in residues ]
+            residue_compatibilities = [residue.patch_is_compatible(patch) for residue in residues]
             for (residue, is_compatible) in zip(residues, residue_compatibilities):
                 if is_compatible:
                     valid_residues_for_patch[patch.name].append(residue.name)
@@ -746,7 +746,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             templhash = OpenMMParameterSet._templhasher(patch) # TODO: this may be redundant now
             if templhash in written_patches:
                 patch_collision = written_patches[templhash]
-                warnings.warn('Skipping writing of patch {} because OpenMM considers it identical to {}'.format(patch, patch_collision))
+                warnings.warn(f'Skipping writing of patch {patch} because OpenMM considers it identical to {patch_collision}')
                 continue
             written_patches[templhash] = patch
             if patch.override_level == 0:
@@ -762,13 +762,14 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             for residue_name in valid_residues_for_patch[name]:
                 try:
                     residue = self.residues[residue_name]
-                except KeyError as e:
-                    msg =  'Compatible residue not found in self.residues\n'
-                    msg += '   patch name: %s\n' % name
-                    msg += '   valid patch combinations: %s\n' % valid_residues_for_patch[name]
-                    msg += '   residue name: %s\n' % residue_name
-                    msg += str(e)
-                    raise(msg)
+                except KeyError as err:
+                    msg =  (
+                        'Compatible residue not found in self.residues\n'
+                        f'   patch name: {name}\n'
+                        f'   valid patch combinations: {valid_residues_for_patch[name]}\n'
+                        f'   residue name: {residue_name}\n'
+                    )
+                    raise KeyError(msg) from err
                 patched_residue = residue.apply_patch(patch)
 
                 instructions = []
@@ -834,8 +835,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         lconv = u.angstroms.conversion_factor_to(u.nanometers)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
         for (a1, a2), bond in iteritems(self.bond_types):
-            if any((a in skip_types for a in (a1, a2))): continue
-            if (a1, a2) in bonds_done: continue
+            if any((a in skip_types for a in (a1, a2))):
+                continue
+            if (a1, a2) in bonds_done:
+                continue
             bonds_done.add((a1, a2))
             bonds_done.add((a2, a1))
             etree.SubElement(xml_force, 'Bond', class1=a1, class2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
@@ -877,9 +880,9 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             terms = OrderedDict()
             for i, term in enumerate(dihed):
                 i += 1
-                terms['periodicity%d' % i] = str(term.per)
-                terms['phase%d' % i] = str(term.phase*pconv)
-                terms['k%d' % i] = str(term.phi_k*kconv)
+                terms[f'periodicity{i}'] = str(term.per)
+                terms[f'phase{i}'] = str(term.phase*pconv)
+                terms[f'k{i}'] = str(term.phi_k*kconv)
             etree.SubElement(xml_force, 'Proper', class1=nowild(a1), class2=a2, class3=a3, class4=nowild(a4), **terms)
         # Now do the periodic impropers. OpenMM expects the central atom to be
         # listed first. ParameterSet goes out of its way to list it third
@@ -974,22 +977,14 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             for t in dt:
                 if t.scee: scee.add(t.scee)
                 if t.scnb: scnb.add(t.scnb)
-        if len(scee) > 1:
-            raise NotImplementedError('Cannot currently handle mixed 1-4 '
-                    'scaling: Elec. Scaling factors %s detected' %
-                    (', '.join([str(x) for x in scee])))
-        if len(scnb) > 1:
-            raise NotImplementedError('Cannot currently handle mixed 1-4 '
-                    'scaling: L-J Scaling factors %s detected' %
-                    (', '.join([str(x) for x in scnb])))
-        if len(scee) > 0:
-            coulomb14scale = 1.0 / scee.pop()
-        else:
-            coulomb14scale = 1.0 / self.default_scee
-        if len(scnb) > 0:
-            lj14scale = 1.0 / scnb.pop()
-        else:
-            lj14scale = 1.0 / self.default_scnb
+        if len(scee) > 1 or len(scnb) > 1:
+            scee_facs = ', '.join([str(x) for x in scee])
+            scnb_facs = ', '.join([str(x) for x in scnb])
+            raise NotImplementedError(
+                f'Cannot currently handle mixed 1-4 scaling: 1-4 eel [{scee_facs}] 1-4 vdw [{scnb_facs}]'
+            )
+        coulomb14scale = 1.0 / scee.pop() if scee else 1.0 / self.default_scee
+        lj14scale = 1.0 / scnb.pop() if scnb else 1.0 / self.default_scnb
 
         # Write NonbondedForce records.
         xml_force = etree.SubElement(xml_root, 'NonbondedForce', coulomb14scale=str(coulomb14scale), lj14scale=str(lj14scale))
@@ -1013,17 +1008,17 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 # We need to use a separate LennardJonesForce instead
                 # TODO: Can we autodetect this and switch on separate_ljforce earlier?
                 if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
-                    raise NotImplementedError('OpenMM <NonbondedForce> cannot handle '
-                        'distinct 1-4 sigma and epsilon parameters; '
-                        'use separate_ljforce=True instead')
+                    raise NotImplementedError(
+                        'OpenMM <NonbondedForce> cannot handle distinct 1-4 sigma and epsilon '
+                        'parameters; use separate_ljforce=True instead'
+                    )
 
             # Ensure we don't have sigma = 0
             if (sigma == 0.0):
                 if (epsilon == 0.0):
                     sigma = 1.0 # reset sigma = 1
                 else:
-                    raise ValueError("For atom type '%s', sigma = 0 but "
-                                     "epsilon != 0." % name)
+                    raise ValueError(f"For atom type '{name}', sigma = 0 but epsilon != 0.")
 
             attributes = { 'class' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
             etree.SubElement(xml_force, 'Atom', **attributes)
@@ -1041,13 +1036,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             for t in dt:
                 if t.scnb: scnb.add(t.scnb)
         if len(scnb) > 1:
-            raise NotImplementedError('Cannot currently handle mixed 1-4 '
-                    'scaling: L-J Scaling factors %s detected' %
-                    (', '.join([str(x) for x in scnb])))
-        if len(scnb) > 0:
-            lj14scale = 1.0 / scnb.pop()
-        else:
-            lj14scale = 1.0 / self.default_scnb
+            scnb_str = ', '.join([str(x) for x in scnb])
+            raise NotImplementedError(
+                f'Cannot currently handle mixed 1-4 scaling: L-J Scaling factors {scnb_str} detected'
+            )
+        lj14scale = 1.0 / scnb.pop() if scnb else 1.0 / self.default_scnb
 
         # write L-J records
         xml_force = etree.SubElement(xml_root, 'LennardJonesForce', lj14scale=str(lj14scale))
@@ -1066,8 +1059,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 if (epsilon == 0.0):
                     sigma = 1.0 # reset sigma = 1
                 else:
-                    raise ValueError("For atom type '%s', sigma = 0 but "
-                                     "epsilon != 0." % name)
+                    raise ValueError(f"For atom type '{name}', sigma = 0 but epsilon != 0.")
 
             # Handle special values used for 14 interactions
             if (atom_type.rmin_14 != atom_type.rmin) or (atom_type.epsilon_14 != atom_type.epsilon):
@@ -1079,8 +1071,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     if (epsilon14 == 0.0):
                         sigma14 = 1.0 # reset sigma = 1
                     else:
-                        raise ValueError("For atom type '%s', sigma_14 = 0 but "
-                                        "epsilon_14 != 0." % name)
+                        raise ValueError(f"For atom type '{name}', sigma_14 = 0 but epsilon_14 != 0.")
             else:
                 sigma14 = None
                 epsilon14 = None
@@ -1115,9 +1106,12 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         xml_force = etree.SubElement(xml_root, 'DrudeForce')
         alpha_scale = (1*u.angstrom/u.nanometers)**3
         for atom, residue in drude_atoms:
-            attributes = { 'type1' : self._get_mm_atom_type(atom, residue, True), 'type2' : self._get_mm_atom_type(atom, residue),
-                           'charge' : str(atom.drude_charge), 'polarizability' : str(abs(alpha_scale*atom.alpha)),
-                           'thole' : str(atom.thole) }
+            attributes = {
+                'type1' : self._get_mm_atom_type(atom, residue, True),
+                'type2' : self._get_mm_atom_type(atom, residue),
+                'charge' : str(atom.drude_charge), 'polarizability' : str(abs(alpha_scale*atom.alpha)),
+                'thole' : str(atom.thole),
+            }
             if atom.anisotropy is not None:
                 aniso = atom.anisotropy
                 attributes['type3'] = self._get_mm_atom_type(aniso.atom2, residue)
@@ -1128,7 +1122,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin):
             etree.SubElement(xml_force, 'Particle', **attributes)
 
     def _write_omm_scripts(self, dest, skip_types):
-        # Not currently implemented, so throw an exception if any unsupported
-        # options are specified
+        # Not currently implemented, so throw an exception if any unsupported options are specified
         if self.combining_rule == 'geometric':
             raise NotImplementedError('Geometric combining rule not currently supported.')

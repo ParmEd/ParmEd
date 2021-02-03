@@ -2,6 +2,7 @@
 This module contains basic information and functionality related to individual
 residues in typical biopolymers.
 """
+from abc import ABC
 
 __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
            'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'HYP', 'ILE', 'LEU', 'LYS',
@@ -11,7 +12,7 @@ __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class BiomolecularResidue(object):
+class BiomolecularResidue(ABC):
     """ Base class for different classes of biopolymer residues """
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
@@ -19,11 +20,11 @@ class BiomolecularResidue(object):
     all_residues = []
 
     def __init_(self, *args, **kwargs):
-        raise NotImplementedError('BiomolecularResidue must be subclassed')
+        super().__init__()
 
     @classmethod
     def get(cls, key):
-        raise NotImplementedError('BiomolecularResidue must be subclassed')
+        raise NotImplementedError()
 
     def __str__(self):
         return self.name
