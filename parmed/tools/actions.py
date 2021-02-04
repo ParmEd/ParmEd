@@ -27,8 +27,7 @@ from ..residue import (ANION_NAMES, CATION_NAMES, SOLVENT_NAMES,
 from ..structure import Structure
 from ..topologyobjects import (Angle, AngleType, Bond, BondType, Dihedral,
                                DihedralType, DihedralTypeList)
-from ..utils.six import add_metaclass, iteritems, string_types
-from ..utils.six.moves import range, zip
+from ..utils.six import iteritems
 from .argumentlist import ArgumentList
 from .exceptions import (AddPDBError, AddPDBWarning,  # CoarseGrainError,
                          AmbiguousParmError, ArgumentError, ChamberError,
@@ -73,16 +72,9 @@ class ActionType(type):
             Usages[name.lower()] = '%s %s' % (name, dct['usage'])
         elif name != 'Action': # Skip base action class
             Usages[name.lower()] = name
-        super(ActionType, cls).__init__(name, bases, dct)
+        super().__init__(name, bases, dct)
 
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-lawsuit = object
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-@add_metaclass(ActionType)
-class Action(lawsuit):
+class Action(metaclass=ActionType):
     """
     The base class for all ParmEd actions. The metaclass for Action adds the
     action and its usage statement to a map that is imported and used by the
@@ -150,20 +142,20 @@ class Action(lawsuit):
         if args or kwargs:
             if arg_list is None:
                 arg_list = ''
-            elif isinstance(arg_list, string_types) and ' ' in arg_list.strip():
+            elif isinstance(arg_list, str) and ' ' in arg_list.strip():
                 # arg_list has a space, so enclose it in quotes
                 arg_list = '"%s"  ' % arg_list
             else:
                 arg_list = '%s ' % arg_list
             arg_list += ' '.join([self._format_arg(a) for a in args])
-            for kw, item in iteritems(kwargs):
+            for kw, item in kwargs.items():
                 arg_list += ' %s %s ' % (kw, self._format_arg(item))
         elif arg_list is None:
             arg_list = ArgumentList('')
-        elif isinstance(arg_list, string_types):
+        elif isinstance(arg_list, str):
             arg_list = self._format_arg(arg_list)
         # If our arg_list is a string, convert it to an ArgumentList
-        if isinstance(arg_list, string_types):
+        if isinstance(arg_list, str):
             arg_list = ArgumentList(arg_list)
         else:
             arg_list = ArgumentList(str(arg_list))
@@ -2447,7 +2439,7 @@ class tiMerge(Action):
         new_atm_idx = 0
         for i in range(natom):
             if molsel2[i] == 1 and sel2[i] == 0:
-                remove_mask.append('%d' % (i+1))
+                remove_mask.append(str(i+1))
             else:
                 remove_map[i] = new_atm_idx
                 new_atm_idx += 1
@@ -2469,8 +2461,9 @@ class tiMerge(Action):
                 mol2common.append(i)
 
         if len(mol1common) != len(mol2common):
-            raise TiMergeError('The number of nonsoftcore atoms in mol1mask and mol2mask must be '
-                               'the same.')
+            raise TiMergeError(
+                'The number of nonsoftcore atoms in mol1mask and mol2mask must be the same.'
+            )
 
         mol2common_sort = []
         # reorder mol2common so that it matches mol1common
@@ -2495,8 +2488,7 @@ class tiMerge(Action):
             atm_j = mol2common[i]
             diff = coordinates[atm_i] - coordinates[atm_j]
             if (np.abs(diff) > self.tol).any():
-                raise TiMergeError('Common (nonsoftcore) atoms must have the ' # pragma: no cover
-                                   'same coordinates.')
+                raise TiMergeError('Common (nonsoftcore) atoms must have the same coordinates.')
 
         for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
@@ -2548,38 +2540,30 @@ class tiMerge(Action):
 
                         for dihed in self.parm.dihedrals:
                             if dihed.atom1.idx == j:
-                                if (dihed.atom2.idx == k or dihed.atom3.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom2.idx == k or dihed.atom3.idx == k or dihed.atom4.idx == k):
                                     dihed.atom1 = atm_new
                             elif dihed.atom2.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom3.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom3.idx == k or dihed.atom4.idx == k):
                                     dihed.atom2 = atm_new
                             elif dihed.atom3.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k or dihed.atom4.idx == k):
                                     dihed.atom3 = atm_new
                             elif dihed.atom4.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
-                                        or dihed.atom3.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k or dihed.atom3.idx == k):
                                     dihed.atom4 = atm_new
 
                         for imp in self.parm.impropers:
                             if imp.atom1.idx == j:
-                                if (imp.atom2.idx == k or imp.atom3.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom2.idx == k or imp.atom3.idx == k or imp.atom4.idx == k):
                                     imp.atom1 = atm_new
                             elif imp.atom2.idx == j:
-                                if (imp.atom1.idx == k or imp.atom3.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom1.idx == k or imp.atom3.idx == k or imp.atom4.idx == k):
                                     imp.atom2 = atm_new
                             elif imp.atom3.idx == j:
-                                if (imp.atom1.idx == k or imp.atom2.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom1.idx == k or imp.atom2.idx == k or imp.atom4.idx == k):
                                     imp.atom3 = atm_new
                             elif imp.atom4.idx == j:
-                                if (imp.atom1.idx == k or imp.atom2.idx == k
-                                        or imp.atom3.idx == k):
+                                if (imp.atom1.idx == k or imp.atom2.idx == k or imp.atom3.idx == k):
                                     imp.atom4 = atm_new
 
                         for cmap in self.parm.cmaps:
@@ -2616,10 +2600,10 @@ class tiMerge(Action):
         for i in range(natom):
             if sel1[i] or molsel1N[i]:
                 new_sc_atm1_int.append(remove_map[i])
-                new_sc_atm1.append('%d' % (remove_map[i]+1))
+                new_sc_atm1.append(str(remove_map[i]+1))
             elif sel2[i] or molsel2N[i]:
                 new_sc_atm2_int.append(remove_map[i])
-                new_sc_atm2.append('%d' % (remove_map[i]+1))
+                new_sc_atm2.append(str(remove_map[i]+1))
 
         # Do not allow definition where dihedrals cross through the softcore
         # region. This is generally breaking a ring (and possibly other cases),
@@ -2642,24 +2626,20 @@ class tiMerge(Action):
                 if (atmi not in new_sc_atm1_int and atmi not in new_sc_atm2_int and
                     atml not in new_sc_atm1_int and atml not in new_sc_atm2_int):
                     raise TiMergeError( # pragma: no cover
-                            'Cannot have dihedral cross through softcore '
-                            'region. (DIHED : %d %d %d %d). Usually this means '
-                            'you have defined the softcore region in a way '
-                            'that breaks a ring. Try redefining your softcore '
-                            'region to include the ring or at least three '
-                            'consecutive atoms.' % (atmi+1, atmj+1, abs(atmk)+1, abs(atml)+1)
+                        'Cannot have dihedral cross through softcore region. (DIHED : '
+                        f'{atmi + 1} {atmj + 1} {abs(atmk) + 1} {abs(atml) + 1}). '
+                        'Usually this means you have defined the softcore region in a way '
+                        'that breaks a ring. Try redefining your softcore region to include the '
+                        'ring or at least three consecutive atoms.'
                     )
 
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
         self.sc_mask2 = '@' + ','.join(new_sc_atm2)
 
-        ret_str = ("Merging molecules %s and %s into the same molecule.\n"
-                   % (self.molmask1, self.molmask2))
-        ret_str2 = ("Use softcore mask:\ntimask1=\'%s\',\ntimask2=\'%s\',"
-                   % (self.sc_mask1, self.sc_mask2))
-        ret_str3 = ("\nscmask1=\'%s\',\nscmask2=\'%s\',"
-                   % (self.sc_mask1, self.sc_mask2))
-        self.output.write('%s%s%s\n' % (ret_str, ret_str2, ret_str3))
+        ret_str = f"Merging molecules {self.molmask1} and {self.molmask2} into the same molecule.\n"
+        ret_str2 = f"Use softcore mask:\ntimask1='{self.sc_mask1}',\ntimask2='{self.sc_mask2}',"
+        ret_str3 = f"\nscmask1='{self.sc_mask1}',\nscmask2='{self.sc_mask2}',"
+        self.output.write(f'{ret_str}{ret_str2}{ret_str3}\n')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2700,16 +2680,15 @@ class parm(Action):
         # Add as many parms as we want with one command, and support globbing
         new_parm = len(arg_list.unmarked()) or None
         # Make sure we specified only one operating mode
-        if (self.new_active_parm is None and self.copied_parm is None and
-                new_parm is None):
-            raise ParmError('Improper usage of `parm\' command')
+        if (self.new_active_parm is None and self.copied_parm is None and new_parm is None):
+            raise ParmError("Improper usage of `parm' command")
         opts = (self.new_active_parm, self.copied_parm, new_parm)
         nnone = 0
         for opt in opts:
             if opt is None:
                 nnone += 1
         if nnone != 2:
-            raise ParmError('Improper usage of `parm\' -- choose one behavior')
+            raise ParmError("Improper usage of `parm' -- choose one behavior")
         # Now get our indexes for copied and new parms if they are integers,
         # otherwise we index based on filename
         if self.new_active_parm is not None:
@@ -2738,18 +2717,17 @@ class parm(Action):
             try:
                 idx = self.parm_list.index(self.new_active_parm)
             except IndexError:
-                return '%s not in parm list. Doing nothing' % self.new_active_parm
-            return 'Setting new active parm [%s]' % self.parm_list[idx]
+                return f'{self.new_active_parm} not in parm list. Doing nothing'
+            return f'Setting new active parm [{self.parm_list[idx]}]'
         elif self.new_parm is not None:
-            return ('Adding prmtop %s to parm list. %s is the active parm.' %
-                    (', '.join(self.new_parm), self.new_parm[-1]))
+            new_parms = ', '.join(self.new_parm)
+            return f'Adding prmtop {new_parms} to parm list. {self.new_parm[-1]} is the active parm.'
         elif self.copied_parm is not None:
             try:
                 idx = self.parm_list.index(self.copied_parm)
             except IndexError:
-                return '%s not in parm list. Doing nothing' % self.new_active_parm
-            return ("Copying prmtop %s to parm list. %s's copy is the active parm." %
-                    (self.parm_list[idx], self.parm_list[idx]))
+                return f'{self.new_active_parm} not in parm list. Doing nothing'
+            return f"Copying prmtop {self.parm_list[idx]} to parm list. {self.parm_list[idx]}'s copy is the active parm."
         raise AssertionError('Should not be here')
 
     def execute(self):
@@ -2761,18 +2739,17 @@ class parm(Action):
                 try:
                     self.parm_list.add_parm(new_parm)
                 except IOError:
-                    warnings.warn('Could not open %s for reading' % new_parm, SeriousParmWarning)
+                    warnings.warn(f'Could not open {new_parm} for reading', SeriousParmWarning)
         elif self.new_active_parm is not None:
             try:
                 self.parm_list.set_new_active(self.new_active_parm)
             except IndexError:
-                warnings.warn('%s is not in the parm list!' % self.new_active_parm,
-                              SeriousParmWarning)
+                warnings.warn(f'{self.new_active_parm} is not in the parm list!', SeriousParmWarning)
         elif self.copied_parm is not None:
             try:
                 self.parm_list.add_parm(copy(self.parm_list[self.copied_parm]))
             except IndexError:
-                warnings.warn('%s is not in the parm list!' % self.copied_parm, SeriousParmWarning)
+                warnings.warn(f'{self.copied_parm} is not in the parm list!', SeriousParmWarning)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2826,8 +2803,8 @@ class cd(Action):
         if len(self.directory) != 1:
             return 'Change directory failed'
         if not os.path.isdir(self.directory[0]):
-            return '%s does not exist. cd failed.' % self.directory[0]
-        return 'New working directory: %s' % self.directory[0]
+            return f'{self.directory[0]} does not exist. cd failed.'
+        return f'New working directory: {self.directory[0]}'
 
     def execute(self):
         if len(self.directory) < 1:
@@ -2839,8 +2816,7 @@ class cd(Action):
                           SeriousParmWarning)
             return # pragma: no cover
         if not os.path.isdir(self.directory[0]):
-            warnings.warn('%s is not a directory' % self.directory[0],
-                          SeriousParmWarning)
+            warnings.warn(f'{self.directory[0]} is not a directory', SeriousParmWarning)
             return # pragma: no cover
         # If we've gotten this far, go ahead and change to the directory
         os.chdir(self.directory[0])
@@ -2890,8 +2866,7 @@ class interpolate(Action):
                      # starts from <num> and increases by 1
         - <num> : Starting number for file names (see <prefix> above)
     """
-    usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] '
-             '[startnum <num>]')
+    usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] [startnum <num>]')
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
@@ -2903,8 +2878,7 @@ class interpolate(Action):
             if self.parm_list[0] is not self.parm:
                 self.parm2 = self.parm_list[0]
         elif parm2 is None:
-            raise AmbiguousParmError('You must identify parm2 if more than 2 '
-                                     'parm instances exist!')
+            raise AmbiguousParmError('You must identify parm2 if more than 2 parm instances exist!')
         else:
             try:
                 parm2 = int(parm2)
@@ -2925,15 +2899,13 @@ class interpolate(Action):
         extra = ''
         if self.eleconly and self.diff_vdw:
             extra = ' [only interpolating charges]'
-        return 'Creating %d interpolated prmtops between %s and %s' % (
-                                    self.nparm, self.parm, self.parm2) + extra
+        return f'Creating {self.nparm} interpolated prmtops between {self.parm} and {self.parm2}' + extra
 
     def _check_parms(self):
         """ Makes sure that the atoms in both parms are all the same """
         parm1, parm2 = self.parm, self.parm2
         if len(parm1.atoms) != len(parm2.atoms):
-            raise IncompatibleParmsError('%s and %s have different #s of '
-                                         'atoms!' % (parm1, parm2))
+            raise IncompatibleParmsError(f'{parm1} and {parm2} have different #s of atoms!')
         ndiff = 0
         for atom1, atom2 in zip(parm1.atoms, parm2.atoms):
             if atom1.name != atom2.name:
@@ -2950,8 +2922,7 @@ class interpolate(Action):
     def execute(self):
         """ Interpolates the prmtops """
         if self.diff_vdw and not self.eleconly:
-            raise NotImplementedError('No support for scaling vdW '
-                                      'parameters yet!')
+            raise NotImplementedError('No support for scaling vdW parameters yet!')
         parm1, parm2 = self.parm, self.parm2
         # Original charges for parm 1
         orig_chg1 = parm1.parm_data['CHARGE']
@@ -3050,23 +3021,19 @@ class summary(Action):
                 _reformat_long_sentence(rset, 'Residue set:           ',
                                         n_words=7)
         )
-        rcount = ','.join('%s: %d' % (x, y)
-                           for x, y in iteritems(
-                               Counter(res.name for res in self.parm.residues)
-                           )
+        rcount = ','.join(
+            '%s: %d' % (x, y) for x, y in Counter(res.name for res in self.parm.residues).items()
         )
         retval.append(
-                _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
-                                        'Residue count:         ', n_words=7)
+            _reformat_long_sentence(
+                ', '.join((sorted(rcount.split(',')))), 'Residue count:         ', n_words=7
+            )
         )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
-            retval.append('System volume (ang^3): %.2f\n'
-                          'System density (g/mL): %f' %
-                          (v, tmass / (v * 0.602204))
-            )
+            retval.append(f'System volume (ang^3): {v:.2f}\nSystem density (g/mL): {tmass / v / 0.602204:f}')
         elif self.parm.box is not None:
             # General triclinic cell
             a, b, c, alpha, beta, gamma = self.parm.box[:]
@@ -3074,13 +3041,9 @@ class summary(Action):
             cosa = math.cos(alpha * math.pi / 180)
             cosb = math.cos(beta * math.pi / 180)
             cosg = math.cos(gamma * math.pi / 180)
-            v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg +
-                                      2 * cosa*cosb*cosg)
-            retval.append('System volume (ang^3): %.2f\n'
-                          'System density (g/mL): %f' %
-                          (v, tmass / (v * 0.602204))
-            )
-        return '%s\n' % '\n'.join(retval)
+            v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg + 2 * cosa*cosb*cosg)
+            retval.append(f'System volume (ang^3): {v:.2f}\nSystem density (g/mL): {tmass / v / 0.602204:f}')
+        return '\n'.join(retval) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3184,8 +3147,8 @@ class addPDB(Action):
 
     def __str__(self):
         if self.pdbpresent:
-            return 'PDB information already present in %s. Doing nothing'
-        retstr = 'Adding PDB information from %s' % self.pdbfile
+            return f'PDB information already present in {self.parm}. Doing nothing'
+        retstr = f'Adding PDB information from {self.pdbfile}'
         if self.elements: retstr += '\n\t[printing elements from prmtop]'
         return retstr
 
@@ -3209,42 +3172,35 @@ class addPDB(Action):
                 reslab = parmres.name
                 resname = res.name.strip()
                 if resname != reslab:
-                    if (not resname in ('WAT', 'HOH') or
-                        not reslab in ('WAT', 'HOH')):
+                    if not resname in ('WAT', 'HOH') or not reslab in ('WAT', 'HOH'):
                         # Allow for 3's and 5's in terminal nucleic acid
                         # residues
-                        if resname in ('A', 'C', 'G', 'U', 'DA',
-                                       'DG', 'DC', 'DT'):
+                        if resname in ('A', 'C', 'G', 'U', 'DA', 'DG', 'DC', 'DT'):
                             if reslab[-1] in '35':
                                 reslab = reslab[:-1]
                         if reslab != resname:
                             needs_warn = True
                             # Support other Amber residue name replacements
-                            if reslab in ('ASP', 'ASH', 'AS4') and \
-                                    resname in ('ASP', 'ASH', 'AS4'):
+                            if reslab in ('ASP', 'ASH', 'AS4') and resname in ('ASP', 'ASH', 'AS4'):
                                 needs_warn = False
-                            elif reslab in ('GLU', 'GLH', 'GL4') and \
-                                    resname in ('GLU', 'GLH', 'GL4'):
+                            elif reslab in ('GLU', 'GLH', 'GL4') and resname in ('GLU', 'GLH', 'GL4'):
                                 needs_warn = False
-                            elif reslab in ('HIP', 'HIS', 'HIE', 'HID') and \
-                                    resname in ('HIP', 'HIS', 'HIE', 'HID'):
+                            elif reslab in ('HIP', 'HIS', 'HIE', 'HID') and resname in ('HIP', 'HIS', 'HIE', 'HID'):
                                 needs_warn = False
-                            elif reslab in ('LYS', 'LYN') and \
-                                    resname in ('LYS', 'LYN'):
+                            elif reslab in ('LYS', 'LYN') and resname in ('LYS', 'LYN'):
                                 needs_warn = False
-                            elif reslab in ('CYS', 'CYX', 'CYM') and \
-                                    resname in ('CYS', 'CYX', 'CYM'):
+                            elif reslab in ('CYS', 'CYX', 'CYM') and resname in ('CYS', 'CYX', 'CYM'):
                                 needs_warn = False
                             if needs_warn:
-                                warnings.warn('Residue name mismatch [#%d] %s '
-                                              'vs. %s' % (i+1, resname, reslab),
-                                              AddPDBWarning)
+                                warnings.warn(
+                                    f'Residue name mismatch [#{i + 1}] {resname} vs. {reslab}',
+                                    AddPDBWarning
+                                )
                 resnums[i] = parmres.number = res.number
                 chainids[i] = parmres.chain = res.chain
                 icodes[i] = parmres.insertion_code = res.insertion_code
             except IndexError:
-                raise AddPDBError('PDB %s has more residues than prmtop %s' %
-                                  (self.pdbfile, self.parm))
+                raise AddPDBError(f'PDB {self.pdbfile} has more residues than prmtop {self.parm}')
             # Now loop through all of the atoms in the parm residue, look for
             # the atom with the same name in the PDB residue
             for atom in parmres:
@@ -3258,35 +3214,33 @@ class addPDB(Action):
         ncmts = ['Residue number (resSeq) read from PDB file; DIMENSION(NRES)']
         if self.printicodes or any(icodes):
             haveicodes = True
-            ncmts += ['Residue insertion codes (iCode) present in %FLAG '
-                      'RESIDUE_ICODE']
+            ncmts += ['Residue insertion codes (iCode) present in %FLAG RESIDUE_ICODE']
         else:
             haveicodes = False
             ncmts += ['Residue insertion code (iCode) not present in PDB file',
                       'If present: %FLAG RESIDUE_ICODE, %FORMAT(20a4)']
-        self.parm.add_flag('RESIDUE_NUMBER', '20I4', data=resnums,
-                           comments=ncmts)
-        self.parm.add_flag('RESIDUE_CHAINID', '20a4', data=chainids,
-                          comments=['Residue chain ID (chainId) read from PDB '
-                                    'file; DIMENSION(NRES)']
+        self.parm.add_flag('RESIDUE_NUMBER', '20I4', data=resnums, comments=ncmts)
+        self.parm.add_flag(
+            'RESIDUE_CHAINID', '20a4', data=chainids,
+            comments=['Residue chain ID (chainId) read from PDB file; DIMENSION(NRES)']
         )
         if haveicodes:
-            self.parm.add_flag('RESIDUE_ICODE', '20a4', data=icodes,
-                comments=['Residue insertion code (iCode) read from PDB file; '
-                        'DIMENSION(NRES)']
+            self.parm.add_flag(
+                'RESIDUE_ICODE', '20a4', data=icodes,
+                comments=['Residue insertion code (iCode) read from PDB file; DIMENSION(NRES)']
             )
         if self.elements:
-            self.parm.add_flag('ATOM_ELEMENT', '20a4',
-                data=['%2s' % (_Element[atm.atomic_number].upper())
-                            for atm in self.parm.atoms
-                ], comments=['Atom element name read from topology file']
+            self.parm.add_flag(
+                'ATOM_ELEMENT', '20a4',
+                data=[f'{_Element[atm.atomic_number].upper():2s}' for atm in self.parm.atoms],
+                comments=['Atom element name read from topology file'],
             )
         self.parm.add_flag('ATOM_OCCUPANCY', '10F8.2', data=occupancies,
-                comments=['Atom occupancies read from the PDB file'])
+                           comments=['Atom occupancies read from the PDB file'])
         self.parm.add_flag('ATOM_BFACTOR', '10F8.2', data=tempfac,
-                comments=['Atom temperature factor from the PDB file'])
+                           comments=['Atom temperature factor from the PDB file'])
         self.parm.add_flag('ATOM_NUMBER', '10I8', data=atomnums,
-                comments=['Atom serial number from the PDB file'])
+                           comments=['Atom serial number from the PDB file'])
         self.parm.load_atom_info() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3308,8 +3262,8 @@ class deletePDB(Action):
 
     def __str__(self):
         if self.pdbpresent:
-            return 'Deleting PDB info from %s' % self.parm
-        return 'No PDB information present in %s. Doing nothing' % self.parm
+            return f'Deleting PDB info from {self.parm}'
+        return f'No PDB information present in {self.parm}. Doing nothing'
 
     def execute(self):
         if not self.pdbpresent: return
@@ -3366,24 +3320,21 @@ class add12_6_4(Action):
             else:
                 self.watermodel = self.watermodel.upper()
                 if not self.watermodel in self._supported_wms:
-                    raise LJ12_6_4Error('Unrecognized water model %s; pick one '
-                                        'of the following: %s' %
-                                        (self.watermodel,
-                                        ', '.join(self._supported_wms))
+                    supported_wms = ', '.join(self._supported_wms)
+                    raise LJ12_6_4Error(
+                        f"Unrecognized water model {self.watermodel}; pick one of the following: {supported_wms}"
                     )
         else:
             if self.watermodel is not None:
-                raise LJ12_6_4Error('c4file and watermodel are mutually '
-                                    'exclusive')
+                raise LJ12_6_4Error('c4file and watermodel are mutually exclusive')
 
     def __str__(self):
         retstr = ('Adding Lennard-Jones C-coefficient for 12-6-4 potential. '
-                  'Polarizabilities read from [%s]. ' % self.polfile)
+                  f'Polarizabilities read from [{self.polfile}]. ')
         if self.c4file is None:
-            retstr += ('Using default C4 parameters for water model [%s].' %
-                       self.watermodel)
+            retstr += f'Using default C4 parameters for water model [{self.watermodel}].'
         else:
-            retstr += 'Reading C4 parameters from [%s].' % self.c4file
+            retstr += f'Reading C4 parameters from [{self.c4file}].'
 
         return retstr
 
@@ -3393,9 +3344,9 @@ class add12_6_4(Action):
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
                 comments=['For 12-6-4 potential used for divalent metal ions'])
-        for i, param in enumerate(params(self.parm, self.mask, self.c4file,
-                                         self.watermodel, self.polfile,
-                                         self.tunfactor)):
+        for i, param in enumerate(
+            params(self.parm, self.mask, self.c4file, self.watermodel, self.polfile, self.tunfactor)
+        ):
             self.parm.parm_data['LENNARD_JONES_CCOEF'][i] = param
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3416,8 +3367,7 @@ class HMassRepartition(Action):
         self.new_h_mass = arg_list.get_next_float(optional=True, default=3.024)
 
     def __str__(self):
-        retstr = ('Repartitioning hydrogen masses to %s daltons. ' %
-                  self.new_h_mass)
+        retstr = f'Repartitioning hydrogen masses to {self.new_h_mass} daltons. '
         if self.changewater:
             return retstr + 'Also changing water hydrogen masses.'
         return retstr + 'Not changing water hydrogen masses.'
@@ -3440,8 +3390,7 @@ class HMassRepartition(Action):
                 heteroidx += 1
             if heteroatom is None:
                 # Only bonded to other hydrogens. Weird, but do not repartition
-                warnings.warn('H atom detected not bound to heteroatom. '
-                              'Ignoring.', ParmWarning)
+                warnings.warn('H atom detected not bound to heteroatom. Ignoring.', ParmWarning)
                 continue
             transfermass = self.new_h_mass - atom.mass
             atom.mass = self.new_h_mass
@@ -3458,9 +3407,9 @@ class HMassRepartition(Action):
                     atom.mass = original_masses[i]
                     if isinstance(self.parm, AmberParm):
                         self.parm.parm_data['MASS'][i] = original_masses[i]
-                raise HMassRepartitionError('Too much mass removed from atom '
-                                            '%d. Hydrogen masses must be '
-                                            'smaller.' % i)
+                raise HMassRepartitionError(
+                    f'Too much mass removed from atom {i}. Hydrogen masses must be smaller.'
+                )
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3502,11 +3451,11 @@ class OpenMM(Action):
 
     def __str__(self):
         return ("Running Amber-style simulation with OpenMM using the command "
-                "string:\n\t%s\nThis may take awhile..." % self.arg_list)
+                f"string:\n\t{self.arg_list}\nThis may take awhile...")
 
     def execute(self):
         """ Runs the OpenMM simulation """
-        from parmed.tools.simulations.openmm import simulate, HAS_OPENMM
+        from .simulations.openmm import simulate, HAS_OPENMM
         if not HAS_OPENMM:
             raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
         # First try to load a restart file if it was supplied
@@ -3584,15 +3533,13 @@ class energy(Action):
     output = sys.stdout
 
     def init(self, arg_list):
-        self.use_openmm = (arg_list.has_key('omm') or
-                    not isinstance(self.parm, AmberParm))
+        self.use_openmm = (arg_list.has_key('omm') or not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
         if self.use_openmm and isinstance(self.parm, AmoebaParm):
-            raise NotImplementedError('Amoeba prmtops can only get energies '
-                                      'from sander')
+            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
 
     def __str__(self):
-        return 'Computing a single-point energy for %s' % self.parm
+        return f'Computing a single-point energy for {self.parm}'
 
     def execute(self):
         if self.use_openmm:
@@ -3605,8 +3552,7 @@ class energy(Action):
             from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
                 raise SimulationError('sander could not be imported. Skipping.') # pragma: no cover
-            # Consume the OMM-specific arguments so we don't have any apparently
-            # unused arguments
+            # Consume the OMM-specific arguments so we don't have any apparently unused arguments
             self.arg_list.get_key_string('platform', None)
             self.arg_list.get_key_string('precision', None)
             self.arg_list.has_key('decompose')

@@ -27,8 +27,7 @@ except ImportError:
 LOGGER = logging.getLogger(__name__)
 
 _SCRIPT_HEADER = """\
-#!/usr/bin/env python
-from __future__ import division, print_function
+#!/usr/bin/env python3
 
 import os, sys
 
@@ -41,7 +40,6 @@ from parmed.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
 from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
 from parmed import unit as u
-from parmed.utils.six.moves import range
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')
