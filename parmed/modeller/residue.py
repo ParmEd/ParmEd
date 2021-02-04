@@ -508,6 +508,8 @@ class ResidueTemplate(object):
         # Ensure residue is connected
         import networkx as nx
         G = residue.to_networkx(False)
+        if nx.is_empty(G):
+            raise IncompatiblePatchError('Patch creates empty residue.')            
         if not nx.is_connected(G):
             components = [ c for c in nx.connected_components(G) ]
             raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
