@@ -21,15 +21,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330
 Boston, MA 02111-1307, USA.
 """
-from __future__ import division
-
-from collections import defaultdict
-from parmed import unit as u
-from parmed.constants import TINY, DEG_TO_RAD, RAD_TO_DEG
-from parmed.vec3 import Vec3
-from math import pi, cos, sin, sqrt, acos
-import numpy as np
 import warnings
+from collections import defaultdict
+from math import pi, cos, sin, sqrt, acos
+
+import numpy as np
+
+from . import unit as u
+from .constants import TINY, DEG_TO_RAD, RAD_TO_DEG
+from .vec3 import Vec3
 
 def box_lengths_and_angles_to_vectors(a, b, c, alpha, beta, gamma):
     """
