@@ -2,8 +2,6 @@
 This is a generalization of the readparm.AmberParm class to handle similar
 Amber-style files with %FLAG/%FORMAT tags
 """
-from __future__ import division, print_function
-
 from ..constants import PrmtopPointers, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC
 from ..exceptions import AmberError
 from ..formats.registry import FileFormatType
@@ -17,7 +15,7 @@ import re
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class FortranFormat(object):
+class FortranFormat:
     """
     Processes Fortran format strings according to the Fortran specification for
     such formats. This object handles reading and writing data with any valid

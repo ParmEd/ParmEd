@@ -144,12 +144,12 @@ class Action(metaclass=ActionType):
                 arg_list = ''
             elif isinstance(arg_list, str) and ' ' in arg_list.strip():
                 # arg_list has a space, so enclose it in quotes
-                arg_list = '"%s"  ' % arg_list
+                arg_list = f'"{arg_list}"  '
             else:
-                arg_list = '%s ' % arg_list
+                arg_list = f'{arg_list} '
             arg_list += ' '.join([self._format_arg(a) for a in args])
             for kw, item in kwargs.items():
-                arg_list += ' %s %s ' % (kw, self._format_arg(item))
+                arg_list += f' {kw} {self._format_arg(item)} '
         elif arg_list is None:
             arg_list = ArgumentList('')
         elif isinstance(arg_list, str):
@@ -169,46 +169,43 @@ class Action(metaclass=ActionType):
                 parm = int(parm)
             except ValueError:
                 if parm in self.parm_list:
-                    print('Using parm %s' % parm)
+                    print(f'Using parm {parm}')
                     self.parm = self.parm_list[parm]
                 else:
-                    warnings.warn('Cannot find parm %s. Skipping this action' % parm,
+                    warnings.warn(f'Cannot find parm {parm}. Skipping this action',
                                   SeriousParmWarning)
                     return # pragma: no cover
             else:
                 if parm >= 0 and parm < len(self.parm_list):
-                    print('Using parm %s' % self.parm_list[parm])
+                    print(f'Using parm {self.parm_list[parm]}')
                     self.parm = self.parm_list[parm]
                 else:
-                    warnings.warn('Cannot find parm %s. Skipping this action' % parm,
+                    warnings.warn(f'Cannot find parm {parm}. Skipping this action',
                                   SeriousParmWarning)
                     return # pragma: no cover
         if self.needs_parm:
             if (self.strictly_supported and
                     type(self.parm) not in self.strictly_supported):
-                raise ParmError('%s objects are not supported by this action' %
-                                type(self.parm).__name__)
+                raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
             elif not self.strictly_supported:
                 for cls in self.not_supported:
                     if type(self.parm) is cls:
-                        raise ParmError('%s objects are not supported by this action' %
-                                        type(self.parm).__name__)
+                        raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
                 for cls in self.supported_subclasses:
                     if isinstance(self.parm, cls):
                         break
                 else:
-                    raise ParmError('%s objects are not supported by this action' %
-                                    type(self.parm).__name__)
+                    raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
         self._arg_list = arg_list
         try:
             self.init(arg_list)
         except NoArgument:
-            cmdname = type(self).__name__
+            cmdname = self.__class__.__name__
             try:
-                usage = '%s %s' % (cmdname, self.usage)
+                usage = f"{cmdname} {self.usage}"
             except AttributeError:
                 usage = cmdname
-            Action.stderr.write("Bad command %s:\n\t%s\n" % (cmdname, usage))
+            Action.stderr.write(f"Bad command {cmdname}:\n\t{usage}\n")
             return
 
         # Check any unmarked commands
@@ -236,7 +233,7 @@ class Action(metaclass=ActionType):
         """
         arg = str(arg)
         if ' ' in arg or '\t' in arg:
-            return ' "%s" ' % arg
+            return f' "{arg}" '
         return arg
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -258,16 +255,15 @@ class parmout(Action):
 
     def __str__(self):
         if self.rst_name is not None:
-            return 'Outputting Amber topology file %s and restart %s' % (self.filename,
-                                                                         self.rst_name)
-        return 'Outputting Amber topology file %s' % self.filename
+            return f'Outputting Amber topology file {self.filename} and restart {self.rst_name}'
+        return f'Outputting Amber topology file {self.filename}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
-            raise FileExists('%s exists; not overwriting.' % self.filename)
+            raise FileExists(f'{self.filename} exists; not overwriting.')
         if self.rst_name is not None:
             if not Action.overwrite and os.path.exists(self.rst_name):
-                raise FileExists('%s exists; not overwriting.' % self.rst_name)
+                raise FileExists(f'{self.rst_name} exists; not overwriting.')
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
             self.parm.save(self.rst_name, format=self.rst7_format, overwrite=Action.overwrite)
@@ -320,21 +316,20 @@ class writeFrcmod(Action):
                     self.parm.parm_data['HBCUT'][idx-1] > 0):
                     warnings.warn('Frcmod dumping does not work with 10-12 prmtops',
                                   SeriousParmWarning)
-                    break # pragma: no cover
+                    break
         except IndexError:
-            pass # pragma: no cover
+            pass
 
     def __str__(self):
-        return 'Dumping FRCMOD file %s with parameters from %s' % (
-                self.frcmod_name, self.parm)
+        return f'Dumping FRCMOD file {self.frcmod_name} with parameters from {self.parm}'
 
     def execute(self):
         """ Writes the frcmod file """
         from parmed.amber.parameters import AmberParameterSet
         if not Action.overwrite and os.path.exists(self.frcmod_name):
-            raise FileExists('%s exists; not overwriting' % self.frcmod_name)
+            raise FileExists(f'{self.frcmod_name} exists; not overwriting')
         parmset = AmberParameterSet.from_structure(self.parm)
-        title = 'Force field parameters from %s' % os.path.split(str(self.parm))[1]
+        title = f'Force field parameters from {os.path.split(str(self.parm))[1]}'
         parmset.write(self.frcmod_name, title=title)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -350,7 +345,7 @@ class loadRestrt(Action):
         self.rst_name = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Loading restart file %s' % self.rst_name
+        return f'Loading restart file {self.rst_name}'
 
     def execute(self):
         self.parm.load_rst7(self.rst_name)
@@ -379,14 +374,14 @@ class loadCoordinates(Action):
         self.filename = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Adding coordinates to %s from %s' % (self.parm.name, self.filename)
+        return f'Adding coordinates to {self.parm.name} from {self.filename}'
 
     def execute(self):
         crd = load_file(self.filename, natom=len(self.parm.atoms), hasbox=self.parm.box is not None)
         try:
             self.parm.coordinates = crd.coordinates.copy()
         except AttributeError:
-            raise ParmError('Cannot get coordinates from %s' % self.filename)
+            raise ParmError(f'Cannot get coordinates from {self.filename}')
         self.parm.box = copy.copy(crd.box)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -419,8 +414,7 @@ class writeCoordinates(Action):
 
     Note, NetCDF files require scipy or netCDF4 to be installed.
     """
-    usage = ('<filename> [netcdftraj | netcdf | pdb | cif | restart | mdcrd | '
-             'mol2]')
+    usage = '<filename> [netcdftraj | netcdf | pdb | cif | restart | mdcrd | mol2]'
     def init(self, arg_list):
         self.filename = filename = arg_list.get_next_string()
         self.filetype = arg_list.get_next_string(optional=True, default='').lower()
@@ -433,8 +427,7 @@ class writeCoordinates(Action):
                 self.filetype = 'PDB'
             elif filename.endswith('.cif'):
                 self.filetype = 'CIF'
-            elif (filename.endswith('.rst7') or filename.endswith('.restrt') or
-                  filename.endswith('.inpcrd')):
+            elif any(filename.endswith(ext) for ext in ('.rst7', '.restrt', 'inpcrd')):
                 self.filetype = 'RESTART'
             elif filename.endswith('.mdcrd'):
                 self.filetype = 'MDCRD'
@@ -458,10 +451,10 @@ class writeCoordinates(Action):
             elif self.filetype == 'mol2':
                 self.filetype = 'MOL2'
             else:
-                raise InputError('Unrecognized file format %s' % self.filetype)
+                raise InputError(f'Unrecognized file format {self.filetype}')
 
     def __str__(self):
-        return 'Writing coordinates to %s as type %s' % (self.filename, self.filetype)
+        return f'Writing coordinates to {self.filename} as type {self.filetype}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
@@ -525,11 +518,11 @@ class writeOFF(Action):
         self.off_file = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Writing Amber OFF file %s' % self.off_file
+        return f'Writing Amber OFF file {self.off_file}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.off_file):
-            raise FileExists('%s exists; not overwriting' % self.off_file)
+            raise FileExists(f'{self.off_file} exists; not overwriting')
         if self.parm.coordinates is None:
             raise WriteOFFError('You must load a restart for WriteOFF!')
 
@@ -549,10 +542,10 @@ class changeRadii(Action):
         self.radii = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Changing PB/GB radii to %s' % self.radii
+        return f'Changing PB/GB radii to {self.radii}'
 
     def execute(self):
-        from parmed.tools.changeradii import ChRad
+        from .changeradii import ChRad
         # Add RADIUS_SET to prmtop if it's not there already, and a blank
         # description, since it's about to be set here
         if isinstance(self.parm, AmberParm):
@@ -587,8 +580,10 @@ class changeLJPair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ %s-%s pairwise interaction to have Rmin = %16.5f and Epsilon = '
-                '%16.5f') % (self.mask1, self.mask2, self.rmin, self.eps)
+        return (
+            f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+            f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
+        )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -633,8 +628,10 @@ class changeLJ14Pair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ 1-4 %s-%s pairwise interaction to have 1-4 Rmin = %16.5f and 1-4 '
-                'Epsilon = %16.5f' % (self.mask1, self.mask2, self.rmin, self.eps))
+        return (
+            f'Setting LJ 1-4 {self.mask1}-{self.mask2} pairwise interaction to have 1-4 '
+            f'Rmin = {self.rmin:16.5f} and 1-4 Epsilon = {self.eps:16.5f}'
+        )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -682,7 +679,7 @@ class checkValidity(Action):
         from parmed.tools.exceptions import WarningList
         # Clear our warnings and start logging them, since check_validity
         # reports concerns about the prmtop through the warning system.
-        warning_log = WarningList(empty_msg=('%s looks OK to me!' % self.parm))
+        warning_log = WarningList(empty_msg=f'{self.parm} looks OK to me!')
         check_validity(self.parm, warning_log)
         warning_log.dump(self.output)
 
@@ -715,10 +712,10 @@ class change(Action):
         elif prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE', 'TREE_CHAIN_CLASSIFICATION', 'ATOM_TYPE'):
             self.new_val = arg_list.get_next_string()
             if len(self.new_val) > 4:
-                warnings.warn('Only 4 letters allowed for %s entries! Truncating remaining '
-                              'letters.' % prop, ParmWarning)
+                warnings.warn(f'Only 4 letters allowed for {prop} entries! Truncating remaining letters.',
+                              ParmWarning)
                 self.new_val = self.new_val[:4]
-            self.new_val_str = '%-4s' % self.new_val
+            self.new_val_str = f'{self.new_val:<4s}'
         else:
             raise ParmedChangeError('You may only use "change" with CHARGE, MASS, RADII, SCREEN, '
                                     'ATOM_NAME, ATOM_TYPE, ATOM_TYPE_INDEX, ATOMIC_NUMBER, or '
@@ -726,7 +723,7 @@ class change(Action):
         if type(self.parm) is AmoebaParm:
             # Catch illegal values for Amoeba topologies
             if prop in ('CHARGE', 'RADII', 'SCREEN', 'ATOM_TYPE_INDEX'):
-                raise ParmedChangeError('You cannot change %s in Amoeba topologies' % prop)
+                raise ParmedChangeError(f'You cannot change {prop} in Amoeba topologies')
             if prop == 'ATOMIC_NUMBER':
                 # AmoebaParm can have an AMOEBA_ATOMIC_NUMBER section instead of
                 # ATOMIC_NUMBER. So see which of them is available and change
@@ -740,21 +737,21 @@ class change(Action):
     def __str__(self):
         atnums = self.mask.Selection()
         if sum(atnums) == 0:
-            return "change %s: Nothing to do" % self.prop
+            return f"change {self.prop}: Nothing to do"
         if self.quiet:
-            return "Changing %s of %s to %s" % (self.prop, self.mask, self.new_val)
-        string = ''
+            return f"Changing {self.prop} of {self.mask} to {self.new_val}"
+        parts = []
         for i, atom in enumerate(self.parm.atoms):
             if atnums[i] == 1:
-                string += "Changing %s of atom # %d (%s) from %s to %s\n" % (
-                    self.prop, i+1, atom.name, self.parm.parm_data[self.prop][i], self.new_val_str
+                parts.append(
+                    f"Changing {self.prop} of atom # {i + 1} ({atom.name}) from {self.parm.parm_data[self.prop][i]} to {self.new_val_str}"
                 )
-        return string
+        return "\n".join(parts) + "\n"
 
     def execute(self):
         atnums = self.mask.Selection()
         if sum(atnums) == 0:
-            warnings.warn('change %s: %s matches no atoms' % (self.prop,self.mask), ParmWarning)
+            warnings.warn(f'change {self.prop}: {self.mask} matches no atoms', ParmWarning)
             return
         if self.prop == 'ATOM_TYPE_INDEX':
             prop = 'nb_idx'
@@ -790,21 +787,22 @@ class printInfo(Action):
     def init(self, arg_list):
         self.flag = arg_list.get_next_string().upper()
         if not self.flag in self.parm.flag_list:
-            warnings.warn('%%FLAG %s not found!' % self.flag,
-                          SeriousParmWarning)
+            warnings.warn(f'%FLAG {self.flag} not found!', SeriousParmWarning)
             self.found = False # pragma: no cover
         else:
             if self.parm.formats[self.flag].type is float:
-                self.format = '%16.5f '
+                self.format = '{0:16.5f} '
+            elif self.parm.formats[self.flag].type is int:
+                self.format = '{0:<16d} '
             else:
-                self.format = '%-16s '
+                self.format = '{0:<16s} '
             self.found = True
 
     def __repr__(self):
         ret_str = []
         if self.found:
             for i, item in enumerate(self.parm.parm_data[self.flag]):
-                ret_str.append(self.format % item)
+                ret_str.append(self.format.format(item))
                 if i % 5 == 4:
                     ret_str.append('\n')
 
@@ -963,11 +961,12 @@ class scee(Action):
             dt.scee = self.scee_value
         if isinstance(self.parm, AmberParm):
             nptra = self.parm.ptr('nptra')
-            if not 'SCEE_SCALE_FACTOR' in self.parm.flag_list:
-                self.parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8',
-                                   data=[self.scee_value for i in range(nptra)])
+            scee_data = [self.scee_value for i in range(nptra)]
+            scee_flag = 'SCEE_SCALE_FACTOR'
+            if scee_flag not in self.parm.flag_list:
+                self.parm.add_flag(scee_flag, '5E16.8', data=scee_data)
             else:
-                self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value for i in range(nptra)]
+                self.parm.parm_data[scee_flag] = scee_data
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -988,11 +987,12 @@ class scnb(Action):
             dt.scnb = self.scnb_value
         if isinstance(self.parm, AmberParm):
             nptra = self.parm.ptr('nptra')
-            if not 'SCNB_SCALE_FACTOR' in self.parm.flag_list:
-                self.parm.add_flag('SCNB_SCALE_FACTOR','5E16.8',
-                                   data=[self.scnb_value for i in range(nptra)])
+            scnb_data = [self.scnb_value for i in range(nptra)]
+            scnb_flag = 'SCNB_SCALE_FACTOR'
+            if scnb_flag not in self.parm.flag_list:
+                self.parm.add_flag(scnb_flag, '5E16.8', data=scnb_data)
             else:
-                self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value for i in range(nptra)]
+                self.parm.parm_data[scnb_flag] = scnb_data
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1026,11 +1026,12 @@ class changeLJSingleType(Action):
 
     def __str__(self):
         if sum(self.mask.Selection()) == 0:
-            return "No atoms selected in %s. Nothing to do." % self.mask
-        return ("Changing %s Lennard-Jones well depth from %.4f to %.4f (kal/mol) and radius from "
-                "%.4f to %.4f (Angstroms)" % (self.mask, self.orig_depth, self.depth,
-                                              self.orig_radius, self.radius)
-               )
+            return f"No atoms selected in {self.mask}. Nothing to do."
+        return (
+            f"Changing {self.mask} Lennard-Jones well depth from {self.orig_depth:.4f} to "
+            f"{self.depth:.4f} (kal/mol) and radius from {self.orig_radius:.4f} to "
+            "{self.radius:.4f} (Angstroms)"
+        )
 
     def execute(self):
         from math import sqrt
@@ -1077,12 +1078,12 @@ class printDetails(Action):
 
     def __repr__(self):
         selection = self.mask.Selection()
-        retstr = ["\nThe mask %s matches %d atoms:\n\n" % (self.mask, sum(selection))]
+        retstr = [f"\nThe mask {self.mask} matches {sum(selection)} atoms:\n\n"]
         # Separate printout for Amoeba-style prmtop files
         if isinstance(self.parm, AmoebaParm):
-            retstr.append('%7s%7s%9s%6s%6s%7s%10s\n' % ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE',
-                                                        'At.#', 'Mass')
-                         )
+            retstr.append(
+                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}{'Mass':>10s}\n"
+            )
             for i, atm in enumerate(self.parm.atoms):
                 if not selection[i]: continue
                 retstr.append('%7d%7d%9s%6s%6s%7d%10.4f\n' % (
@@ -1136,50 +1137,47 @@ class printPointers(Action):
 
     def __repr__(self):
         ptrs = self.parm.parm_data['POINTERS']
-        ret_str = """
-NATOM (number of atoms in system)................= %d
-NTYPES (number of atom type names)...............= %d
-NBONH (number of bonds containing H).............= %d
-MBONA (number of bonds without H)................= %d
-NTHETH (number of angles containing H)...........= %d
-MTHETA (number of angles without H)..............= %d
-NPHIH (number of dihedrals containing H).........= %d
-MPHIA (number of dihedrals without H)............= %d
-NHPARM (currently unused)........................= %d
-NPARM (1 if made with addles, 0 if not)..........= %d
-NNB (number of excluded atoms)...................= %d
-NRES (number of residues in system)..............= %d
-NBONA (MBONA + constraint bonds).................= %d
-NTHETA (MTHETA + constraint angles)..............= %d
-NPHIA (MPHIA + constraint dihedrals).............= %d
-NUMBND (number of unique bond types).............= %d
-NUMANG (number of unique angle types)............= %d
-NPTRA (number of unique dihedral types)..........= %d
-NATYP (number of nonbonded atom types)...........= %d
-NPHB (number of distinct 10-12 H-bond pairs).....= %d
-IFPERT (1 if prmtop is perturbed; not used)......= %d
-NBPER (perturbed bonds; not used)................= %d
-NGPER (perturbed angles; not used)...............= %d
-NDPER (perturbed dihedrals; not used)............= %d
-MBPER (bonds in perturbed group; not used).......= %d
-MGPER (angles in perturbed group; not used)......= %d
-MDPER (diheds in perturbed group; not used)......= %d
-IFBOX (Type of box: 1=orthogonal, 2=not, 0=none).= %d
-NMXRS (number of atoms in largest residue).......= %d
-IFCAP (1 if solvent cap exists)..................= %d
-NUMEXTRA (number of extra points in topology)....= %d
-""" % tuple(ptrs[:31])
+        ret_str = f"""
+NATOM (number of atoms in system)................= {ptrs[0]:d}
+NTYPES (number of atom type names)...............= {ptrs[1]:d}
+NBONH (number of bonds containing H).............= {ptrs[2]:d}
+MBONA (number of bonds without H)................= {ptrs[3]:d}
+NTHETH (number of angles containing H)...........= {ptrs[4]:d}
+MTHETA (number of angles without H)..............= {ptrs[5]:d}
+NPHIH (number of dihedrals containing H).........= {ptrs[6]:d}
+MPHIA (number of dihedrals without H)............= {ptrs[7]:d}
+NHPARM (currently unused)........................= {ptrs[8]:d}
+NPARM (1 if made with addles, 0 if not)..........= {ptrs[9]:d}
+NNB (number of excluded atoms)...................= {ptrs[10]:d}
+NRES (number of residues in system)..............= {ptrs[11]:d}
+NBONA (MBONA + constraint bonds).................= {ptrs[12]:d}
+NTHETA (MTHETA + constraint angles)..............= {ptrs[13]:d}
+NPHIA (MPHIA + constraint dihedrals).............= {ptrs[14]:d}
+NUMBND (number of unique bond types).............= {ptrs[15]:d}
+NUMANG (number of unique angle types)............= {ptrs[16]:d}
+NPTRA (number of unique dihedral types)..........= {ptrs[17]:d}
+NATYP (number of nonbonded atom types)...........= {ptrs[18]:d}
+NPHB (number of distinct 10-12 H-bond pairs).....= {ptrs[19]:d}
+IFPERT (1 if prmtop is perturbed; not used)......= {ptrs[20]:d}
+NBPER (perturbed bonds; not used)................= {ptrs[21]:d}
+NGPER (perturbed angles; not used)...............= {ptrs[22]:d}
+NDPER (perturbed dihedrals; not used)............= {ptrs[23]:d}
+MBPER (bonds in perturbed group; not used).......= {ptrs[24]:d}
+MGPER (angles in perturbed group; not used)......= {ptrs[25]:d}
+MDPER (diheds in perturbed group; not used)......= {ptrs[26]:d}
+IFBOX (Type of box: 1=orthogonal, 2=not, 0=none).= {ptrs[27]:d}
+NMXRS (number of atoms in largest residue).......= {ptrs[28]:d}
+IFCAP (1 if solvent cap exists)..................= {ptrs[29]:d}
+NUMEXTRA (number of extra points in topology)....= {ptrs[30]:d}
+"""
         if len(ptrs) == 32:
-            ret_str += "NCOPY (number of PIMD slices/number of beads)....= %d\n" % ptrs[31]
+            ret_str += f"NCOPY (number of PIMD slices/number of beads)....= {ptrs[31]:d}\n"
         if self.parm.ptr('IFBOX'):
-            ret_str += "\nSOLVENT POINTERS\n" + """
-IPTRES (Final solute residue)....................= %d
-NSPM (Total number of molecules).................= %d
-NSPSOL (The first solvent "molecule")............= %d
-""" % (self.parm.parm_data['SOLVENT_POINTERS'][0],
-       self.parm.parm_data['SOLVENT_POINTERS'][1],
-       self.parm.parm_data['SOLVENT_POINTERS'][2])
-
+            ret_str += "\nSOLVENT POINTERS\n" + f"""
+IPTRES (Final solute residue)....................= {self.parm.parm_data['SOLVENT_POINTERS'][0]:d}
+NSPM (Total number of molecules).................= {self.parm.parm_data['SOLVENT_POINTERS'][1]:d}
+NSPSOL (The first solvent "molecule")............= {self.parm.parm_data['SOLVENT_POINTERS'][2]:d}
+"""
         return ret_str
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1204,56 +1202,27 @@ class setMolecules(Action):
         elif solute_ions.lower() == 'false':
             self.solute_ions = False
         else:
-            warnings.warn("Value of solute_ions is unrecognized [%s]! Assuming True" % solute_ions,
+            warnings.warn(f"Value of solute_ions is unrecognized [{solute_ions}]! Assuming True",
                           SeriousParmWarning)
             self.solute_ions = True # pragma: no cover
 
     def __str__(self):
-        return ("Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS "
-                "and ATOMS_PER_MOLECULE)")
+        return "Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS and ATOMS_PER_MOLECULE)"
 
     def execute(self):
         owner = self.parm.rediscover_molecules(self.solute_ions)
         if owner is not None:
             if self.parm.coordinates is None:
-                warnings.warn('The atoms in %s were reordered to correct molecule ordering. Any '
-                              'topology printed from now on will *not* work with the original '
-                              'inpcrd or trajectory files created with this prmtop! Consider '
-                              'quitting and loading a restart prior to using setMolecules' %
-                              self.parm, ParmWarning)
+                warnings.warn(
+                    f'The atoms in {self.parm} were reordered to correct molecule ordering. Any '
+                    'topology printed from now on will *not* work with the original inpcrd or '
+                    'trajectory files created with this prmtop! Consider quitting and loading a '
+                    'restart prior to using setMolecules',
+                    ParmWarning,
+                )
             # If we had to reorder our atoms, we need to remake our parm
             self.parm.remake_parm()
         self.parm.load_pointers()
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-#
-#class addCoarseGrain(Action):
-#    """
-#    Adds coarse graining information to the Amber topology file according to
-#    a given coarse graining parameter file
-#    """
-#    strictly_supported = (AmberParm,)
-#    usage = '<parameter_file>
-#    def init(self, arg_list):
-#        self.cg_param_file = arg_list.get_next_string()
-#        if not os.path.exists(self.cg_param_file):
-#            raise CoarseGrainError('Cannot find parameter file %s' %
-#                                    self.cg_param_file)
-#        # Check to see if we've already made this a coarsegrained file...
-#        if 'ANGLE_COEF_A' in self.parm.flag_list:
-#            warnings.warn('Prmtop already has coarse grained sections',
-#                        ParmWarning)
-#
-#    def __str__(self):
-#        return ("Setting up coarse graining for topology file using parameter "
-#                "file " + self.cg_param_file)
-#
-#    def execute(self):
-#        from parmed.tools.coarsegrain import addCoarseGrain as addCG
-#        if 'ANGLE_COEF_A' in self.parm.flag_list: return
-#        addCG(self.parm, self.cg_param_file)
-#
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class changeProtState(Action):
     """
