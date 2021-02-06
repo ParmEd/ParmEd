@@ -1078,31 +1078,34 @@ class printDetails(Action):
 
     def __repr__(self):
         selection = self.mask.Selection()
-        retstr = [f"\nThe mask {self.mask} matches {sum(selection)} atoms:\n\n"]
+        retstr = [f"\nThe mask {self.mask} matches {sum(selection)} atoms:\n"]
         # Separate printout for Amoeba-style prmtop files
         if isinstance(self.parm, AmoebaParm):
             retstr.append(
-                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}{'Mass':>10s}\n"
+                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}{'Mass':>10s}"
             )
             for i, atm in enumerate(self.parm.atoms):
-                if not selection[i]: continue
-                retstr.append('%7d%7d%9s%6s%6s%7d%10.4f\n' % (
-                              i+1, atm.residue.idx+1, atm.residue.name, atm.name, atm.type,
-                              atm.atomic_number, atm.mass)
-                             )
+                if not selection[i]:
+                    continue
+                retstr.append(
+                    f'{i + 1:7d}{atm.residue.idx + 1:7d}{atm.residue.name:>9s}{atm.name:>6s}'
+                    f'{atm.type:>6s}{atm.atomic_number:7d}{atm.mass:10.4f}'
+                )
         else:
-            retstr.append("%7s%7s%9s%6s%6s%7s%12s%12s%10s%10s%10s%10s\n" %
-                          ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'At.#', 'LJ Radius',
-                           'LJ Depth', 'Mass', 'Charge', 'GB Radius', 'GB Screen')
-                         )
+            retstr.append(
+                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}"
+                f"{'LJ Radius':>12s}{'LJ Depth':>12s}{'Mass':>10s}{'Charge':>10s}"
+                f"{'GB Radius':>10s}{'GB Screen':>10s}"
+            )
             for i, atm in enumerate(self.parm.atoms):
-                if not selection[i]: continue
-                retstr.append("%7d%7d%9s%6s%6s%7d%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n" %
-                              (i+1, atm.residue.idx+1, atm.residue.name, atm.name, atm.type,
-                               atm.atomic_number, atm.rmin, atm.epsilon, atm.mass, atm.charge,
-                               atm.solvent_radius, atm.screen)
-                             )
-        return ''.join(retstr)
+                if not selection[i]:
+                    continue
+                retstr.append(
+                    f'{i + 1:7d}{atm.residue.idx + 1:7d}{atm.residue.name:>9s}{atm.name:>6s}'
+                    f'{atm.type:>6s}{atm.atomic_number:7d}{atm.rmin:12.4f}{atm.epsilon:12.4f}'
+                    f'{atm.mass:10.4f}{atm.charge:10.4f}{atm.solvent_radius:10.4f}{atm.screen:10.4f}'
+                )
+        return '\n'.join(retstr) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1119,7 +1122,7 @@ class printFlags(Action):
 
     def __repr__(self):
         string = ['\n']
-        string.extend('%%FLAG %s\n' % flag for flag in self.parm.flag_list)
+        string.extend(f'%FLAG {flag}\n' for flag in self.parm.flag_list)
         return ''.join(string)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1240,8 +1243,7 @@ class changeProtState(Action):
         if sum(sel) == 0:
             return "No residues selected for state change"
         res = self.parm.atoms[sel.index(1)].residue
-        return 'Changing protonation state of residue %d (%s) to %d' % (res.idx+1, res.name,
-                                                                        self.state)
+        return f'Changing protonation state of residue {res.idx + 1} ({res.name}) to {self.state}'
 
     @staticmethod
     def _add_ash_glh(residues):
@@ -1249,7 +1251,8 @@ class changeProtState(Action):
         Adds ASH and GLH to the titratable residue list unless it's already
         there
         """
-        if 'ASH' in residues.titratable_residues: return None
+        if 'ASH' in residues.titratable_residues:
+            return None
         dummyrefene1 = residues._ReferenceEnergy()
         dummyrefene1_old = residues._ReferenceEnergy()
         dummyrefene1_old.set_pKa(1.0)
@@ -1282,7 +1285,7 @@ class changeProtState(Action):
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
     def execute(self):
-        from parmed.amber import titratable_residues as residues
+        from ..amber import titratable_residues as residues
         changeProtState._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
@@ -1292,16 +1295,18 @@ class changeProtState(Action):
         # Get the charges from cpin_data. The first 2 elements are energy and
         # proton count so the charges are chgs[2:]
         if not resname in residues.titratable_residues:
-            raise ChangeStateError("Residue %s isn't defined as a titratable "
-                                   "residue in titratable_residues.py" % resname)
+            raise ChangeStateError(f"Residue {resname} isn't defined as a titratable "
+                                   "residue in titratable_residues.py")
         if not getattr(residues, resname).typ == "ph":
-            raise ChangeStateError('Redidue %s is not a pH titratable residue' % resname)
+            raise ChangeStateError(f'Redidue {resname} is not a pH titratable residue')
 
         res = getattr(residues, resname)
 
         if self.state >= len(res.states):
-            raise ChangeStateError('Residue %s only has titratable states 0--%d. You chose state %d'
-                                   % (resname, len(res.states)-1, self.state))
+            raise ChangeStateError(
+                f'Residue {resname} only has titratable states 0--{len(res.states) - 1}. '
+                f'You chose state {self.state}'
+            )
 
         if sum(sel) != len(res.states[self.state].charges):
             raise ChangeStateError('You must select one and only one entire titratable residue')
@@ -1313,7 +1318,7 @@ class changeProtState(Action):
                                        'change the protonation state')
             # Actually make the change
             self.parm.parm_data['CHARGE'][atom.idx] = atom.charge = charges[i]
-            
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class changeRedoxState(Action):
@@ -1332,8 +1337,7 @@ class changeRedoxState(Action):
         if sum(sel) == 0:
             return "No residues selected for state change"
         res = self.parm.atoms[sel.index(1)].residue
-        return 'Changing reduction state of residue %d (%s) to %d' % (res.idx+1, res.name,
-                                                                        self.state)
+        return f'Changing reduction state of residue {res.idx + 1} ({res.name}) to {self.state}'
 
     def execute(self):
         from parmed.amber import titratable_residues as residues
@@ -1345,16 +1349,18 @@ class changeRedoxState(Action):
         # Get the charges from cein_data. The first 2 elements are energy and
         # electron count so the charges are chgs[2:]
         if not resname in residues.titratable_residues:
-            raise ChangeStateError("Residue %s isn't defined as a titratable "
-                                   "residue in titratable_residues.py" % resname)
+            raise ChangeStateError(f"Residue {resname} isn't defined as a titratable "
+                                   "residue in titratable_residues.py")
         if not getattr(residues, resname).typ == "redox":
-            raise ChangeStateError('Redidue %s is not a redox potential titratable residue' % resname)
+            raise ChangeStateError(f'Redidue {resname} is not a redox potential titratable residue')
 
         res = getattr(residues, resname)
 
         if self.state >= len(res.states):
-            raise ChangeStateError('Residue %s only has titratable states 0--%d. You chose state %d'
-                                   % (resname, len(res.states)-1, self.state))
+            raise ChangeStateError(
+                f'Residue {resname} only has titratable states 0--{len(res.states) - 1}. '
+                f'You chose state {self.state}'
+            )
 
         if sum(sel) != len(res.states[self.state].charges):
             raise ChangeStateError('You must select one and only one entire titratable residue')
@@ -1381,12 +1387,14 @@ class netCharge(Action):
         self.mask = AmberMask(self.parm, mask)
 
     def __str__(self):
-        return 'The net charge of %s is %.4f' % (self.mask,
-            sum([self.parm.atoms[i].charge for i in self.mask.Selected()]))
+        return f'The net charge of {self.mask} is {self._net_charge():.4f}'
+
+    def _net_charge(self):
+        return sum([self.parm.atoms[i].charge for i in self.mask.Selected()])
 
     def execute(self):
         """ Calculates the charge of all atoms selected in mask """
-        return sum([self.parm.atoms[i].charge for i in self.mask.Selected()])
+        return self._net_charge()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1404,8 +1412,7 @@ class strip(Action):
         self.num_atoms = sum(self.mask.Selection())
 
     def __str__(self):
-        retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
-                    (self.mask, self.num_atoms)]
+        retstr = [f"Removing mask '{self.mask}' ({self.num_atoms} atoms) from the topology file."]
         if self.nobox:
             retstr.append('Deleting box info.')
         return ' '.join(retstr)
@@ -1436,7 +1443,7 @@ class defineSolvent(Action):
         residue.SOLVENT_NAMES = self.res_list.split(',')
 
     def __str__(self):
-        return "Residues %s are now considered to be solvent" % self.res_list
+        return f"Residues {self.res_list} are now considered to be solvent"
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1456,8 +1463,7 @@ class addExclusions(Action):
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
 
     def __str__(self):
-        return 'Adding atoms from %s to exclusion lists of atoms in %s' % (
-            self.mask2, self.mask1)
+        return f'Adding atoms from {self.mask2} to exclusion lists of atoms in {self.mask1}'
 
     def execute(self):
         # Loop through both selections and add each selected atom in sel2 to
@@ -1467,7 +1473,8 @@ class addExclusions(Action):
             for j in self.mask2.Selected():
                 atm2 = self.parm.atoms[j]
                 # Skip over atm1 == atm2
-                if atm1 is atm2: continue
+                if atm1 is atm2:
+                    continue
                 # Add each other to each other's exclusion lists.
                 atm1.exclude(atm2)
                 self.parm.atoms.changed = True
@@ -1493,17 +1500,16 @@ class printBonds(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%19s %19s %10s %10s' %
-                        ('Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
+        retstr = [f"{'Atom 1':>19s} {'Atom 2':>19s} {'R eq':>10s} {'Frc Cnst':>10s}"]
         # Loop through all of the bonds without and inc hydrogen
         atomsel = set(self.mask.Selected())
         atomsel2 = set(self.mask2.Selected())
         do_measured = self.parm.coordinates is not None
         do_energy = all(b.type is not None for b in self.parm.bonds)
         if do_measured:
-            retstr.append(' %10s' % 'Distance')
+            retstr.append(f" {'Distance':>10s}")
             if do_energy:
-                retstr.append(' %10s' % 'Energy')
+                retstr.append(f" {'Energy':>10s}")
         retstr.append('\n')
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
@@ -1514,18 +1520,19 @@ class printBonds(Action):
                 found = True
             if not found: continue
             if bond.type is not None:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f' % (
-                        atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, bond.type.req, bond.type.k)
+                retstr.append(
+                    f"{atom1.idx + 1:7d} {atom1.name:>4s} ({str(atom1.type):>4s}) {atom2.idx + 1:7d} "
+                    f"{atom2.name:>4s} ({str(atom2.type):>4s}) {bond.type.req:10.4f} {bond.type.k:10.4f}"
                 )
             else:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s' % (
-                        atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, 'N/A', 'N/A'))
+                retstr.append(
+                    f"{atom1.idx + 1:7d} {atom1.name:>4s} ({str(atom1.type):>4s}) {atom2.idx + 1:7d} "
+                    f"{atom2.name:>4s} ({str(atom2.type):>4s}) {'N/A':>10s} {'N/A':>10s}"
+                )
             if do_measured:
-                retstr.append(' %10.4f' % bond.measure())
+                retstr.append(f' {bond.measure():10.4f}')
                 if do_energy:
-                    retstr.append(' %10.4f' % bond.energy())
+                    retstr.append(f' {bond.energy():10.4f}')
             retstr.append('\n')
         return ''.join(retstr)
 
@@ -1560,8 +1567,7 @@ class printAngles(Action):
         return self.__repr__()
 
     def __repr__(self):
-        retstr = ['%19s  %19s  %19s %10s %10s' %
-                        ('Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
+        retstr = [f"{'Atom 1':>19s}  {'Atom 2':>19s}  {'Atom 3':>19s} {'Frc Cnst':>10s} {'Theta eq':>10s}"]
         do_measured = self.parm.coordinates is not None
         do_energy = all(a.type is not None for a in self.parm.angles)
         if do_measured:
