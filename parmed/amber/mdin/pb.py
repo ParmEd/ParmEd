@@ -3,10 +3,15 @@ This module contains all of the pb namelist variables for the amber
 programs and automatically loads those dictionaries with the default
 values found in that program (sander or sander.APBS)
 """
+from dataclasses import dataclass, field
+from typing import Dict
 
+from .typing import InputDataType
+
+@dataclass
 class pb:
 
-    sander = {
+    sander: Dict[str, InputDataType] = {
         'epsin' : 1.0, 'epsout' : 80.0, 'smoothopt' : 1,
         'istrng' : 0.0, 'pbtemp' : 300.0, 'radiopt' : 1,
         'dprob' : 1.4, 'iprob' : 2.0, 'npbopt' : 0, 'solvopt' : 1,
@@ -29,7 +34,7 @@ class pb:
         'mctrdz' : 0.0, 'mprob' : 2.7, 'poretype': 1, 'npbverb' : 0,
     }
 
-    sanderAPBS = {
+    sanderAPBS: Dict[str, InputDataType] = {
         'dime' : '0,0,0', 'pdime' : '0,0,0', 'cglen' : '0,0,0',
         'fglen' : '0,0,0', 'grid' : '0,0,0', 'nlev' : 4,
         'nonlin' : 0, 'bcfl' : 1, 'nion' : 0, 'pdie' : 2.0,

@@ -53,9 +53,9 @@ Things I would like to see, but are not as important:
 Target Python Version
 ---------------------
 
-ParmEd officially supports Python 3.6+ in the same code base
+ParmEd officially supports Python 3.7+ in the same code base
 
-In addition to supporting CPython 3.6+, ParmEd also strives to support
+In addition to supporting CPython 3.7+, ParmEd also strives to support
 the ``pypy`` interpreter.  Under the ``pypy`` interpreter, PDB file parsing
 is about 3-5x faster *using the same code*. Since ParmEd parses a substantial
 amount of metadata from RCSB/wwPDB files, the added efficiency can be useful for

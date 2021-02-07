@@ -3,10 +3,15 @@ This module contains all of the cntrl namelist variables for the
 different amber programs and automatically loads those dictionaries
 with the default values found in that program (sander or pmemd).
 """
+from dataclasses import dataclass, field
+from typing import Dict
 
+from .typing import InputDataType
+
+@dataclass
 class cntrl:
 
-    sander  = {
+    sander: Dict[str, InputDataType] = {
         'irest': 0, 'ibelly' : 0, 'ntx' : 1, 'ntxo' : 1,
         'ntcx' : 0, 'ig' : 71277, 'tempi' : 0.0, 'ntb' : -1, 'ntt' : 0,
         'nchain' : 1, 'temp0' : 300.0, 'tautp' : 1.0, 'ntp' : 0,
@@ -65,7 +70,7 @@ class cntrl:
         'mcbarint' : 100, 'lj1264' : 0,
     }
 
-    pmemd = {
+    pmemd: Dict[str, InputDataType] = {
         'imin' : 0, 'nmropt' : 0, 'ntx' : 1, 'irest' : 0,
         'ntrx' : 1, 'ntxo' : 1, 'ntpr' : 50, 'ntave' : 0, 'ntwr' : 500,
         'iwrap' : 0, 'ntwx' : 0, 'ntwv' : 0, 'ntwe' : 0, 'ioutfm' : 0,

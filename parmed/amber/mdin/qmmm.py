@@ -3,10 +3,15 @@ This module contains all of the qmmm namelist variables for the
 amber programs and automatically loads those dictionaries with the
 default values found in that program (sander only).
 """
+from dataclasses import dataclass, field
+from typing import Dict
 
+from .typing import InputDataType
+
+@dataclass
 class qmmm:
 
-    sander = {
+    sander: Dict[str, InputDataType] = {
         'qmcut' : -1, 'iqmatoms' : '', 'qmmask' : '', 'qmgb' : 2,
         'qm_theory' : '', 'qmcharge' : 0, 'qmqmdx' : 1,
         'verbosity' : 0, 'tight_p_conv' : 0, 'scfconv' : 1.0e-8,
