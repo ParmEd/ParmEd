@@ -27,37 +27,18 @@ from ..topologyobjects import DihedralType, ImproperType, DrudeAtom
 try:
     from lxml import etree
     _have_lxml = True
+    def pretty_print(tree):
+        return etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
 except ImportError:
+    from xml.dom import minidom
     from xml.etree import ElementTree as etree
     _have_lxml = False
-
-def _pretty_print_lxml(tree):
-    return etree.tostring(tree, encoding=DEFAULT_ENCODING, pretty_print=True).decode('utf-8')
-
-def _pretty_print_xml_stdlib(tree):
-    from xml.dom import minidom
-    xml = etree.tostring(tree.getroot(), encoding=DEFAULT_ENCODING).decode('utf-8')
-    return minidom.parseString(xml).toprettyxml(indent="  ")
-
-if _have_lxml:
-    pretty_print = _pretty_print_lxml
-else:
-    pretty_print = _pretty_print_xml_stdlib
+    def pretty_print(tree):
+        xml = etree.tostring(tree.getroot(), encoding=DEFAULT_ENCODING).decode('utf-8')
+        return minidom.parseString(xml).toprettyxml(indent="  ")
 
 import logging
 LOGGER = logging.getLogger(__name__)
-
-def needs_lxml(func):
-    """
-    Decorator to raise an ImportError if a function requires lxml but it is not
-    present
-    """
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if etree is None:
-            raise ImportError('required package lxml could not be found')
-        return func(*args, **kwargs)
-    return wrapper
 
 class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=FileFormatType):
     """ Class storing parameters from an OpenMM parameter set
@@ -294,7 +275,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             return atom.drude_type
         return atom.type
 
-    @needs_lxml
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
               improper_dihedrals_ordering='default', charmm_imp=False, skip_duplicates=True):
         """ Write the parameter set to an XML file for use with OpenMM
@@ -559,7 +539,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         # TODO: Is there any other data that is rendered to ffxml files we should include?
         return hash(hash_info)
 
-    @needs_lxml
     def _write_omm_provenance(self, root, provenance):
         info = etree.SubElement(root, 'Info')
 
@@ -589,7 +568,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 else:
                     raise TypeError(f'Incorrect type of the {tag} element content')
 
-    @needs_lxml
     def _write_omm_atom_types(self, xml_root, skip_types, skip_residues):
         if not self.atom_types: return
         xml_section = etree.SubElement(xml_root, "AtomTypes")
@@ -636,7 +614,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             wy1="0", wy2="-1", wy3="1",
             p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
 
-    @needs_lxml
     def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
@@ -719,7 +696,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
         return [valid_residues_for_patch, valid_patches_for_residue]
 
-    @needs_lxml
     def _write_omm_patches(self, xml_root, valid_residues_for_patch, write_apply_to_residue=False):
         """
         Write patch definitions for OpenMM ForceField
@@ -826,7 +802,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             for command, attrib in instructions:
                 etree.SubElement(patch_xml, command, dict(attrib))
 
-    @needs_lxml
     def _write_omm_bonds(self, xml_root, skip_types):
         if not self.bond_types: return
         xml_force = etree.SubElement(xml_root, 'HarmonicBondForce')
@@ -842,7 +817,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             bonds_done.add((a2, a1))
             etree.SubElement(xml_force, 'Bond', class1=a1, class2=a2, length=str(bond.req*lconv), k=str(bond.k*kconv))
 
-    @needs_lxml
     def _write_omm_angles(self, xml_root, skip_types):
         if not self.angle_types: return
         xml_force = etree.SubElement(xml_root, 'HarmonicAngleForce')
@@ -856,7 +830,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             angles_done.add((a3, a2, a1))
             etree.SubElement(xml_force, 'Angle', class1=a1, class2=a2, class3=a3, angle=str(angle.theteq*tconv), k=str(angle.k*kconv))
 
-    @needs_lxml
     def _write_omm_dihedrals(self, xml_root, skip_types, improper_dihedrals_ordering):
         if not self.dihedral_types and not self.improper_periodic_types: return
         # In ParameterSet, dihedral_types is *always* of type DihedralTypeList.
@@ -902,7 +875,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             etree.SubElement(xml_force, 'Improper', class1=a1, class2=nowild(a2), class3=nowild(a3), class4=nowild(a4),
                        periodicity1=str(improp.per), phase1=str(improp.phase*pconv), k1=str(improp.phi_k*kconv))
 
-    @needs_lxml
     def _write_omm_impropers(self, xml_root, skip_types):
         if not self.improper_types: return
         xml_force = etree.SubElement(xml_root, 'CustomTorsionForce', energy="k*(theta-theta0)^2")
@@ -917,7 +889,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             etree.SubElement(xml_force, 'Improper', class1=nowild(a1), class2=nowild(a2), class3=nowild(a3), class4=nowild(a4),
                        k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
 
-    @needs_lxml
     def _write_omm_urey_bradley(self, xml_root, skip_types):
         if not self.urey_bradley_types: return None
         xml_root.append( etree.Comment("Urey-Bradley terms") )
@@ -933,7 +904,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             if urey == NoUreyBradley: continue
             etree.SubElement(xml_force, 'UreyBradley', class1=a1, class2=a2, class3=a3, d=str(urey.req*length_conv), k=str(urey.k*frc_conv))
 
-    @needs_lxml
     def _write_omm_cmaps(self, xml_root, skip_types):
         if not self.cmap_types: return
         xml_force = etree.SubElement(xml_root, 'CMAPTorsionForce')
@@ -962,7 +932,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             etree.SubElement(xml_force, 'Torsion', map=str(maps[id(cmap)]),
                        class1=a1, class2=a2, class3=a3, class4=a4, class5=a5)
 
-    @needs_lxml
     def _write_omm_nonbonded(self, xml_root, skip_types, separate_ljforce):
         if not self.atom_types: return
         # Compute conversion factors for writing in natrual OpenMM units.
@@ -1022,7 +991,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             attributes = { 'class' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
             etree.SubElement(xml_force, 'Atom', **attributes)
 
-    @needs_lxml
     def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
         if not self.nbfix_types and not separate_ljforce: return
         # Convert Conversion factors for writing in natural OpenMM units
@@ -1090,7 +1058,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             sigma = rmin/(2**(1.0/6))
             etree.SubElement(xml_force, 'NBFixPair', class1=atom_types[0], class2=atom_types[1], sigma=str(sigma), epsilon=str(emin))
 
-    @needs_lxml
     def _write_omm_DrudeForce(self, xml_root, skip_types):
         # Find all atoms with Drude particles.
         drude_atoms = []
