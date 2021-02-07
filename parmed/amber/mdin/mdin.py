@@ -23,7 +23,7 @@ def addOn(line, string, file):
         return line + string
 
 
-class Mdin(object):
+class Mdin:
 
     def __init__(self, program = 'sander', verbosity = 1):
         # define instance data
