@@ -1,8 +1,7 @@
 """
 Tests the parmed/structure module
 """
-from __future__ import division
-
+from io import StringIO
 import bz2
 import gzip
 from copy import copy
@@ -13,9 +12,6 @@ from parmed.exceptions import CharmmWarning, ParameterWarning
 import parmed.structure as structure
 from parmed.topologyobjects import *
 import parmed.unit as u
-from parmed.utils.six.moves import StringIO
-from parmed.utils.six import integer_types
-from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
 import random
 import string
@@ -689,7 +685,7 @@ class TestStructureAdd(unittest.TestCase):
                     cmp_atoms(a1, a2)
                 if hasattr(v1, 'type'):
                     self.assertEqual(v1.type, v2.type)
-                    if not isinstance(v1.type, integer_types):
+                    if not isinstance(v1.type, int):
                         if v1.type is None:
                             self.assertIs(v2.type, None)
                         else:
@@ -803,7 +799,7 @@ class TestStructureAdd(unittest.TestCase):
                     cmp_atoms(a1, a2)
                 if hasattr(v1, 'type'):
                     self.assertEqual(v1.type, v2.type)
-                    if not isinstance(v1.type, integer_types):
+                    if not isinstance(v1.type, int):
                         self.assertIsNot(v1.type, v2.type)
         chk_valence(s.bonds, s1.bonds+s2.bonds)
         chk_valence(s.angles, s1.angles+s2.angles)

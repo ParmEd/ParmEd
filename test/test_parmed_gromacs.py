@@ -7,6 +7,7 @@ import sys
 import os
 import unittest
 import warnings
+from io import StringIO
 
 import numpy as np
 
@@ -20,7 +21,6 @@ from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.gromacs._gromacsfile import GromacsFile
 from parmed import gromacs as gmx, periodic_table
 from parmed.topologyobjects import UnassignedAtomType
-from parmed.utils.six.moves import range, zip, StringIO
 from utils import (get_fn, diff_files, get_saved_fn, FileIOTestCase, HAS_GROMACS,
                    create_random_structure)
 import utils

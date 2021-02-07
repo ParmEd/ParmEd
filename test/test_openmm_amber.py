@@ -1,8 +1,6 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division, print_function, absolute_import
-
 from collections import defaultdict
 from copy import copy
 from math import sqrt
@@ -12,7 +10,6 @@ from parmed.exceptions import ParameterError
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
-from parmed.utils.six.moves import range, zip
 import parmed.tools as PT
 import sys
 import unittest

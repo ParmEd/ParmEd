@@ -1,8 +1,8 @@
 """
 Tests parmed.formats package
 """
-from __future__ import division
 import utils
+from io import StringIO
 
 from copy import copy
 import numpy as np
@@ -12,8 +12,6 @@ from parmed import (amber, charmm, exceptions, formats, gromacs, residue, Struct
 from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
-from parmed.utils.six import iteritems, add_metaclass
-from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
 import sys
@@ -44,14 +42,14 @@ class TestFileLoader(FileIOTestCase):
         fn = self.get_fn('test', written=True)
         with open(fn, 'w'):
             pass
-        for name, cls in iteritems(PARSER_REGISTRY):
+        for name, cls in PARSER_REGISTRY.items():
             self.assertFalse(cls.id_format(fn))
 
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_load_amber_prmtop(self):
@@ -1214,7 +1212,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in iteritems(a1.other_locations):
+                for key, oa in a1.other_locations.items():
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa
@@ -2160,8 +2158,7 @@ class TestRegistry(FileIOTestCase):
     def test_file_format_type(self):
         """ Tests the FileFormatType metaclass """
         def create_metaclass():
-            @add_metaclass(formats.registry.FileFormatType)
-            class PDBFile(object):
+            class PDBFile(metaclass=formats.registry.FileFormatType):
                 def id_format(fname):
                     return False
                 def parse(fname):
@@ -2189,7 +2186,7 @@ class TestFileDownloader(unittest.TestCase):
         self.assertTrue(amber.AmberOFFLibrary.id_format(self.url + 'amino12.lib'))
         off = amber.AmberOFFLibrary.parse(self.url + 'amino12.lib')
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_download_amber_prmtop(self):

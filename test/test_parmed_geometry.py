@@ -1,13 +1,11 @@
 """
 Tests the routines in the parmed.geometry module
 """
-from __future__ import division
 import utils
 
 from parmed import Atom
 from parmed import geometry as geo
 from parmed import unit as u
-from parmed.utils.six.moves import zip
 import math
 import unittest
 import numpy as np

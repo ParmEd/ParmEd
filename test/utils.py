@@ -13,8 +13,6 @@ from typing import Union
 import numpy as np
 
 from parmed import gromacs, openmm
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 
 try:
     from simtk import openmm as mm
@@ -197,7 +195,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
         raise ValueError('Cannot specify absolute_error AND relative_error')
     if absolute_error is not None: absolute_error = float(absolute_error)
     if relative_error is not None: relative_error = float(relative_error)
-    if isinstance(file1, string_types):
+    if isinstance(file1, str):
         try:
             f1 = open(file1, 'r')
         except IOError:
@@ -206,7 +204,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
     else:
         f1 = file1
         file1 = str(file1)
-    if isinstance(file2, string_types):
+    if isinstance(file2, str):
         try:
             f2 = open(file2, 'r')
         except IOError:

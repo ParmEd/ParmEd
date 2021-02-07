@@ -1,8 +1,5 @@
 """ Tests the functionality in parmed/parameters.py """
-from __future__ import division, print_function
-
 import parmed as pmd
-from parmed.utils.six import iteritems
 import unittest
 from utils import get_fn
 import warnings
@@ -77,7 +74,7 @@ class TestParameterSet(unittest.TestCase):
 
         params = pmd.ParameterSet.from_structure(struct)
         self.assertEqual(len(params.urey_bradley_types), 2)
-        for key, ubt in iteritems(params.urey_bradley_types):
+        for key, ubt in params.urey_bradley_types.items():
             self.assertEqual(len(key), 3)
             self.assertEqual(ubt.req, 2.0)
             self.assertEqual(ubt.k, 150.0)

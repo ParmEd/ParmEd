@@ -1,9 +1,8 @@
 """
 Tests the functionality in parmed.modeller
 """
-from __future__ import division
-
 from copy import copy
+from io import StringIO
 import numpy as np
 try:
     import pandas as pd
@@ -18,15 +17,12 @@ import parmed as pmd
 from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
 from parmed.exceptions import AmberWarning, Mol2Error
-from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer,
-                             PatchTemplate,
+from parmed.modeller import (ResidueTemplate, ResidueTemplateContainer, PatchTemplate,
                              PROTEIN, SOLVENT, StandardBiomolecularResidues)
 from parmed.formats import Mol2File, PDBFile
 from parmed.geometry import distance2
 from parmed.exceptions import MoleculeError
 from parmed.utils import find_atom_pairs
-from parmed.utils.six import iteritems
-from parmed.utils.six.moves import zip, range, StringIO
 from parmed.tools import changeRadii
 import random
 import sys
@@ -830,7 +826,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         """ Tests reading Amber amino12 OFF library (internal residues) """
         offlib = AmberOFFLibrary.parse(get_fn('amino12.lib'))
         self.assertEqual(len(offlib), 28)
-        for name, res in iteritems(offlib):
+        for name, res in offlib.items():
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertEqual(res.head.name, 'N')
@@ -930,7 +926,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         """ Test reading N-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in iteritems(offlib):
+        for name, res in offlib.items():
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertIs(res.head, None)
@@ -941,7 +937,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         """ Test reading C-terminal amino acid Amber OFF library """
         offlib = AmberOFFLibrary.parse(get_fn('aminoct12.lib'))
         self.assertEqual(len(offlib), 26)
-        for name, res in iteritems(offlib):
+        for name, res in offlib.items():
             self.assertIsInstance(res, ResidueTemplate)
             self.assertEqual(name, res.name)
             self.assertEqual(res.head.name, 'N')
@@ -952,7 +948,7 @@ class TestAmberOFFLibrary(utils.FileIOTestCase):
         # Turn off warnings... the solvents.lib file is SO broken.
         offlib = AmberOFFLibrary.parse(get_fn('solvents.lib'))
         self.assertEqual(len(offlib), 24)
-        for name, res in iteritems(offlib):
+        for name, res in offlib.items():
             self.assertEqual(res.name, name)
             if 'BOX' in name:
                 self.assertIsInstance(res, ResidueTemplateContainer)
@@ -1270,7 +1266,7 @@ class TestBondDetermination(utils.FileIOTestCase):
 
     def test_simple_bond_assignment(self):
         """ Tests the assignment of bonds to simple Structure instances """
-        for name, res in iteritems(StandardBiomolecularResidues):
+        for name, res in StandardBiomolecularResidues.items():
             s = Structure()
             for a in res.atoms:
                 s.add_atom(copy(a), name, 1)

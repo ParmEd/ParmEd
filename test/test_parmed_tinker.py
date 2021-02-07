@@ -6,7 +6,6 @@ from utils import get_fn
 import unittest
 import parmed as pmd
 from parmed.tinker import parameterfile, system, tinkerfiles
-from parmed.utils.six.moves import zip
 
 class TestTinkerFiles(unittest.TestCase):
 

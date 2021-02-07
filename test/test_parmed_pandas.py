@@ -1,13 +1,11 @@
 """
 Tests the pandas functionality of the parmed/structure module
 """
-from __future__ import division, print_function, absolute_import
 from utils import get_fn
 
 import parmed.structure as structure
 from parmed import load_file
 from parmed.topologyobjects import Atom
-from parmed.utils.six.moves import zip
 import numpy as np
 import os
 import unittest

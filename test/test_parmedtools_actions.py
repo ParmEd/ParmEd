@@ -1,9 +1,8 @@
 """
 Tests for the various actions in ParmEd
 """
-from __future__ import division, print_function
-
 from copy import copy
+from io import StringIO
 import numpy as np
 import os
 import parmed as pmd
@@ -13,8 +12,6 @@ from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils import PYPY
-from parmed.utils.six.moves import range, zip, StringIO
-from parmed.utils.six import string_types, iteritems
 import parmed.unit as u
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
@@ -1994,32 +1991,28 @@ Basic MD simulation
         from parmed.tools.add1264 import DEFAULT_C4_PARAMS
         fn = self.get_fn('c4file', written=True)
         with open(fn, 'w') as f:
-            for items in iteritems(DEFAULT_C4_PARAMS['TIP4PEW']):
+            for items in DEFAULT_C4_PARAMS['TIP4PEW'].items():
                 f.write('%s %s\n' % items)
         parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
         PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
-        act = PT.add12_6_4(parm, ':MG', c4file=fn,
-                     polfile=self.get_fn('lj_1264_pol.dat'))
+        act = PT.add12_6_4(parm, ':MG', c4file=fn, polfile=self.get_fn('lj_1264_pol.dat'))
         act.execute()
         str(act)
         parm.write_parm(self.get_fn('Mg_ti1_b_1264.parm7', written=True))
-        self.assertTrue(diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
-                                   get_saved_fn('Mg_ti1_b_1264.parm7'))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
     def test_add_12_6_4_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(self.get_fn('mg_na_cl.parm7'))
         parm2 = AmberParm(self.get_fn('na_cl_mg.parm7'))
-        PT.add12_6_4(parm1, ':MG,NA,CL',
-                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
-        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P',
-                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
-        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')),
-                         saved.PRINTLJMATRIX_MGNACL)
-        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
-                         saved.PRINTLJMATRIX_NACLMG)
+        PT.add12_6_4(parm1, ':MG,NA,CL', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')), saved.PRINTLJMATRIX_MGNACL)
+        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')), saved.PRINTLJMATRIX_NACLMG)
 
     @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):

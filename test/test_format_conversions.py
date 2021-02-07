@@ -1,6 +1,4 @@
 """ Test various topology format conversions """
-from __future__ import print_function, division, absolute_import
-
 import os
 import unittest
 import warnings
@@ -10,7 +8,6 @@ import numpy as np
 from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning, ParameterError
 from parmed.gromacs._gromacsfile import GromacsFile
-from parmed.utils.six.moves import zip, range
 from parmed import unit as u, topologyobjects as to
 from parmed.tools import addLJType
 from utils import (

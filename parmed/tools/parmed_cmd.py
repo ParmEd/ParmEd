@@ -10,8 +10,6 @@ import traceback
 from glob import glob
 
 from ..exceptions import ParmedError, ParmedWarning
-from ..utils.six import iteritems
-from ..utils.six.moves import range  # pylint: disable=W0622,E0401
 from .actions import COMMANDMAP, Usages
 from .argumentlist import ArgumentList
 from .exceptions import InterpreterError
@@ -177,7 +175,7 @@ class ParmedCmd(cmd.Cmd):
         auto-complete. This eliminates the need to modify the ParmedCmd class
         when a new command is added
         """
-        for _cmd, cmdclass in iteritems(COMMANDMAP):
+        for _cmd, cmdclass in COMMANDMAP.items():
             if _cmd in ('source', 'go', 'EOF', 'quit', 'help', 'parmout'):
                 continue
             cmdname = cmdclass.__name__

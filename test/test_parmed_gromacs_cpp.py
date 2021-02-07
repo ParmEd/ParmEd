@@ -1,11 +1,10 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
-from __future__ import print_function, division
 from utils import get_fn
+from io import StringIO
 from parmed.exceptions import PreProcessorError, PreProcessorWarning
 from parmed.gromacs._cpp import CPreProcessor
-from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 import warnings

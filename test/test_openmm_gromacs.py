@@ -6,7 +6,6 @@ from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
 from parmed.exceptions import GromacsWarning, ParmedError, OpenMMWarning
 import parmed.unit as u
-from parmed.utils.six.moves import range, zip
 from parmed.vec3 import Vec3
 import os
 import unittest

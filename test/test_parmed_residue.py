@@ -1,7 +1,6 @@
 """
 Tests the functionality in parmed.residue
 """
-
 import utils
 import parmed as pmd
 from parmed import residue
