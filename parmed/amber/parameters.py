@@ -15,10 +15,8 @@ from ..formats.mol2 import Mol2File
 from ..formats.registry import FileFormatType
 from ..parameters import ParameterSet
 from ..periodic_table import Mass, element_by_mass, AtomicNum
-from ..topologyobjects import (AtomType, BondType, AngleType, DihedralType,
-                                    DihedralTypeList)
+from ..topologyobjects import AtomType, BondType, AngleType, DihedralType, DihedralTypeList
 from ..utils.io import genopen
-from ..utils.six import iteritems
 from collections.abc import Sequence
 
 # parameter file regexes
@@ -766,7 +764,7 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
                 f'{a1:<2}-{a2:<2}-{a3:<2}-{a4:<2} {1:4d} {typ.phi_k:14.8f} {typ.phase:8.3f} '
                 f'{cont * typ.per:5.1f}    SCEE={typ.scee} SCNB={typ.scnb}\n'
             )
-        for (a1, a2, a3, a4), typ in iteritems(self.dihedral_types):
+        for (a1, a2, a3, a4), typ in self.dihedral_types.items():
             if id(typ) in done: continue
             done.add(id(typ))
             if isinstance(typ, DihedralType) or len(typ) == 1:
@@ -781,7 +779,7 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
         # Write the impropers
         outfile.write('IMPROPER\n')
         written_impropers = dict()
-        for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
+        for (a1, a2, a3, a4), typ in self.improper_periodic_types.items():
             # Make sure wild-cards come at the beginning
             if a2 == 'X':
                 assert a4 == 'X', 'Malformed generic improper!'
@@ -800,13 +798,13 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
         outfile.write('\n')
         # Write the LJ terms
         outfile.write('NONB\n')
-        for atom, typ in iteritems(self.atom_types):
+        for atom, typ in self.atom_types.items():
             outfile.write(f'{atom:<2}  {typ.rmin:12.8f} {typ.epsilon:12.8f}\n')
         outfile.write('\n')
         # Write the NBFIX terms
         if self.nbfix_types:
             outfile.write('LJEDIT\n')
-            for (a1, a2), (eps, rmin) in iteritems(self.nbfix_types):
+            for (a1, a2), (eps, rmin) in self.nbfix_types.items():
                 outfile.write(
                     f'{a1:<2} {a2:<2} {eps:12.8f} {rmin / 2:12.8f} {eps:12.8f} {rmin / 2:12.8f}\n'
                 )

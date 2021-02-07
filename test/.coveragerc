@@ -2,7 +2,6 @@
 source = parmed
 omit =
     */parmed/utils/fortranformat/*
-    */parmed/utils/six.py
     */parmed/formats/pdbx/*
     */parmed/vec3.py
     */parmed/utils/netcdf.py

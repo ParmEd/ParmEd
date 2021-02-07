@@ -21,7 +21,6 @@ from ..periodic_table import Element
 from ..topologyobjects import NoUreyBradley
 from .. import unit as u
 from ..utils.io import genopen
-from ..utils.six import iteritems
 from ..exceptions import ParameterWarning
 from ..topologyobjects import DihedralType, ImproperType, DrudeAtom
 
@@ -458,7 +457,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 return [a_types[a_names.index(atomname)]]
 
         # Iterate over all residues
-        for name, residue in chain(iteritems(self.residues), iteritems(self.patches)):
+        for name, residue in chain(self.residues.items(), self.patches.items()):
             for impr in residue._impr:
                 # Get the list of types involved in this improper
                 try:
@@ -501,7 +500,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
         unique_keys = OrderedDict() # unique_keys[key] is the key to retrieve the improper from improper_types
         improper_types = OrderedDict() # replacement for self.improper_types with compressed impropers
-        for atoms, improper in iteritems(self.improper_types):
+        for atoms, improper in self.improper_types.items():
             # Compute a unique key
             unique_key = tuple(sorted(atoms))
             if unique_key in unique_keys:
@@ -524,14 +523,14 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
     def _find_unused_residues(self):
         skip_residues = set()
-        for name, residue in iteritems(self.residues):
+        for name, residue in self.residues.items():
             if any((atom.type not in self.atom_types for atom in residue.atoms)):
                 skip_residues.add(name)
         return skip_residues
 
     def _find_unused_types(self, skip_residues):
         keep_types = set()
-        for name, residue in iteritems(self.residues):
+        for name, residue in self.residues.items():
             if name not in skip_residues:
                 for atom in residue.atoms:
                     keep_types.add(atom.type)
@@ -569,7 +568,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         date_generated.text = f'{ttup[0]:02d}-{ttup[1]:02d}-{ttup[2]:02d}'
 
         provenance = provenance or OrderedDict()
-        for tag, content in iteritems(provenance):
+        for tag, content in provenance.items():
             if tag == 'DateGenerated':
                 continue
             if not isinstance(content, list):
@@ -607,7 +606,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                         properties = { 'name' : self._get_mm_atom_type(atom, residue, True), 'class' : atom.drude_type, 'mass' : '0.0' }
                         etree.SubElement(xml_section, 'Type', **properties)
         else:
-            for name, atom_type in iteritems(self.atom_types):
+            for name, atom_type in self.atom_types.items():
                 if name in skip_types: continue
                 assert atom_type.atomic_number >= 0, 'Atomic number not set!'
                 properties = { 'name' : name, 'class' : name, 'mass' : str(atom_type.mass) }
@@ -644,7 +643,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             valid_patches_for_residue = OrderedDict()
         written_residues = OrderedDict()
         xml_section = etree.SubElement(xml_root, 'Residues')
-        for name, residue in iteritems(self.residues):
+        for name, residue in self.residues.items():
             if name in skip_residues: continue
             templhash = OpenMMParameterSet._templhasher(residue)
             if templhash in written_residues:
@@ -738,7 +737,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         if not self.patches: return
         written_patches = OrderedDict()
         xml_patches = etree.SubElement(xml_root, 'Patches')
-        for name, patch in iteritems(self.patches):
+        for name, patch in self.patches.items():
             # Require that at least one valid patch combination exists for this patch
             if (name not in valid_residues_for_patch) or (len(valid_residues_for_patch[name])==0):
                 continue
@@ -834,7 +833,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         bonds_done = set()
         lconv = u.angstroms.conversion_factor_to(u.nanometers)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) / lconv**2 * 2
-        for (a1, a2), bond in iteritems(self.bond_types):
+        for (a1, a2), bond in self.bond_types.items():
             if any((a in skip_types for a in (a1, a2))):
                 continue
             if (a1, a2) in bonds_done:
@@ -850,7 +849,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         angles_done = set()
         tconv = u.degree.conversion_factor_to(u.radians)
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule) * 2
-        for (a1, a2, a3), angle in iteritems(self.angle_types):
+        for (a1, a2, a3), angle in self.angle_types.items():
             if any((a in skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in angles_done: continue
             angles_done.add((a1, a2, a3))
@@ -872,7 +871,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         kconv = u.kilocalorie.conversion_factor_to(u.kilojoule)
         def nowild(name):
             return name if name != 'X' else ''
-        for (a1, a2, a3, a4), dihed in iteritems(self.dihedral_types):
+        for (a1, a2, a3, a4), dihed in self.dihedral_types.items():
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
             if (a1, a2, a3, a4) in diheds_done: continue
             diheds_done.add((a1, a2, a3, a4))
@@ -889,7 +888,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         # (consistent with Amber) except in instances where order is random (as
         # in CHARMM parameter files). But CHARMM parameter files don't have
         # periodic impropers, so we don't have to worry about that here.
-        for (a2, a3, a1, a4), improp in iteritems(self.improper_periodic_types):
+        for (a2, a3, a1, a4), improp in self.improper_periodic_types.items():
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
             # Try to make the wild-cards in the middle
             if a4 == 'X':
@@ -913,7 +912,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         tconv = u.degree.conversion_factor_to(u.radian)
         def nowild(name):
             return name if name != 'X' else ''
-        for (a1, a2, a3, a4), improp in iteritems(self.improper_types):
+        for (a1, a2, a3, a4), improp in self.improper_types.items():
             if any((a in skip_types for a in (a1, a2, a3, a4))): continue
             etree.SubElement(xml_force, 'Improper', class1=nowild(a1), class2=nowild(a2), class3=nowild(a3), class4=nowild(a4),
                        k=str(improp.psi_k*kconv), theta0=str(improp.psi_eq*tconv))
@@ -928,7 +927,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         _ommfrc = u.kilojoule_per_mole/u.nanometer**2
         frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
         ureys_done = set()
-        for (a1, a2, a3), urey in iteritems(self.urey_bradley_types):
+        for (a1, a2, a3), urey in self.urey_bradley_types.items():
             if any((a in skip_types for a in (a1, a2, a3))): continue
             if (a1, a2, a3) in ureys_done: continue
             if urey == NoUreyBradley: continue
@@ -941,7 +940,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         maps = OrderedDict()
         counter = 0
         econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
-        for _, cmap in iteritems(self.cmap_types):
+        for _, cmap in self.cmap_types.items():
             if id(cmap) in maps: continue
             maps[id(cmap)] = counter
             counter += 1
@@ -955,7 +954,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 map_string += '\n'
             xml_map.text = map_string
         used_torsions = set()
-        for (a1, a2, a3, a4, _, _, _, a5), cmap in iteritems(self.cmap_types):
+        for (a1, a2, a3, a4, _, _, _, a5), cmap in self.cmap_types.items():
             if any((a in skip_types for a in (a1, a2, a3, a4, a5))): continue
             if (a1, a2, a3, a4, a5) in used_torsions: continue
             used_torsions.add((a1, a2, a3, a4, a5))
@@ -989,7 +988,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         # Write NonbondedForce records.
         xml_force = etree.SubElement(xml_root, 'NonbondedForce', coulomb14scale=str(coulomb14scale), lj14scale=str(lj14scale))
         etree.SubElement(xml_force, 'UseAttributeFromResidue', name="charge")
-        for name, atom_type in iteritems(self.atom_types):
+        for name, atom_type in self.atom_types.items():
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
                 sigma = atom_type.sigma * length_conv  # in md_unit_system
@@ -1044,7 +1043,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
         # write L-J records
         xml_force = etree.SubElement(xml_root, 'LennardJonesForce', lj14scale=str(lj14scale))
-        for name, atom_type in iteritems(self.atom_types):
+        for name, atom_type in self.atom_types.items():
             if name in skip_types: continue
             if (atom_type.rmin is not None) and (atom_type.epsilon is not None):
                 sigma = atom_type.sigma * length_conv  # in md_unit_system
@@ -1084,7 +1083,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             etree.SubElement(xml_force, 'Atom', **attributes)
 
         # write NBFIX records
-        for (atom_types, value) in iteritems(self.nbfix_types):
+        for (atom_types, value) in self.nbfix_types.items():
             emin = value[0] * ene_conv
             rmin = value[1] * length_conv
             # convert to sigma; note that NBFIX types are not rmin/2 but rmin

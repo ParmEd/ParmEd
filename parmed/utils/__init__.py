@@ -2,13 +2,12 @@
 from ..exceptions import MoleculeError as _MoleculeError
 from .pairlist import find_atom_pairs
 from ..topologyobjects import Atom
-from . import six
 from shutil import which
 from typing import List, Set, Tuple
 import sys
 
 __all__ = [
-    'six', 'io', 'timer', 'which', 'tag_molecules', 'PYPY', 'canonical_improper_order', 'find_atom_pairs'
+    'io', 'timer', 'which', 'tag_molecules', 'PYPY', 'canonical_improper_order', 'find_atom_pairs'
 ]
 
 PYPY = '__pypy__' in sys.builtin_module_names

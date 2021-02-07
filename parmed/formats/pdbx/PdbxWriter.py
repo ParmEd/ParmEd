@@ -17,9 +17,7 @@ __email__     = "jwest@rcsb.rutgers.edu"
 __license__   = "Creative Commons Attribution 3.0 Unported"
 __version__   = "V0.01"
 
-from parmed.utils.six.moves import range
-from parmed.formats.pdbx.PdbxContainers import (DefinitionContainer,
-                                                   DataContainer)
+from parmed.formats.pdbx.PdbxContainers import (DefinitionContainer, DataContainer)
 from parmed.exceptions import PdbxError
 import sys
 
