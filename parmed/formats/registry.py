@@ -16,11 +16,9 @@ Note, id_format must be IMPLEMENTED for each class added to the registry, not
 simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
-from __future__ import division, print_function, absolute_import
 from contextlib import closing
-from parmed.utils.io import genopen
-from parmed.utils.six import iteritems
-from parmed.exceptions import FormatNotFound
+from ..utils.io import genopen
+from ..exceptions import FormatNotFound
 import os
 
 PARSER_REGISTRY = dict()
@@ -169,7 +167,7 @@ def load_file(filename, *args, **kwargs):
     elif not os.access(filename, os.R_OK):
         raise FileNotFoundError('%s does not have read permissions set' % filename)
 
-    for name, cls in iteritems(PARSER_REGISTRY):
+    for name, cls in PARSER_REGISTRY.items():
         if not hasattr(cls, 'id_format'):
             continue
         try:

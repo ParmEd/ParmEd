@@ -73,8 +73,6 @@ __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
 
-from parmed.utils.six import string_types, PY3
-from parmed.utils.six.moves import range
 import math
 import copy
 from .standard_dimensions import *
@@ -114,7 +112,7 @@ class Quantity(object):
                 # Ulist of a Quantity is just the Quantity itself
                 unit = value.unit
                 value = value._value
-            elif isinstance(value, string_types):
+            elif isinstance(value, str):
                 unit = dimensionless
             else:
                 # Is value a container?
@@ -599,11 +597,6 @@ class Quantity(object):
         """
         return Quantity(-(self._value), self.unit)
 
-    def __nonzero__(self):
-        """Returns True if value underlying Quantity is zero, False otherwise.
-        """
-        return bool(self._value)
-
     def __bool__(self):
         return bool(self._value)
 
@@ -782,9 +775,6 @@ class Quantity(object):
     # list.reverse will automatically delegate correctly
     # list.sort with no arguments will delegate correctly
     # list.sort with a comparison function cannot be done correctly
-
-if PY3:
-    del Quantity.__nonzero__
 
 def is_quantity(x):
     """

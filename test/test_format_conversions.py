@@ -1,6 +1,4 @@
 """ Test various topology format conversions """
-from __future__ import print_function, division, absolute_import
-
 import os
 import unittest
 import warnings
@@ -10,7 +8,6 @@ import numpy as np
 from parmed import load_file, gromacs, amber, openmm, charmm
 from parmed.exceptions import GromacsWarning, ParameterError
 from parmed.gromacs._gromacsfile import GromacsFile
-from parmed.utils.six.moves import zip, range
 from parmed import unit as u, topologyobjects as to
 from parmed.tools import addLJType
 from utils import (
@@ -364,7 +361,7 @@ class TestAmberToCharmm(FileIOTestCase, TestCaseRelative):
         parm = load_file(self.get_fn('trx.prmtop'), self.get_fn('trx.inpcrd'))
         parm.save(self.get_fn('amber_to_charmm.psf', written=True))
         params = charmm.CharmmParameterSet.from_structure(parm)
-        params.write(str=self.get_fn('amber_to_charmm.str', written=True))
+        params.write(stream=self.get_fn('amber_to_charmm.str', written=True))
 
         self.assertTrue(
             diff_files(

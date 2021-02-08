@@ -1,8 +1,6 @@
 """
 Tests the functionality in the parmed.amber package
 """
-from __future__ import print_function, division
-
 from copy import copy
 import glob
 import math
@@ -10,6 +8,7 @@ import numpy as np
 import os
 import re
 import sys
+from io import StringIO
 import parmed as pmd
 from parmed.amber import (
     readparm, asciicrd, mask, parameters, mdin, FortranFormat, titratable_residues, AmberOFFLibrary
@@ -22,8 +21,6 @@ from parmed import topologyobjects, load_file, Structure
 from parmed.tools import change
 import parmed.unit as u
 from parmed.utils import PYPY
-from parmed.utils.six import string_types, iteritems
-from parmed.utils.six.moves import range, zip, StringIO
 import pickle
 import random
 import saved_outputs as saved
@@ -34,10 +31,7 @@ from utils import (
     diff_files, has_openmm
 )
 import warnings
-try:
-    from string import letters
-except ImportError:
-    from string import ascii_letters as letters
+from string import ascii_letters as letters
 
 def _picklecycle(obj):
     return pickle.loads(pickle.dumps(obj))
@@ -195,20 +189,6 @@ class TestReadParm(FileIOTestCase):
         # Make sure our OMM topology changes correspondingly
         self.assertIsNot(top, parm.topology)
 
-    def test_deprecations(self):
-        """ Test proper deprecation of old/renamed AmberParm features """
-        rst7_name = get_fn('ash.rst7')
-        parm7_name = get_fn('ash.parm7')
-        with self.assertWarns(DeprecationWarning):
-            readparm.AmberParm(parm7_name, rst7_name=rst7_name)
-        with self.assertWarns(DeprecationWarning):
-            readparm.AmberParm(parm7_name, rst7_name, rst7_name=rst7_name)
-        parm = readparm.AmberParm(get_fn('ash.parm7'), rst7_name=get_fn('ash.rst7'))
-        for atom in parm.atoms:
-            self.assertTrue(hasattr(atom, 'xx'))
-            self.assertTrue(hasattr(atom, 'xy'))
-            self.assertTrue(hasattr(atom, 'xz'))
-
     def test_molecule_error_detection(self):
         """ Tests noncontiguous molecule detection """
         parm = readparm.AmberParm(get_fn('things.parm7'))
@@ -313,7 +293,7 @@ class TestReadParm(FileIOTestCase):
         self.assertEqual(parm.flag_list, parm2.flag_list)
         for flag in parm.flag_list:
             for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
-                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                if isinstance(x1, str) or isinstance(x2, str):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
@@ -328,7 +308,7 @@ class TestReadParm(FileIOTestCase):
         self.assertEqual(set(parm.flag_list), set(parm2.flag_list))
         for flag in parm.flag_list:
             for x1, x2 in zip(parm.parm_data[flag], parm2.parm_data[flag]):
-                if isinstance(x1, string_types) or isinstance(x2, string_types):
+                if isinstance(x1, str) or isinstance(x2, str):
                     self.assertEqual(x1, x2)
                 else:
                     self.assertAlmostEqual(x1, x2)
@@ -437,14 +417,14 @@ class TestReadParm(FileIOTestCase):
         # Check that TORSION_TORSION data is restored properly
         used_tortors = sorted(set(tt.type.idx+1 for tt in parm.torsion_torsions))
         tortordata = dict()
-        for flag, data in iteritems(parm.parm_data):
+        for flag, data in parm.parm_data.items():
             if 'TORSION_TORSION' not in flag: continue
             tortordata[flag] = np.array(data)
 
         parm.remake_parm()
 
         myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
-        for flag, data in iteritems(parm.parm_data):
+        for flag, data in parm.parm_data.items():
             if 'TORSION_TORSION' not in flag: continue
             rematch = myre.match(flag)
             if rematch:
@@ -877,12 +857,12 @@ class TestReadParm(FileIOTestCase):
                 self.assertEqual(sum([b in cmap for b in parm.bonds]), 4)
 
 def _num_unique_types(dct):
-    return len(set(id(item) for _, item in iteritems(dct)))
+    return len(set(id(item) for _, item in dct.items()))
 
 def _num_unique_dtypes(dct):
     used_types = set()
     num = 0
-    for _, x in iteritems(dct):
+    for _, x in dct.items():
         if id(x) in used_types: continue
         used_types.add(id(x))
         num += len(x)
@@ -2429,7 +2409,7 @@ class TestAmberMdin(FileIOTestCase):
         fn = self.get_fn('test.mdin', written=True)
         mdin1 = mdin.Mdin('sander')
         self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb'})
-        self.assertEqual(mdin1.title, 'mdin prepared by mdin.py')
+        self.assertEqual(mdin1.title, 'mdin prepared by ParmEd')
         self.assertEqual(mdin1.verbosity, 0)
         # What the heck was this for?
         self.assertTrue(mdin1.check())
@@ -2664,24 +2644,28 @@ class TestAmberTitratableResidues(FileIOTestCase):
 
     def test_titratable_residue(self):
         """ Tests the TitratableResidue object """
-        as4 = titratable_residues.AS4
-        self.assertEqual(str(as4), saved.AS4_TITR_OUTPUT)
+        self.assertEqual(str(titratable_residues.AS4), saved.AS4_TITR_OUTPUT)
+        self.assertEqual(str(titratable_residues.TYX), saved.TYX_TITR_OUTPUT)
+        self.assertEqual(str(titratable_residues.HEH), saved.HEH_TITR_OUTPUT)
         # Test error handling for TitratableResidue
         newres = titratable_residues.TitratableResidue(
-                'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], "ph", 7.0,
+            'NWR', ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'], "ph", 7.0,
         )
         self.assertEqual(newres.pKa, 7.0)
-        self.assertRaises(AmberError, lambda:
-                newres.add_state([10.0, 20.0], 10.0, 10.0, 3, 7.0)
-        )
-        self.assertRaises(AmberError, lambda:
-            newres.add_states([[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,5, 6, 7]],
-                              [10, 20, 30], [10, 20, 30], [3, 2, 1], [7.0, 0.0, 0.0])
-        )
-        self.assertRaises(AmberError, lambda: newres.cpin_pointers(10))
+        with self.assertRaises(AmberError):
+            newres.add_state([10.0, 20.0], 10.0, 10.0, 3, 7.0)
+        with self.assertRaises(AmberError):
+            newres.add_states(
+                [[1, 2, 3, 4, 5, 6, 7], [2, 3, 4,5, 6, 7]],
+                [10, 20, 30], [10, 20, 30], [3, 2, 1], [7.0, 0.0, 0.0]
+            )
+        with self.assertRaises(AmberError):
+            newres.cpin_pointers(10)
         newres.set_first_state(0)
         newres.set_first_state(0) # Second setting should be ignored
-        self.assertRaises(AmberError, lambda: newres.set_first_state(1))
+        with self.assertRaises(AmberError):
+            newres.set_first_state(1)
         newres.set_first_charge(0)
         newres.set_first_charge(0)
-        self.assertRaises(AmberError, lambda: newres.set_first_charge(1))
+        with self.assertRaises(AmberError):
+            newres.set_first_charge(1)

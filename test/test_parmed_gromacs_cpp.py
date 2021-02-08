@@ -1,11 +1,10 @@
 """
 Tests the functionality in the parmed.gromacs package
 """
-from __future__ import print_function, division
 from utils import get_fn
+from io import StringIO
 from parmed.exceptions import PreProcessorError, PreProcessorWarning
 from parmed.gromacs._cpp import CPreProcessor
-from parmed.utils.six.moves import range, zip, StringIO
 import os
 import unittest
 import warnings
@@ -31,7 +30,7 @@ class TestGromacsCpp(unittest.TestCase):
         pp = CPreProcessor(f)
         self.assertRaises(NotImplementedError, lambda: pp.seek(10))
         self.assertRaises(NotImplementedError, pp.read)
-        f = StringIO('#ifdef MYVAR\n#elif defined(NOTMYVAR)\n#else\nline\#endif')
+        f = StringIO('#ifdef MYVAR\n#elif defined(NOTMYVAR)\n#else\nline\n#endif')
         pp = CPreProcessor(f)
         self.assertRaises(NotImplementedError, pp.read)
 

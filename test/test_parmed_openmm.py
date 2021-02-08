@@ -1,7 +1,6 @@
 """ Tests some OpenMM-specific functionality """
-from __future__ import print_function, division, absolute_import
-
 from collections import OrderedDict
+from io import StringIO
 import math
 import os
 import unittest
@@ -11,7 +10,6 @@ from unittest import skipIf
 import numpy as np
 
 import parmed as pmd
-from parmed.utils.six import StringIO
 from io import TextIOWrapper
 from parmed.charmm import (CharmmPsfFile, CharmmCrdFile, CharmmRstFile,
                            CharmmParameterSet)

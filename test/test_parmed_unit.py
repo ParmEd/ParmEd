@@ -1,13 +1,9 @@
 """
 Tests the functionality in the parmed.unit package.
 """
-from __future__ import division
-
 import utils
 import numpy as np
 from parmed import unit as u
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 import copy
 import math
 import unittest
@@ -630,11 +626,11 @@ class TestNumpyUnits(utils.QuantityTestCase):
         """ Tests the internal _is_string method with numpy Quantities """
         a = np.array([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance("", str)
-        self.assertTrue(isinstance("", string_types))
-        self.assertTrue(isinstance("t", string_types))
-        self.assertTrue(isinstance("test", string_types))
-        self.assertFalse(isinstance(3, string_types))
-        self.assertFalse(isinstance(a, string_types))
+        self.assertTrue(isinstance("", str))
+        self.assertTrue(isinstance("t", str))
+        self.assertTrue(isinstance("test", str))
+        self.assertFalse(isinstance(3, str))
+        self.assertFalse(isinstance(a, str))
 
     def testNumpyFunctions(self):
         """ Tests various numpy attributes that they result in Quantities """

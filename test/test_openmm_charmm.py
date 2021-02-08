@@ -16,14 +16,11 @@ in the Amber restart file. The energies are very close, but have been
 recalculated using ParmEd for comparison here to improve the precision. The
 implementation these energies were computed by has already been validated.
 """
-from __future__ import division, print_function, absolute_import
-
 from parmed.amber.readparm import Rst7
 from parmed.charmm import CharmmPsfFile, CharmmCrdFile, CharmmRstFile, CharmmParameterSet
 from parmed.exceptions import CharmmWarning, ParameterError
 from parmed.openmm.utils import energy_decomposition
 from parmed import unit as u, openmm, load_file, UreyBradley
-from parmed.utils.six.moves import range
 from copy import copy
 from math import sqrt
 import unittest

@@ -1,13 +1,11 @@
 """
 Tests the NetCDF file parsing capabilities with the different backends
 """
-
 from random import randint
 import numpy as np
 from parmed import __version__
 from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
 from parmed import unit as u
-from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
 from parmed.utils.netcdf import NetCDFFile
 from unittest import skipIf

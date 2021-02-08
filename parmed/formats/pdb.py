@@ -2,16 +2,12 @@
 This package contains classes responsible for reading and writing both PDB and
 PDBx/mmCIF files.
 """
-from __future__ import division, print_function, absolute_import
-
 from collections import OrderedDict, namedtuple
 from contextlib import closing
-try:
-    from string import ascii_letters
-except ImportError:
-    from string import letters as ascii_letters # Python 2
+from string import ascii_letters
 import io
 import ftplib
+import gzip
 import numpy as np
 from ..exceptions import PDBError, PDBWarning
 from ..formats.pdbx import PdbxReader, PdbxWriter, containers
@@ -23,8 +19,6 @@ from ..structure import Structure
 from ..topologyobjects import Atom, ExtraPoint, Bond, Link
 from ..symmetry import Symmetry
 from ..utils.io import genopen
-from ..utils.six import iteritems, string_types, add_metaclass, PY3
-from ..utils.six.moves import range
 import re
 import warnings
 
@@ -91,19 +85,17 @@ def _is_hetatm(resname):
     """
     if len(resname) != 3:
         return not (RNAResidue.has(resname) or DNAResidue.has(resname))
-    return not (AminoAcidResidue.has(resname) or RNAResidue.has(resname)
-                or DNAResidue.has(resname))
+    return not (AminoAcidResidue.has(resname) or RNAResidue.has(resname) or DNAResidue.has(resname))
 
 def _number_truncated_to_n_digits(num, digits):
     """ Truncates the given number to the specified number of digits """
     if num < 0:
-        return int(-(-num % eval('1e%d' % (digits-1))))
-    return int(num % eval('1e%d' % digits))
+        return int(-(-num % eval(f'1e{digits - 1:d}')))
+    return int(num % eval(f'1e{digits:d}'))
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@add_metaclass(FileFormatType)
-class PDBFile(object):
+class PDBFile(metaclass=FileFormatType):
     """ Standard PDB file format parser and writer """
     #===================================================
 
@@ -126,7 +118,7 @@ class PDBFile(object):
         is_fmt : bool
             True if it is a PDB file
         """
-        if isinstance(filename, string_types):
+        if isinstance(filename, str):
             own_handle = True
             fileobject = genopen(filename, 'r')
         elif hasattr(filename, 'read'):
@@ -258,8 +250,7 @@ class PDBFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        import gzip
-        if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
+        if not isinstance(pdb_id, str) or len(pdb_id) != 4:
             raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
@@ -267,18 +258,15 @@ class PDBFile(object):
         ftp.login()
         fileobj = io.BytesIO()
         try:
-            ftp_loc = '/pub/pdb/data/structures/divided/pdb/%s/pdb%s.ent.gz' % (pdb_id[1:3], pdb_id)
-            ftp.retrbinary('RETR %s' % ftp_loc , fileobj.write)
+            ftp_loc = f"/pub/pdb/data/structures/divided/pdb/{pdb_id[1:3]}/pdb{pdb_id}.ent.gz"
+            ftp.retrbinary(f"RETR {ftp_loc}", fileobj.write)
         except ftplib.all_errors as err:
-            raise IOError('Could not retrieve PDB ID %s; %s' % (pdb_id, err))
+            raise IOError(f"Could not retrieve PDB ID {pdb_id}; {err}") from err
         finally:
             ftp.close()
         # Rewind, wrap it in a GzipFile and send it to parse
         fileobj.seek(0)
-        if PY3:
-            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
-        else:
-            fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         if saveto is not None:
             with closing(genopen(saveto, 'w')) as f:
                 f.write(fileobj.read())
@@ -361,7 +349,7 @@ class PDBFile(object):
             the PDB file.  No bonds or other topological features are added by
             default.
         """
-        if isinstance(filename, string_types):
+        if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:
@@ -660,9 +648,14 @@ class PDBFile(object):
             self._atom_map_from_all_attributes[all_attribute_key] = atom
             self._atom_map_from_attributes[attribute_key] = atom
             self._atom_map_from_atom_number[atom_number] = atom
-            self.struct.add_atom(atom, atom_parts['residue_name'], residue_number,
-                                 atom_parts['chain'], atom_parts['insertion_code'],
-                                 atom_parts['segment_id'])
+            self.struct.add_atom(
+                atom,
+                atom_parts['residue_name'],
+                residue_number,
+                atom_parts['chain'],
+                atom_parts['insertion_code'],
+                atom_parts['segment_id'],
+            )
             self._model1_atoms_in_structure.add(atom)
             self._last_atom = atom
         else:
@@ -672,8 +665,9 @@ class PDBFile(object):
                 raise PDBError('Atom number mismatch between models')
             if (atom_from_first_model.residue.name != atom_parts['residue_name'] or
                 atom_from_first_model.name != atom_parts['name']):
-                raise PDBError('Atom/residue name mismatch in different models in model %d [%s]!' %
-                               (self._current_model_number, line.strip()))
+                raise PDBError(
+                    f'Atom/residue name mismatch in different models in model {self._current_model_number} [{line.strip()}]!'
+                )
         if self._current_model_number == 1 or current_atom in self._model1_atoms_in_structure:
             self._coordinates[-1].extend([atom.xx, atom.xy, atom.xz])
 
@@ -681,8 +675,10 @@ class PDBFile(object):
         if self._current_model_number == 1 and len(self.struct.atoms) == 0:
             return # MODEL 1
         if self._model_open:
-            warnings.warn('%s begun before last model ended. Assuming it is ending' % line.strip(),
-                          PDBWarning)
+            warnings.warn(
+                f'{line.strip()} begun before last model ended. Assuming it is ending',
+                PDBWarning,
+            )
             self._end_model(line)
         self._coordinates.append([])
         self._model_atom_counts.append(0)
@@ -700,7 +696,7 @@ class PDBFile(object):
         if len(self._atom_map_from_attributes) == 0:
             raise PDBError('No atoms found in model')
         if len(self._coordinates[-1]) != 3 * len(self._atom_map_from_attributes):
-            raise PDBError('Coordinate mismatch in model %d' % self._current_model_number)
+            raise PDBError(f'Coordinate mismatch in model {self._current_model_number}')
 
     def _parse_connect_record(self, line):
         """
@@ -713,8 +709,9 @@ class PDBFile(object):
         index_3 = try_convert(line[21:26], int)
         index_4 = try_convert(line[26:31], int)
         if origin_index is None or index_1 is None:
-            warnings.warn('Bad CONECT record -- not enough atom indexes in line: %s' % line,
-                          PDBWarning)
+            warnings.warn(
+                f'Bad CONECT record -- not enough atom indexes in line: {line}', PDBWarning
+            )
             return
         origin_atom = self._atom_map_from_atom_number.get(origin_index, None)
         atom_1 = self._atom_map_from_atom_number.get(index_1, None)
@@ -722,8 +719,10 @@ class PDBFile(object):
         atom_3 = self._atom_map_from_atom_number.get(index_3, None)
         atom_4 = self._atom_map_from_atom_number.get(index_4, None)
         if origin_atom is None or atom_1 is None:
-            warnings.warn('CONECT record - could not find atoms %d and/or %d to connect. Line: %s' %
-                          (origin_index, index_1, line), PDBWarning)
+            warnings.warn(
+                f'CONECT record - could not find atoms {origin_index} and/or {index_1} to connect. Line: {line}',
+                PDBWarning,
+            )
             return
         origin_atom = self._atom_map_to_parent.get(origin_atom, origin_atom)
         for partner in (atom_1, atom_2, atom_3, atom_4):
@@ -751,7 +750,7 @@ class PDBFile(object):
             try:
                 length = float(line[73:78])
             except ValueError:
-                warnings.warn('Malformed LINK line (bad distance): %s' % line, PDBWarning)
+                warnings.warn(f'Malformed LINK line (bad distance): {line}', PDBWarning)
                 continue
 
             key1 = self._make_atom_key_from_parts(atom_1_parts)
@@ -760,18 +759,20 @@ class PDBFile(object):
                 a1 = self._atom_map_from_attributes[key1]
                 a2 = self._atom_map_from_attributes[key2]
             except KeyError:
-                warnings.warn('Could not find link atoms %s and %s' % (key1, key2), PDBWarning)
+                warnings.warn(f'Could not find link atoms {key1} and {key2}', PDBWarning)
             else:
                 self.struct.links.append(Link(a1, a2, length, symop1, symop2))
 
     def _assign_anisou_to_atoms(self):
         """ Assigns the ANISOU tensors to the atoms they belong to """
-        for key, (anisou_tensor, line) in iteritems(self._anisou_records):
+        for key, (anisou_tensor, line) in self._anisou_records.items():
             try:
                 self._atom_map_from_all_attributes[key].anisou = anisou_tensor
             except KeyError:
-                warnings.warn('Could not find atom belonging to anisou tensor with key %s. '
-                              'Line: %s' % (key, line), PDBWarning)
+                warnings.warn(
+                    f'Could not find atom belonging to anisou tensor with key {key}. Line: {line}',
+                    PDBWarning
+                )
 
     def _postprocess_metadata(self):
         self.struct.keywords = [s.strip() for s in self.struct.keywords.split(',') if s.strip()]
@@ -912,7 +913,7 @@ class PDBFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in iteritems(atom.other_locations):
+                for key, item in atom.other_locations.items():
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item
@@ -1028,8 +1029,7 @@ class PDBFile(object):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-@add_metaclass(FileFormatType)
-class CIFFile(object):
+class CIFFile(metaclass=FileFormatType):
     """ Standard PDBx/mmCIF file format parser and writer """
     #===================================================
 
@@ -1097,8 +1097,7 @@ class CIFFile(object):
 
         TypeError if pdb_id is not a 4-character string
         """
-        import gzip
-        if not isinstance(pdb_id, string_types) or len(pdb_id) != 4:
+        if not isinstance(pdb_id, str) or len(pdb_id) != 4:
             raise ValueError('pdb_id must be the 4-letter PDB code')
 
         pdb_id = pdb_id.lower()
@@ -1114,10 +1113,7 @@ class CIFFile(object):
         finally:
             ftp.close()
         fileobj.seek(0)
-        if PY3:
-            fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
-        else:
-            fileobj = gzip.GzipFile(fileobj=fileobj, mode='r')
+        fileobj = io.TextIOWrapper(gzip.GzipFile(fileobj=fileobj, mode='r'))
         if saveto is not None:
             with closing(genopen(saveto, 'w')) as f:
                 f.write(fileobj.read())
@@ -1192,7 +1188,7 @@ class CIFFile(object):
         If this occurs, check the formatting on each line and make sure it
         matches the others.
         """
-        if isinstance(filename, string_types):
+        if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:
@@ -1452,7 +1448,7 @@ class CIFFile(object):
                             )
                     except (ValueError, KeyError):
                         # If at least one went wrong, set them all to None
-                        for key, atom in iteritems(atommap):
+                        for key, atom in atommap.items():
                             atom.anisou = None
                         warnings.warn('Problem processing anisotropic '
                                       'B-factors. Skipping', PDBWarning)
@@ -1581,7 +1577,7 @@ class CIFFile(object):
             def print_atoms(atom, coords):
                 occ = atom.occupancy
                 a = atom
-                for key, item in iteritems(atom.other_locations):
+                for key, item in atom.other_locations.items():
                     if item.occupancy > occ:
                         occ = item.occupancy
                         a = item

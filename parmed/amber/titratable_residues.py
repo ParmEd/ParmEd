@@ -3,19 +3,13 @@ This module contains all of the information for the titratable residues,
 including reference energies, model compound pKas, and charge vectors for every
 titratable residue treated.
 """
-from __future__ import print_function, division
-
-titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
-                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN', 'TYX']
-
 from math import log
 from io import StringIO
 from ..exceptions import AmberWarning, AmberError
-from ..utils.six.moves import range
 import warnings
 
-# Print all AmberWarning's
-warnings.filterwarnings('always', category=AmberWarning)
+titratable_residues = ['AS4', 'GL4', 'CYS', 'TYR', 'HIP', 'LYS', 'DAP', 'DCP',
+                       'DG', 'DT', 'AP', 'CP', 'G', 'U', 'HEH', 'PRN', 'TYX']
 
 class _State(object):
     """ A protonation state """
@@ -43,16 +37,14 @@ class _ReferenceEnergy(object):
         self.igb7 = igb7
         self.igb8 = igb8
 
-    def solvent_energies(self, igb1=None, igb2=None, igb5=None,
-                         igb7=None, igb8=None):
+    def solvent_energies(self, igb1=None, igb2=None, igb5=None, igb7=None, igb8=None):
         """
         Add solvent reference energies, copying the GB reference energies if
         none are explicitly given
         """
         self.solvent = _ReferenceEnergy(igb1, igb2, igb5, igb7, igb8)
 
-    def dielc2_energies(self, igb1=None, igb2=None, igb5=None,
-                        igb7=None, igb8=None):
+    def dielc2_energies(self, igb1=None, igb2=None, igb5=None, igb7=None, igb8=None):
         """
         Add reference energies for a dielectric constant of 2.0. Since this has
         no reason to be near the original reference energies, do not use those
@@ -101,8 +93,8 @@ class _LineBuffer(object):
 
     def add_word(self, word):
         if len(self.linebuffer) + len(word) > self.CHARS_PER_LINE:
-            self.file.write(self.linebuffer + '\n')
-            self.linebuffer = ' %s' % word
+            self.file.write(f"{self.linebuffer}\n")
+            self.linebuffer = f' {word}'
         else:
             self.linebuffer += word
 
@@ -143,91 +135,75 @@ class TitratableResidue(object):
         saying if the energy is not set
         """
         ret_str = ''
+        igb_str = f'igb{igb}'
         for state in self.states:
             if dielc == 2:
                 if solvent:
-                    refene = getattr(state.refene.dielc2.solvent, 'igb%d'%igb)
+                    refene = getattr(state.refene.dielc2.solvent, igb_str)
                 else:
-                    refene = getattr(state.refene.dielc2, 'igb%d'%igb)
+                    refene = getattr(state.refene.dielc2, igb_str)
             else:
                 if solvent:
-                    refene = getattr(state.refene.solvent, 'igb%d'%igb)
+                    refene = getattr(state.refene.solvent, igb_str)
                 else:
-                    refene = getattr(state.refene, 'igb%d'%igb)
+                    refene = getattr(state.refene, igb_str)
 
             if refene is None:
-                ret_str += '%12s' % 'Not Set'
+                ret_str += f"{'Not Set':>12s}"
             else:
-                ret_str += '%12.5f' % refene
+                ret_str += f"{refene:12.5f}"
 
         return ret_str
 
     def __str__(self):
-        if (self.typ=="ph"):
-            ret_str = ('%-4s\tpKa = %5.1f\n%8s' % (self.resname, self.pKa, 'ATOM') +
-                       ''.join(['%12s' % ('STATE %d' % i) for i in
-                               range(len(self.states))]) + '\n'
-            )
-        elif (self.typ=="redox"):
-            ret_str = ('%-4s\tEo = %7.3f V\n%8s' % (self.resname, self.Eo, 'ATOM') +
-                       ''.join(['%12s' % ('STATE %d' % i) for i in
-                               range(len(self.states))]) + '\n'
-            )
+        delineator = '-' * (8 + 12 * len(self.states))
+        if self.typ == "ph":
+            ret_strs = [f"{self.resname:<4s}\tpKa = {self.pKa:5.1f}"]
+        elif self.typ == "redox":
+            ret_strs = [f"{self.resname:<4s}\tEo = {self.Eo:7.3f} V"]
         else:
-            ret_str = ('%-4s\n%8s' % (self.resname, 'ATOM') +
-                       ''.join(['%12s' % ('STATE %d' % i) for i in
-                               range(len(self.states))]) + '\n'
-            )
+            ret_strs = [f"{self.resname:<4s}"]
+        ret_strs.append(
+            f"{'ATOM':>8s}" + ''.join([f"STATE {i}".rjust(12) for i in range(len(self.states))])
+        )
         for i, atom in enumerate(self.atom_list):
-            ret_str += ('%8s' % atom +
-                        ''.join(['%12.4f' % (state.charges[i])
-                                for state in self.states]) + '\n'
-            )
-        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        if (self.typ == "ph" or self.typ == "phredox"):
-            ret_str += ('%8s' % 'Prot Cnt' +
-                        ''.join(['%12d' % state.protcnt for state in self.states]) +
-                        '\n')
-            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-            ret_str += ('%8s' % 'pKa Corr' +
-                        ''.join(['%12.4f' % state.pka_corr for state in self.states]) +
-                        '\n')
+            ret_strs.append(f"{atom:>8s}" + "".join([f"{state.charges[i]:12.4f}" for state in self.states]))
+        ret_strs.append(delineator)
+        if self.typ == "ph" or self.typ == "phredox":
+            ret_strs.append("Prot Cnt".rjust(8) + "".join([f"{state.protcnt:12d}" for state in self.states]))
+            ret_strs.append(delineator)
+            ret_strs.append("pKa Corr".rjust(8) + "".join([f"{state.pka_corr:12.4f}" for state in self.states]))
         if (self.typ == "phredox"):
-            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
+            ret_strs.append(delineator)
         if (self.typ == "redox" or self.typ == "phredox"):
-            ret_str += ('%8s' % 'Elec Cnt' +
-                        ''.join(['%12d' % state.eleccnt for state in self.states]) +
-                        '\n')
-            ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-            ret_str += ('%8s' % 'Eo Corr' +
-                        ''.join(['%12.4f' % state.eo_corr for state in self.states]) +
-                        '\n')
-        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        ret_str += ('Reference Energies (ES = Explicit solvent, IS = Implicit '
-                    'solvent)\n\n')
-        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1) + '\n'
-        ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2) + '\n'
-        ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5) + '\n'
-        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7) + '\n'
-        ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8) + '\n'
-        ret_str += '%8s' % ('igb=1 ES') + self._str_refenes(True, 1) + '\n'
-        ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2) + '\n'
-        ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5) + '\n'
-        ret_str += '%8s' % ('igb=7 ES') + self._str_refenes(True, 7) + '\n'
-        ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8) + '\n'
-        ret_str += '-' * (8 + 12 * len(self.states)) + '\n'
-        ret_str += 'Reference Energies for Internal Dielectric of 2.0\n\n'
-        ret_str += '%8s' % ('igb=1 IS') + self._str_refenes(False, 1, 2) + '\n'
-        ret_str += '%8s' % ('igb=2 IS') + self._str_refenes(False, 2, 2) + '\n'
-        ret_str += '%8s' % ('igb=5 IS') + self._str_refenes(False, 5, 2) + '\n'
-        ret_str += '%8s' % ('igb=7 IS') + self._str_refenes(False, 7, 2) + '\n'
-        ret_str += '%8s' % ('igb=8 IS') + self._str_refenes(False, 8, 2) + '\n'
-        ret_str += '%8s' % ('igb=1 ES') + self._str_refenes(True, 1, 2) + '\n'
-        ret_str += '%8s' % ('igb=2 ES') + self._str_refenes(True, 2, 2) + '\n'
-        ret_str += '%8s' % ('igb=5 ES') + self._str_refenes(True, 5, 2) + '\n'
-        ret_str += '%8s' % ('igb=7 ES') + self._str_refenes(True, 7, 2) + '\n'
-        ret_str += '%8s' % ('igb=8 ES') + self._str_refenes(True, 8, 2) + '\n'
-        return ret_str
+            ret_strs.append("Elec Cnt".rjust(8) + "".join([f"{state.eleccnt:12d}" for state in self.states]))
+            ret_strs.append(delineator)
+            ret_strs.append("Eo Corr".rjust(8) + "".join([f"{state.eo_corr:12.4f}" for state in self.states]))
+        ret_strs.append(delineator)
+        ret_strs.extend(["Reference Energies (ES = Explicit solvent, IS = Implicit solvent)", ""])
+        ret_strs.append(f"{'igb=1 IS':8s}{self._str_refenes(False, 1)}")
+        ret_strs.append(f"{'igb=2 IS':8s}{self._str_refenes(False, 2)}")
+        ret_strs.append(f"{'igb=5 IS':8s}{self._str_refenes(False, 5)}")
+        ret_strs.append(f"{'igb=7 IS':8s}{self._str_refenes(False, 7)}")
+        ret_strs.append(f"{'igb=8 IS':8s}{self._str_refenes(False, 8)}")
+        ret_strs.append(f"{'igb=1 ES':8s}{self._str_refenes(True, 1)}")
+        ret_strs.append(f"{'igb=2 ES':8s}{self._str_refenes(True, 2)}")
+        ret_strs.append(f"{'igb=5 ES':8s}{self._str_refenes(True, 5)}")
+        ret_strs.append(f"{'igb=7 ES':8s}{self._str_refenes(True, 7)}")
+        ret_strs.append(f"{'igb=8 ES':8s}{self._str_refenes(True, 8)}")
+        ret_strs.append(delineator)
+        ret_strs.extend(["Reference Energies for Internal Dielectric of 2.0", ""])
+        ret_strs.append(f"{'igb=1 IS':8s}{self._str_refenes(False, 1, 2)}")
+        ret_strs.append(f"{'igb=2 IS':8s}{self._str_refenes(False, 2, 2)}")
+        ret_strs.append(f"{'igb=5 IS':8s}{self._str_refenes(False, 5, 2)}")
+        ret_strs.append(f"{'igb=7 IS':8s}{self._str_refenes(False, 7, 2)}")
+        ret_strs.append(f"{'igb=8 IS':8s}{self._str_refenes(False, 8, 2)}")
+        ret_strs.append(f"{'igb=1 ES':8s}{self._str_refenes(True, 1, 2)}")
+        ret_strs.append(f"{'igb=2 ES':8s}{self._str_refenes(True, 2, 2)}")
+        ret_strs.append(f"{'igb=5 ES':8s}{self._str_refenes(True, 5, 2)}")
+        ret_strs.append(f"{'igb=7 ES':8s}{self._str_refenes(True, 7, 2)}")
+        ret_strs.append(f"{'igb=8 ES':8s}{self._str_refenes(True, 8, 2)}")
+        return "\n".join(ret_strs) + "\n"
 
     def add_state(self, charges, refene, refene_old=None, protcnt=None, pka_corr=None, eleccnt=None, eo_corr=None):
         """ Add a single titratable state for this titratable residue """
@@ -241,21 +217,19 @@ class TitratableResidue(object):
         if len(charges) != len(refenes) or (len(charges) != len(refenes_old) and refenes_old) or (len(charges) != len(protcnts) and protcnts) \
            or (len(charges) != len(pka_corrs) and pka_corrs) or (len(charges) != len(eleccnts) and eleccnts) \
            or (len(charges) != len(eo_corrs) and eo_corrs):
-            raise AmberError('Inconsistent list of parameters for '
-                             'TitratableResidue.add_states')
+            raise AmberError('Inconsistent list of parameters for TitratableResidue.add_states')
         for i in range(len(charges)):
             self.add_state(charges[i], refenes[i], refenes_old[i], protcnts[i], pka_corrs[i], eleccnts[i], eo_corrs[i])
 
     def cpin_pointers(self, first_atom):
         """ Sets and returns the cpin info """
         if self.first_state == -1 or self.first_charge == -1:
-            raise AmberError('Must set residue pointers before writing '
-                             'cpin info!')
-        return {'FIRST_ATOM' : first_atom,
-                'FIRST_CHARGE' : self.first_charge,
-                'FIRST_STATE' : self.first_state,
-                'NUM_ATOMS' : len(self.atom_list),
-                'NUM_STATES' : len(self.states)}
+            raise AmberError('Must set residue pointers before writing cpin info!')
+        return {'FIRST_ATOM': first_atom,
+                'FIRST_CHARGE': self.first_charge,
+                'FIRST_STATE': self.first_state,
+                'NUM_ATOMS': len(self.atom_list),
+                'NUM_STATES': len(self.states)}
 
     def set_first_state(self, index):
         """ Sets the first state index """
@@ -296,25 +270,22 @@ class TitratableResidue(object):
             elif (self.typ == "phredox"):
                 diff = protcnts[i] - protcnts[0] + eleccnts[0] - eleccnts[i]
             if abs(charge_diff - diff) >= 0.0001:
-                warnings.warn('Inconsistencies detected in charge definitions '
-                              'in %s' % self.resname, AmberWarning)
+                warnings.warn(f'Charge definitions inconsistent in {self.resname}', AmberWarning)
         # Check all of the reference energies to make sure that the pKa was set
         # for all but one of them
         notset = 0
         valid = True
         for state in self.states:
-            if (not state.refene_old):
+            if not state.refene_old:
                 valid = False
                 break
             notset += int(state.refene_old.pKa_is_set)
         if (notset != len(self.states) - 1 and valid):
-            warnings.warn('Not enough states are pKa-adjusted in %s' %
-                          self.resname)
+            warnings.warn(f"Not enough states are pKa-adjusted in {self.resname}")
 
 class TitratableResidueList(list):
     """ List of all titratable residues """
-    def __init__(self, system_name='Unknown', solvated=False,
-                 first_solvent=0):
+    def __init__(self, system_name='Unknown', solvated=False, first_solvent=0):
         list.__init__(self)
         self.first_atoms = []
         self.residue_nums = []
@@ -329,8 +300,9 @@ class TitratableResidueList(list):
         self.first_atoms.append(first_atom)
         self.residue_nums.append(resnum)
         if state < 0 or state >= len(residue.states):
-            raise AmberError('Residue %s only has states 0-%d (%d chosen)' %
-                        (residue.resname, len(residue.states)-1, state))
+            raise AmberError(
+                f"Residue {residue.resname} only has states 0-{len(residue.states)} ({state} chosen)"
+            )
         self.resstates.append(state)
 
     def set_states(self, statelist):
@@ -339,32 +311,23 @@ class TitratableResidueList(list):
         enough states in the list to set every residue, or emit a warning
         """
         if len(statelist) != len(self):
-            warnings.warn(('Number of states (%d) does not equal number of '
-                            'residues (%d). Using default initial states.') %
-                            (len(statelist), len(self)), AmberWarning)
+            warnings.warn(
+                f"Number of states ({len(statelist)}) does not equal number of "
+                f"residues ({len(self)}). Using default initial states.", AmberWarning
+            )
             return
         # Check that all states are allowable
         for i, state in enumerate(statelist):
             if state < 0 or state >= len(self[i].states):
-                raise AmberError('Bad state choice (%d). Minimum is 0, '
-                            'maximum is %d' % (state, len(self[i].states)))
+                raise AmberError(f"Bad state choice ({state}). Minimum is 0, maximum is {len(self[i].states)}")
         # If we got here, then we are OK
         self.resstates = statelist
 
     def sort(self):
         """ Sorts by residue number """
-        # Bubble sort, cuz who cares?
-        nswaps = 1
-        while nswaps > 0:
-            nswaps = 0
-            for i in range(len(self)-1):
-                if self.first_atoms[i] > self.first_atoms[i+1]:
-                    nswaps += 1
-                    self.first_atoms[i], self.first_atoms[i+1] = \
-                        self.first_atoms[i+1], self.first_atoms[i]
-                    self[i], self[i+1] = self[i+1], self[i]
-                    self.residue_nums[i], self.residue_nums[i+1] = \
-                        self.residue_nums[i+1], self.residue_nums[i]
+        atoms_residues = sorted(list(zip(self.first_atoms, self.residue_nums)))
+        self.first_atoms = [atom_residue[0] for atom_residue in atoms_residues]
+        self.residue_nums = [atom_residue[1] for atom_residue in atoms_residues]
 
     def write_cpin(self, output, igb=2, intdiel=1.0, oldfmt=False, typ="ph", coions=False):
         """ Writes the CPIN file based on the titrated residues """
@@ -377,8 +340,8 @@ class TitratableResidueList(list):
         buf = _LineBuffer(end)
         limit_buf.add_word('&CNSTPHE_LIMITS')
         limit_buf.flush()
-        limit_buf.add_word(' ntres=%d,' % len(self))
-        limit_buf.add_word(' maxh=%d,' % max(len(r.states) for r in self))
+        limit_buf.add_word(f' ntres={len(self)},')
+        limit_buf.add_word(f' maxh={max(len(r.states) for r in self)},')
         if (typ == "ph"):
             buf.add_word('&CNSTPH')
         elif (typ == "redox"):
@@ -409,9 +372,9 @@ class TitratableResidueList(list):
                             refene = state.refene_old
                     # See if we want the explicit solvent refene or not
                     if self.solvated:
-                        energies.append(getattr(refene.solvent, 'igb%d' % igb))
+                        energies.append(getattr(refene.solvent, f"igb{igb}"))
                     else:
-                        energies.append(getattr(refene, 'igb%d' % igb))
+                        energies.append(getattr(refene, f"igb{igb}"))
                     if (typ == "ph" or typ == "phredox"):
                         # Add protonation count of this state
                         if (state.protcnt):
@@ -443,20 +406,20 @@ class TitratableResidueList(list):
                 first_charge += len(new_charges)
             pointers.append(res.cpin_pointers(self.first_atoms[i]))
 
-        limit_buf.add_word(' natchrg=%d,' % len(charges))
-        limit_buf.add_word(' ntstates=%d' % max(len(protcnts), len(eleccnts)))
+        limit_buf.add_word(f' natchrg={len(charges)},')
+        limit_buf.add_word(f' ntstates={max(len(protcnts), len(eleccnts))},')
         limit_buf.flush()
         limit_buf.add_word('/')
         limit_buf.flush()
         # Print the charges
         for charge in charges:
-            buf.add_word('%s,' % charge)
+            buf.add_word(f'{charge},')
         buf.flush()
         # Print the protcnts
         if (typ == "ph" or typ == "phredox"):
             buf.add_word(' PROTCNT=')
             for protcnt in protcnts:
-                buf.add_word('%d,' % protcnt)
+                buf.add_word(f'{protcnt:d},')
         buf.flush()
         if (typ == "redox" or typ == "phredox"):
             buf.add_word(' ELECCNT=')
@@ -464,56 +427,52 @@ class TitratableResidueList(list):
                 buf.add_word('%d,' % eleccnt)
         buf.flush()
         # Print the residue names
-        buf.add_word(" RESNAME='System: %s'," % self.system_name)
+        buf.add_word(f" RESNAME='System: {self.system_name}',")
         for i, res in enumerate(self):
-            buf.add_word("'Residue: %s %d'," %
-                    (res.resname, self.residue_nums[i]))
+            buf.add_word(f"'Residue: {res.resname} {self.residue_nums[i]:d}',")
         buf.flush()
         # Print the residue states
         buf.add_word(" RESSTATE=")
         for state in self.resstates:
-            buf.add_word('%d,' % state)
+            buf.add_word(f'{state:d},')
         buf.flush()
         # Print the residue pointers
         buf.add_word(' ') # get a leading space
         for i, p in enumerate(pointers):
-            buf.add_word("STATEINF(%d)%%FIRST_ATOM=%d, " % (i, p['FIRST_ATOM']))
-            buf.add_word("STATEINF(%d)%%FIRST_CHARGE=%d, " % (i, p['FIRST_CHARGE']))
-            buf.add_word("STATEINF(%d)%%FIRST_STATE=%d, " % (i, p['FIRST_STATE']))
-            buf.add_word("STATEINF(%d)%%NUM_ATOMS=%d, " % (i, p['NUM_ATOMS']))
-            buf.add_word("STATEINF(%d)%%NUM_STATES=%d, " % (i, p['NUM_STATES']))
+            buf.add_word(f"STATEINF({i})%FIRST_ATOM={p['FIRST_ATOM']}, ")
+            buf.add_word(f"STATEINF({i})%FIRST_CHARGE={p['FIRST_CHARGE']}, ")
+            buf.add_word(f"STATEINF({i})%FIRST_STATE={p['FIRST_STATE']}, ")
+            buf.add_word(f"STATEINF({i})%NUM_ATOMS={p['NUM_ATOMS']}, ")
+            buf.add_word(f"STATEINF({i})%NUM_STATES={p['NUM_STATES']}, ")
         buf.flush()
         # Print the reference energies
         buf.add_word(' STATENE=')
         for i, energy in enumerate(energies):
             if energy is None:
-                raise AmberError("%d'th reference energy not known for igb = %d" % (i, igb))
-            buf.add_word('%.6f,' % energy)
+                raise AmberError(f"{i}'th reference energy not known for igb = {igb}")
+            buf.add_word(f'{energy:.6f},')
         buf.flush()
         # Print the pKa or Eo reference
-        if (not oldfmt):
-            if (typ == "ph" or typ == "phredox"):
+        if not oldfmt:
+            if typ == "ph" or typ == "phredox":
                 buf.add_word(' PKA_CORR=')
                 for pka_corr in pka_corrs:
-                    buf.add_word('%.4f,' % pka_corr)
+                    buf.add_word(f'{pka_corr:.4f},')
             buf.flush()
             if (typ == "redox" or typ == "phredox"):
                 buf.add_word(' EO_CORR=')
                 for eo_corr in eo_corrs:
-                    buf.add_word('%.4f,' % eo_corr)
+                    buf.add_word(f'{eo_corr:.4f},')
             buf.flush()
         # Print the # of residues and explicit solvent info if required
         buf.add_word(' TRESCNT=%d,' % len(self))
         if self.solvated:
             if (typ == "ph"):
-                buf.add_word('CPHFIRST_SOL=%d, CPH_IGB=%d, CPH_INTDIEL=%s, ' %
-                            (self.first_sol, igb, intdiel))
+                buf.add_word(f'CPHFIRST_SOL={self.first_sol}, CPH_IGB={igb}, CPH_INTDIEL={intdiel}, ')
             elif (typ == "redox"):
-                buf.add_word('CEFIRST_SOL=%d, CE_IGB=%d, CE_INTDIEL=%s, ' %
-                            (self.first_sol, igb, intdiel))
+                buf.add_word(f'CEFIRST_SOL={self.first_sol}, CE_IGB={igb}, CE_INTDIEL={intdiel}, ')
             elif (typ == "phredox"):
-                buf.add_word('CPHEFIRST_SOL=%d, CPHE_IGB=%d, CPHE_INTDIEL=%s, ' %
-                            (self.first_sol, igb, intdiel))
+                buf.add_word(f'CPHEFIRST_SOL={self.first_sol}, CPHE_IGB={igb}, CPHE_INTDIEL={intdiel}, ')
             buf.flush()
             # Now scan through all of the waters
         buf.flush()

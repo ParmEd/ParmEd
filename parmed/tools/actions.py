@@ -1,20 +1,21 @@
 """
 All of the prmtop actions used in PARMED. Each class is a separate action.
 """
-from __future__ import absolute_import, division, print_function
-
 import copy
 import math
 import os
 import sys
 import warnings
 from collections import Counter, OrderedDict
+from glob import glob
 
 import numpy as np
 
-from .. import gromacs, unit as u
-from ..amber import (AmberAsciiRestart, AmberMask, AmberMdcrd, AmberParm,
-                     AmoebaParm, ChamberParm, NetCDFRestart, NetCDFTraj)
+from .. import gromacs, unit as u, read_PDB
+from ..amber import (
+    AmberAsciiRestart, AmberMask, AmberMdcrd, AmberParm, AmoebaParm, ChamberParm,
+    NetCDFRestart, NetCDFTraj
+)
 from ..amber._chamberparm import ConvertFromPSF
 from ..charmm import CharmmParameterSet, CharmmPsfFile
 from ..exceptions import ParmedError
@@ -22,24 +23,21 @@ from ..formats import CIFFile, Mol2File, PDBFile
 from ..formats.registry import load_file
 from ..modeller import AmberOFFLibrary, ResidueTemplateContainer
 from ..periodic_table import Element as _Element
-from ..residue import (ANION_NAMES, CATION_NAMES, SOLVENT_NAMES,
-                       AminoAcidResidue, DNAResidue, RNAResidue)
+from ..residue import (
+    ANION_NAMES, CATION_NAMES, SOLVENT_NAMES, AminoAcidResidue, DNAResidue, RNAResidue
+)
 from ..structure import Structure
-from ..topologyobjects import (Angle, AngleType, Bond, BondType, Dihedral,
-                               DihedralType, DihedralTypeList)
-from ..utils.six import add_metaclass, iteritems, string_types
-from ..utils.six.moves import range, zip
+from ..topologyobjects import (
+    Angle, AngleType, Bond, BondType, Dihedral, DihedralType, DihedralTypeList
+)
 from .argumentlist import ArgumentList
-from .exceptions import (AddPDBError, AddPDBWarning,  # CoarseGrainError,
-                         AmbiguousParmError, ArgumentError, ChamberError,
-                         ChangeLJPairError, ChangeStateError,
-                         DeleteDihedralError, FileDoesNotExist, FileExists,
-                         HMassRepartitionError, IncompatibleParmsError,
-                         InputError, LJ12_6_4Error, NoArgument,
-                         NonexistentParm, ParmedChangeError, ParmError,
-                         ParmFileNotFound, ParmWarning, SeriousParmWarning,
-                         SetParamError, SimulationError, TiMergeError,
-                         UnhandledArgumentWarning, WriteOFFError)
+from .exceptions import (
+    AddPDBError, AddPDBWarning, AmbiguousParmError, ArgumentError, ChamberError, ChangeLJPairError,
+    ChangeStateError, DeleteDihedralError, FileDoesNotExist, FileExists, HMassRepartitionError,
+    IncompatibleParmsError, InputError, LJ12_6_4Error, NoArgument, NonexistentParm, ParmError,
+    ParmedChangeError, ParmFileNotFound, ParmWarning, SeriousParmWarning, SetParamError,
+    SimulationError, TiMergeError, UnhandledArgumentWarning, WriteOFFError, LJ_TypeError
+)
 from .parmlist import ParmList
 
 GB_RADII = ['amber6', 'bondi', 'mbondi', 'mbondi2', 'mbondi3']
@@ -73,16 +71,9 @@ class ActionType(type):
             Usages[name.lower()] = '%s %s' % (name, dct['usage'])
         elif name != 'Action': # Skip base action class
             Usages[name.lower()] = name
-        super(ActionType, cls).__init__(name, bases, dct)
+        super().__init__(name, bases, dct)
 
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-lawsuit = object
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-@add_metaclass(ActionType)
-class Action(lawsuit):
+class Action(metaclass=ActionType):
     """
     The base class for all ParmEd actions. The metaclass for Action adds the
     action and its usage statement to a map that is imported and used by the
@@ -150,20 +141,20 @@ class Action(lawsuit):
         if args or kwargs:
             if arg_list is None:
                 arg_list = ''
-            elif isinstance(arg_list, string_types) and ' ' in arg_list.strip():
+            elif isinstance(arg_list, str) and ' ' in arg_list.strip():
                 # arg_list has a space, so enclose it in quotes
-                arg_list = '"%s"  ' % arg_list
+                arg_list = f'"{arg_list}"  '
             else:
-                arg_list = '%s ' % arg_list
+                arg_list = f'{arg_list} '
             arg_list += ' '.join([self._format_arg(a) for a in args])
-            for kw, item in iteritems(kwargs):
-                arg_list += ' %s %s ' % (kw, self._format_arg(item))
+            for kw, item in kwargs.items():
+                arg_list += f' {kw} {self._format_arg(item)} '
         elif arg_list is None:
             arg_list = ArgumentList('')
-        elif isinstance(arg_list, string_types):
+        elif isinstance(arg_list, str):
             arg_list = self._format_arg(arg_list)
         # If our arg_list is a string, convert it to an ArgumentList
-        if isinstance(arg_list, string_types):
+        if isinstance(arg_list, str):
             arg_list = ArgumentList(arg_list)
         else:
             arg_list = ArgumentList(str(arg_list))
@@ -177,46 +168,43 @@ class Action(lawsuit):
                 parm = int(parm)
             except ValueError:
                 if parm in self.parm_list:
-                    print('Using parm %s' % parm)
+                    print(f'Using parm {parm}')
                     self.parm = self.parm_list[parm]
                 else:
-                    warnings.warn('Cannot find parm %s. Skipping this action' % parm,
+                    warnings.warn(f'Cannot find parm {parm}. Skipping this action',
                                   SeriousParmWarning)
                     return # pragma: no cover
             else:
                 if parm >= 0 and parm < len(self.parm_list):
-                    print('Using parm %s' % self.parm_list[parm])
+                    print(f'Using parm {self.parm_list[parm]}')
                     self.parm = self.parm_list[parm]
                 else:
-                    warnings.warn('Cannot find parm %s. Skipping this action' % parm,
+                    warnings.warn(f'Cannot find parm {parm}. Skipping this action',
                                   SeriousParmWarning)
                     return # pragma: no cover
         if self.needs_parm:
             if (self.strictly_supported and
                     type(self.parm) not in self.strictly_supported):
-                raise ParmError('%s objects are not supported by this action' %
-                                type(self.parm).__name__)
+                raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
             elif not self.strictly_supported:
                 for cls in self.not_supported:
                     if type(self.parm) is cls:
-                        raise ParmError('%s objects are not supported by this action' %
-                                        type(self.parm).__name__)
+                        raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
                 for cls in self.supported_subclasses:
                     if isinstance(self.parm, cls):
                         break
                 else:
-                    raise ParmError('%s objects are not supported by this action' %
-                                    type(self.parm).__name__)
+                    raise ParmError(f'{type(self.parm).__name__} objects are not supported by this action')
         self._arg_list = arg_list
         try:
             self.init(arg_list)
         except NoArgument:
-            cmdname = type(self).__name__
+            cmdname = self.__class__.__name__
             try:
-                usage = '%s %s' % (cmdname, self.usage)
+                usage = f"{cmdname} {self.usage}"
             except AttributeError:
                 usage = cmdname
-            Action.stderr.write("Bad command %s:\n\t%s\n" % (cmdname, usage))
+            Action.stderr.write(f"Bad command {cmdname}:\n\t{usage}\n")
             return
 
         # Check any unmarked commands
@@ -244,7 +232,7 @@ class Action(lawsuit):
         """
         arg = str(arg)
         if ' ' in arg or '\t' in arg:
-            return ' "%s" ' % arg
+            return f' "{arg}" '
         return arg
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -266,16 +254,15 @@ class parmout(Action):
 
     def __str__(self):
         if self.rst_name is not None:
-            return 'Outputting Amber topology file %s and restart %s' % (self.filename,
-                                                                         self.rst_name)
-        return 'Outputting Amber topology file %s' % self.filename
+            return f'Outputting Amber topology file {self.filename} and restart {self.rst_name}'
+        return f'Outputting Amber topology file {self.filename}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
-            raise FileExists('%s exists; not overwriting.' % self.filename)
+            raise FileExists(f'{self.filename} exists; not overwriting.')
         if self.rst_name is not None:
             if not Action.overwrite and os.path.exists(self.rst_name):
-                raise FileExists('%s exists; not overwriting.' % self.rst_name)
+                raise FileExists(f'{self.rst_name} exists; not overwriting.')
         self.parm.write_parm(self.filename)
         if self.rst_name is not None:
             self.parm.save(self.rst_name, format=self.rst7_format, overwrite=Action.overwrite)
@@ -328,21 +315,20 @@ class writeFrcmod(Action):
                     self.parm.parm_data['HBCUT'][idx-1] > 0):
                     warnings.warn('Frcmod dumping does not work with 10-12 prmtops',
                                   SeriousParmWarning)
-                    break # pragma: no cover
+                    break
         except IndexError:
-            pass # pragma: no cover
+            pass
 
     def __str__(self):
-        return 'Dumping FRCMOD file %s with parameters from %s' % (
-                self.frcmod_name, self.parm)
+        return f'Dumping FRCMOD file {self.frcmod_name} with parameters from {self.parm}'
 
     def execute(self):
         """ Writes the frcmod file """
-        from parmed.amber.parameters import AmberParameterSet
+        from ..amber.parameters import AmberParameterSet
         if not Action.overwrite and os.path.exists(self.frcmod_name):
-            raise FileExists('%s exists; not overwriting' % self.frcmod_name)
+            raise FileExists(f'{self.frcmod_name} exists; not overwriting')
         parmset = AmberParameterSet.from_structure(self.parm)
-        title = 'Force field parameters from %s' % os.path.split(str(self.parm))[1]
+        title = f'Force field parameters from {os.path.split(str(self.parm))[1]}'
         parmset.write(self.frcmod_name, title=title)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -358,7 +344,7 @@ class loadRestrt(Action):
         self.rst_name = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Loading restart file %s' % self.rst_name
+        return f'Loading restart file {self.rst_name}'
 
     def execute(self):
         self.parm.load_rst7(self.rst_name)
@@ -387,14 +373,14 @@ class loadCoordinates(Action):
         self.filename = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Adding coordinates to %s from %s' % (self.parm.name, self.filename)
+        return f'Adding coordinates to {self.parm.name} from {self.filename}'
 
     def execute(self):
         crd = load_file(self.filename, natom=len(self.parm.atoms), hasbox=self.parm.box is not None)
         try:
             self.parm.coordinates = crd.coordinates.copy()
         except AttributeError:
-            raise ParmError('Cannot get coordinates from %s' % self.filename)
+            raise ParmError(f'Cannot get coordinates from {self.filename}')
         self.parm.box = copy.copy(crd.box)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -427,8 +413,7 @@ class writeCoordinates(Action):
 
     Note, NetCDF files require scipy or netCDF4 to be installed.
     """
-    usage = ('<filename> [netcdftraj | netcdf | pdb | cif | restart | mdcrd | '
-             'mol2]')
+    usage = '<filename> [netcdftraj | netcdf | pdb | cif | restart | mdcrd | mol2]'
     def init(self, arg_list):
         self.filename = filename = arg_list.get_next_string()
         self.filetype = arg_list.get_next_string(optional=True, default='').lower()
@@ -441,8 +426,7 @@ class writeCoordinates(Action):
                 self.filetype = 'PDB'
             elif filename.endswith('.cif'):
                 self.filetype = 'CIF'
-            elif (filename.endswith('.rst7') or filename.endswith('.restrt') or
-                  filename.endswith('.inpcrd')):
+            elif any(filename.endswith(ext) for ext in ('.rst7', '.restrt', 'inpcrd')):
                 self.filetype = 'RESTART'
             elif filename.endswith('.mdcrd'):
                 self.filetype = 'MDCRD'
@@ -466,10 +450,10 @@ class writeCoordinates(Action):
             elif self.filetype == 'mol2':
                 self.filetype = 'MOL2'
             else:
-                raise InputError('Unrecognized file format %s' % self.filetype)
+                raise InputError(f'Unrecognized file format {self.filetype}')
 
     def __str__(self):
-        return 'Writing coordinates to %s as type %s' % (self.filename, self.filetype)
+        return f'Writing coordinates to {self.filename} as type {self.filetype}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.filename):
@@ -533,11 +517,11 @@ class writeOFF(Action):
         self.off_file = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Writing Amber OFF file %s' % self.off_file
+        return f'Writing Amber OFF file {self.off_file}'
 
     def execute(self):
         if not Action.overwrite and os.path.exists(self.off_file):
-            raise FileExists('%s exists; not overwriting' % self.off_file)
+            raise FileExists(f'{self.off_file} exists; not overwriting')
         if self.parm.coordinates is None:
             raise WriteOFFError('You must load a restart for WriteOFF!')
 
@@ -557,10 +541,10 @@ class changeRadii(Action):
         self.radii = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Changing PB/GB radii to %s' % self.radii
+        return f'Changing PB/GB radii to {self.radii}'
 
     def execute(self):
-        from parmed.tools.changeradii import ChRad
+        from .changeradii import ChRad
         # Add RADIUS_SET to prmtop if it's not there already, and a blank
         # description, since it's about to be set here
         if isinstance(self.parm, AmberParm):
@@ -595,8 +579,10 @@ class changeLJPair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ %s-%s pairwise interaction to have Rmin = %16.5f and Epsilon = '
-                '%16.5f') % (self.mask1, self.mask2, self.rmin, self.eps)
+        return (
+            f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+            f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
+        )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -641,8 +627,10 @@ class changeLJ14Pair(Action):
         self.eps = arg_list.get_next_float()
 
     def __str__(self):
-        return ('Setting LJ 1-4 %s-%s pairwise interaction to have 1-4 Rmin = %16.5f and 1-4 '
-                'Epsilon = %16.5f' % (self.mask1, self.mask2, self.rmin, self.eps))
+        return (
+            f'Setting LJ 1-4 {self.mask1}-{self.mask2} pairwise interaction to have 1-4 '
+            f'Rmin = {self.rmin:16.5f} and 1-4 Epsilon = {self.eps:16.5f}'
+        )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -686,11 +674,11 @@ class checkValidity(Action):
         return 'Determining validity of prmtop'
 
     def execute(self):
-        from parmed.tools.checkvalidity import check_validity
-        from parmed.tools.exceptions import WarningList
+        from .checkvalidity import check_validity
+        from .exceptions import WarningList
         # Clear our warnings and start logging them, since check_validity
         # reports concerns about the prmtop through the warning system.
-        warning_log = WarningList(empty_msg=('%s looks OK to me!' % self.parm))
+        warning_log = WarningList(empty_msg=f'{self.parm} looks OK to me!')
         check_validity(self.parm, warning_log)
         warning_log.dump(self.output)
 
@@ -723,10 +711,10 @@ class change(Action):
         elif prop in ('ATOM_NAME', 'AMBER_ATOM_TYPE', 'TREE_CHAIN_CLASSIFICATION', 'ATOM_TYPE'):
             self.new_val = arg_list.get_next_string()
             if len(self.new_val) > 4:
-                warnings.warn('Only 4 letters allowed for %s entries! Truncating remaining '
-                              'letters.' % prop, ParmWarning)
+                warnings.warn(f'Only 4 letters allowed for {prop} entries! Truncating remaining letters.',
+                              ParmWarning)
                 self.new_val = self.new_val[:4]
-            self.new_val_str = '%-4s' % self.new_val
+            self.new_val_str = f'{self.new_val:<4s}'
         else:
             raise ParmedChangeError('You may only use "change" with CHARGE, MASS, RADII, SCREEN, '
                                     'ATOM_NAME, ATOM_TYPE, ATOM_TYPE_INDEX, ATOMIC_NUMBER, or '
@@ -734,7 +722,7 @@ class change(Action):
         if type(self.parm) is AmoebaParm:
             # Catch illegal values for Amoeba topologies
             if prop in ('CHARGE', 'RADII', 'SCREEN', 'ATOM_TYPE_INDEX'):
-                raise ParmedChangeError('You cannot change %s in Amoeba topologies' % prop)
+                raise ParmedChangeError(f'You cannot change {prop} in Amoeba topologies')
             if prop == 'ATOMIC_NUMBER':
                 # AmoebaParm can have an AMOEBA_ATOMIC_NUMBER section instead of
                 # ATOMIC_NUMBER. So see which of them is available and change
@@ -748,21 +736,21 @@ class change(Action):
     def __str__(self):
         atnums = self.mask.Selection()
         if sum(atnums) == 0:
-            return "change %s: Nothing to do" % self.prop
+            return f"change {self.prop}: Nothing to do"
         if self.quiet:
-            return "Changing %s of %s to %s" % (self.prop, self.mask, self.new_val)
-        string = ''
+            return f"Changing {self.prop} of {self.mask} to {self.new_val}"
+        parts = []
         for i, atom in enumerate(self.parm.atoms):
             if atnums[i] == 1:
-                string += "Changing %s of atom # %d (%s) from %s to %s\n" % (
-                    self.prop, i+1, atom.name, self.parm.parm_data[self.prop][i], self.new_val_str
+                parts.append(
+                    f"Changing {self.prop} of atom # {i + 1} ({atom.name}) from {self.parm.parm_data[self.prop][i]} to {self.new_val_str}"
                 )
-        return string
+        return "\n".join(parts) + "\n"
 
     def execute(self):
         atnums = self.mask.Selection()
         if sum(atnums) == 0:
-            warnings.warn('change %s: %s matches no atoms' % (self.prop,self.mask), ParmWarning)
+            warnings.warn(f'change {self.prop}: {self.mask} matches no atoms', ParmWarning)
             return
         if self.prop == 'ATOM_TYPE_INDEX':
             prop = 'nb_idx'
@@ -798,21 +786,22 @@ class printInfo(Action):
     def init(self, arg_list):
         self.flag = arg_list.get_next_string().upper()
         if not self.flag in self.parm.flag_list:
-            warnings.warn('%%FLAG %s not found!' % self.flag,
-                          SeriousParmWarning)
+            warnings.warn(f'%FLAG {self.flag} not found!', SeriousParmWarning)
             self.found = False # pragma: no cover
         else:
             if self.parm.formats[self.flag].type is float:
-                self.format = '%16.5f '
+                self.format = '{0:16.5f} '
+            elif self.parm.formats[self.flag].type is int:
+                self.format = '{0:<16d} '
             else:
-                self.format = '%-16s '
+                self.format = '{0:<16s} '
             self.found = True
 
     def __repr__(self):
         ret_str = []
         if self.found:
             for i, item in enumerate(self.parm.parm_data[self.flag]):
-                ret_str.append(self.format % item)
+                ret_str.append(self.format.format(item))
                 if i % 5 == 4:
                     ret_str.append('\n')
 
@@ -842,7 +831,7 @@ class addLJType(Action):
         return 'Making atoms %s into a new LJ atom type' % self.mask
 
     def execute(self):
-        from parmed.tools.addljtype import AddLJType
+        from .addljtype import AddLJType
         # Find the first atom that's selected in this selection. We've
         # already made sure that at least one atom was selected
         sel_atms = self.mask.Selection()
@@ -971,11 +960,12 @@ class scee(Action):
             dt.scee = self.scee_value
         if isinstance(self.parm, AmberParm):
             nptra = self.parm.ptr('nptra')
-            if not 'SCEE_SCALE_FACTOR' in self.parm.flag_list:
-                self.parm.add_flag('SCEE_SCALE_FACTOR', '5E16.8',
-                                   data=[self.scee_value for i in range(nptra)])
+            scee_data = [self.scee_value for i in range(nptra)]
+            scee_flag = 'SCEE_SCALE_FACTOR'
+            if scee_flag not in self.parm.flag_list:
+                self.parm.add_flag(scee_flag, '5E16.8', data=scee_data)
             else:
-                self.parm.parm_data['SCEE_SCALE_FACTOR'] = [self.scee_value for i in range(nptra)]
+                self.parm.parm_data[scee_flag] = scee_data
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -989,18 +979,19 @@ class scnb(Action):
         self.scnb_value = arg_list.get_next_float()
 
     def __str__(self):
-        return "Setting default SCNB van der Waals scaling value to %.4f" % self.scnb_value
+        return f"Setting default SCNB van der Waals scaling value to {self.scnb_value:.4f}"
 
     def execute(self):
         for dt in self.parm.dihedral_types:
             dt.scnb = self.scnb_value
         if isinstance(self.parm, AmberParm):
             nptra = self.parm.ptr('nptra')
-            if not 'SCNB_SCALE_FACTOR' in self.parm.flag_list:
-                self.parm.add_flag('SCNB_SCALE_FACTOR','5E16.8',
-                                   data=[self.scnb_value for i in range(nptra)])
+            scnb_data = [self.scnb_value for i in range(nptra)]
+            scnb_flag = 'SCNB_SCALE_FACTOR'
+            if scnb_flag not in self.parm.flag_list:
+                self.parm.add_flag(scnb_flag, '5E16.8', data=scnb_data)
             else:
-                self.parm.parm_data['SCNB_SCALE_FACTOR'] = [self.scnb_value for i in range(nptra)]
+                self.parm.parm_data[scnb_flag] = scnb_data
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1034,17 +1025,17 @@ class changeLJSingleType(Action):
 
     def __str__(self):
         if sum(self.mask.Selection()) == 0:
-            return "No atoms selected in %s. Nothing to do." % self.mask
-        return ("Changing %s Lennard-Jones well depth from %.4f to %.4f (kal/mol) and radius from "
-                "%.4f to %.4f (Angstroms)" % (self.mask, self.orig_depth, self.depth,
-                                              self.orig_radius, self.radius)
-               )
+            return f"No atoms selected in {self.mask}. Nothing to do."
+        return (
+            f"Changing {self.mask} Lennard-Jones well depth from {self.orig_depth:.4f} to "
+            f"{self.depth:.4f} (kal/mol) and radius from {self.orig_radius:.4f} to "
+            "{self.radius:.4f} (Angstroms)"
+        )
 
     def execute(self):
-        from math import sqrt
-        from parmed.tools.exceptions import LJ_TypeError
         # If this is an empty mask do nothing
-        if self.orig_radius is None: return
+        if self.orig_radius is None:
+            return
         # Make sure we've only selected a single atom type with our mask
         attype = None
         selection = self.mask.Selection()
@@ -1064,7 +1055,7 @@ class changeLJSingleType(Action):
         for i in range(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+attype-1] - 1
             rij = self.parm.LJ_radius[i] + self.radius
-            wij = sqrt(self.parm.LJ_depth[i] * self.depth)
+            wij = math.sqrt(self.parm.LJ_depth[i] * self.depth)
             acoef = wij * rij ** 12
             bcoef = 2 * wij * rij ** 6
             self.parm.parm_data['LENNARD_JONES_ACOEF'][lj_index] = acoef
@@ -1085,31 +1076,34 @@ class printDetails(Action):
 
     def __repr__(self):
         selection = self.mask.Selection()
-        retstr = ["\nThe mask %s matches %d atoms:\n\n" % (self.mask, sum(selection))]
+        retstr = [f"\nThe mask {self.mask} matches {sum(selection)} atoms:\n"]
         # Separate printout for Amoeba-style prmtop files
         if isinstance(self.parm, AmoebaParm):
-            retstr.append('%7s%7s%9s%6s%6s%7s%10s\n' % ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE',
-                                                        'At.#', 'Mass')
-                         )
+            retstr.append(
+                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}{'Mass':>10s}"
+            )
             for i, atm in enumerate(self.parm.atoms):
-                if not selection[i]: continue
-                retstr.append('%7d%7d%9s%6s%6s%7d%10.4f\n' % (
-                              i+1, atm.residue.idx+1, atm.residue.name, atm.name, atm.type,
-                              atm.atomic_number, atm.mass)
-                             )
+                if not selection[i]:
+                    continue
+                retstr.append(
+                    f'{i + 1:7d}{atm.residue.idx + 1:7d}{atm.residue.name:>9s}{atm.name:>6s}'
+                    f'{atm.type:>6s}{atm.atomic_number:7d}{atm.mass:10.4f}'
+                )
         else:
-            retstr.append("%7s%7s%9s%6s%6s%7s%12s%12s%10s%10s%10s%10s\n" %
-                          ('ATOM', 'RES', 'RESNAME', 'NAME', 'TYPE', 'At.#', 'LJ Radius',
-                           'LJ Depth', 'Mass', 'Charge', 'GB Radius', 'GB Screen')
-                         )
+            retstr.append(
+                f"{'ATOM':>7s}{'RES':>7s}{'RESNAME':>9s}{'NAME':>6s}{'TYPE':>6s}{'At.#':>7s}"
+                f"{'LJ Radius':>12s}{'LJ Depth':>12s}{'Mass':>10s}{'Charge':>10s}"
+                f"{'GB Radius':>10s}{'GB Screen':>10s}"
+            )
             for i, atm in enumerate(self.parm.atoms):
-                if not selection[i]: continue
-                retstr.append("%7d%7d%9s%6s%6s%7d%12.4f%12.4f%10.4f%10.4f%10.4f%10.4f\n" %
-                              (i+1, atm.residue.idx+1, atm.residue.name, atm.name, atm.type,
-                               atm.atomic_number, atm.rmin, atm.epsilon, atm.mass, atm.charge,
-                               atm.solvent_radius, atm.screen)
-                             )
-        return ''.join(retstr)
+                if not selection[i]:
+                    continue
+                retstr.append(
+                    f'{i + 1:7d}{atm.residue.idx + 1:7d}{atm.residue.name:>9s}{atm.name:>6s}'
+                    f'{atm.type:>6s}{atm.atomic_number:7d}{atm.rmin:12.4f}{atm.epsilon:12.4f}'
+                    f'{atm.mass:10.4f}{atm.charge:10.4f}{atm.solvent_radius:10.4f}{atm.screen:10.4f}'
+                )
+        return '\n'.join(retstr) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1126,7 +1120,7 @@ class printFlags(Action):
 
     def __repr__(self):
         string = ['\n']
-        string.extend('%%FLAG %s\n' % flag for flag in self.parm.flag_list)
+        string.extend(f'%FLAG {flag}\n' for flag in self.parm.flag_list)
         return ''.join(string)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1144,50 +1138,47 @@ class printPointers(Action):
 
     def __repr__(self):
         ptrs = self.parm.parm_data['POINTERS']
-        ret_str = """
-NATOM (number of atoms in system)................= %d
-NTYPES (number of atom type names)...............= %d
-NBONH (number of bonds containing H).............= %d
-MBONA (number of bonds without H)................= %d
-NTHETH (number of angles containing H)...........= %d
-MTHETA (number of angles without H)..............= %d
-NPHIH (number of dihedrals containing H).........= %d
-MPHIA (number of dihedrals without H)............= %d
-NHPARM (currently unused)........................= %d
-NPARM (1 if made with addles, 0 if not)..........= %d
-NNB (number of excluded atoms)...................= %d
-NRES (number of residues in system)..............= %d
-NBONA (MBONA + constraint bonds).................= %d
-NTHETA (MTHETA + constraint angles)..............= %d
-NPHIA (MPHIA + constraint dihedrals).............= %d
-NUMBND (number of unique bond types).............= %d
-NUMANG (number of unique angle types)............= %d
-NPTRA (number of unique dihedral types)..........= %d
-NATYP (number of nonbonded atom types)...........= %d
-NPHB (number of distinct 10-12 H-bond pairs).....= %d
-IFPERT (1 if prmtop is perturbed; not used)......= %d
-NBPER (perturbed bonds; not used)................= %d
-NGPER (perturbed angles; not used)...............= %d
-NDPER (perturbed dihedrals; not used)............= %d
-MBPER (bonds in perturbed group; not used).......= %d
-MGPER (angles in perturbed group; not used)......= %d
-MDPER (diheds in perturbed group; not used)......= %d
-IFBOX (Type of box: 1=orthogonal, 2=not, 0=none).= %d
-NMXRS (number of atoms in largest residue).......= %d
-IFCAP (1 if solvent cap exists)..................= %d
-NUMEXTRA (number of extra points in topology)....= %d
-""" % tuple(ptrs[:31])
+        ret_str = f"""
+NATOM (number of atoms in system)................= {ptrs[0]:d}
+NTYPES (number of atom type names)...............= {ptrs[1]:d}
+NBONH (number of bonds containing H).............= {ptrs[2]:d}
+MBONA (number of bonds without H)................= {ptrs[3]:d}
+NTHETH (number of angles containing H)...........= {ptrs[4]:d}
+MTHETA (number of angles without H)..............= {ptrs[5]:d}
+NPHIH (number of dihedrals containing H).........= {ptrs[6]:d}
+MPHIA (number of dihedrals without H)............= {ptrs[7]:d}
+NHPARM (currently unused)........................= {ptrs[8]:d}
+NPARM (1 if made with addles, 0 if not)..........= {ptrs[9]:d}
+NNB (number of excluded atoms)...................= {ptrs[10]:d}
+NRES (number of residues in system)..............= {ptrs[11]:d}
+NBONA (MBONA + constraint bonds).................= {ptrs[12]:d}
+NTHETA (MTHETA + constraint angles)..............= {ptrs[13]:d}
+NPHIA (MPHIA + constraint dihedrals).............= {ptrs[14]:d}
+NUMBND (number of unique bond types).............= {ptrs[15]:d}
+NUMANG (number of unique angle types)............= {ptrs[16]:d}
+NPTRA (number of unique dihedral types)..........= {ptrs[17]:d}
+NATYP (number of nonbonded atom types)...........= {ptrs[18]:d}
+NPHB (number of distinct 10-12 H-bond pairs).....= {ptrs[19]:d}
+IFPERT (1 if prmtop is perturbed; not used)......= {ptrs[20]:d}
+NBPER (perturbed bonds; not used)................= {ptrs[21]:d}
+NGPER (perturbed angles; not used)...............= {ptrs[22]:d}
+NDPER (perturbed dihedrals; not used)............= {ptrs[23]:d}
+MBPER (bonds in perturbed group; not used).......= {ptrs[24]:d}
+MGPER (angles in perturbed group; not used)......= {ptrs[25]:d}
+MDPER (diheds in perturbed group; not used)......= {ptrs[26]:d}
+IFBOX (Type of box: 1=orthogonal, 2=not, 0=none).= {ptrs[27]:d}
+NMXRS (number of atoms in largest residue).......= {ptrs[28]:d}
+IFCAP (1 if solvent cap exists)..................= {ptrs[29]:d}
+NUMEXTRA (number of extra points in topology)....= {ptrs[30]:d}
+"""
         if len(ptrs) == 32:
-            ret_str += "NCOPY (number of PIMD slices/number of beads)....= %d\n" % ptrs[31]
+            ret_str += f"NCOPY (number of PIMD slices/number of beads)....= {ptrs[31]:d}\n"
         if self.parm.ptr('IFBOX'):
-            ret_str += "\nSOLVENT POINTERS\n" + """
-IPTRES (Final solute residue)....................= %d
-NSPM (Total number of molecules).................= %d
-NSPSOL (The first solvent "molecule")............= %d
-""" % (self.parm.parm_data['SOLVENT_POINTERS'][0],
-       self.parm.parm_data['SOLVENT_POINTERS'][1],
-       self.parm.parm_data['SOLVENT_POINTERS'][2])
-
+            ret_str += "\nSOLVENT POINTERS\n" + f"""
+IPTRES (Final solute residue)....................= {self.parm.parm_data['SOLVENT_POINTERS'][0]:d}
+NSPM (Total number of molecules).................= {self.parm.parm_data['SOLVENT_POINTERS'][1]:d}
+NSPSOL (The first solvent "molecule")............= {self.parm.parm_data['SOLVENT_POINTERS'][2]:d}
+"""
         return ret_str
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1212,56 +1203,27 @@ class setMolecules(Action):
         elif solute_ions.lower() == 'false':
             self.solute_ions = False
         else:
-            warnings.warn("Value of solute_ions is unrecognized [%s]! Assuming True" % solute_ions,
+            warnings.warn(f"Value of solute_ions is unrecognized [{solute_ions}]! Assuming True",
                           SeriousParmWarning)
             self.solute_ions = True # pragma: no cover
 
     def __str__(self):
-        return ("Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS "
-                "and ATOMS_PER_MOLECULE)")
+        return "Setting MOLECULE properties of the prmtop (SOLVENT_POINTERS and ATOMS_PER_MOLECULE)"
 
     def execute(self):
         owner = self.parm.rediscover_molecules(self.solute_ions)
         if owner is not None:
             if self.parm.coordinates is None:
-                warnings.warn('The atoms in %s were reordered to correct molecule ordering. Any '
-                              'topology printed from now on will *not* work with the original '
-                              'inpcrd or trajectory files created with this prmtop! Consider '
-                              'quitting and loading a restart prior to using setMolecules' %
-                              self.parm, ParmWarning)
+                warnings.warn(
+                    f'The atoms in {self.parm} were reordered to correct molecule ordering. Any '
+                    'topology printed from now on will *not* work with the original inpcrd or '
+                    'trajectory files created with this prmtop! Consider quitting and loading a '
+                    'restart prior to using setMolecules',
+                    ParmWarning,
+                )
             # If we had to reorder our atoms, we need to remake our parm
             self.parm.remake_parm()
         self.parm.load_pointers()
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-#
-#class addCoarseGrain(Action):
-#    """
-#    Adds coarse graining information to the Amber topology file according to
-#    a given coarse graining parameter file
-#    """
-#    strictly_supported = (AmberParm,)
-#    usage = '<parameter_file>
-#    def init(self, arg_list):
-#        self.cg_param_file = arg_list.get_next_string()
-#        if not os.path.exists(self.cg_param_file):
-#            raise CoarseGrainError('Cannot find parameter file %s' %
-#                                    self.cg_param_file)
-#        # Check to see if we've already made this a coarsegrained file...
-#        if 'ANGLE_COEF_A' in self.parm.flag_list:
-#            warnings.warn('Prmtop already has coarse grained sections',
-#                        ParmWarning)
-#
-#    def __str__(self):
-#        return ("Setting up coarse graining for topology file using parameter "
-#                "file " + self.cg_param_file)
-#
-#    def execute(self):
-#        from parmed.tools.coarsegrain import addCoarseGrain as addCG
-#        if 'ANGLE_COEF_A' in self.parm.flag_list: return
-#        addCG(self.parm, self.cg_param_file)
-#
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class changeProtState(Action):
     """
@@ -1279,8 +1241,7 @@ class changeProtState(Action):
         if sum(sel) == 0:
             return "No residues selected for state change"
         res = self.parm.atoms[sel.index(1)].residue
-        return 'Changing protonation state of residue %d (%s) to %d' % (res.idx+1, res.name,
-                                                                        self.state)
+        return f'Changing protonation state of residue {res.idx + 1} ({res.name}) to {self.state}'
 
     @staticmethod
     def _add_ash_glh(residues):
@@ -1288,7 +1249,8 @@ class changeProtState(Action):
         Adds ASH and GLH to the titratable residue list unless it's already
         there
         """
-        if 'ASH' in residues.titratable_residues: return None
+        if 'ASH' in residues.titratable_residues:
+            return None
         dummyrefene1 = residues._ReferenceEnergy()
         dummyrefene1_old = residues._ReferenceEnergy()
         dummyrefene1_old.set_pKa(1.0)
@@ -1321,7 +1283,7 @@ class changeProtState(Action):
         residues.titratable_residues.extend(['ASH', 'GLH'])
 
     def execute(self):
-        from parmed.amber import titratable_residues as residues
+        from ..amber import titratable_residues as residues
         changeProtState._add_ash_glh(residues)
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
@@ -1331,16 +1293,18 @@ class changeProtState(Action):
         # Get the charges from cpin_data. The first 2 elements are energy and
         # proton count so the charges are chgs[2:]
         if not resname in residues.titratable_residues:
-            raise ChangeStateError("Residue %s isn't defined as a titratable "
-                                   "residue in titratable_residues.py" % resname)
+            raise ChangeStateError(f"Residue {resname} isn't defined as a titratable "
+                                   "residue in titratable_residues.py")
         if not getattr(residues, resname).typ == "ph":
-            raise ChangeStateError('Redidue %s is not a pH titratable residue' % resname)
+            raise ChangeStateError(f'Redidue {resname} is not a pH titratable residue')
 
         res = getattr(residues, resname)
 
         if self.state >= len(res.states):
-            raise ChangeStateError('Residue %s only has titratable states 0--%d. You chose state %d'
-                                   % (resname, len(res.states)-1, self.state))
+            raise ChangeStateError(
+                f'Residue {resname} only has titratable states 0--{len(res.states) - 1}. '
+                f'You chose state {self.state}'
+            )
 
         if sum(sel) != len(res.states[self.state].charges):
             raise ChangeStateError('You must select one and only one entire titratable residue')
@@ -1352,7 +1316,7 @@ class changeProtState(Action):
                                        'change the protonation state')
             # Actually make the change
             self.parm.parm_data['CHARGE'][atom.idx] = atom.charge = charges[i]
-            
+
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 class changeRedoxState(Action):
@@ -1371,29 +1335,31 @@ class changeRedoxState(Action):
         if sum(sel) == 0:
             return "No residues selected for state change"
         res = self.parm.atoms[sel.index(1)].residue
-        return 'Changing reduction state of residue %d (%s) to %d' % (res.idx+1, res.name,
-                                                                        self.state)
+        return f'Changing reduction state of residue {res.idx + 1} ({res.name}) to {self.state}'
 
     def execute(self):
-        from parmed.amber import titratable_residues as residues
+        from ..amber import titratable_residues as residues
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
-        if sum(sel) == 0: return
+        if sum(sel) == 0:
+            return
         residue = self.parm.atoms[sel.index(1)].residue
         resname = residue.name
         # Get the charges from cein_data. The first 2 elements are energy and
         # electron count so the charges are chgs[2:]
         if not resname in residues.titratable_residues:
-            raise ChangeStateError("Residue %s isn't defined as a titratable "
-                                   "residue in titratable_residues.py" % resname)
+            raise ChangeStateError(f"Residue {resname} isn't defined as a titratable "
+                                   "residue in titratable_residues.py")
         if not getattr(residues, resname).typ == "redox":
-            raise ChangeStateError('Redidue %s is not a redox potential titratable residue' % resname)
+            raise ChangeStateError(f'Redidue {resname} is not a redox potential titratable residue')
 
         res = getattr(residues, resname)
 
         if self.state >= len(res.states):
-            raise ChangeStateError('Residue %s only has titratable states 0--%d. You chose state %d'
-                                   % (resname, len(res.states)-1, self.state))
+            raise ChangeStateError(
+                f'Residue {resname} only has titratable states 0--{len(res.states) - 1}. '
+                f'You chose state {self.state}'
+            )
 
         if sum(sel) != len(res.states[self.state].charges):
             raise ChangeStateError('You must select one and only one entire titratable residue')
@@ -1420,12 +1386,14 @@ class netCharge(Action):
         self.mask = AmberMask(self.parm, mask)
 
     def __str__(self):
-        return 'The net charge of %s is %.4f' % (self.mask,
-            sum([self.parm.atoms[i].charge for i in self.mask.Selected()]))
+        return f'The net charge of {self.mask} is {self._net_charge():.4f}'
+
+    def _net_charge(self):
+        return sum([self.parm.atoms[i].charge for i in self.mask.Selected()])
 
     def execute(self):
         """ Calculates the charge of all atoms selected in mask """
-        return sum([self.parm.atoms[i].charge for i in self.mask.Selected()])
+        return self._net_charge()
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1443,8 +1411,7 @@ class strip(Action):
         self.num_atoms = sum(self.mask.Selection())
 
     def __str__(self):
-        retstr = ["Removing mask '%s' (%d atoms) from the topology file." %
-                    (self.mask, self.num_atoms)]
+        retstr = [f"Removing mask '{self.mask}' ({self.num_atoms} atoms) from the topology file."]
         if self.nobox:
             retstr.append('Deleting box info.')
         return ' '.join(retstr)
@@ -1465,7 +1432,7 @@ class defineSolvent(Action):
     usage = '<residue_list>'
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
-        from parmed import residue
+        from .. import residue
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
         if res_list.endswith(','):
@@ -1475,7 +1442,7 @@ class defineSolvent(Action):
         residue.SOLVENT_NAMES = self.res_list.split(',')
 
     def __str__(self):
-        return "Residues %s are now considered to be solvent" % self.res_list
+        return f"Residues {self.res_list} are now considered to be solvent"
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1495,8 +1462,7 @@ class addExclusions(Action):
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
 
     def __str__(self):
-        return 'Adding atoms from %s to exclusion lists of atoms in %s' % (
-            self.mask2, self.mask1)
+        return f'Adding atoms from {self.mask2} to exclusion lists of atoms in {self.mask1}'
 
     def execute(self):
         # Loop through both selections and add each selected atom in sel2 to
@@ -1506,7 +1472,8 @@ class addExclusions(Action):
             for j in self.mask2.Selected():
                 atm2 = self.parm.atoms[j]
                 # Skip over atm1 == atm2
-                if atm1 is atm2: continue
+                if atm1 is atm2:
+                    continue
                 # Add each other to each other's exclusion lists.
                 atm1.exclude(atm2)
                 self.parm.atoms.changed = True
@@ -1531,19 +1498,36 @@ class printBonds(Action):
     def __str__(self):
         return self.__repr__()
 
+    @staticmethod
+    def _build_bond_report(bond: Bond, do_measured: bool, do_energy: bool) -> str:
+        k = req = "N/A"
+        if bond.type is not None:
+            k = f'{bond.type.k:10.4f}'
+            req = f'{bond.type.req:10.4f}'
+        atom1 = bond.atom1
+        atom2 = bond.atom2
+        retstr = [
+            f"{atom1.idx + 1:7d} {atom1.name:>4s} ({str(atom1.type):>4s}) {atom2.idx + 1:7d} "
+            f"{atom2.name:>4s} ({str(atom2.type):>4s}) {req:>10s} {k:>10s}"
+        ]
+        if do_measured:
+            retstr.append(f'{bond.measure():10.4f}')
+            if do_energy:
+                retstr.append(f'{bond.energy():10.4f}')
+        return ' '.join(retstr)
+
     def __repr__(self):
-        retstr = ['%19s %19s %10s %10s' %
-                        ('Atom 1', 'Atom 2', 'R eq', 'Frc Cnst')]
+        header = f"{'Atom 1':>19s} {'Atom 2':>19s} {'R eq':>10s} {'Frc Cnst':>10s}"
         # Loop through all of the bonds without and inc hydrogen
         atomsel = set(self.mask.Selected())
         atomsel2 = set(self.mask2.Selected())
         do_measured = self.parm.coordinates is not None
         do_energy = all(b.type is not None for b in self.parm.bonds)
         if do_measured:
-            retstr.append(' %10s' % 'Distance')
+            header += f" {'Distance':>10s}"
             if do_energy:
-                retstr.append(' %10s' % 'Energy')
-        retstr.append('\n')
+                header += f" {'Energy':>10s}"
+        retstr = [header]
         for bond in self.parm.bonds:
             atom1, atom2 = bond.atom1, bond.atom2
             found = False
@@ -1551,22 +1535,10 @@ class printBonds(Action):
                 found = True
             elif atom2.idx in atomsel and atom1.idx in atomsel2:
                 found = True
-            if not found: continue
-            if bond.type is not None:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %10.4f %10.4f' % (
-                        atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, bond.type.req, bond.type.k)
-                )
-            else:
-                retstr.append('%7d %4s (%4s) %7d %4s (%4s) %-10s %-10s' % (
-                        atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                        atom2.name, atom2.type, 'N/A', 'N/A'))
-            if do_measured:
-                retstr.append(' %10.4f' % bond.measure())
-                if do_energy:
-                    retstr.append(' %10.4f' % bond.energy())
-            retstr.append('\n')
-        return ''.join(retstr)
+            if not found:
+                continue
+            retstr.append(self._build_bond_report(bond, do_measured, do_energy))
+        return '\n'.join(retstr) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1598,41 +1570,43 @@ class printAngles(Action):
     def __str__(self):
         return self.__repr__()
 
+    @staticmethod
+    def _build_angle_report(angle: Angle, do_measured: bool, do_energy: bool) -> str:
+        k = theteq = 'N/A'
+        if angle.type is not None:
+            k = f'{angle.type.k:10.4f}'
+            theteq = f'{angle.type.theteq:10.4f}'
+        atom1 = angle.atom1
+        atom2 = angle.atom2
+        atom3 = angle.atom3
+        retstr = [
+            f'{atom1.idx + 1:7d} {atom1.name:>4s} ({str(atom1.type):>4s})  {atom2.idx + 1:7d} '
+            f'{atom2.name:>4s} ({str(atom2.type):>4s})  {atom3.idx +1:7d} {atom3.name:>4s} '
+            f'({str(atom3.type):>4s}) {k:>10s} {theteq:>10s}'
+        ]
+        if do_measured:
+            retstr.append(f'{angle.measure():10.4f}')
+            if do_energy:
+                retstr.append(f'{angle.energy():10.4f}')
+        return ' '.join(retstr)
+        
+
     def __repr__(self):
-        retstr = ['%19s  %19s  %19s %10s %10s' %
-                        ('Atom 1', 'Atom 2', 'Atom 3', 'Frc Cnst', 'Theta eq')]
+        header = f"{'Atom 1':>19s}  {'Atom 2':>19s}  {'Atom 3':>19s} {'Frc Cnst':>10s} {'Theta eq':>10s}"
         do_measured = self.parm.coordinates is not None
         do_energy = all(a.type is not None for a in self.parm.angles)
         if do_measured:
-            retstr.append(' %10s' % 'Angle')
+            header += f" {'Angle':>10s}"
             if do_energy:
-                retstr.append(' %10s' % 'Energy')
-        retstr.append('\n')
+                header += f" {'Energy':>10s}"
+        retstr = [header]
         if self.one_arg:
             atomsel = self.mask.Selection()
             for angle in self.parm.angles:
                 atom1, atom2, atom3 = angle.atom1, angle.atom2, angle.atom3
-                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                        atomsel[atom3.idx]):
+                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or atomsel[atom3.idx]):
                     continue
-                if angle.type is not None:
-                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f' % (atom1.idx+1, atom1.name,
-                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
-                           atom3.idx+1, atom3.name, atom3.type, angle.type.k,
-                           angle.type.theteq)
-                    )
-                else:
-                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s' % (atom1.idx+1, atom1.name,
-                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
-                           atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
-                    )
-                if do_measured:
-                    retstr.append(' %10.4f' % angle.measure())
-                    if do_energy:
-                        retstr.append(' %10.4f' % angle.energy())
-                retstr.append('\n')
+                retstr.append(self._build_angle_report(angle, do_measured, do_energy))
         else:
             atomsel = set(self.mask.Selected())
             atomsel2 = set(self.mask2.Selected())
@@ -1648,26 +1622,10 @@ class printAngles(Action):
                     found = True
                 elif atom3.idx in atomsel and atom1.idx in atomsel3:
                     found = True
-                if not found: continue
-                if angle.type is not None:
-                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%10.4f %10.4f' % (atom1.idx+1, atom1.name,
-                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
-                           atom3.idx+1, atom3.name, atom3.type, angle.type.k,
-                           angle.type.theteq)
-                    )
-                else:
-                    retstr.append('%7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           '%-10s %-10s' % (atom1.idx+1, atom1.name,
-                           atom1.type, atom2.idx+1, atom2.name, atom2.type,
-                           atom3.idx+1, atom3.name, atom3.type, 'N/A', 'N/A')
-                    )
-                if do_measured:
-                    retstr.append(' %10.4f' % angle.measure())
-                    if do_energy:
-                        retstr.append(' %10.4f' % angle.energy())
-                retstr.append('\n')
-        return ''.join(retstr)
+                if not found:
+                    continue
+                retstr.append(self._build_angle_report(angle, do_measured, do_energy))
+        return '\n'.join(retstr) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1703,18 +1661,52 @@ class printDihedrals(Action):
     def __str__(self):
         return self.__repr__()
 
-    def __repr__(self):
-        retstr = ['%21s  %19s  %19s  %19s %10s %10s %10s %10s %10s' % (
-                'Atom 1', 'Atom 2', 'Atom 3', 'Atom 4', 'Height', 'Periodic.',
-                'Phase', 'EEL Scale', 'VDW Scale')]
-        do_measured = self.parm.coordinates is not None
-        do_energy = all(isinstance(d.type, (DihedralType, DihedralTypeList))
-                        for d in self.parm.dihedrals)
+    def _build_dihedral_report(self, dihedral: Dihedral, do_measured: bool, do_energy: bool) -> str:
+        atom1 = dihedral.atom1
+        atom2 = dihedral.atom2
+        atom3 = dihedral.atom3
+        atom4 = dihedral.atom4
+        scee = scnb = k = per = phase = 'N/A'
+        if dihedral.improper:
+            char = 'I'
+        elif dihedral.ignore_end:
+            char = 'M'
+        else:
+            char = ' '
+        if dihedral.type is not None:
+            k = f'{dihedral.type.phi_k:10.4f}'
+            per = f'{dihedral.type.per:10.4f}'
+            phase = f'{dihedral.type.phase:10.4f}'
+            if not isinstance(self.parm, AmoebaParm):
+                scee = f'{dihedral.type.scee:10.4f}'
+                scnb = f'{dihedral.type.scnb:10.4f}'
+        retstr = [
+            f"{char} {atom1.idx + 1:7d} {atom1.name:>4s} ({str(atom1.type):>4s})  {atom2.idx + 1:7d} "
+            f"{atom2.name:>4s} ({str(atom2.type):>4s})  {atom3.idx + 1:7d} {atom3.name:>4s} "
+            f"({str(atom3.type):>4s})  {atom4.idx + 1:7d} {atom4.name:>4s} ({str(atom4.type):>4s}) "
+            f"{k:>10s} {per:>10s} {phase:>10s} {scee:>10s} {scnb:>10s}"
+        ]
         if do_measured:
-            retstr.append(' %10s' % 'Dihedral')
+            retstr.append(f'{dihedral.measure():10.4f}')
             if do_energy:
-                retstr.append(' %10s' % 'Energy')
-        retstr.append('\n')
+                retstr.append(f'{dihedral.energy():10.4f}')
+
+        return ' '.join(retstr)
+
+    def __repr__(self):
+        header = (
+            f"{'Atom 1':>21s}  {'Atom 2':>19s}  {'Atom 3':>19s}  {'Atom 4':>19s} {'Height':>10s} "
+            f"{'Periodic.':>10s} {'Phase':>10s} {'EEL Scale':>10s} {'VDW Scale':>10s}"
+        )
+        do_measured = self.parm.coordinates is not None
+        do_energy = all(
+            isinstance(d.type, (DihedralType, DihedralTypeList)) for d in self.parm.dihedrals
+        )
+        if do_measured:
+            header += f" {'Dihedral':>10s}"
+            if do_energy:
+                header += f" {'Energy':>10s}"
+        retstr = [header]
         # Loop through all of the bonds without and inc hydrogen
         if self.one_mask:
             atomsel = self.mask.Selection()
@@ -1723,59 +1715,9 @@ class printDihedrals(Action):
                 atom2 = dihedral.atom2
                 atom3 = dihedral.atom3
                 atom4 = dihedral.atom4
-                if not (atomsel[atom1.idx] or atomsel[atom2.idx] or
-                        atomsel[atom3.idx] or atomsel[atom4.idx]):
+                if not any(atomsel[atom.idx] for atom in (atom1, atom2, atom3, atom4)):
                     continue
-
-                # Determine if it's an Improper, Multiterm, or neither
-                if isinstance(self.parm, AmoebaParm):
-                    char = ' '
-                    scee = scnb = 'N/A'
-                    k = '%10.4f' % dihedral.type.phi_k
-                    per = '%10.4f' % dihedral.type.per
-                    phase = '%10.4f' % dihedral.type.phase
-                elif dihedral.improper:
-                    char = 'I'
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                elif dihedral.ignore_end:
-                    char = 'M'
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                else:
-                    char = ' '
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s (%4s) '
-                           ' %7d %4s (%4s) %10s %10s %10s %10s %10s' %
-                           (char, atom1.idx+1, atom1.name, atom1.type, atom2.idx+1,
-                            atom2.name, atom2.type, atom3.idx+1, atom3.name,
-                            atom3.type, atom4.idx+1, atom4.name, atom4.type,
-                            k, per, phase, scee, scnb)
-                )
-                if do_measured:
-                    retstr.append(' %10.4f' % dihedral.measure())
-                    if do_energy:
-                        retstr.append(' %10.4f' % dihedral.energy())
-                retstr.append('\n')
+                retstr.append(self._build_dihedral_report(dihedral, do_measured, do_energy))
         else:
             atomsel = set(self.mask.Selected())
             atomsel2 = set(self.mask2.Selected())
@@ -1795,57 +1737,11 @@ class printDihedrals(Action):
                 elif (atom1.idx in atomsel4 and atom2.idx in atomsel3 and
                     atom3.idx in atomsel2 and atom4.idx in atomsel):
                     found = True
-                if not found: continue
-                if isinstance(self.parm, AmoebaParm):
-                    char = ' '
-                    scee = scnb = 'N/A'
-                    k = '%10.4f' % dihedral.type.phi_k
-                    per = '%10.4f' % dihedral.type.per
-                    phase = '%10.4f' % dihedral.type.phase
-                elif dihedral.improper:
-                    char = 'I'
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                elif dihedral.ignore_end:
-                    char = 'M'
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                else:
-                    char = ' '
-                    if dihedral.type is not None:
-                        scee = '%10.4f' % dihedral.type.scee
-                        scnb = '%10.4f' % dihedral.type.scnb
-                        k = '%10.4f' % dihedral.type.phi_k
-                        per = '%10.4f' % dihedral.type.per
-                        phase = '%10.4f' % dihedral.type.phase
-                    else:
-                        scee = scnb = k = per = phase = 'N/A'
-                retstr.append('%1s %7d %4s (%4s)  %7d %4s (%4s)  %7d %4s '
-                           '(%4s)  %7d %4s (%4s) %10s %10s %10s %10s '
-                           '%10s' % (char, atom1.idx+1, atom1.name,
-                            atom1.type, atom2.idx+1, atom2.name, atom2.type,
-                            atom3.idx+1, atom3.name, atom3.type, atom4.idx+1,
-                            atom4.name, atom4.type, k, per, phase, scee, scnb)
-                )
-                if do_measured:
-                    retstr.append(' %10.4f' % dihedral.measure())
-                    if do_energy:
-                        retstr.append(' %10.4f' % dihedral.energy())
-                retstr.append('\n')
+                if not found:
+                    continue
+                retstr.append(self._build_dihedral_report(dihedral, do_measured, do_energy))
 
-        return ''.join(retstr)
+        return '\n'.join(retstr) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1871,17 +1767,17 @@ class setBond(Action):
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
 
     def __str__(self):
-        return ('Set a bond between %s and %s with k = %f kcal/(mol Angstrom'
-                '**2) and Req = %f Angstroms') % (self.mask1, self.mask2,
-                self.k, self.req)
+        return (
+            f'Set a bond between {self.mask1} and {self.mask2} with k = {self.k:f} kcal/(mol '
+            f'Angstrom**2) and Req = {self.req} Angstroms'
+        )
 
     def execute(self):
         sel1 = self.mask1.Selection()
         sel2 = self.mask2.Selection()
 
         if sum(sel1) != sum(sel2):
-            raise SetParamError('setBond: Each mask must select the same '
-                                'number of atoms!')
+            raise SetParamError('setBond: Each mask must select the same number of atoms!')
 
         # If no atoms, nothing to do
         if sum(sel1) == 0: return
@@ -1951,9 +1847,10 @@ class setAngle(Action):
         self.mask3 = AmberMask(self.parm, arg_list.get_next_mask())
 
     def __str__(self):
-        return ('Set an angle between %s, %s and %s with k = %f kcal/(mol '
-                'rad**2) and THETeq = %f degrees') % (self.mask1, self.mask2,
-                self.mask3, self.k, self.theteq)
+        return (
+            f'Set an angle between {self.mask1}, {self.mask2} and {self.mask3} with k = {self.k} '
+            f'kcal/(mol rad**2) and THETeq = {self.theteq} degrees'
+        )
 
     def execute(self):
         sel1 = self.mask1.Selection()
@@ -1961,10 +1858,10 @@ class setAngle(Action):
         sel3 = self.mask3.Selection()
 
         if sum(sel1) != sum(sel2) or sum(sel1) != sum(sel3):
-            raise SetParamError('Each mask in setAngle must select the same '
-                                'number of atoms!')
+            raise SetParamError('Each mask in setAngle must select the same number of atoms!')
 
-        if sum(sel1) == 0: return
+        if sum(sel1) == 0:
+            return
 
         # Create the new angle type
         new_ang_typ = AngleType(self.k, self.theteq)
@@ -2060,11 +1957,10 @@ class addDihedral(Action):
             raise InputError('addDihedral: type must be "normal" or "improper"')
 
     def __str__(self):
-        return ('Set %s dihedral between %s, %s, %s, and %s with phi_k = %f '
-                'kcal/mol periodicity = %f phase = %f degrees scee = %f '
-                'scnb = %f' %
-               (self.type, self.mask1, self.mask2, self.mask3, self.mask4,
-                self.phi_k, self.per, self.phase, self.scee, self.scnb)
+        return (
+            f'Set {self.type} dihedral between {self.mask1}, {self.mask2}, {self.mask3}, and '
+            f'{self.mask4} with phi_k = {self.phi_k} kcal/mol periodicity = {self.per} phase = '
+            f'{self.phase} degrees scee = {self.scee} scnb = {self.scnb}'
         )
 
     def execute(self):
@@ -2073,17 +1969,15 @@ class addDihedral(Action):
         sel3 = self.mask3.Selection()
         sel4 = self.mask4.Selection()
 
-        if (sum(sel1) != sum(sel2) or sum(sel1) != sum(sel3) or
-                                      sum(sel1) != sum(sel4)):
-            raise SetParamError('addDihedral: Each mask must select the same '
-                                'number of atoms!')
+        if (sum(sel1) != sum(sel2) or sum(sel1) != sum(sel3) or sum(sel1) != sum(sel4)):
+            raise SetParamError('addDihedral: Each mask must select the same number of atoms!')
 
         # If we do nothing, just return
-        if sum(sel1) == 0: return
+        if sum(sel1) == 0:
+            return
 
         # Create the new dihedral type
-        new_dih_typ = DihedralType(self.phi_k, self.per, self.phase, self.scee,
-                                   self.scnb)
+        new_dih_typ = DihedralType(self.phi_k, self.per, self.phase, self.scee, self.scnb)
         exists = False
         # Do not add a duplicate dihedral type
         for dih_typ in self.parm.dihedral_types:
@@ -2116,8 +2010,8 @@ class addDihedral(Action):
                           atm1 in atm4.angle_partners or
                           atm1 in atm4.dihedral_partners)
             self.parm.dihedrals.append(
-                    Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
-                             ignore_end=ignore_end, type=new_dih_typ)
+                Dihedral(atm1, atm2, atm3, atm4, improper=self.improper,
+                         ignore_end=ignore_end, type=new_dih_typ)
             )
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2140,18 +2034,16 @@ class addAtomicNumber(Action):
 
     def __str__(self):
         if self.present:
-            return 'ATOMIC_NUMBER already in [%s] -- Doing nothing.' % self.parm
-        return "Adding ATOMIC_NUMBER to [%s]" % self.parm
+            return f'ATOMIC_NUMBER already in [{self.parm}] -- Doing nothing.'
+        return f"Adding ATOMIC_NUMBER to [{self.parm}]"
 
     def execute(self):
         if self.present: return
         if self.parm.amoeba:
-            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8',
-                               num_items=len(self.parm.atoms))
+            self.parm.add_flag('AMOEBA_ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
             flag = 'AMOEBA_ATOMIC_NUMBER'
         else:
-            self.parm.add_flag('ATOMIC_NUMBER', '10I8',
-                               num_items=len(self.parm.atoms))
+            self.parm.add_flag('ATOMIC_NUMBER', '10I8', num_items=len(self.parm.atoms))
             flag = 'ATOMIC_NUMBER'
         for i, atm in enumerate(self.parm.atoms):
             self.parm.parm_data[flag][i] = atm.atomic_number
@@ -2173,20 +2065,18 @@ class deleteDihedral(Action):
         if (sum(self.mask1.Selection()) != sum(self.mask2.Selection()) or
             sum(self.mask1.Selection()) != sum(self.mask3.Selection()) or
             sum(self.mask1.Selection()) != sum(self.mask4.Selection())):
-            raise DeleteDihedralError('All masks must select the same number '
-                                      'of atoms!. They selected %d, %d, %d, '
-                                      'and %d, respectively' % (
-                    sum(self.mask1.Selection()), sum(self.mask2.Selection()),
-                    sum(self.mask3.Selection()), sum(self.mask4.Selection()))
+            raise DeleteDihedralError(
+                f"All masks must select the same number of atoms!. They selected "
+                f"{sum(self.mask1.Selection())}, {sum(self.mask2.Selection())}, "
+                f"{sum(self.mask3.Selection())}, and {sum(self.mask4.Selection())}, respectively"
             )
 
     def __str__(self):
         if sum(self.mask1.Selection()) == 0:
             return 'No specified dihedrals to delete'
-        return ('Deleting dihedral terms involving [%s]-[%s]-[%s]-[%s]'
-                ' (At most %d total, distinct, dihedrals)' %
-               (self.mask1, self.mask2, self.mask3, self.mask4,
-                sum(self.mask1.Selection()))
+        return (
+            f'Deleting dihedral terms involving [{self.mask1}]-[{self.mask2}]-[{self.mask3}]-'
+            f'[{self.mask4}] (At most {self.mask1.Selection()} total, distinct, dihedrals)'
         )
 
     def execute(self):
@@ -2213,13 +2103,12 @@ class deleteDihedral(Action):
             atm3 = self.parm.atoms[atnum3]
             atm4 = self.parm.atoms[atnum4]
             # Make sure none of the indices are the same
-            if (atm1 is atm2 or atm1 is atm3 or atm1 is atm4 or
-                atm2 is atm3 or atm2 is atm4 or atm3 is atm4):
-                warnings.warn('Skipping %d-%d-%d-%d dihedral deletion -- '
-                              'duplicate atoms!' %
-                              (atnum1, atnum2, atnum3, atnum4),
-                              SeriousParmWarning)
-                continue # pragma: no cover
+            if len({atm1, atm2, atm3, atm4}) < 4:
+                warnings.warn(
+                    f'Skipping {atnum1}-{atnum2}-{atnum3}-{atnum4} dihedral deletion -- duplicate atoms!',
+                    SeriousParmWarning,
+                )
+                continue
             # Now search through our dihedral list to see which indexes (if any)
             # we have to remove. Keep tabs of them so we can pop them in reverse
             # order (so we don't have to re-figure indices) afterwards
@@ -2262,8 +2151,7 @@ class printLJMatrix(Action):
         return self.__repr__()
 
     def __repr__(self):
-        has_1264 = (hasattr(self.parm, 'parm_data') and
-                    'LENNARD_JONES_CCOEF' in self.parm.parm_data)
+        has_1264 = hasattr(self.parm, 'parm_data') and 'LENNARD_JONES_CCOEF' in self.parm.parm_data
         ntypes = self.parm.ptr('NTYPES')
         ret_str = []
         if self.idx is not None:
@@ -2273,7 +2161,8 @@ class printLJMatrix(Action):
         else:
             sel = self.mask.Selection()
         # If we selected no atoms, bail out
-        if sum(sel) == 0: return 'No atom types selected'
+        if sum(sel) == 0:
+            return 'No atom types selected'
         # Figure out which types correspond to which names
         typenames = [set() for i in range(self.parm.ptr('NTYPES'))]
         for i, atom in enumerate(self.parm.atoms):
@@ -2281,7 +2170,8 @@ class printLJMatrix(Action):
         # Otherwise, collect our list of atom types that we selected
         sel_types = set()
         for i, atom in enumerate(self.parm.atoms):
-            if sel[i] == 0: continue
+            if sel[i] == 0:
+                continue
             sel_types.add(atom.nb_idx)
         sel_types = sorted(list(sel_types)) # sort the atom types
         # Convert all of the typenames into strings, then find the longest one so
@@ -2291,20 +2181,19 @@ class printLJMatrix(Action):
             typenames[i] = ','.join(sorted(list(names))) + ' [%d]' % (i+1)
             maxlen = max(maxlen, len(typenames[i]))
         if has_1264:
-            fmt = '\n%%%ds %%%ds %%15s %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
-            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
-                    'B coefficient', 'C coefficient', 'R i,j', 'Eps i,j')
+            fmt = f'\n{{0:>{maxlen}s}} {{1:>{maxlen}s}} {{2:>15s}} {{3:>15s}} {{4:>15s}} {{5:>10s}} {{6:>10s}}'
+            matfmt = f'{{0:>{maxlen}s}} {{1:>{maxlen}s}} {{2:>15.6f}} {{3:>15.6f}} {{4:>15.6f}} {{5:>10.6f}} {{6:>10.6f}}\n'
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient', 'B coefficient', 'C coefficient', 'R i,j', 'Eps i,j')
         else:
-            fmt = '\n%%%ds %%%ds %%15s %%15s %%10s %%10s' % (maxlen, maxlen)
-            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient',
-                    'B coefficient', 'R i,j', 'Eps i,j')
-        ret_str.append(fmt % args)
-        ret_str.extend(['\n','-'*len(ret_str[-1]), '\n'])
+            fmt = f'\n{{0:>{maxlen}s}} {{1:>{maxlen}s}} {{2:>15s}} {{3:>15s}} {{4:>10s}} {{5:>10s}}'
+            matfmt = f'{{0:>{maxlen}s}} {{1:>{maxlen}s}} {{2:>15.6f}} {{3:>15.6f}} {{4:>10.6f}} {{5:>10.6f}}\n'
+            args = ('Atom Type 1', 'Atom Type 2', 'A coefficient', 'B coefficient', 'R i,j', 'Eps i,j')
+        ret_str.append(fmt.format(*args))
+        ret_str.extend(['\n','-' * len(ret_str[-1]), '\n'])
         for ty in sel_types:
             for ty2 in range(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
-                idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][
-                            ntypes*(type1-1)+type2-1]
+                idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(type1-1)+type2-1]
                 acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
                 bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
                 if has_1264:
@@ -2315,17 +2204,10 @@ class printLJMatrix(Action):
                     rij = (2 * acoef / bcoef) ** (1 / 6)
                     eij = (bcoef * bcoef / (4 * acoef))
                 if has_1264:
-                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%15.6f %%10.6f %%10.6f\n' %
-                            (maxlen, maxlen) %
-                            (typenames[type1-1], typenames[type2-1],
-                             acoef, bcoef, ccoef, rij, eij)
-                )
+                    args = typenames[type1-1], typenames[type2-1], acoef, bcoef, ccoef, rij, eij
                 else:
-                    ret_str.append('%%%ds %%%ds %%15.6f %%15.6f %%10.6f %%10.6f\n' %
-                            (maxlen, maxlen) %
-                            (typenames[type1-1], typenames[type2-1],
-                             acoef, bcoef, rij, eij)
-                )
+                    args = typenames[type1-1], typenames[type2-1], acoef, bcoef, rij, eij
+                ret_str.append(matfmt.format(*args))
 
         return ''.join(ret_str)
 
@@ -2378,9 +2260,7 @@ class tiMerge(Action):
             self.molmask2N = None
 
     def __str__(self):
-        return ('Merging molecules [%s] [%s] with sc mask [%s] [%s]' % (
-               self.molmask1, self.molmask2, self.mask1, self.mask2 )
-        )
+        return f'Merging molecules [{self.molmask1}] [{self.molmask2}] with sc mask [{self.mask1}] [{self.mask2}]'
 
     def execute(self):
         sel1 = self.mask1.Selection()
@@ -2447,7 +2327,7 @@ class tiMerge(Action):
         new_atm_idx = 0
         for i in range(natom):
             if molsel2[i] == 1 and sel2[i] == 0:
-                remove_mask.append('%d' % (i+1))
+                remove_mask.append(str(i+1))
             else:
                 remove_map[i] = new_atm_idx
                 new_atm_idx += 1
@@ -2469,8 +2349,9 @@ class tiMerge(Action):
                 mol2common.append(i)
 
         if len(mol1common) != len(mol2common):
-            raise TiMergeError('The number of nonsoftcore atoms in mol1mask and mol2mask must be '
-                               'the same.')
+            raise TiMergeError(
+                'The number of nonsoftcore atoms in mol1mask and mol2mask must be the same.'
+            )
 
         mol2common_sort = []
         # reorder mol2common so that it matches mol1common
@@ -2495,8 +2376,7 @@ class tiMerge(Action):
             atm_j = mol2common[i]
             diff = coordinates[atm_i] - coordinates[atm_j]
             if (np.abs(diff) > self.tol).any():
-                raise TiMergeError('Common (nonsoftcore) atoms must have the ' # pragma: no cover
-                                   'same coordinates.')
+                raise TiMergeError('Common (nonsoftcore) atoms must have the same coordinates.')
 
         for j in range(natom):
             if keep_mask[j] == 1 and sel2[j] == 0:
@@ -2548,38 +2428,30 @@ class tiMerge(Action):
 
                         for dihed in self.parm.dihedrals:
                             if dihed.atom1.idx == j:
-                                if (dihed.atom2.idx == k or dihed.atom3.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom2.idx == k or dihed.atom3.idx == k or dihed.atom4.idx == k):
                                     dihed.atom1 = atm_new
                             elif dihed.atom2.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom3.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom3.idx == k or dihed.atom4.idx == k):
                                     dihed.atom2 = atm_new
                             elif dihed.atom3.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
-                                        or dihed.atom4.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k or dihed.atom4.idx == k):
                                     dihed.atom3 = atm_new
                             elif dihed.atom4.idx == j:
-                                if (dihed.atom1.idx == k or dihed.atom2.idx == k
-                                        or dihed.atom3.idx == k):
+                                if (dihed.atom1.idx == k or dihed.atom2.idx == k or dihed.atom3.idx == k):
                                     dihed.atom4 = atm_new
 
                         for imp in self.parm.impropers:
                             if imp.atom1.idx == j:
-                                if (imp.atom2.idx == k or imp.atom3.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom2.idx == k or imp.atom3.idx == k or imp.atom4.idx == k):
                                     imp.atom1 = atm_new
                             elif imp.atom2.idx == j:
-                                if (imp.atom1.idx == k or imp.atom3.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom1.idx == k or imp.atom3.idx == k or imp.atom4.idx == k):
                                     imp.atom2 = atm_new
                             elif imp.atom3.idx == j:
-                                if (imp.atom1.idx == k or imp.atom2.idx == k
-                                        or imp.atom4.idx == k):
+                                if (imp.atom1.idx == k or imp.atom2.idx == k or imp.atom4.idx == k):
                                     imp.atom3 = atm_new
                             elif imp.atom4.idx == j:
-                                if (imp.atom1.idx == k or imp.atom2.idx == k
-                                        or imp.atom3.idx == k):
+                                if (imp.atom1.idx == k or imp.atom2.idx == k or imp.atom3.idx == k):
                                     imp.atom4 = atm_new
 
                         for cmap in self.parm.cmaps:
@@ -2616,10 +2488,10 @@ class tiMerge(Action):
         for i in range(natom):
             if sel1[i] or molsel1N[i]:
                 new_sc_atm1_int.append(remove_map[i])
-                new_sc_atm1.append('%d' % (remove_map[i]+1))
+                new_sc_atm1.append(str(remove_map[i]+1))
             elif sel2[i] or molsel2N[i]:
                 new_sc_atm2_int.append(remove_map[i])
-                new_sc_atm2.append('%d' % (remove_map[i]+1))
+                new_sc_atm2.append(str(remove_map[i]+1))
 
         # Do not allow definition where dihedrals cross through the softcore
         # region. This is generally breaking a ring (and possibly other cases),
@@ -2642,24 +2514,20 @@ class tiMerge(Action):
                 if (atmi not in new_sc_atm1_int and atmi not in new_sc_atm2_int and
                     atml not in new_sc_atm1_int and atml not in new_sc_atm2_int):
                     raise TiMergeError( # pragma: no cover
-                            'Cannot have dihedral cross through softcore '
-                            'region. (DIHED : %d %d %d %d). Usually this means '
-                            'you have defined the softcore region in a way '
-                            'that breaks a ring. Try redefining your softcore '
-                            'region to include the ring or at least three '
-                            'consecutive atoms.' % (atmi+1, atmj+1, abs(atmk)+1, abs(atml)+1)
+                        'Cannot have dihedral cross through softcore region. (DIHED : '
+                        f'{atmi + 1} {atmj + 1} {abs(atmk) + 1} {abs(atml) + 1}). '
+                        'Usually this means you have defined the softcore region in a way '
+                        'that breaks a ring. Try redefining your softcore region to include the '
+                        'ring or at least three consecutive atoms.'
                     )
 
         self.sc_mask1 = '@' + ','.join(new_sc_atm1)
         self.sc_mask2 = '@' + ','.join(new_sc_atm2)
 
-        ret_str = ("Merging molecules %s and %s into the same molecule.\n"
-                   % (self.molmask1, self.molmask2))
-        ret_str2 = ("Use softcore mask:\ntimask1=\'%s\',\ntimask2=\'%s\',"
-                   % (self.sc_mask1, self.sc_mask2))
-        ret_str3 = ("\nscmask1=\'%s\',\nscmask2=\'%s\',"
-                   % (self.sc_mask1, self.sc_mask2))
-        self.output.write('%s%s%s\n' % (ret_str, ret_str2, ret_str3))
+        ret_str = f"Merging molecules {self.molmask1} and {self.molmask2} into the same molecule.\n"
+        ret_str2 = f"Use softcore mask:\ntimask1='{self.sc_mask1}',\ntimask2='{self.sc_mask2}',"
+        ret_str3 = f"\nscmask1='{self.sc_mask1}',\nscmask2='{self.sc_mask2}',"
+        self.output.write(f'{ret_str}{ret_str2}{ret_str3}\n')
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2669,11 +2537,12 @@ class source(Action):
     """
     usage = '<file>'
     needs_parm = False
+
     def init(self, arg_list):
         self.filename = arg_list.get_next_string()
 
     def __str__(self):
-        return 'Sourcing %s' % self.filename
+        return f'Sourcing {self.filename}'
 
     def execute(self):
         """
@@ -2689,27 +2558,28 @@ class parm(Action):
     Either adds a new parm to the list of available parms to edit in ParmEd, or
     it sets a new 'active' parm to edit by default with new commands
     """
-    usage = ('<filename> [<filename> [<filename> ...]] || parm copy <filename>|'
-             '<index> || parm select <filename>|<index>')
+    usage = (
+        '<filename> [<filename> [<filename> ...]] || parm copy <filename>|<index> || '
+        'parm select <filename>|<index>'
+    )
     needs_parm = False
+
     def init(self, arg_list):
-        from glob import glob
         self.new_active_parm = arg_list.get_key_string('select', None)
         self.copied_parm = arg_list.get_key_string('copy', None)
         self.new_parm = None
         # Add as many parms as we want with one command, and support globbing
         new_parm = len(arg_list.unmarked()) or None
         # Make sure we specified only one operating mode
-        if (self.new_active_parm is None and self.copied_parm is None and
-                new_parm is None):
-            raise ParmError('Improper usage of `parm\' command')
+        if (self.new_active_parm is None and self.copied_parm is None and new_parm is None):
+            raise ParmError("Improper usage of `parm' command")
         opts = (self.new_active_parm, self.copied_parm, new_parm)
         nnone = 0
         for opt in opts:
             if opt is None:
                 nnone += 1
         if nnone != 2:
-            raise ParmError('Improper usage of `parm\' -- choose one behavior')
+            raise ParmError("Improper usage of `parm' -- choose one behavior")
         # Now get our indexes for copied and new parms if they are integers,
         # otherwise we index based on filename
         if self.new_active_parm is not None:
@@ -2728,7 +2598,7 @@ class parm(Action):
             while new_parm is not None:
                 listparms = glob(new_parm)
                 if not listparms:
-                    raise ParmFileNotFound('No files matching %s' % new_parm)
+                    raise ParmFileNotFound(f'No files matching {new_parm}')
                 self.new_parm.extend(glob(new_parm))
                 new_parm = arg_list.get_next_string(optional=True)
             assert self.new_parm, 'No matching parm files? should not happen'
@@ -2738,18 +2608,17 @@ class parm(Action):
             try:
                 idx = self.parm_list.index(self.new_active_parm)
             except IndexError:
-                return '%s not in parm list. Doing nothing' % self.new_active_parm
-            return 'Setting new active parm [%s]' % self.parm_list[idx]
+                return f'{self.new_active_parm} not in parm list. Doing nothing'
+            return f'Setting new active parm [{self.parm_list[idx]}]'
         elif self.new_parm is not None:
-            return ('Adding prmtop %s to parm list. %s is the active parm.' %
-                    (', '.join(self.new_parm), self.new_parm[-1]))
+            new_parms = ', '.join(self.new_parm)
+            return f'Adding prmtop {new_parms} to parm list. {self.new_parm[-1]} is the active parm.'
         elif self.copied_parm is not None:
             try:
                 idx = self.parm_list.index(self.copied_parm)
             except IndexError:
-                return '%s not in parm list. Doing nothing' % self.new_active_parm
-            return ("Copying prmtop %s to parm list. %s's copy is the active parm." %
-                    (self.parm_list[idx], self.parm_list[idx]))
+                return f'{self.new_active_parm} not in parm list. Doing nothing'
+            return f"Copying prmtop {self.parm_list[idx]} to parm list. {self.parm_list[idx]}'s copy is the active parm."
         raise AssertionError('Should not be here')
 
     def execute(self):
@@ -2761,18 +2630,17 @@ class parm(Action):
                 try:
                     self.parm_list.add_parm(new_parm)
                 except IOError:
-                    warnings.warn('Could not open %s for reading' % new_parm, SeriousParmWarning)
+                    warnings.warn(f'Could not open {new_parm} for reading', SeriousParmWarning)
         elif self.new_active_parm is not None:
             try:
                 self.parm_list.set_new_active(self.new_active_parm)
             except IndexError:
-                warnings.warn('%s is not in the parm list!' % self.new_active_parm,
-                              SeriousParmWarning)
+                warnings.warn(f'{self.new_active_parm} is not in the parm list!', SeriousParmWarning)
         elif self.copied_parm is not None:
             try:
                 self.parm_list.add_parm(copy(self.parm_list[self.copied_parm]))
             except IndexError:
-                warnings.warn('%s is not in the parm list!' % self.copied_parm, SeriousParmWarning)
+                warnings.warn(f'{self.copied_parm} is not in the parm list!', SeriousParmWarning)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -2783,7 +2651,6 @@ class ls(Action):
     usage = '[Unix ls options]'
     needs_parm = False
     def init(self, arg_list):
-        from glob import glob
         self.args = []
         # Process the argument list to mimic the real ls as much as possible
         while True:
@@ -2816,31 +2683,27 @@ class cd(Action):
     """
     usage = '<directory>'
     needs_parm = False
+
     def init(self, arg_list):
-        from glob import glob
-        from os.path import expanduser, expandvars
-        mydir = expanduser(expandvars(arg_list.get_next_string()))
+        mydir = os.path.expanduser(os.path.expandvars(arg_list.get_next_string()))
         self.directory = glob(mydir)
 
     def __str__(self):
         if len(self.directory) != 1:
             return 'Change directory failed'
         if not os.path.isdir(self.directory[0]):
-            return '%s does not exist. cd failed.' % self.directory[0]
-        return 'New working directory: %s' % self.directory[0]
+            return f'{self.directory[0]} does not exist. cd failed.'
+        return f'New working directory: {self.directory[0]}'
 
     def execute(self):
         if len(self.directory) < 1:
-            warnings.warn('No recognized directories given to cd',
-                          SeriousParmWarning)
+            warnings.warn('No recognized directories given to cd', SeriousParmWarning)
             return # pragma: no cover
         elif len(self.directory) > 1:
-            warnings.warn('More than one file/directory given to cd',
-                          SeriousParmWarning)
+            warnings.warn('More than one file/directory given to cd', SeriousParmWarning)
             return # pragma: no cover
         if not os.path.isdir(self.directory[0]):
-            warnings.warn('%s is not a directory' % self.directory[0],
-                          SeriousParmWarning)
+            warnings.warn(f'{self.directory[0]} is not a directory', SeriousParmWarning)
             return # pragma: no cover
         # If we've gotten this far, go ahead and change to the directory
         os.chdir(self.directory[0])
@@ -2862,7 +2725,7 @@ class listParms(Action):
 
         retstr = 'Loaded topology files:'
         for i, parm in enumerate(self.parm_list):
-            retstr += '\n[%d]\t%s' % (i, parm)
+            retstr += f'\n[{i}]\t{parm}'
             if parm is self.parm_list.parm:
                 retstr += ' (active)'
 
@@ -2890,8 +2753,7 @@ class interpolate(Action):
                      # starts from <num> and increases by 1
         - <num> : Starting number for file names (see <prefix> above)
     """
-    usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] '
-             '[startnum <num>]')
+    usage = ('<nparm> [parm2 <other_parm>] [eleconly] [prefix <prefix>] [startnum <num>]')
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         # Make sure we have at least 2 prmtops
@@ -2903,8 +2765,7 @@ class interpolate(Action):
             if self.parm_list[0] is not self.parm:
                 self.parm2 = self.parm_list[0]
         elif parm2 is None:
-            raise AmbiguousParmError('You must identify parm2 if more than 2 '
-                                     'parm instances exist!')
+            raise AmbiguousParmError('You must identify parm2 if more than 2 parm instances exist!')
         else:
             try:
                 parm2 = int(parm2)
@@ -2925,15 +2786,13 @@ class interpolate(Action):
         extra = ''
         if self.eleconly and self.diff_vdw:
             extra = ' [only interpolating charges]'
-        return 'Creating %d interpolated prmtops between %s and %s' % (
-                                    self.nparm, self.parm, self.parm2) + extra
+        return f'Creating {self.nparm} interpolated prmtops between {self.parm} and {self.parm2}' + extra
 
     def _check_parms(self):
         """ Makes sure that the atoms in both parms are all the same """
         parm1, parm2 = self.parm, self.parm2
         if len(parm1.atoms) != len(parm2.atoms):
-            raise IncompatibleParmsError('%s and %s have different #s of '
-                                         'atoms!' % (parm1, parm2))
+            raise IncompatibleParmsError(f'{parm1} and {parm2} have different #s of atoms!')
         ndiff = 0
         for atom1, atom2 in zip(parm1.atoms, parm2.atoms):
             if atom1.name != atom2.name:
@@ -2950,8 +2809,7 @@ class interpolate(Action):
     def execute(self):
         """ Interpolates the prmtops """
         if self.diff_vdw and not self.eleconly:
-            raise NotImplementedError('No support for scaling vdW '
-                                      'parameters yet!')
+            raise NotImplementedError('No support for scaling vdW parameters yet!')
         parm1, parm2 = self.parm, self.parm2
         # Original charges for parm 1
         orig_chg1 = parm1.parm_data['CHARGE']
@@ -3050,23 +2908,19 @@ class summary(Action):
                 _reformat_long_sentence(rset, 'Residue set:           ',
                                         n_words=7)
         )
-        rcount = ','.join('%s: %d' % (x, y)
-                           for x, y in iteritems(
-                               Counter(res.name for res in self.parm.residues)
-                           )
+        rcount = ','.join(
+            '%s: %d' % (x, y) for x, y in Counter(res.name for res in self.parm.residues).items()
         )
         retval.append(
-                _reformat_long_sentence(', '.join((sorted(rcount.split(',')))),
-                                        'Residue count:         ', n_words=7)
+            _reformat_long_sentence(
+                ', '.join((sorted(rcount.split(',')))), 'Residue count:         ', n_words=7
+            )
         )
         if self.parm.box is not None and set(self.parm.box[3:]) == set([90]):
             a, b, c = self.parm.box[:3]
             v = a * b * c
             # Get the total volume (and density) of orthorhombic box
-            retval.append('System volume (ang^3): %.2f\n'
-                          'System density (g/mL): %f' %
-                          (v, tmass / (v * 0.602204))
-            )
+            retval.append(f'System volume (ang^3): {v:.2f}\nSystem density (g/mL): {tmass / v / 0.602204:f}')
         elif self.parm.box is not None:
             # General triclinic cell
             a, b, c, alpha, beta, gamma = self.parm.box[:]
@@ -3074,13 +2928,9 @@ class summary(Action):
             cosa = math.cos(alpha * math.pi / 180)
             cosb = math.cos(beta * math.pi / 180)
             cosg = math.cos(gamma * math.pi / 180)
-            v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg +
-                                      2 * cosa*cosb*cosg)
-            retval.append('System volume (ang^3): %.2f\n'
-                          'System density (g/mL): %f' %
-                          (v, tmass / (v * 0.602204))
-            )
-        return '%s\n' % '\n'.join(retval)
+            v = a * b * c * math.sqrt(1 - cosa*cosa - cosb*cosb - cosg*cosg + 2 * cosa*cosb*cosg)
+            retval.append(f'System volume (ang^3): {v:.2f}\nSystem density (g/mL): {tmass / v / 0.602204:f}')
+        return '\n'.join(retval) + '\n'
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3184,14 +3034,14 @@ class addPDB(Action):
 
     def __str__(self):
         if self.pdbpresent:
-            return 'PDB information already present in %s. Doing nothing'
-        retstr = 'Adding PDB information from %s' % self.pdbfile
+            return f'PDB information already present in {self.parm}. Doing nothing'
+        retstr = f'Adding PDB information from {self.pdbfile}'
         if self.elements: retstr += '\n\t[printing elements from prmtop]'
         return retstr
 
     def execute(self):
-        from parmed import read_PDB
-        if self.pdbpresent: return
+        if self.pdbpresent:
+            return
         pdb = read_PDB(self.pdbfile)
         resnums = [0 for res in self.parm.residues]
         chainids = ['Z' for res in self.parm.residues]
@@ -3209,42 +3059,35 @@ class addPDB(Action):
                 reslab = parmres.name
                 resname = res.name.strip()
                 if resname != reslab:
-                    if (not resname in ('WAT', 'HOH') or
-                        not reslab in ('WAT', 'HOH')):
+                    if not resname in ('WAT', 'HOH') or not reslab in ('WAT', 'HOH'):
                         # Allow for 3's and 5's in terminal nucleic acid
                         # residues
-                        if resname in ('A', 'C', 'G', 'U', 'DA',
-                                       'DG', 'DC', 'DT'):
+                        if resname in ('A', 'C', 'G', 'U', 'DA', 'DG', 'DC', 'DT'):
                             if reslab[-1] in '35':
                                 reslab = reslab[:-1]
                         if reslab != resname:
                             needs_warn = True
                             # Support other Amber residue name replacements
-                            if reslab in ('ASP', 'ASH', 'AS4') and \
-                                    resname in ('ASP', 'ASH', 'AS4'):
+                            if reslab in ('ASP', 'ASH', 'AS4') and resname in ('ASP', 'ASH', 'AS4'):
                                 needs_warn = False
-                            elif reslab in ('GLU', 'GLH', 'GL4') and \
-                                    resname in ('GLU', 'GLH', 'GL4'):
+                            elif reslab in ('GLU', 'GLH', 'GL4') and resname in ('GLU', 'GLH', 'GL4'):
                                 needs_warn = False
-                            elif reslab in ('HIP', 'HIS', 'HIE', 'HID') and \
-                                    resname in ('HIP', 'HIS', 'HIE', 'HID'):
+                            elif reslab in ('HIP', 'HIS', 'HIE', 'HID') and resname in ('HIP', 'HIS', 'HIE', 'HID'):
                                 needs_warn = False
-                            elif reslab in ('LYS', 'LYN') and \
-                                    resname in ('LYS', 'LYN'):
+                            elif reslab in ('LYS', 'LYN') and resname in ('LYS', 'LYN'):
                                 needs_warn = False
-                            elif reslab in ('CYS', 'CYX', 'CYM') and \
-                                    resname in ('CYS', 'CYX', 'CYM'):
+                            elif reslab in ('CYS', 'CYX', 'CYM') and resname in ('CYS', 'CYX', 'CYM'):
                                 needs_warn = False
                             if needs_warn:
-                                warnings.warn('Residue name mismatch [#%d] %s '
-                                              'vs. %s' % (i+1, resname, reslab),
-                                              AddPDBWarning)
+                                warnings.warn(
+                                    f'Residue name mismatch [#{i + 1}] {resname} vs. {reslab}',
+                                    AddPDBWarning
+                                )
                 resnums[i] = parmres.number = res.number
                 chainids[i] = parmres.chain = res.chain
                 icodes[i] = parmres.insertion_code = res.insertion_code
             except IndexError:
-                raise AddPDBError('PDB %s has more residues than prmtop %s' %
-                                  (self.pdbfile, self.parm))
+                raise AddPDBError(f'PDB {self.pdbfile} has more residues than prmtop {self.parm}')
             # Now loop through all of the atoms in the parm residue, look for
             # the atom with the same name in the PDB residue
             for atom in parmres:
@@ -3258,35 +3101,33 @@ class addPDB(Action):
         ncmts = ['Residue number (resSeq) read from PDB file; DIMENSION(NRES)']
         if self.printicodes or any(icodes):
             haveicodes = True
-            ncmts += ['Residue insertion codes (iCode) present in %FLAG '
-                      'RESIDUE_ICODE']
+            ncmts += ['Residue insertion codes (iCode) present in %FLAG RESIDUE_ICODE']
         else:
             haveicodes = False
             ncmts += ['Residue insertion code (iCode) not present in PDB file',
                       'If present: %FLAG RESIDUE_ICODE, %FORMAT(20a4)']
-        self.parm.add_flag('RESIDUE_NUMBER', '20I4', data=resnums,
-                           comments=ncmts)
-        self.parm.add_flag('RESIDUE_CHAINID', '20a4', data=chainids,
-                          comments=['Residue chain ID (chainId) read from PDB '
-                                    'file; DIMENSION(NRES)']
+        self.parm.add_flag('RESIDUE_NUMBER', '20I4', data=resnums, comments=ncmts)
+        self.parm.add_flag(
+            'RESIDUE_CHAINID', '20a4', data=chainids,
+            comments=['Residue chain ID (chainId) read from PDB file; DIMENSION(NRES)']
         )
         if haveicodes:
-            self.parm.add_flag('RESIDUE_ICODE', '20a4', data=icodes,
-                comments=['Residue insertion code (iCode) read from PDB file; '
-                        'DIMENSION(NRES)']
+            self.parm.add_flag(
+                'RESIDUE_ICODE', '20a4', data=icodes,
+                comments=['Residue insertion code (iCode) read from PDB file; DIMENSION(NRES)']
             )
         if self.elements:
-            self.parm.add_flag('ATOM_ELEMENT', '20a4',
-                data=['%2s' % (_Element[atm.atomic_number].upper())
-                            for atm in self.parm.atoms
-                ], comments=['Atom element name read from topology file']
+            self.parm.add_flag(
+                'ATOM_ELEMENT', '20a4',
+                data=[f'{_Element[atm.atomic_number].upper():2s}' for atm in self.parm.atoms],
+                comments=['Atom element name read from topology file'],
             )
         self.parm.add_flag('ATOM_OCCUPANCY', '10F8.2', data=occupancies,
-                comments=['Atom occupancies read from the PDB file'])
+                           comments=['Atom occupancies read from the PDB file'])
         self.parm.add_flag('ATOM_BFACTOR', '10F8.2', data=tempfac,
-                comments=['Atom temperature factor from the PDB file'])
+                           comments=['Atom temperature factor from the PDB file'])
         self.parm.add_flag('ATOM_NUMBER', '10I8', data=atomnums,
-                comments=['Atom serial number from the PDB file'])
+                           comments=['Atom serial number from the PDB file'])
         self.parm.load_atom_info() # Get that information saved
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3296,30 +3137,21 @@ class deletePDB(Action):
     This action deletes the flags added by addPDB if they are present.
     """
     supported_subclasses = (AmberParm,)
+    pdb_flags = {'RESIDUE_NUMBER', 'RESIDUE_CHAINID', 'RESIDUE_ICODE', 'ATOM_ELEMENT',
+                 'ATOM_BFACTOR', 'ATOM_OCCUPANCY', 'ATOM_NUMBER'}
     def init(self, arg_list):
-        self.pdbpresent = ('RESIDUE_NUMBER' in self.parm.flag_list or
-                           'RESIDUE_CHAINID' in self.parm.flag_list or
-                           'RESIDUE_ICODE' in self.parm.flag_list or
-                           'ATOM_ELEMENT' in self.parm.flag_list or
-                           'ATOM_BFACTOR' in self.parm.flag_list or
-                           'ATOM_OCCUPANCY' in self.parm.flag_list or
-                           'ATOM_NUMBER' in self.parm.flag_list
-        )
+        self.pdbpresent = any(flag in self.parm.flag_list for flag in self.pdb_flags)
 
     def __str__(self):
         if self.pdbpresent:
-            return 'Deleting PDB info from %s' % self.parm
-        return 'No PDB information present in %s. Doing nothing' % self.parm
+            return f'Deleting PDB info from {self.parm}'
+        return f'No PDB information present in {self.parm}. Doing nothing'
 
     def execute(self):
-        if not self.pdbpresent: return
-        self.parm.delete_flag('RESIDUE_NUMBER')
-        self.parm.delete_flag('RESIDUE_CHAINID')
-        self.parm.delete_flag('RESIDUE_ICODE')
-        self.parm.delete_flag('ATOM_ELEMENT')
-        self.parm.delete_flag('ATOM_BFACTOR')
-        self.parm.delete_flag('ATOM_OCCUPANCY')
-        self.parm.delete_flag('ATOM_NUMBER')
+        if not self.pdbpresent:
+            return
+        for flag in self.pdb_flags:
+            self.parm.delete_flag(flag)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3355,9 +3187,9 @@ class add12_6_4(Action):
                         arg_list.get_next_mask(optional=True, default=':ZN'))
         self.c4file = arg_list.get_key_string('c4file', None)
         self.watermodel = arg_list.get_key_string('watermodel', None)
-        self.polfile = arg_list.get_key_string('polfile',
-                            os.path.join(os.getenv('AMBERHOME') or '', 'dat',
-                            'leap', 'parm', 'lj_1264_pol.dat'))
+        self.polfile = arg_list.get_key_string(
+            'polfile', os.path.join(os.getenv('AMBERHOME') or '', 'dat', 'leap', 'parm', 'lj_1264_pol.dat')
+        )
         self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
 
         if self.c4file is None:
@@ -3366,36 +3198,33 @@ class add12_6_4(Action):
             else:
                 self.watermodel = self.watermodel.upper()
                 if not self.watermodel in self._supported_wms:
-                    raise LJ12_6_4Error('Unrecognized water model %s; pick one '
-                                        'of the following: %s' %
-                                        (self.watermodel,
-                                        ', '.join(self._supported_wms))
+                    supported_wms = ', '.join(self._supported_wms)
+                    raise LJ12_6_4Error(
+                        f"Unrecognized water model {self.watermodel}; pick one of the following: {supported_wms}"
                     )
         else:
             if self.watermodel is not None:
-                raise LJ12_6_4Error('c4file and watermodel are mutually '
-                                    'exclusive')
+                raise LJ12_6_4Error('c4file and watermodel are mutually exclusive')
 
     def __str__(self):
         retstr = ('Adding Lennard-Jones C-coefficient for 12-6-4 potential. '
-                  'Polarizabilities read from [%s]. ' % self.polfile)
+                  f'Polarizabilities read from [{self.polfile}]. ')
         if self.c4file is None:
-            retstr += ('Using default C4 parameters for water model [%s].' %
-                       self.watermodel)
+            retstr += f'Using default C4 parameters for water model [{self.watermodel}].'
         else:
-            retstr += 'Reading C4 parameters from [%s].' % self.c4file
+            retstr += f'Reading C4 parameters from [{self.c4file}].'
 
         return retstr
 
     def execute(self):
-        from parmed.tools.add1264 import params1264 as params
+        from .add1264 import params1264 as params
         self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
                 comments=['For 12-6-4 potential used for divalent metal ions'])
-        for i, param in enumerate(params(self.parm, self.mask, self.c4file,
-                                         self.watermodel, self.polfile,
-                                         self.tunfactor)):
+        for i, param in enumerate(
+            params(self.parm, self.mask, self.c4file, self.watermodel, self.polfile, self.tunfactor)
+        ):
             self.parm.parm_data['LENNARD_JONES_CCOEF'][i] = param
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -3416,8 +3245,7 @@ class HMassRepartition(Action):
         self.new_h_mass = arg_list.get_next_float(optional=True, default=3.024)
 
     def __str__(self):
-        retstr = ('Repartitioning hydrogen masses to %s daltons. ' %
-                  self.new_h_mass)
+        retstr = f'Repartitioning hydrogen masses to {self.new_h_mass} daltons. '
         if self.changewater:
             return retstr + 'Also changing water hydrogen masses.'
         return retstr + 'Not changing water hydrogen masses.'
@@ -3440,8 +3268,7 @@ class HMassRepartition(Action):
                 heteroidx += 1
             if heteroatom is None:
                 # Only bonded to other hydrogens. Weird, but do not repartition
-                warnings.warn('H atom detected not bound to heteroatom. '
-                              'Ignoring.', ParmWarning)
+                warnings.warn('H atom detected not bound to heteroatom. Ignoring.', ParmWarning)
                 continue
             transfermass = self.new_h_mass - atom.mass
             atom.mass = self.new_h_mass
@@ -3458,9 +3285,9 @@ class HMassRepartition(Action):
                     atom.mass = original_masses[i]
                     if isinstance(self.parm, AmberParm):
                         self.parm.parm_data['MASS'][i] = original_masses[i]
-                raise HMassRepartitionError('Too much mass removed from atom '
-                                            '%d. Hydrogen masses must be '
-                                            'smaller.' % i)
+                raise HMassRepartitionError(
+                    f'Too much mass removed from atom {i}. Hydrogen masses must be smaller.'
+                )
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -3502,11 +3329,11 @@ class OpenMM(Action):
 
     def __str__(self):
         return ("Running Amber-style simulation with OpenMM using the command "
-                "string:\n\t%s\nThis may take awhile..." % self.arg_list)
+                f"string:\n\t{self.arg_list}\nThis may take awhile...")
 
     def execute(self):
         """ Runs the OpenMM simulation """
-        from parmed.tools.simulations.openmm import simulate, HAS_OPENMM
+        from .simulations.openmm import simulate, HAS_OPENMM
         if not HAS_OPENMM:
             raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
         # First try to load a restart file if it was supplied
@@ -3584,29 +3411,26 @@ class energy(Action):
     output = sys.stdout
 
     def init(self, arg_list):
-        self.use_openmm = (arg_list.has_key('omm') or
-                    not isinstance(self.parm, AmberParm))
+        self.use_openmm = (arg_list.has_key('omm') or not isinstance(self.parm, AmberParm))
         self.arg_list = ArgumentList(arg_list)
         if self.use_openmm and isinstance(self.parm, AmoebaParm):
-            raise NotImplementedError('Amoeba prmtops can only get energies '
-                                      'from sander')
+            raise NotImplementedError('Amoeba prmtops can only get energies from sander')
 
     def __str__(self):
-        return 'Computing a single-point energy for %s' % self.parm
+        return f'Computing a single-point energy for {self.parm}'
 
     def execute(self):
         if self.use_openmm:
-            from parmed.tools.simulations.openmm import energy, HAS_OPENMM
+            from .simulations.openmm import energy, HAS_OPENMM
             if not HAS_OPENMM:
                 raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
 
             energy(self.parm, self.arg_list, self.output)
         else:
-            from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
+            from .simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
                 raise SimulationError('sander could not be imported. Skipping.') # pragma: no cover
-            # Consume the OMM-specific arguments so we don't have any apparently
-            # unused arguments
+            # Consume the OMM-specific arguments so we don't have any apparently unused arguments
             self.arg_list.get_key_string('platform', None)
             self.arg_list.get_key_string('precision', None)
             self.arg_list.has_key('decompose')
@@ -3701,42 +3525,36 @@ class deleteBond(Action):
         if not self.del_bonds:
             return 'No bonds to delete'
         if not self.verbose:
-            return 'Deleting the %d bonds found between %s and %s' % (
-                    len(self.del_bonds), self.mask1, self.mask2)
+            return f'Deleting the {len(self.del_bonds)} bonds found between {self.mask1} and {self.mask2}'
         # Now we want full statistics
-        retstr = 'Deleting %d bonds between %s and %s:\n' % (
-                    len(self.del_bonds), self.mask1, self.mask2)
+        retstr = f'Deleting {len(self.del_bonds)} bonds between {self.mask1} and {self.mask2}:\n'
         for bond in self.del_bonds:
             a1, a2 = self.parm.bonds[bond].atom1, self.parm.bonds[bond].atom2
-            retstr += '\t%d [%s %d] %s --- %d [%s %d] %s\n' % (a1.idx+1,
-                    a1.residue.name, a1.residue.idx+1, a1.name, a2.idx+1,
-                    a2.residue.name, a2.residue.idx+1, a2.name)
-        retstr += 'Deleting %d angles, ' % (len(self.del_angles))
+            retstr += (
+                f'\t{a1.idx + 1} [{a1.residue.name} {a1.residue.idx + 1}] {a1.name} --- '
+                f'{a2.idx + 1} [{a2.residue.name} {a2.residue.idx}] {a2.name}\n'
+            )
+        retstr += f'Deleting {len(self.del_angles)} angles, '
         if self.parm.trigonal_angles or self.parm.out_of_plane_bends or \
                 self.parm.stretch_bends or self.parm.torsion_torsions:
-            retstr += ('%d Urey-Bradleys, %d trigonal angles,\n         '
-                       '%d dihedrals, %d out-of-plane bends, %d stretch-bends\n'
-                       '         and %d torsion-torsions' % (
-                        len(self.del_urey_bradleys),
-                        len(self.del_trigonal_angles),
-                        len(self.del_dihedrals)+len(self.del_rbtorsions),
-                        len(self.del_oopbends), len(self.del_strbnds),
-                        len(self.del_tortors))
+            retstr += (
+                f'{len(self.del_urey_bradleys)} Urey-Bradleys, {len(self.del_trigonal_angles)} trigonal angles,\n         '
+                f'{len(self.del_dihedrals) + len(self.del_rbtorsions)} dihedrals, {len(self.del_oopbends)} '
+                f'out-of-plane bends, {len(self.del_strbnds)} stretch-bends\n'
+                f'         and {len(self.del_tortors)} torsion-torsions'
             )
         elif self.parm.urey_bradleys or self.parm.impropers or self.parm.cmaps:
-            retstr += ('%d Urey-Bradleys, %d impropers,\n         %d dihedrals '
-                        'and %d CMAPs' % (
-                        len(self.del_urey_bradleys), len(self.del_impropers),
-                        len(self.del_dihedrals)+len(self.del_rbtorsions),
-                        len(self.del_cmaps))
+            retstr += (
+                f'{len(self.del_urey_bradleys)} Urey-Bradleys, {len(self.del_impropers)} impropers,\n'
+                f'         {len(self.del_dihedrals) + len(self.del_rbtorsions)} dihedrals and {len(self.del_cmaps)} CMAPs'
             )
         else:
-            retstr += 'and %d dihedrals' % (len(self.del_dihedrals) +
-                    len(self.del_rbtorsions))
+            retstr += f'and {len(self.del_dihedrals) + len(self.del_rbtorsions)} dihedrals'
         return retstr
 
     def execute(self):
-        if not self.del_bonds: return
+        if not self.del_bonds:
+            return
         for i in sorted(self.del_bonds, reverse=True):
             self.parm.bonds[i].delete()
             del self.parm.bonds[i]
@@ -3820,40 +3638,35 @@ class chamber(Action):
 
     def init(self, arg_list):
         from os.path import expandvars, expanduser
-        import glob
         # First get all of the topology files
         self.topfiles, self.paramfiles, self.streamfiles = [], [], []
         while arg_list.has_key('-top', mark=False):
-            topfile = expanduser(arg_list.get_key_string('-top', None))
-            topfile = expandvars(topfile)
-            topfiles = glob.glob(topfile)
+            topfile = os.path.expanduser(arg_list.get_key_string('-top', None))
+            topfile = os.path.expandvars(topfile)
+            topfiles = glob(topfile)
             if not topfiles:
-                raise FileDoesNotExist('CHARMM RTF file %s does not exist' %
-                                       topfile)
+                raise FileDoesNotExist(f'CHARMM RTF file {topfile} does not exist')
             self.topfiles.extend(topfiles)
         while arg_list.has_key('-param', mark=False):
-            param = expanduser(arg_list.get_key_string('-param', None))
-            param = expandvars(param)
-            params = glob.glob(param)
+            param = os.path.expanduser(arg_list.get_key_string('-param', None))
+            param = os.path.expandvars(param)
+            params = glob(param)
             if not params:
-                raise FileDoesNotExist('CHARMM parameter file %s does not exist'
-                                       % param)
+                raise FileDoesNotExist(f'CHARMM parameter file {param} does not exist')
             self.paramfiles.extend(params)
         while arg_list.has_key('-str', mark=False):
-            stream = expanduser(arg_list.get_key_string('-str', None))
-            stream = expandvars(stream)
-            streams = glob.glob(stream)
+            stream = os.path.expanduser(arg_list.get_key_string('-str', None))
+            stream = os.path.expandvars(stream)
+            streams = glob(stream)
             if not streams:
-                raise FileDoesNotExist('CHARMM stream file %s does not exist' %
-                                       stream)
+                raise FileDoesNotExist(f'CHARMM stream file {stream} does not exist')
             self.streamfiles.extend(streams)
         while arg_list.has_key('-toppar', mark=False):
-            toppar = expanduser(arg_list.get_key_string('-toppar', None))
-            toppar = expandvars(toppar)
-            toppars = glob.glob(toppar)
+            toppar = os.path.expanduser(arg_list.get_key_string('-toppar', None))
+            toppar = os.path.expandvars(toppar)
+            toppars = glob(toppar)
             if not toppars:
-                raise FileDoesNotExist('CHARMM toppar file %s does not exist' %
-                                       toppar)
+                raise FileDoesNotExist(f'CHARMM toppar file {toppar} does not exist')
             for fname in toppars:
                 base = os.path.split(fname)[1] # ignore the directory name
                 if base.endswith('.rtf') or base.endswith('.top'):
@@ -3868,18 +3681,16 @@ class chamber(Action):
                     elif 'top' in base:
                         self.topfiles.append(fname)
                     else:
-                        raise InputError('Cannot detect filetype of %s' % fname)
+                        raise InputError(f'Cannot detect filetype of {fname}')
                 else:
-                    raise InputError('Cannot detect filetype of %s' % fname)
+                    raise InputError(f'Cannot detect filetype of {fname}')
         crdfile = arg_list.get_key_string('-crd', None)
         if crdfile is not None:
-            crdfiles = glob.glob(expanduser(expandvars(crdfile)))
+            crdfiles = glob(os.path.expanduser(os.path.expandvars(crdfile)))
             if not crdfiles:
-                raise FileDoesNotExist('Coordinate file %s does not exist' %
-                                       crdfile)
+                raise FileDoesNotExist(f'Coordinate file {crdfile} does not exist')
             if len(crdfiles) > 1:
-                raise InputError('Too many coordinate files selected through '
-                                 'globbing')
+                raise InputError('Too many coordinate files selected through globbing')
             self.crdfile = crdfiles[0]
         else:
             self.crdfile = None
@@ -3887,9 +3698,9 @@ class chamber(Action):
         psf = arg_list.get_key_string('-psf', None)
         if psf is None:
             raise InputError('chamber requires a PSF file')
-        self.psf = glob.glob(expanduser(expandvars(psf)))
+        self.psf = glob(os.path.expanduser(os.path.expandvars(psf)))
         if not self.psf:
-            raise FileDoesNotExist('chamber PSF file %s cannot be found' % psf)
+            raise FileDoesNotExist(f'chamber PSF file {psf} cannot be found')
         if len(self.psf) > 1:
             raise InputError('Too many PSF files selected through globbing')
         self.psf = self.psf[0]
@@ -3905,8 +3716,7 @@ class chamber(Action):
             if len(self.box) == 3:
                 self.box += [90.0, 90.0, 90.0]
             elif len(self.box) != 6:
-                raise InputError('Box must be 3 lengths or 3 lengths and 3 '
-                                 'angles!')
+                raise InputError('Box must be 3 lengths or 3 lengths and 3 angles!')
         else:
             self.box = 'bounding'
         self.radii = arg_list.get_key_string('-radii', 'mbondi')
@@ -3915,25 +3725,24 @@ class chamber(Action):
         if not self.paramfiles and not self.streamfiles:
             raise InputError('No parameter files were provided!')
         if not self.radii in GB_RADII:
-            raise InputError('Illegal radius set %s -- must be one of '
-                             '%s' % (self.radii, ', '.join(GB_RADII)))
+            raise InputError(f'Illegal radius set {self.radii} -- must be one of {GB_RADII}')
         arg_list.has_key('nocondense')
         self.nosettle = arg_list.has_key('nosettle')
 
     def __str__(self):
-        retstr = 'Creating chamber topology file from PSF %s, ' % self.psf
+        retstr = f'Creating chamber topology file from PSF {self.psf}, '
         if self.topfiles:
-            retstr += 'RTF files [%s], ' % (', '.join(self.topfiles))
+            retstr += f'RTF files {self.topfiles}, '
             if not self.streamfiles or not self.paramfiles:
                 retstr += 'and '
         if self.paramfiles:
-            retstr += 'PAR files [%s]' % (', '.join(self.paramfiles))
+            retstr += f'PAR files {self.paramfiles}'
             if self.streamfiles:
                 retstr += ', and '
         if self.streamfiles:
-            retstr += 'STR files [%s].' % (', '.join(self.streamfiles))
+            retstr += f'STR files {self.streamfiles}.'
         if self.crdfile is not None:
-            retstr += ' Coords from %s.' % self.crdfile
+            retstr += f' Coords from {self.crdfile}.'
         if self.cmap:
             retstr += ' Using CMAP.'
         else:
@@ -3941,8 +3750,8 @@ class chamber(Action):
         if self.box == 'bounding':
             retstr += ' Defining a bounding box.'
         elif self.box is not None:
-            retstr += ' Box info %s.' % (self.box)
-        retstr += ' GB Radius set %s.' % self.radii
+            retstr += f' Box info {self.box}.'
+        retstr += f' GB Radius set {self.radii}.'
         if self.nosettle:
             retstr += ' Not changing water names.'
         return retstr
@@ -3970,7 +3779,7 @@ class chamber(Action):
                 else:
                     coords = crd.coordinates
             except (AttributeError, TypeError):
-                raise ChamberError('No coordinates in %s' % self.crdfile)
+                raise ChamberError(f'No coordinates in {self.crdfile}')
             if hasattr(crd, 'box') and crd.box is not None:
                 if len(crd.box.shape) == 1:
                     crdbox = crd.box
@@ -3978,9 +3787,10 @@ class chamber(Action):
                     # Trajectory
                     crdbox = crd.box[0]
             if coords.shape != (len(psf.atoms), 3):
-                raise ChamberError('Mismatch in number of coordinates (%d) and '
-                                   '3*number of atoms (%d)' % (len(coords),
-                                   3*len(psf.atoms)))
+                raise ChamberError(
+                    f'Mismatch in number of coordinates ({len(coords)}) and 3*number of atoms '
+                    f'({3 * len(psf.atoms)})'
+                )
             # Set the coordinates now, since creating the parm may re-order the
             # atoms in order to maintain contiguous molecules
             psf.coordinates = coords
@@ -4031,8 +3841,8 @@ class chamber(Action):
         # Now load the parameters
         try:
             psf.load_parameters(parmset)
-        except ParmedError as e:
-            raise ChamberError('Problem assigning parameters to PSF: %s' % e)
+        except ParmedError as err:
+            raise ChamberError(f'Problem assigning parameters to PSF: {err}') from err
         parm = ConvertFromPSF(psf, parmset)
         parm.name = self.psf
         changeRadii(parm, self.radii).execute()
@@ -4127,18 +3937,15 @@ class minimize(Action):
             if not self.use_openmm:
                 raise InputError('Restraints only permitted with omm option')
             if self.weight <= 0:
-                raise InputError('Restraints require a restraint stiffness '
-                                 'larger than 0 kcal/mol/A^2')
+                raise InputError('Restraints require a positive restraint weight')
         else:
             self.restrain = None
         if self.platform not in ('CUDA', 'OpenCL', 'CPU', 'Reference', None):
-            raise InputError('platform must be CUDA, OpenCL, CPU or Reference '
-                             '(NOT %s)' % self.platform)
+            raise InputError(f'platform [{self.platform}] must be CUDA, OpenCL, CPU or Reference')
         if self.precision not in ('mixed', 'single', 'double'):
             raise InputError('precision must be single, double, or mixed.')
         if self.parm.ptr('ifbox') == 0 and not self.igb in (0,1,2,5,6,7,8):
-            raise InputError('Illegal igb value (%d). Must be 0, 1, 2, 5, 6, '
-                             '7, or 8' % self.igb)
+            raise InputError(f'igb [{self.igb}] must be 0, 1, 2, 5, 6, 7, or 8.')
         if self.maxcyc is not None and self.maxcyc <= 0:
             raise InputError('maxcyc must be a positive integer')
         if self.tol < 0:
@@ -4146,8 +3953,7 @@ class minimize(Action):
         if self.tol == 0 and self.maxcyc is None:
             raise InputError('tolerance must be > 0 if maxcyc is not set.')
         if self.norun and not self.use_openmm:
-            raise InputError('norun only makes sense with the script and omm '
-                             'options')
+            raise InputError('norun only makes sense with the script and omm options')
 
     def __str__(self):
         retstr = 'Minimizing %s ' % self.parm
@@ -4168,18 +3974,17 @@ class minimize(Action):
         if self.cutoff is None:
             retstr += 'and no cutoff '
         else:
-            retstr += 'and a cutoff of %.2f Angstroms ' % self.cutoff
-        retstr += 'to a tolerance of %s. ' % self.tol
+            retstr += f'and a cutoff of {self.cutoff:.2f} Angstroms '
+        retstr += f'to a tolerance of {self.tol}. '
         if self.restrain is not None:
-            retstr += 'Restraining %s with weights %f. ' % (self.restrain,
-                                                            self.weight)
+            retstr += f'Restraining {self.restrain} with weights {self.weight}. '
         if self.maxcyc is not None:
-            retstr += 'Using at most %d minimization steps.' % self.maxcyc
+            retstr += f'Using at most {self.maxcyc} minimization steps.'
         return retstr.strip()
 
     def execute(self):
-        from parmed.tools.simulations.openmm import minimize as omm_min
-        from parmed.tools.simulations.sanderapi import minimize as san_min
+        from .simulations.openmm import minimize as omm_min
+        from .simulations.sanderapi import minimize as san_min
         if self.parm.coordinates is None:
             raise SimulationError('You must load coordinates before "minimize"')
         if self.use_openmm:
@@ -4187,8 +3992,7 @@ class minimize(Action):
                     self.restrain, self.weight, self.script, self.platform,
                     self.precision, self.norun, self.tol, self.maxcyc)
         else:
-            san_min(self.parm, self.igb, self.saltcon, self.cutoff, self.tol,
-                    self.maxcyc)
+            san_min(self.parm, self.igb, self.saltcon, self.cutoff, self.tol, self.maxcyc)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -4209,11 +4013,10 @@ class outPDB(Action):
         self.anisou = arg_list.has_key('anisou')
         self.filename = arg_list.get_next_string()
         if self.parm.coordinates is None:
-            raise InputError('Parm %s does not have loaded coordinates' %
-                             self.parm)
+            raise InputError(f'Parm {self.parm} does not have loaded coordinates')
 
     def __str__(self):
-        retstr = 'Writing PDB file %s' % self.filename
+        retstr = f'Writing PDB file {self.filename}'
         if self.renumber:
             retstr += ' renumbering atoms and residues'
         else:
@@ -4245,11 +4048,10 @@ class outCIF(Action):
         self.anisou = arg_list.has_key('anisou')
         self.filename = arg_list.get_next_string()
         if self.parm.coordinates is None:
-            raise InputError('Parm %s does not have loaded coordinates' %
-                             self.parm)
+            raise InputError(f'Parm {self.parm} does not have loaded coordinates')
 
     def __str__(self):
-        retstr = 'Writing PDB file %s' % self.filename
+        retstr = f'Writing PDBx file {self.filename}'
         if self.renumber:
             retstr += ' renumbering atoms and residues'
         else:
@@ -4259,8 +4061,7 @@ class outCIF(Action):
         return retstr
 
     def execute(self):
-        self.parm.write_cif(self.filename, renumber=self.renumber,
-                            write_anisou=self.anisou)
+        self.parm.write_cif(self.filename, renumber=self.renumber, write_anisou=self.anisou)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -4317,7 +4118,7 @@ class gromber(Action):
             if '=' in current_define:
                 parts = current_define.split('=')
                 if len(parts) != 2:
-                    raise InputError('Illegal define: %s' % current_define)
+                    raise InputError(f'Illegal define: {current_define}')
                 key, val = parts
                 defines[key] = val
             else:
@@ -4331,18 +4132,15 @@ class gromber(Action):
         self.radii = arg_list.get_key_string('radii', 'mbondi')
 
     def __str__(self):
-        retstr = ['Converting Gromacs topology %s to Amber. ' % self.topfile]
+        retstr = [f'Converting Gromacs topology {self.topfile} to Amber. ']
         if self.defines:
             retstr.append('Using the following defines:\n')
-            for key, val in iteritems(self.defines):
-                retstr.append('\t%s=%s\n' % (key, val))
-        retstr.append('Using topology directory [%s]. ' %
-                      gromacs.GROMACS_TOPDIR)
+            retstr.extend([f'\t{key}={val}\n' for key, val in self.defines.items()])
+        retstr.append(f'Using topology directory [{gromacs.GROMACS_TOPDIR}]. ')
         if self.coordinate_file is None:
             retstr.append('No coordinates provided.')
         else:
-            retstr.append('Getting coordinates (and box) from %s.' %
-                          self.coordinate_file)
+            retstr.append(f'Getting coordinates (and box) from {self.coordinate_file}.')
         return ''.join(retstr)
 
     def execute(self):
@@ -4361,8 +4159,7 @@ class gromber(Action):
                         a1.xy = a2.xy
                         a1.xz = a2.xz
                     except AttributeError:
-                        raise InputError('%s does not contain coordinates' %
-                                         self.coordinate_file)
+                        raise InputError(f'{self.coordinate_file} does not contain coordinates')
                     try:
                         a1.vx = a2.vx
                         a1.vy = a2.vy
@@ -4382,8 +4179,7 @@ class gromber(Action):
                 for a, xyz in zip(top.atoms, pos):
                     a.xx, a.xy, a.xz = pos
             else:
-                raise InputError('Cannot find coordinates in %s' %
-                                 self.coordinate_file)
+                raise InputError(f'Cannot find coordinates in {self.coordinate_file}')
             if hasattr(crd, 'box') and callable(crd.box):
                 top.box = copy.copy(crd.box(0))
             else:
@@ -4418,7 +4214,5 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
     term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
 
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
-    parm.parm_data['%s_ACOEF' % key][term_idx] = eps * rmin**12
-    parm.parm_data['%s_BCOEF' % key][term_idx] = 2 * eps * rmin**6
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    parm.parm_data[f'{key}_ACOEF'][term_idx] = eps * rmin**12
+    parm.parm_data[f'{key}_BCOEF'][term_idx] = 2 * eps * rmin**6

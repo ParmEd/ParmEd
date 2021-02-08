@@ -2,8 +2,6 @@
 Convert an OpenMM Topology into a Structure instance, optionally filling in
 parameters from a System
 """
-from __future__ import absolute_import, division, print_function
-
 import warnings
 from collections import defaultdict
 
@@ -15,13 +13,12 @@ from ..formats import load_file
 from ..geometry import box_vectors_to_lengths_and_angles
 from ..periodic_table import Element
 from ..structure import Structure
-from ..topologyobjects import (Angle, AngleType, Atom, AtomType, Bond, BondType, Cmap, CmapType,
-                               Dihedral, DihedralType, ExtraPoint, Improper, ImproperType,
-                               NonbondedException, NonbondedExceptionType, RBTorsionType,
-                               UreyBradley)
+from ..topologyobjects import (
+    Angle, AngleType, Atom, AtomType, Bond, BondType, Cmap, CmapType, Dihedral, DihedralType,
+    ExtraPoint, Improper, ImproperType, NonbondedException, NonbondedExceptionType, RBTorsionType,
+    UreyBradley
+)
 from ..utils.decorators import needs_openmm
-from ..utils.six import integer_types, iteritems, string_types
-from ..utils.six.moves import range
 
 __all__ = ['load_topology']
 
@@ -98,7 +95,7 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
                         aid = int(a.id)
                     except ValueError:
                         aid = a.id
-                    atype = aid if not isinstance(aid, integer_types) else ''
+                    atype = aid if not isinstance(aid, int) else ''
                     atom = Atom(atomic_number=a.element.atomic_number,
                                 name=a.name, mass=a.element.mass, type=atype)
                 struct.add_atom(atom, residue, resid, chain)
@@ -116,7 +113,7 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
     loaded_box = False
 
     if xyz is not None:
-        if isinstance(xyz, string_types):
+        if isinstance(xyz, str):
             xyz = load_file(xyz, skip_bonds=True)
             struct.coordinates = xyz.coordinates
             if struct.box is not None:
@@ -136,17 +133,15 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
     if system is None:
         return struct
 
-    if isinstance(system, string_types):
+    if isinstance(system, str):
         system = load_file(system)
 
     if not isinstance(system, mm.System):
-        raise TypeError('system must be an OpenMM System object or serialized '
-                        'XML of an OpenMM System object')
+        raise TypeError('system must be an OpenMM System object or serialized XML of an OpenMM System object')
 
     # We have a system, try to extract parameters from it
     if len(struct.atoms) != system.getNumParticles():
-        raise TypeError('Topology and System have different numbers of atoms (%d vs. %d)' %
-                        (len(struct.atoms), system.getNumParticles()))
+        raise TypeError(f'Topology and System have different numbers of atoms ({len(struct.atoms)} vs. {system.getNumParticles()})')
 
     processed_forces = set()
     ignored_forces = (mm.CMMotionRemover, mm.AndersenThermostat, mm.MonteCarloBarostat,
@@ -188,7 +183,7 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
             continue
         else:
             struct.unknown_functional = True
-            warnings.warn('Unsupported Force type %s' % type(force).__name__, OpenMMWarning)
+            warnings.warn(f'Unsupported Force type {force.__class__.__name__}', OpenMMWarning)
         processed_forces.add(type(force))
 
     return struct
@@ -211,8 +206,7 @@ def _process_bond(struct, force):
                 if aj in bond:
                     break
             else:
-                raise RuntimeError('aj in ai.bond_partners, but couldn\'t find '
-                                   'that bond!')
+                raise RuntimeError('aj in ai.bond_partners, but couldn\'t find that bond!')
             bond.type = bond_type
         else:
             struct.bonds.append(Bond(ai, aj, type=bond_type))
@@ -237,7 +231,7 @@ def _process_angle(struct, force):
 def _process_urey_bradley(struct, force):
     """ Adds Urey-Bradley parameters to the structure """
     if not struct.angles:
-        warnings.warn('Adding what seems to be Urey-Bradley terms before ' # pragma: no cover
+        warnings.warn('Adding what seems to be Urey-Bradley terms before '
                       'Angles. This is unexpected, but the parameters will '
                       'all be present in one form or another.', OpenMMWarning)
     typemap = dict()
@@ -246,15 +240,13 @@ def _process_urey_bradley(struct, force):
         ai, aj = struct.atoms[i], struct.atoms[j]
         key = (req._value, k._value)
         if struct.angles and ai not in aj.angle_partners:
-            warnings.warn('Adding what seems to be Urey-Bradley terms, but ' # pragma: no cover
-                          'atoms %d and %d do not appear to be angled to each '
-                          'other. Parameters will all be present, but may not '
-                          'be in expected places.' % (ai.idx, aj.idx),
-                          OpenMMWarning)
+            warnings.warn(f'Adding what seems to be Urey-Bradley terms, but atoms {a.idx} and '
+                          f'{aj.idx} do not appear to be angled to each other. Parameters will '
+                          'all be present, but may not be in expected places.')
         if key in typemap:
             urey_type = typemap[key]
         else:
-            urey_type = BondType(k*0.5, req)
+            urey_type = BondType(k * 0.5, req)
             typemap[key] = urey_type
             struct.urey_bradley_types.append(urey_type)
         struct.urey_bradleys.append(UreyBradley(ai, aj, type=urey_type))
@@ -274,10 +266,8 @@ def _process_dihedral(struct, force):
             dihed_type = DihedralType(phi_k, per, phase)
             typemap[key] = dihed_type
             struct.dihedral_types.append(dihed_type)
-        improper = (ai in ak.bond_partners and aj in ak.bond_partners and
-                    al in ak.bond_partners)
-        struct.dihedrals.append(Dihedral(ai, aj, ak, al, improper=improper,
-                                         type=dihed_type))
+        improper = ai in ak.bond_partners and aj in ak.bond_partners and al in ak.bond_partners
+        struct.dihedrals.append(Dihedral(ai, aj, ak, al, improper=improper, type=dihed_type))
     struct.dihedral_types.claim()
 
 def _process_rbtorsion(struct, force):
@@ -287,17 +277,11 @@ def _process_rbtorsion(struct, force):
         i, j, k, l, c0, c1, c2, c3, c4, c5 = force.getTorsionParameters(ii)
         ai, aj = struct.atoms[i], struct.atoms[j]
         ak, al = struct.atoms[k], struct.atoms[l]
-        # TODO -- Fix this when OpenMM is fixed
-        try:
-            key = (c0._value, c1._value, c2._value, c3._value, c4._value, c5._value)
-            f = 1                          # pragma: no cover
-        except AttributeError:             # pragma: no cover
-            key = (c0, c1, c2, c3, c4, c5) # pragma: no cover
-            f = u.kilojoules_per_mole      # pragma: no cover
+        key = (c0._value, c1._value, c2._value, c3._value, c4._value, c5._value)
         if key in typemap:
             dihed_type = typemap[key]
         else:
-            dihed_type = RBTorsionType(c0*f, c1*f, c2*f, c3*f, c4*f, c5*f)
+            dihed_type = RBTorsionType(c0, c1, c2, c3, c4, c5)
             typemap[key] = dihed_type
             struct.rb_torsion_types.append(dihed_type)
         struct.rb_torsions.append(Dihedral(ai, aj, ak, al, type=dihed_type))
@@ -313,15 +297,14 @@ def _process_improper(struct, force):
         Returns True if the energy expression is recognized as a quadratic
         improper, and False otherwise
     """
-    eqn = force.getEnergyFunction().replace(' ', '')
+    eqn = force.getEnergyFunction().lower().replace(' ', '')
     if ';' in eqn: # Just look at the first segment of the equation if there are multiple
         eqn = eqn[:eqn.index(';')]
     # Don't try to be fancy with regexes for fear of making a possible mistake.
     # ParmEd and OpenMM use only these two eqns for the improper torsions:
     #  k*(theta-theta0)^2 vs. 0.5*k*(theta-theta0)^2
     # So only recognize the above 2 forms
-    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2', 'k*dtheta_torus^2',
-                   '0.5*k*dtheta_torus^2'):
+    if eqn not in ('0.5*k*(theta-theta0)^2', 'k*(theta-theta0)^2', 'k*dtheta_torus^2', '0.5*k*dtheta_torus^2'):
         return False
     if eqn.startswith('0.5'):
         fac = 0.5
@@ -337,8 +320,7 @@ def _process_improper(struct, force):
         if key in typemap:
             imp_type = typemap[key]
         else:
-            imp_type = ImproperType(psi_k*fac*u.kilojoule_per_mole/u.radian**2,
-                                    psi_eq*u.radian)
+            imp_type = ImproperType(psi_k*fac*u.kilojoule_per_mole/u.radian**2, psi_eq*u.radian)
             typemap[key] = imp_type
             struct.improper_types.append(imp_type)
         struct.impropers.append(Improper(ai, aj, ak, al, type=imp_type))
@@ -363,9 +345,8 @@ def _process_cmap(struct, force):
     for ii in range(force.getNumTorsions()):
         mapidx, ii, ij, ik, il, ji, jj, jk, jl = force.getTorsionParameters(ii)
         if ij != ji or ik != jj or il != jk:
-            warnings.warn('Non-continuous CMAP torsions detected. Not ' # pragma: no cover
-                          'supported.', OpenMMWarning)
-            continue # pragma: no cover
+            warnings.warn('Non-continuous CMAP torsions detected. Not supported.', OpenMMWarning)
+            continue
         ai, aj, ak = struct.atoms[ii], struct.atoms[ij], struct.atoms[ik]
         al, am = struct.atoms[il], struct.atoms[jl]
         cmap_type = cmap_types[mapidx]
@@ -393,8 +374,7 @@ def _process_nonbonded(struct, force, condense_atom_types):
             if atom.type == '':
                 element_typemap[atype_name] += 1
                 atype_name = '%s%d' % (atype_name, element_typemap[atype_name])
-            typemap[key] = atom_type = AtomType(atype_name, None, atom.mass,
-                                                atom.atomic_number)
+            typemap[key] = atom_type = AtomType(atype_name, None, atom.mass, atom.atomic_number)
         atom.charge = chg.value_in_unit(u.elementary_charge)
         rmin = sig.value_in_unit(u.angstroms) * 2**(1/6) / 2 # to rmin/2
         eps = eps.value_in_unit(u.kilocalories_per_mole)
@@ -428,7 +408,7 @@ def _process_nonbonded(struct, force, condense_atom_types):
             chgscale = q / (ai.charge * aj.charge)
         except ZeroDivisionError:
             if q != 0:
-                raise ValueError("Can't scale charge product 0 to match %s" % q)
+                raise ValueError(f"Can't scale charge product 0 to match {q}")
             chgscale = None
         nbtype = NonbondedExceptionType(sig*2**(1/6), eps, chgscale)
         struct.adjusts.append(NonbondedException(ai, aj, type=nbtype))
@@ -449,7 +429,7 @@ def _process_nonbonded(struct, force, condense_atom_types):
             adjust_type.chgscale = first_scaling_factor
 
     # Check that all of our exceptions are accounted for
-    for ai, exceptions in iteritems(bond_graph_exceptions):
+    for ai, exceptions in bond_graph_exceptions.items():
         if exceptions - explicit_exceptions[ai]:
             struct.unknown_functional = True
             warnings.warn('Detected incomplete exceptions. Not supported.', OpenMMWarning)

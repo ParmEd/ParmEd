@@ -1,19 +1,17 @@
 """
 Tests parmed.formats package
 """
-from __future__ import division
 import utils
+from io import StringIO
 
 from copy import copy
 import numpy as np
 import parmed as pmd
 from parmed import (amber, charmm, exceptions, formats, gromacs, residue, Structure, read_PDB, Atom,
-                    read_CIF, download_PDB, download_CIF, topologyobjects, write_PDB, write_CIF)
+                    read_CIF, download_PDB, download_CIF, topologyobjects)
 from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
-from parmed.utils.six import iteritems, add_metaclass
-from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
 import sys
@@ -44,14 +42,14 @@ class TestFileLoader(FileIOTestCase):
         fn = self.get_fn('test', written=True)
         with open(fn, 'w'):
             pass
-        for name, cls in iteritems(PARSER_REGISTRY):
+        for name, cls in PARSER_REGISTRY.items():
             self.assertFalse(cls.id_format(fn))
 
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_load_amber_prmtop(self):
@@ -1170,15 +1168,6 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         for res in residue.RNAResidue.all_residues:
             self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
-    def test_deprecations(self):
-        """ Test functions that raise deprecation warnings """
-        fn = self.get_fn('blah', written=True)
-        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-        with self.assertWarns(DeprecationWarning):
-            write_PDB(parm, fn)
-        with self.assertWarns(DeprecationWarning):
-            write_CIF(parm, fn)
-
     def test_link(self):
         """ Tests proper handling and processing of LINK records in PDB files """
         parm = pmd.load_file(get_fn('5qk8.pdb'))
@@ -1223,7 +1212,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in iteritems(a1.other_locations):
+                for key, oa in a1.other_locations.items():
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa
@@ -2169,8 +2158,7 @@ class TestRegistry(FileIOTestCase):
     def test_file_format_type(self):
         """ Tests the FileFormatType metaclass """
         def create_metaclass():
-            @add_metaclass(formats.registry.FileFormatType)
-            class PDBFile(object):
+            class PDBFile(metaclass=formats.registry.FileFormatType):
                 def id_format(fname):
                     return False
                 def parse(fname):
@@ -2198,7 +2186,7 @@ class TestFileDownloader(unittest.TestCase):
         self.assertTrue(amber.AmberOFFLibrary.id_format(self.url + 'amino12.lib'))
         off = amber.AmberOFFLibrary.parse(self.url + 'amino12.lib')
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_download_amber_prmtop(self):

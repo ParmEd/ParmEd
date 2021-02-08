@@ -1,16 +1,13 @@
 """
 Tests for the parmed/charmm subpackage
 """
-from __future__ import division, print_function
-
 from collections import OrderedDict, defaultdict
+from io import StringIO
 import copy
 import numpy as np
 import os
 import parmed as pmd
 from parmed.utils.io import genopen
-from parmed.utils.six import iteritems, string_types
-from parmed.utils.six.moves import StringIO
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
@@ -586,46 +583,40 @@ class TestCharmmParameters(TestCharmmBase):
         params = parameters.CharmmParameterSet(
                 get_fn('parm14sb_all.prm'),
         )
-        for i, tortype in iteritems(params.dihedral_types):
+        for i, tortype in params.dihedral_types.items():
             for typ in tortype:
                 self.assertAlmostEqual(typ.scee, 1.2)
         params = parameters.CharmmParameterSet(
                 get_fn('parm14sb_all_2.prm')
         )
-        for i, tortype in iteritems(params.dihedral_types):
+        for i, tortype in params.dihedral_types.items():
             for typ in tortype:
                 self.assertAlmostEqual(typ.scee, 1.2)
         # Now test that adding to the parameter set with a DIFFERENT 1-4 scaling
         # factor is caught
-        self.assertRaises(exceptions.CharmmError, lambda:
-                params.read_parameter_file(get_fn('par_all36_prot.prm'))
-        )
-        self.assertRaises(exceptions.CharmmError, lambda:
-                parameters.CharmmParameterSet(get_fn('parm14sb_all.prm'),
-                                              get_fn('dummy_charmm.str'))
-        )
+        with self.assertRaises(exceptions.CharmmError):
+            params.read_parameter_file(get_fn('par_all36_prot.prm'))
+        with self.assertRaises(exceptions.CharmmError):
+            parameters.CharmmParameterSet(get_fn('parm14sb_all.prm'), get_fn('dummy_charmm.str'))
 
     def test_geometric(self):
         """ Test reading CHARMM parameter file with geometric comb. rule """
-        opls = parameters.CharmmParameterSet(get_fn('top_opls_aa.inp'),
-                                             get_fn('par_opls_aa.inp'))
+        opls = parameters.CharmmParameterSet(get_fn('top_opls_aa.inp'), get_fn('par_opls_aa.inp'))
         self.assertEqual(opls.combining_rule, 'geometric')
         # Now test error handling corresponding to illegal mixing of
         # incompatible parameter files.
         non_opls = parameters.CharmmParameterSet(get_fn('par_all36_prot.prm'))
         self.assertEqual(non_opls.combining_rule, 'lorentz')
         non_opls.read_topology_file(get_fn('top_opls_aa.inp'))
-        self.assertRaises(exceptions.CharmmError, lambda:
-                non_opls.read_parameter_file(get_fn('par_geometric_combining.inp'))
-        )
-        self.assertRaises(exceptions.CharmmError, lambda:
-                non_opls.read_parameter_file(get_fn('par_opls_aa.inp'))
-        )
-        for _, dt in iteritems(opls.dihedral_types):
-            for t in dt: t.scee = t.scnb = 1.0
-        self.assertRaises(exceptions.CharmmError, lambda:
-                opls.read_parameter_file(get_fn('par_all36_prot.prm'))
-        )
+        with self.assertRaises(exceptions.CharmmError):
+            non_opls.read_parameter_file(get_fn('par_geometric_combining.inp'))
+        with self.assertRaises(exceptions.CharmmError):
+            non_opls.read_parameter_file(get_fn('par_opls_aa.inp'))
+        for _, dt in opls.dihedral_types.items():
+            for t in dt:
+                t.scee = t.scnb = 1.0
+        with self.assertRaises(exceptions.CharmmError):
+            opls.read_parameter_file(get_fn('par_all36_prot.prm'))
 
     def test_single_parameterset(self):
         """ Test reading a single parameter set """
@@ -642,8 +633,7 @@ class TestCharmmParameters(TestCharmmBase):
         )
         self._check_single_paramset(
             parameters.CharmmParameterSet.load_set(
-                tfile=get_fn('top_all22_prot.inp'),
-                pfile=get_fn('par_all22_prot.inp'),
+                tfile=get_fn('top_all22_prot.inp'), pfile=get_fn('par_all22_prot.inp')
             )
         )
 
@@ -667,13 +657,13 @@ class TestCharmmParameters(TestCharmmBase):
         # Look at the parsed residue templates and make sure they line up
         self.assertEqual(len(params.residues), 32)
         self.assertEqual(set(params.residues.keys()),
-                set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
-                     'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
-                     'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
-                     'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
+            set(['ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY',
+                 'HSD', 'HSE', 'HSP', 'ILE', 'LEU', 'LYS', 'MET', 'PHE',
+                 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL', 'ALAD', 'TIP3',
+                 'TP3M', 'SOD', 'MG', 'POT', 'CES', 'CAL', 'CLA', 'ZN2'])
         )
         self.assertEqual(len(params.patches), 22)
-        for resname, res in iteritems(params.residues):
+        for resname, res in params.residues.items():
             if resname in ('TIP3', 'TP3M', 'SOD', 'MG', 'CLA', 'POT', 'CES',
                     'CAL', 'ZN2', 'ALAD'):
                 self.assertIs(res.first_patch, None)
@@ -753,11 +743,11 @@ class TestCharmmParameters(TestCharmmBase):
     def test_write_params(self):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
         params = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp'))
-        params.write(top=self.get_fn('test.rtf', written=True),
-                     par=self.get_fn('test.par', written=True))
-        params.write(str=self.get_fn('test.str', written=True))
+        params.write(top=self.get_fn('test.rtf', written=True), par=self.get_fn('test.par', written=True))
+        with self.assertWarns(DeprecationWarning):
+            params.write(str=self.get_fn('test.str', written=True))
         # Check bad options
-        self.assertRaises(ValueError, lambda: params.write())
+        self.assertRaises(ValueError, params.write)
 
         params2 = parameters.CharmmParameterSet(
             self.get_fn('test.rtf', written=True), self.get_fn('test.par', written=True)
@@ -866,24 +856,21 @@ class TestCharmmParameters(TestCharmmBase):
 
         # Load a parameter set with NoUreyBradley to make sure it's retained as
         # a singleton. Also build a list of atom type tuples
-        for i, (typstr, typ) in enumerate(iteritems(params1.atom_types)):
+        for i, (typstr, typ) in enumerate(params1.atom_types.items()):
             params1.atom_types_tuple[(typstr, i+1)] = typ
             params1.atom_types_int[i+1] = typ
         for key in params1.angle_types:
             params1.urey_bradley_types[key] = to.NoUreyBradley
         chparams = parameters.CharmmParameterSet.from_parameterset(params1)
-        for _, item in iteritems(chparams.urey_bradley_types):
+        for _, item in chparams.urey_bradley_types.items():
             self.assertIs(item, to.NoUreyBradley)
-        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types),
-                                                    iteritems(params1.atom_types)):
+        for (typstr1, typ1), (typstr2, typ2) in zip(params1.atom_types.items(), params1.atom_types.items()):
             self.assertEqual(typstr1, typstr2)
             self.assertEqual(typ1, typ2)
-        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types_int),
-                                                    iteritems(params1.atom_types_int)):
+        for (typstr1, typ1), (typstr2, typ2) in zip(params1.atom_types_int.items(), params1.atom_types_int.items()):
             self.assertEqual(typstr1, typstr2)
             self.assertEqual(typ1, typ2)
-        for (typstr1, typ1), (typstr2, typ2) in zip(iteritems(params1.atom_types_tuple),
-                                                    iteritems(params1.atom_types_tuple)):
+        for (typstr1, typ1), (typstr2, typ2) in zip(params1.atom_types_tuple.items(), params1.atom_types_tuple.items()):
             self.assertEqual(typstr1, typstr2)
             self.assertEqual(typ1, typ2)
 
@@ -900,8 +887,7 @@ class TestCharmmParameters(TestCharmmBase):
         )
         gmx.parameterset.nbfix_types[('X', 'Y')] = (2.0, 3.0)
         from_gmx2 = parameters.CharmmParameterSet.from_parameterset(gmx.parameterset)
-        for (key1, typ1), (key2, typ2) in zip(iteritems(from_gmx.cmap_types),
-                                              iteritems(from_gmx2.cmap_types)):
+        for (key1, typ1), (key2, typ2) in zip(from_gmx.cmap_types.items(), from_gmx2.cmap_types.items()):
             self.assertEqual(key1, key2)
             self.assertEqual(typ1, typ2)
         self.assertEqual(len(from_gmx2.nbfix_types), 1)
@@ -926,7 +912,7 @@ class TestCharmmParameters(TestCharmmBase):
 
 
     def _check_uppercase_types(self, params):
-        for aname, atom_type in iteritems(params.atom_types):
+        for aname, atom_type in params.atom_types.items():
             self.assertEqual(aname, aname.upper())
             self.assertEqual(atom_type.name, atom_type.name.upper())
         for key in params.bond_types:
@@ -946,13 +932,13 @@ class TestCharmmParameters(TestCharmmBase):
         def get_typeset(set1, set2):
             ids1 = set()
             ids2 = set()
-            for _, item in iteritems(set1):
+            for _, item in set1.items():
                 ids1.add(id(item))
-            for _, item in iteritems(set2):
+            for _, item in set2.items():
                 ids2.add(id(item))
             return ids1, ids2
         def typenames(key):
-            if isinstance(key, string_types):
+            if isinstance(key, str):
                 return parameters._typeconv(key)
             return tuple(typenames(k) for k in key)
         # Bonds
@@ -962,7 +948,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(b1 & b2)
         else:
             self.assertEqual(b1, b2)
-        for key, item2 in iteritems(set2.bond_types):
+        for key, item2 in set2.bond_types.items():
             self.assertEqual(set1.bond_types[typenames(key)], item2)
         # Angles
         a1, a2 = get_typeset(set1.angle_types, set2.angle_types)
@@ -971,7 +957,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(a1 & a2)
         else:
             self.assertEqual(a1, a2)
-        for key, item2 in iteritems(set2.angle_types):
+        for key, item2 in set2.angle_types.items():
             self.assertEqual(set1.angle_types[typenames(key)], item2)
         # Dihedrals
         d1, d2 = get_typeset(set1.dihedral_types, set2.dihedral_types)
@@ -980,7 +966,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(d1 & d2)
         else:
             self.assertEqual(d1, d2)
-        for key, item2 in iteritems(set2.dihedral_types):
+        for key, item2 in set2.dihedral_types.items():
             self.assertEqual(set1.dihedral_types[typenames(key)], item2)
         # Impropers
         d1, d2 = get_typeset(set1.improper_types, set2.improper_types)
@@ -989,7 +975,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(d1 & d2)
         else:
             self.assertEqual(d1, d2)
-        for key, item2 in iteritems(set2.improper_types):
+        for key, item2 in set2.improper_types.items():
             self.assertEqual(set1.improper_types[typenames(key)], item2)
         # Periodic impropers
         d1, d2 = get_typeset(set1.improper_periodic_types, set2.improper_periodic_types)
@@ -998,7 +984,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(d1 & d2)
         else:
             self.assertEqual(d1, d2)
-        for key, item2 in iteritems(set2.improper_periodic_types):
+        for key, item2 in set2.improper_periodic_types.items():
             self.assertEqual(set1.improper_periodic_types[typenames(key)], item2)
         # CMAPs
         d1, d2 = get_typeset(set1.cmap_types, set2.cmap_types)
@@ -1007,7 +993,7 @@ class TestCharmmParameters(TestCharmmBase):
             self.assertFalse(d1 & d2)
         else:
             self.assertEqual(d1, d2)
-        for key, item2 in iteritems(set2.cmap_types):
+        for key, item2 in set2.cmap_types.items():
             self.assertEqual(len(key), 8)
             self.assertEqual(set1.cmap_types[typenames(key)], item2)
         # Atom types

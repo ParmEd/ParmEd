@@ -5,20 +5,17 @@ topology files and extracts all parameters from the parameter files
 
 Author: Jason M. Swails
 """
-from __future__ import absolute_import, division, print_function
-
 import warnings
 from collections import OrderedDict
 from copy import copy
 from itertools import permutations
 
 from .exceptions import ParameterError, ParameterWarning
-from .topologyobjects import (AtomType, DihedralType, DihedralTypeList,
-                              NoUreyBradley, UnassignedAtomType)
-from .utils.six import iteritems, itervalues
-from .utils.six.moves import range #pylint: disable=W0622,E0401
+from .topologyobjects import (
+    AtomType, DihedralType, DihedralTypeList, NoUreyBradley, UnassignedAtomType
+)
 
-class ParameterSet(object):
+class ParameterSet:
     """
     Stores a parameter set defining a force field
 
@@ -96,58 +93,58 @@ class ParameterSet(object):
 
     def __copy__(self):
         other = type(self)()
-        for key, item in iteritems(self.atom_types):
+        for key, item in self.atom_types.items():
             other.atom_types[key] = copy(item)
-        for key, item in iteritems(self.atom_types_int):
+        for key, item in self.atom_types_int.items():
             other.atom_types_int[key] = copy(item)
-        for key, item in iteritems(self.atom_types_tuple):
+        for key, item in self.atom_types_tuple.items():
             other.atom_types_tuple[key] = copy(item)
-        for key, item in iteritems(self.bond_types):
+        for key, item in self.bond_types.items():
             if key in other.bond_types: continue
             typ = copy(item)
             other.bond_types[key] = typ
             other.bond_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.pair_types):
+        for key, item in self.pair_types.items():
             if key in other.pair_types: continue
             typ = copy(item)
             other.pair_types[key] = typ
             other.pair_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.angle_types):
+        for key, item in self.angle_types.items():
             if key in other.angle_types: continue
             typ = copy(item)
             other.angle_types[key] = typ
             other.angle_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.dihedral_types):
+        for key, item in self.dihedral_types.items():
             if key in other.dihedral_types: continue
             typ = copy(item)
             other.dihedral_types[key] = typ
             other.dihedral_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.rb_torsion_types):
+        for key, item in self.rb_torsion_types.items():
             if key in other.rb_torsion_types: continue
             typ = copy(item)
             other.rb_torsion_types[key] = typ
             other.rb_torsion_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.improper_types):
+        for key, item in self.improper_types.items():
             if key in other.improper_types: continue
             other.improper_types[key] = copy(item)
-        for key, item in iteritems(self.improper_periodic_types):
+        for key, item in self.improper_periodic_types.items():
             if key in other.improper_periodic_types: continue
             typ = copy(item)
             other.improper_periodic_types[key] = typ
             other.improper_periodic_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.urey_bradley_types):
+        for key, item in self.urey_bradley_types.items():
             if key in other.urey_bradley_types: continue
             typ = copy(item)
             other.urey_bradley_types[key] = typ
             other.urey_bradley_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.cmap_types):
+        for key, item in self.cmap_types.items():
             if key in other.cmap_types: continue
             typ = copy(item)
             other.cmap_types[key] = typ
             other.cmap_types[tuple(reversed(key))] = typ
-        for key, item in iteritems(self.residues):
+        for key, item in self.residues.items():
             other.residues[key] = copy(item)
-        for key, item in iteritems(self.patches):
+        for key, item in self.patches.items():
             other.patches[key] = copy(item)
         other._improper_key_map = copy(self._improper_key_map)
         other.combining_rule = self.combining_rule
@@ -225,7 +222,7 @@ class ParameterSet(object):
             key = (bond.atom1.type, bond.atom2.type)
             if key in params.bond_types:
                 if not allow_unequal_duplicates and params.bond_types[key] != bond.type:
-                    raise ParameterError('Unequal bond types defined between %s and %s' % key)
+                    raise ParameterError(f'Unequal bond types defined between {key[0]} and {key[1]}')
                 continue # pragma: no cover
             typ = copy(bond.type)
             key = (bond.atom1.type, bond.atom2.type)
@@ -236,7 +233,7 @@ class ParameterSet(object):
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
             if key in params.angle_types:
                 if not allow_unequal_duplicates and params.angle_types[key] != angle.type:
-                    raise ParameterError('Unequal angle types defined between %s, %s, and %s' % key)
+                    raise ParameterError('Unequal angle types defined between {}, {}, and {}'.format(*key))
                 continue # pragma: no cover
             typ = copy(angle.type)
             key = (angle.atom1.type, angle.atom2.type, angle.atom3.type)
@@ -255,8 +252,9 @@ class ParameterSet(object):
                     if key in params.improper_periodic_types:
                         if (not allow_unequal_duplicates and
                                 params.improper_periodic_types[key] != dihedral.type):
-                            raise ParameterError('Unequal dihedral types defined between %s, %s, '
-                                                 '%s, and %s' % key)
+                            raise ParameterError(
+                                'Unequal dihedral types defined between {}, {}, {}, and {}'.format(*key)
+                            )
                         continue # pragma: no cover
                     typ = copy(dihedral.type)
                     params.improper_periodic_types[key] = typ
@@ -269,8 +267,9 @@ class ParameterSet(object):
                     if not allow_unequal_duplicates:
                         if isinstance(dihedral.type, DihedralTypeList):
                             if params.dihedral_types[key] != dihedral.type:
-                                raise ParameterError('Unequal dihedral types defined between %s, '
-                                                     '%s, %s, and %s' % key)
+                                raise ParameterError(
+                                    'Unequal dihedral types defined between {}, {}, {}, and {}'.format(*key)
+                                )
                         elif isinstance(dihedral.type, DihedralType):
                             for dt in params.dihedral_types[key]:
                                 if dt == dihedral.type:
@@ -294,8 +293,9 @@ class ParameterSet(object):
                         for t in params.dihedral_types[key]:
                             if t.per == dihedral.type.per:
                                 if not allow_unequal_duplicates and t != dihedral.type:
-                                    raise ParameterError('Unequal dihedral types defined bewteen '
-                                                         '%s, %s, %s, and %s' % key)
+                                    raise ParameterError(
+                                        'Unequal dihedral types defined bewteen {}, {}, {}, and {}'.format(*key)
+                                    )
                                 break
                         else:
                             # If we got here, we did NOT find this periodicity.
@@ -326,8 +326,7 @@ class ParameterSet(object):
                    improper.atom3.type, improper.atom4.type)
             if key in params.improper_types:
                 if not allow_unequal_duplicates and params.improper_types[key] != improper.type:
-                    raise ParameterError('Unequal improper types defined between '
-                                         '%s, %s, %s, and %s' % key)
+                    raise ParameterError('Unequal improper types defined between {}, {}, {}, and {}'.format(*key))
                 continue # pragma: no cover
             params.improper_types[key] = copy(improper.type)
         for cmap in struct.cmaps:
@@ -336,8 +335,9 @@ class ParameterSet(object):
                    cmap.atom2.type, cmap.atom3.type, cmap.atom4.type, cmap.atom5.type)
             if key in params.cmap_types:
                 if not allow_unequal_duplicates and cmap.type != params.cmap_types[key]:
-                    raise ParameterError('Unequal CMAP types defined between %s, %s, %s, %s, and '
-                                         '%s' % (key[0], key[1], key[2], key[3], key[7]))
+                    raise ParameterError(
+                        f'Unequal CMAP types defined between {key[0]}, {key[1]}, {key[2]}, {key[3]}, and {key[7]}'
+                    )
                 continue # pragma: no cover
             typ = copy(cmap.type)
             params.cmap_types[key] = typ
@@ -348,8 +348,7 @@ class ParameterSet(object):
             key = _find_ureybrad_key(urey)
             if key is None: continue
             if urey_brads_preassigned and key not in params.urey_bradley_types:
-                warnings.warn('Angle corresponding to Urey-Bradley type not found',
-                              ParameterWarning)
+                warnings.warn('Angle corresponding to Urey-Bradley type not found', ParameterWarning)
             typ = copy(urey.type)
             params.urey_bradley_types[key] = typ
             params.urey_bradley_types[tuple(reversed(key))] = typ
@@ -365,7 +364,7 @@ class ParameterSet(object):
             key = (adjust.atom1.type, adjust.atom2.type)
             if key in params.pair_types:
                 if not allow_unequal_duplicates and params.pair_types[key] != adjust.type:
-                    raise ParameterError('Unequal pair types defined between %s and %s' % key)
+                    raise ParameterError('Unequal pair types defined between {} and {}'.format(*key))
                 continue # pragma: no cover
             typ = copy(adjust.type)
             params.pair_types[key] = typ
@@ -373,8 +372,7 @@ class ParameterSet(object):
         # Trap for Amoeba potentials
         if (struct.trigonal_angles or struct.out_of_plane_bends or struct.torsion_torsions or
                 struct.stretch_bends or struct.trigonal_angles or struct.pi_torsions):
-            raise NotImplementedError('Cannot extract parameters from an Amoeba-parametrized '
-                                      'system yet')
+            raise NotImplementedError('Cannot extract parameters from an Amoeba-parametrized system')
         return params
 
     def condense(self, do_dihedrals=True):
@@ -450,8 +448,8 @@ class ParameterSet(object):
 
     def typeify_templates(self):
         """ Assign atom types to atom names in templates """
-        from parmed.modeller import ResidueTemplateContainer, ResidueTemplate
-        for residue in itervalues(self.residues):
+        from .modeller import ResidueTemplateContainer, ResidueTemplate
+        for residue in self.residues.values():
             if isinstance(residue, ResidueTemplateContainer):
                 for res in residue:
                     for atom in res:
@@ -469,7 +467,7 @@ def _find_ureybrad_key(urey):
     a1, a2 = urey.atom1, urey.atom2
     shared_bond_partners = set(a1.bond_partners) & set(a2.bond_partners)
     if len({a.type for a in shared_bond_partners}) != 1:
-        warnings.warn('Urey-Bradley %r shares multiple central atoms', ParameterWarning)
+        warnings.warn(f'Urey-Bradley {repr(urey)} shares multiple central atoms', ParameterWarning)
     return (a1.type, list(shared_bond_partners)[0].type, a2.type)
 
 def _find_improper_keys(dih):

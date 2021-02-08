@@ -13,15 +13,10 @@ try:
         sys.argv.remove('--no-setuptools')
         raise ImportError() # Don't import setuptools...
     from setuptools import setup, Extension
-    kws = dict(entry_points={
-            'console_scripts' : ['parmed = parmed.scripts:clapp'],
-            'gui_scripts' : ['xparmed = parmed.scripts:guiapp']}
-    )
+    kws = {"entry_points" : {"console_scripts" : ["parmed = parmed.scripts:clapp"]}}
 except ImportError:
     from distutils.core import setup, Extension
-    kws = {'scripts' : [os.path.join('scripts', 'parmed'),
-                        os.path.join('scripts', 'xparmed')]
-    }
+    kws = {'scripts' : [os.path.join('scripts', 'parmed')]}
 
 from distutils.command.clean import clean as Clean
 
@@ -36,6 +31,7 @@ def prepare_env_for_osx():
         '16': '10.12',
         '17': '10.13',
         '18': '10.14',
+        '19': '10.15',
     }
     os.environ['CXX'] = 'clang++'
     os.environ['CC'] = 'clang'
@@ -44,8 +40,7 @@ def prepare_env_for_osx():
         os.environ['MACOSX_DEPLOYMENT_TARGET'] = darwin_major_to_osx_map[darwin_major]
 
 class CleanCommand(Clean):
-    """python setup.py clean
-    """
+    """python setup.py clean """
     # lightly adapted from scikit-learn package
     description = "Remove build artifacts from the source tree"
 
@@ -88,7 +83,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta', 'parmed.rdkit',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
             'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
-            'parmed.tools.gui', 'parmed.tools.simulations']
+            'parmed.tools.simulations']
 
 # Optimized readparm
 sources = [os.path.join('src', '_rdparm.cpp'),
@@ -129,20 +124,18 @@ if __name__ == '__main__':
             shutil.rmtree(folder)
         except OSError:
             sys.stderr.write(
-                    'Could not remove old package %s; you should make sure\n'
-                      'this is completely removed in order to make sure you\n'
-                      'do not accidentally use the old version of ParmEd\n' %
-                      folder
+                f'Could not remove old package {folder}; you should make sure\n'
+                'this is completely removed in order to make sure you\n'
+                'do not accidentally use the old version of ParmEd\n'
             )
     def delfile(file):
         try:
             os.unlink(file)
         except OSError:
             sys.stderr.write(
-                    'Could not remove old script %s; you should make sure\n'
-                      'this is completely removed in order to make sure you\n'
-                      'do not accidentally use the old version of ParmEd\n' %
-                      file
+                f'Could not remove old script {file}; you should make sure\n'
+                'this is completely removed in order to make sure you\n'
+                'do not accidentally use the old version of ParmEd\n'
             )
 
     for folder in sys.path:
@@ -152,22 +145,26 @@ if __name__ == '__main__':
         pmdtools = os.path.join(folder, 'ParmedTools')
         pmd = os.path.join(folder, 'parmed.py')
         xpmd = os.path.join(folder, 'xparmed.py')
+        xpmd2 = os.path.join(folder, 'xparmed')
         pmdc = os.path.join(folder, 'parmed.pyc')
         xpmdc = os.path.join(folder, 'xparmed.pyc')
         if os.path.isdir(chem): deldir(chem)
         if os.path.isdir(pmdtools): deldir(pmdtools)
         if os.path.exists(pmd): delfile(pmd)
         if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(xpmd2): delfile(xpmd2)
         if os.path.exists(pmdc): delfile(pmdc)
         if os.path.exists(xpmdc): delfile(xpmdc)
 
     for folder in os.getenv('PATH').split(os.pathsep):
         pmd = os.path.join(folder, 'parmed.py')
         xpmd = os.path.join(folder, 'xparmed.py')
+        xpmd2 = os.path.join(folder, 'xparmed')
         pmdc = os.path.join(folder, 'parmed.pyc')
         xpmdc = os.path.join(folder, 'xparmed.pyc')
         if os.path.exists(pmd): delfile(pmd)
         if os.path.exists(xpmd): delfile(xpmd)
+        if os.path.exists(xpmd2): delfile(xpmd2)
         if os.path.exists(pmdc): delfile(pmdc)
         if os.path.exists(xpmdc): delfile(xpmdc)
 
@@ -175,7 +172,7 @@ if __name__ == '__main__':
     cmdclass.update(versioneer.get_cmdclass())
     setup(name='ParmEd',
           version=versioneer.get_version(),
-          description='Amber parameter file editor',
+          description='Inter-package toolkit for molecular mechanical simulations',
           author='Jason Swails',
           author_email='jason.swails@gmail.com',
           url='https://parmed.github.io/ParmEd/html/index.html',
@@ -183,7 +180,6 @@ if __name__ == '__main__':
           packages=packages,
           ext_modules=extensions,
           cmdclass=cmdclass,
-          test_suite='nose.collector',
           package_data={'parmed.modeller': ['data/*.lib']},
           **kws
     )

@@ -1,9 +1,8 @@
 """
 Tests for the various actions in ParmEd
 """
-from __future__ import division, print_function
-
 from copy import copy
+from io import StringIO
 import numpy as np
 import os
 import parmed as pmd
@@ -13,8 +12,6 @@ from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils import PYPY
-from parmed.utils.six.moves import range, zip, StringIO
-from parmed.utils.six import string_types, iteritems
 import parmed.unit as u
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
@@ -93,7 +90,7 @@ class TestNonParmActions(FileIOTestCase):
 
     def setUp(self):
         self.parm = gasparm
-        FileIOTestCase.setUp(self)
+        super().setUp()
 
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
@@ -1370,12 +1367,14 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parms.add_parm(parm)
         parms.add_parm(origparm)
         # First do some error checking
-        self.assertRaises(exc.ArgumentError, lambda:
-                PT.interpolate(parms, -1, 'eleconly',
-                    prefix=self.get_fn('test.parm7', written=True)).execute())
+        with self.assertRaises(exc.ArgumentError):
+            PT.interpolate(
+                parms, -1, 'eleconly', prefix=self.get_fn('test.parm7', written=True)
+            ).execute()
         sys.stdout = open(os.devnull, 'w')
-        act = PT.interpolate(parms, 5, 'eleconly', startnum=2,
-                       prefix=self.get_fn('test.parm7', written=True))
+        act = PT.interpolate(
+            parms, 5, 'eleconly', startnum=2, prefix=self.get_fn('test.parm7', written=True)
+        )
         str(act)
         act.execute()
         sys.stdout = sys.__stdout__
@@ -1409,29 +1408,29 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         str(act)
         act.execute()
         # Now check error handling if the selected residue is not protonable
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ACE', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ASH', 10).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':*', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ASH@CA', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, '@13-25', 1).execute)
-        self.assertRaises(exc.NonexistentParm, lambda:
-                PT.interpolate(load_file(self.get_fn('ash.parm7')), 10, 'eleconly').execute())
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ACE', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ASH', 10).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':*', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ASH@CA', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, '@13-25', 1).execute()
+        with self.assertRaises(exc.NonexistentParm):
+            PT.interpolate(load_file(self.get_fn('ash.parm7')), 10, 'eleconly').execute()
         # Make a list of 3 parms and make sure ambiguity causes failure
         act = PT.parm(parm, copy=0)
         act.execute()
         PT.changeProtState(act.parm_list, ':ASH', 1).execute()
         PT.parm(act.parm_list, copy=0).execute()
         self.assertEqual(len(act.parm_list), 3)
-        self.assertRaises(exc.AmbiguousParmError, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly').execute())
+        with self.assertRaises(exc.AmbiguousParmError):
+            PT.interpolate(act.parm_list, 10, 'eleconly').execute()
         act.parm_list.add_parm(self.get_fn('trx.prmtop'))
-        self.assertRaises(exc.IncompatibleParmsError, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute())
+        with self.assertRaises(exc.IncompatibleParmsError):
+            PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute()
         act.parm_list[0].atoms[0].name = 'FOO'
         with self.assertWarns(exc.SeriousParmWarning):
             PT.interpolate(act.parm_list, 10, 'eleconly', parm=0, parm2=1).execute()
@@ -1619,24 +1618,27 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         # Now tweak some residue name
         parm2.residues[0].name = 'FOO'
         parm2.remake_parm()
-        self.assertRaises(exc.AddPDBWarning, lambda:
-                PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem', 'strict').execute())
+        # Test that AddPDBWarning becomes fatal under 'strict'
+        with self.assertRaises(exc.AddPDBWarning):
+            PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem', 'strict').execute()
         # Now mix-and-match PDB files that do not have the same number of atoms
         parm2.residues[0].name = 'G5'
         parm2.strip(':5')
-        self.assertRaises(exc.AddPDBError, lambda:
-                PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem').execute())
+        with self.assertRaises(exc.AddPDBError):
+            PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem').execute()
 
     def test_add_pdb2(self):
         """ Test addPDB with atypical numbering and extra residues """
+        fname = '4lzt_pdb.parm7'
         parm = load_file(self.get_fn('4lzt.parm7'))
         act = PT.addPDB(parm, self.get_fn('4lzt_NoNO3.pdb'), 'strict')
         act.execute()
         str(act)
-        parm.write_parm(self.get_fn('4lzt_pdb.parm7', written=True))
-        self.assertTrue(diff_files(get_saved_fn('4lzt_pdb.parm7'),
-                                   self.get_fn('4lzt_pdb.parm7', written=True),
-                                   absolute_error=1e-6)
+        parm.write_parm(self.get_fn(fname, written=True))
+        self.assertTrue(
+            diff_files(
+                self.get_fn(fname, saved=True), self.get_fn(fname, written=True), absolute_error=1e-6
+            )
         )
         act = PT.addPDB(parm, self.get_fn('4lzt_NoNO3.pdb'))
         str(act)
@@ -1652,18 +1654,15 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                     self.assertAlmostEqual(atom.mass, 1.008)
                 else:
                     self.assertEqual(atom.mass, 2)
-        self.assertEqual(parm.parm_data['MASS'],
-                         [a.mass for a in parm.atoms])
-        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
-                               sum(parm.parm_data['MASS']))
+        self.assertEqual(parm.parm_data['MASS'], [a.mass for a in parm.atoms])
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
         PT.HMassRepartition(parm, 3.0, 'dowater').execute()
         for atom in parm.atoms:
             if atom.atomic_number == 1:
                 self.assertEqual(atom.mass, 3.0)
-        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
-                               sum(parm.parm_data['MASS']))
-        self.assertRaises(exc.HMassRepartitionError, lambda:
-                PT.HMassRepartition(parm, 100.0).execute())
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
+        with self.assertRaises(exc.HMassRepartitionError):
+            PT.HMassRepartition(parm, 100.0).execute()
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_openmm_action(self):
@@ -1992,32 +1991,28 @@ Basic MD simulation
         from parmed.tools.add1264 import DEFAULT_C4_PARAMS
         fn = self.get_fn('c4file', written=True)
         with open(fn, 'w') as f:
-            for items in iteritems(DEFAULT_C4_PARAMS['TIP4PEW']):
+            for items in DEFAULT_C4_PARAMS['TIP4PEW'].items():
                 f.write('%s %s\n' % items)
         parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
         PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
-        act = PT.add12_6_4(parm, ':MG', c4file=fn,
-                     polfile=self.get_fn('lj_1264_pol.dat'))
+        act = PT.add12_6_4(parm, ':MG', c4file=fn, polfile=self.get_fn('lj_1264_pol.dat'))
         act.execute()
         str(act)
         parm.write_parm(self.get_fn('Mg_ti1_b_1264.parm7', written=True))
-        self.assertTrue(diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
-                                   get_saved_fn('Mg_ti1_b_1264.parm7'))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
     def test_add_12_6_4_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(self.get_fn('mg_na_cl.parm7'))
         parm2 = AmberParm(self.get_fn('na_cl_mg.parm7'))
-        PT.add12_6_4(parm1, ':MG,NA,CL',
-                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
-        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P',
-                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
-        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')),
-                         saved.PRINTLJMATRIX_MGNACL)
-        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
-                         saved.PRINTLJMATRIX_NACLMG)
+        PT.add12_6_4(parm1, ':MG,NA,CL', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')), saved.PRINTLJMATRIX_MGNACL)
+        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')), saved.PRINTLJMATRIX_NACLMG)
 
     @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):
@@ -3342,22 +3337,21 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         parm = copy(amoebaparm)
         flag = 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT'
         PT.scale(parm, flag, 2.0).execute()
-        self.assertEqual([2*x for x in amoebaparm.parm_data[flag]],
-                         parm.parm_data[flag])
+        self.assertEqual([2*x for x in amoebaparm.parm_data[flag]], parm.parm_data[flag])
         PT.scale(parm, flag, 0.0).execute()
         for val in parm.parm_data[flag]:
             self.assertEqual(val, 0)
 
     def test_interpolate(self):
         """ Check that interpolate action fails for AmoebaParm """
-        self.assertRaises(exc.ParmError, lambda:
-                PT.interpolate(amoebaparm).execute())
+        with self.assertRaises(exc.ParmError):
+            PT.interpolate(amoebaparm).execute()
 
     def test_change_prot_state(self):
         """ Check that changeProtState fails for AmoebaParm """
         parm = copy(amoebaparm)
-        self.assertRaises(exc.ParmError, lambda:
-                PT.changeProtState(parm, ':32', 0).execute())
+        with self.assertRaises(exc.ParmError):
+            PT.changeProtState(parm, ':32', 0).execute()
 
     def test_lmod(self):
         """ Check that lmod fails for AmoebaParm """
