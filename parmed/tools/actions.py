@@ -36,7 +36,7 @@ from .exceptions import (
     ChangeStateError, DeleteDihedralError, FileDoesNotExist, FileExists, HMassRepartitionError,
     IncompatibleParmsError, InputError, LJ12_6_4Error, NoArgument, NonexistentParm, ParmError,
     ParmedChangeError, ParmFileNotFound, ParmWarning, SeriousParmWarning, SetParamError,
-    SimulationError, TiMergeError, UnhandledArgumentWarning, WriteOFFError
+    SimulationError, TiMergeError, UnhandledArgumentWarning, WriteOFFError, LJ_TypeError
 )
 from .parmlist import ParmList
 
@@ -324,7 +324,7 @@ class writeFrcmod(Action):
 
     def execute(self):
         """ Writes the frcmod file """
-        from parmed.amber.parameters import AmberParameterSet
+        from ..amber.parameters import AmberParameterSet
         if not Action.overwrite and os.path.exists(self.frcmod_name):
             raise FileExists(f'{self.frcmod_name} exists; not overwriting')
         parmset = AmberParameterSet.from_structure(self.parm)
@@ -674,8 +674,8 @@ class checkValidity(Action):
         return 'Determining validity of prmtop'
 
     def execute(self):
-        from parmed.tools.checkvalidity import check_validity
-        from parmed.tools.exceptions import WarningList
+        from .checkvalidity import check_validity
+        from .exceptions import WarningList
         # Clear our warnings and start logging them, since check_validity
         # reports concerns about the prmtop through the warning system.
         warning_log = WarningList(empty_msg=f'{self.parm} looks OK to me!')
@@ -831,7 +831,7 @@ class addLJType(Action):
         return 'Making atoms %s into a new LJ atom type' % self.mask
 
     def execute(self):
-        from parmed.tools.addljtype import AddLJType
+        from .addljtype import AddLJType
         # Find the first atom that's selected in this selection. We've
         # already made sure that at least one atom was selected
         sel_atms = self.mask.Selection()
@@ -1033,10 +1033,9 @@ class changeLJSingleType(Action):
         )
 
     def execute(self):
-        from math import sqrt
-        from parmed.tools.exceptions import LJ_TypeError
         # If this is an empty mask do nothing
-        if self.orig_radius is None: return
+        if self.orig_radius is None:
+            return
         # Make sure we've only selected a single atom type with our mask
         attype = None
         selection = self.mask.Selection()
@@ -1056,7 +1055,7 @@ class changeLJSingleType(Action):
         for i in range(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+attype-1] - 1
             rij = self.parm.LJ_radius[i] + self.radius
-            wij = sqrt(self.parm.LJ_depth[i] * self.depth)
+            wij = math.sqrt(self.parm.LJ_depth[i] * self.depth)
             acoef = wij * rij ** 12
             bcoef = 2 * wij * rij ** 6
             self.parm.parm_data['LENNARD_JONES_ACOEF'][lj_index] = acoef
@@ -1339,10 +1338,11 @@ class changeRedoxState(Action):
         return f'Changing reduction state of residue {res.idx + 1} ({res.name}) to {self.state}'
 
     def execute(self):
-        from parmed.amber import titratable_residues as residues
+        from ..amber import titratable_residues as residues
         sel = self.mask.Selection()
         # If we didn't select any residues, just return
-        if sum(sel) == 0: return
+        if sum(sel) == 0:
+            return
         residue = self.parm.atoms[sel.index(1)].residue
         resname = residue.name
         # Get the charges from cein_data. The first 2 elements are energy and
@@ -1432,7 +1432,7 @@ class defineSolvent(Action):
     usage = '<residue_list>'
     supported_subclasses = (AmberParm,)
     def init(self, arg_list):
-        from parmed import residue
+        from .. import residue
         res_list = arg_list.get_next_string()
         res_list.replace(' ', '')
         if res_list.endswith(','):
@@ -3217,7 +3217,7 @@ class add12_6_4(Action):
         return retstr
 
     def execute(self):
-        from parmed.tools.add1264 import params1264 as params
+        from .add1264 import params1264 as params
         self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
@@ -3421,13 +3421,13 @@ class energy(Action):
 
     def execute(self):
         if self.use_openmm:
-            from parmed.tools.simulations.openmm import energy, HAS_OPENMM
+            from .simulations.openmm import energy, HAS_OPENMM
             if not HAS_OPENMM:
                 raise SimulationError('OpenMM could not be imported. Skipping.') # pragma: no cover
 
             energy(self.parm, self.arg_list, self.output)
         else:
-            from parmed.tools.simulations.sanderapi import energy, HAS_SANDER
+            from .simulations.sanderapi import energy, HAS_SANDER
             if not HAS_SANDER:
                 raise SimulationError('sander could not be imported. Skipping.') # pragma: no cover
             # Consume the OMM-specific arguments so we don't have any apparently unused arguments

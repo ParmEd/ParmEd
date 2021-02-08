@@ -530,7 +530,7 @@ class ChamberParm(AmberParm):
 
     def _set_nonbonded_tables(self, nbfixes=None):
         """ Sets the tables of Lennard-Jones nonbonded interaction pairs """
-        from parmed.tools.actions import addLJType
+        from ..tools.actions import addLJType
         data = self.parm_data
         ntypes = data['POINTERS'][PrmtopPointers.NTYPES]
         ntypes2 = ntypes * ntypes

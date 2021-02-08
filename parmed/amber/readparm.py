@@ -38,7 +38,7 @@ def LoadParm(parmname, xyz=None, box=None):
         (i.e., CHARMM force field), or Amoeba-style (i.e., Amoeba force field),
         and then returns an instance of the appropriate type.
     """
-    from parmed import load_file
+    from .. import load_file
     parm = AmberFormat(parmname)
     if 'CTITLE' in parm.flag_list:
         parm = parm.view_as(ChamberParm)

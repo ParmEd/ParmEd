@@ -237,9 +237,8 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
 
     #===================================================
 
-    def __init__(self, fname=None, defines=None, parametrize=True,
-                 xyz=None, box=None):
-        from parmed import load_file
+    def __init__(self, fname=None, defines=None, parametrize=True, xyz=None, box=None):
+        from .. import load_file
         super(GromacsTopologyFile, self).__init__()
         self.parameterset = None
         self.defaults = _Defaults(gen_pairs='yes') # make ParmEd's default yes
@@ -250,8 +249,7 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
                 if isinstance(xyz, str):
                     f = load_file(xyz, skip_bonds=True)
                     if not hasattr(f, 'coordinates') or f.coordinates is None:
-                        raise TypeError('File %s does not have coordinates' %
-                                        xyz)
+                        raise TypeError(f'File {xyz} does not have coordinates')
                     self.coordinates = f.coordinates
                     if box is None and hasattr(f, 'box'):
                         self.box = f.box
@@ -267,7 +265,7 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
 
     def read(self, fname, defines=None, parametrize=True):
         """ Reads the topology file into the current instance """
-        from parmed import gromacs as gmx
+        from .. import gromacs as gmx
         params = self.parameterset = ParameterSet()
         molecules = self.molecules = dict()
         bond_types = dict()
@@ -292,8 +290,7 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
                     molname, nrexcl = line.split()
                     nrexcl = int(nrexcl)
                     if molname in molecules:
-                        raise GromacsError('Duplicate definition of molecule %s'
-                                           % molname)
+                        raise GromacsError(f'Duplicate definition of molecule {molname}')
                     molecule = Structure()
                     molecules[molname] = (molecule, nrexcl)
                     molnames.append(molname)
@@ -1339,7 +1336,7 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
         ValueError if the combine, parameters, or molfile input cannot be parsed
         """
         import parmed.gromacs as gmx
-        from parmed import __version__
+        from .. import __version__
         own_handle = False
         fname = ''
         params = ParameterSet.from_structure(self, allow_unequal_duplicates=True)

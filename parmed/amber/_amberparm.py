@@ -161,7 +161,7 @@ class AmberParm(AmberFormat, Structure):
         Initializes topology data structures, like the list of atoms, bonds,
         etc., after the topology file has been read.
         """
-        from parmed import load_file
+        from .. import load_file
         # We need to handle RESIDUE_ICODE properly since it may have picked up
         # some extra values
         if 'RESIDUE_ICODE' in self.flag_list:

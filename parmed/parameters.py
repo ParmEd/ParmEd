@@ -448,7 +448,7 @@ class ParameterSet:
 
     def typeify_templates(self):
         """ Assign atom types to atom names in templates """
-        from parmed.modeller import ResidueTemplateContainer, ResidueTemplate
+        from .modeller import ResidueTemplateContainer, ResidueTemplate
         for residue in self.residues.values():
             if isinstance(residue, ResidueTemplateContainer):
                 for res in residue:

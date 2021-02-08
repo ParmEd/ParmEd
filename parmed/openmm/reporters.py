@@ -462,7 +462,7 @@ class MdcrdReporter(object):
             - simulation (Simulation) The Simulation to generate a report for
             - state (State) The current state of the simulation
         """
-        from parmed.amber.asciicrd import VELSCALE
+        from ..amber.asciicrd import VELSCALE
         global VELUNIT, FRCUNIT
         if self.crds:
             crds = state.getPositions().value_in_unit(u.angstrom)

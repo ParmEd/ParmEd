@@ -362,7 +362,7 @@ class CharmmPsfFile(Structure):
         If copy is False, the original object may have its atom type names
         changed if any of them have lower-case letters
         """
-        from parmed.charmm.parameters import _typeconv as typeconv
+        from .parameters import _typeconv as typeconv
         if (struct.rb_torsions or struct.trigonal_angles or
                 struct.out_of_plane_bends or struct.pi_torsions or
                 struct.stretch_bends or struct.torsion_torsions or

@@ -51,9 +51,7 @@ DEFAULT_C4_PARAMS = {
 
 def params1264(parm, mask, c4file, watermodel, polfile, tunfactor):
    
-    from parmed import periodic_table as pt
-
-    global DEFAULT_C4_PARAMS, WATER_POL
+    from .. import periodic_table as pt
 
     try:
         pollist = _get_params(polfile)

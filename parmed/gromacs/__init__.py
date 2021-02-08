@@ -2,7 +2,7 @@
 Contains classes for parsing GROMACS topology and parameter files
 """
 import os as _os
-from parmed.utils import which as _which
+from ..utils import which as _which
 
 __all__ = ['GROMACS_TOPDIR', 'GromacsTopologyFile', 'GromacsGroFile']
 
@@ -41,5 +41,5 @@ except NameError:
     pass
 del _os, _which
 
-from parmed.gromacs.gromacstop import GromacsTopologyFile
-from parmed.gromacs.gromacsgro import GromacsGroFile
+from .gromacstop import GromacsTopologyFile
+from .gromacsgro import GromacsGroFile

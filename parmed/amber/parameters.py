@@ -48,7 +48,7 @@ def _find_amber_file(fname, search_oldff):
     - $AMBERHOME/dat/leap/lib
     - $AMBERHOME/dat/leap/parm
     """
-    from parmed.amber import AMBERHOME
+    from . import AMBERHOME
     if len(fname) > 1 and {fname[0], fname[-1]} in ({'"'}, {"'"}):
         # Strip quotes
         fname = fname[1:-1]

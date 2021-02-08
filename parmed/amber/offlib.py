@@ -605,7 +605,7 @@ def _imaging_atom(res):
     except 1, it is the heavy atom. Otherwise, it is the atom *closest* to the
     COM of the residue
     """
-    from parmed.geometry import center_of_mass
+    from ..geometry import center_of_mass
     #TODO implement the docstring
     found_heavy = False
     heavy_idx = -1

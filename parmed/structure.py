@@ -630,7 +630,7 @@ class Structure:
         --------
         :func:`parmed.utils.pandautils.create_dataframe`
         """
-        from parmed.utils.pandautils import create_dataframe
+        from .utils.pandautils import create_dataframe
         return create_dataframe(self)
 
     #===================================================
@@ -648,7 +648,7 @@ class Structure:
         --------
         :func:`parmed.utils.pandautils.load_dataframe`
         """
-        from parmed.utils.pandautils import load_dataframe
+        from .utils.pandautils import load_dataframe
         return load_dataframe(self, df)
 
     #===================================================
@@ -798,7 +798,7 @@ class Structure:
             selection of atoms. If it is an iterable, it must be the same length
             as the `atoms` list.
         """
-        from parmed.amber import AmberMask
+        from .amber import AmberMask
         if isinstance(selection, AmberMask):
             if selection.parm is not self:
                 raise TypeError('passed mask does not belong to Structure')
@@ -847,7 +847,7 @@ class Structure:
             knows about the standard amino acid, RNA, and DNA residues.
         """
         # Import here to avoid circular references
-        from parmed.modeller import StandardBiomolecularResidues
+        from .modeller import StandardBiomolecularResidues
         # Build a composite dict of all residue templates
         all_residues = copy(StandardBiomolecularResidues)
         for lib in reslibs:
@@ -1176,7 +1176,7 @@ class Structure:
         selection : selector (slice, tuple, ... etc.)
             The selection given to the [] operator
         """
-        from parmed.amber import AmberMask
+        from .amber import AmberMask
         # Now we select a subset of atoms. Convert "selection" into a natom list
         # with 0s and 1s, depending on what the input selection is
         if isinstance(selection, str):
@@ -1421,7 +1421,7 @@ class Structure:
         ``overwrite`` is ``False``, the filesystem is read-only, or write
         permissions are not granted for the user
         """
-        from parmed import amber, charmm, formats, gromacs
+        from . import amber, charmm, formats, gromacs
         extmap = {
                 '.pdb' : 'PDB',
                 '.pqr' : 'PQR',
@@ -3884,7 +3884,7 @@ class StructureView(object):
         --------
         :func:`parmed.utils.pandautils.create_dataframe`
         """
-        from parmed.utils.pandautils import create_dataframe
+        from .utils.pandautils import create_dataframe
         return create_dataframe(self)
 
     def load_dataframe(self, df):
@@ -3900,7 +3900,7 @@ class StructureView(object):
         --------
         :func:`parmed.utils.pandautils.load_dataframe`
         """
-        from parmed.utils.pandautils import load_dataframe
+        from .utils.pandautils import load_dataframe
         return load_dataframe(self, df)
 
     @property

@@ -2,16 +2,17 @@
 This is a generalization of the readparm.AmberParm class to handle similar
 Amber-style files with %FLAG/%FORMAT tags
 """
+import datetime
+import re
+from contextlib import closing
+from copy import copy
+from math import ceil
+
 from ..constants import PrmtopPointers, AMBER_ELECTROSTATIC, CHARMM_ELECTROSTATIC
 from ..exceptions import AmberError
 from ..formats.registry import FileFormatType
 from ..utils.io import genopen
-from contextlib import closing
-from copy import copy
-import datetime
-from parmed.utils.fortranformat import FortranRecordReader, FortranRecordWriter
-from math import ceil
-import re
+from ..utils.fortranformat import FortranRecordReader, FortranRecordWriter
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -346,7 +347,8 @@ class AmberFormat(metaclass=FileFormatType):
         in the prmtop file contains (i.e., either an AmberParm, ChamberParm,
         AmoebaParm, or AmberFormat)
         """
-        from parmed.amber import LoadParm, BeemanRestart
+        from .readparm import LoadParm
+        from ._tinkerparm import BeemanRestart
         try:
             return LoadParm(filename, *args, **kwargs)
         except (IndexError, KeyError):
@@ -430,7 +432,7 @@ class AmberFormat(metaclass=FileFormatType):
 
         # See if we have the optimized parser available
         try:
-            from parmed.amber import _rdparm
+            from . import _rdparm
         except ImportError:
             return self.rdparm_slow(fname)
 

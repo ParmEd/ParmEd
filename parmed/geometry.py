@@ -316,7 +316,7 @@ def _cross(v1, v2):
 
 
 def _get_coords_from_atom_or_tuple(a):
-    from parmed.topologyobjects import Atom
+    from .topologyobjects import Atom
     if isinstance(a, Atom):
         return a.xx, a.xy, a.xz
     return a
