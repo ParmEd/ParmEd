@@ -725,7 +725,7 @@ class Atom(_ListItem):
 
     @property
     def umass(self):
-        return self._mass * u.daltons
+        return self.mass * u.daltons
 
     @property
     def usolvent_radius(self):
