@@ -25,15 +25,6 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Chiral
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'RBTorsionType',
            'UnassignedAtomType', 'Link', 'DrudeAtom', 'DrudeAnisotropy']
 
-# Create the AKMA unit system which is the unit system used by Amber and CHARMM
-scale_factor = u.sqrt(1/u.kilocalories_per_mole * (u.daltons * u.angstroms**2))
-scale_factor = scale_factor.value_in_unit(u.picoseconds)
-akma_time_unit = u.BaseUnit(u.picosecond_base_unit.dimension, 'akma time', symbol='aks')
-akma_time_unit.define_conversion_factor_to(u.picosecond_base_unit, scale_factor)
-akma_unit_system = u.UnitSystem([u.angstrom_base_unit, u.dalton_base_unit, akma_time_unit,
-                                 u.elementary_charge_base_unit, u.kelvin_base_unit,
-                                 u.mole_base_unit, u.radian_base_unit])
-
 def _strip_units(value, unit=None):
     """
     Strips any units from the given value by casting them into the AKMA unit
@@ -44,7 +35,7 @@ def _strip_units(value, unit=None):
         if unit is None:
             if value.unit.is_compatible(u.degrees):
                 return value.value_in_unit(u.degrees)
-            return value.value_in_unit_system(akma_unit_system)
+            return value.value_in_unit_system(u.akma_unit_system)
         else:
             return value.value_in_unit(unit)
     return value
@@ -725,7 +716,7 @@ class Atom(_ListItem):
 
     @property
     def umass(self):
-        return self._mass * u.daltons
+        return self.mass * u.daltons
 
     @property
     def usolvent_radius(self):
