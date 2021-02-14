@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit.basedimension
+Module openmm.unit.basedimension
 
 BaseDimension class for use by units and quantities.
 BaseDimensions are things like "length" and "mass".
@@ -61,8 +61,7 @@ class BaseDimension(object):
         """Create a new BaseDimension.
 
         Each new BaseDimension is assumed to be independent of all other BaseDimensions.
-        Use the existing BaseDimensions in simtk.dimension instead of creating
-        new ones.
+        Use the existing BaseDimensions instead of creating new ones.
         """
         self.name = name
         if not self.name in BaseDimension._index_by_name.keys():
@@ -79,6 +78,15 @@ class BaseDimension(object):
         Returns True if self < other, False otherwise.
         """
         return self._index < other._index
+
+    def __le__(self, other):
+        return self._index <= other._index
+
+    def __gt__(self, other):
+        return self._index > other._index
+
+    def __ge__(self, other):
+        return self._index >= other._index
 
     def __hash__(self):
         """
