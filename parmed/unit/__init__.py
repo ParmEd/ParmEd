@@ -34,7 +34,7 @@ except ImportError:
 
 _time_scale = (daltons * angstroms**2 / kilocalories_per_mole).conversion_factor_to(picoseconds**2)
 akma_time_base_unit = BaseUnit(time_dimension, "akma_time_unit", "akma-s")
-akma_time_base_unit.define_conversion_factor_to(picosecond_base_unit, 1 / sqrt(_time_scale))
+akma_time_base_unit.define_conversion_factor_to(picosecond_base_unit, sqrt(_time_scale))
 del _time_scale
 
 akma_unit_system = UnitSystem([

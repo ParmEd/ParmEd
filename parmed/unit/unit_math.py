@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit.math
+Module openmm.unit.math
 
 Arithmetic methods on Quantities and Units
 
