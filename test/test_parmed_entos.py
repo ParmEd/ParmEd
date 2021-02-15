@@ -1,5 +1,5 @@
 """ Test cases for integrating with Entos """
-from unittest import skipIf, TestCase
+from unittest import skipUnless, TestCase
 import numpy as np
 
 import parmed as pmd
@@ -8,7 +8,7 @@ from parmed.entos.imports import constants, QMMMSystem
 from parmed.entos.imports import Molecule
 from utils import get_fn
 
-@skipIf(not HAS_ENTOS, "Entos test cases require Entos packages to be installed")
+@skipUnless(HAS_ENTOS, "Entos test cases require Entos packages to be installed")
 class TestEntos(TestCase):
 
     def test_to_entos_molecule(self):
@@ -30,7 +30,15 @@ class TestEntos(TestCase):
         with self.assertRaises(ValueError):
             to_entos_molecule(pmd.load_file(get_fn("ash.parm7")))
 
+    @skipUnless(HAS_MISTRAL, "QM/MM system creation tests require mistral")
     def test_to_entos_qmmm_system(self):
+        """ Test the creation of an Entos QMMMSystem from Structure """
         struct = pmd.load_file(get_fn("ala3_solv.parm7"), get_fn("ala3_solv.rst7"))
         qmmm_system = to_entos_qmmm_system(struct, ':1-3')
         self.assertIsInstance(qmmm_system, QMMMSystem)
+
+    @skipUnless(HAS_MISTRAL, "QM/MM system creation tests require mistral")
+    def test_to_entos_qmmm_system_requires_coordinates(self):
+        """ Check that to_entos_qmmm_system requires coordinates """
+        with self.assertRaises(ValueError):
+            to_entos_qmmm_system(pmd.load_file(get_fn("ala3_solv.parm7")), ":1-3")
