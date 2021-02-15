@@ -3,7 +3,6 @@ from typing import Optional, Sequence, Union
 
 import numpy as np
 
-from .. import unit as u
 from ..structure import Structure
 from ..utils.decorators import needs_openmm
 from .imports import Molecule, constants, QMMMSystem, HAS_ENTOS, HAS_MISTRAL
