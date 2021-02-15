@@ -1921,8 +1921,8 @@ class Structure:
         ----------
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
-            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            CutoffNonPeriodic, CutoffPeriodic, PME, LJPME, or Ewald objects
+            from the simtk.openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -1990,7 +1990,7 @@ class Structure:
             nonbondedMethod = app.NoCutoff
         system = mm.System()
         # Make sure periodic simulations have a box
-        if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald):
+        if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald, app.LJPME):
             if self.box is None:
                 raise ValueError('No periodic boundary conditions detected')
         # Do hydrogen mass repartitioning if necessary
@@ -2535,12 +2535,16 @@ class Structure:
             force.setNonbondedMethod(mm.NonbondedForce.PME)
             force.setCutoffDistance(nonbondedCutoff)
             force.setEwaldErrorTolerance(ewaldErrorTolerance)
+        elif nonbondedMethod is app.LJPME:
+            force.setNonbondedMethod(mm.NonbondedForce.LJPME)
+            force.setCutoffDistance(nonbondedCutoff)
+            force.setEwaldErrorTolerance(ewaldErrorTolerance)
         elif nonbondedMethod is app.Ewald:
             force.setNonbondedMethod(mm.NonbondedForce.Ewald)
             force.setCutoffDistance(nonbondedCutoff)
             force.setEwaldErrorTolerance(ewaldErrorTolerance)
         else:
-            raise ValueError('Unrecognized nonbondedMethod (%s)' % nonbondedMethod)
+            raise ValueError(f'Unrecognized nonbondedMethod ({nonbondedMethod})')
         force.setReactionFieldDielectric(reactionFieldDielectric)
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
@@ -2728,7 +2732,7 @@ class Structure:
         force.addPerParticleParameter('type')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
         force.setUseLongRangeCorrection(True)
-        if nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+        if nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic, app.LJPME):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         elif nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)

@@ -1127,12 +1127,12 @@ class AmberParm(AmberFormat, Structure):
         force.setUseLongRangeCorrection(True)
         # Determine which nonbonded method we should use and transfer the
         # nonbonded cutoff
-        assert nonbondedMethod in {app.NoCutoff, app.CutoffNonPeriodic, app.PME, app.Ewald, app.CutoffPeriodic}, 'Bad nonbondedMethod'
+        assert nonbondedMethod in {app.NoCutoff, app.CutoffNonPeriodic, app.PME, app.LJPME, app.Ewald, app.CutoffPeriodic}, 'Bad nonbondedMethod'
         if nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
-        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
+        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic, app.LJPME):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
 

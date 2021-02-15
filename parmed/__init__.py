@@ -8,7 +8,7 @@ between standard and amber file formats, manipulate structures, etc.
 # version tuple
 __author__ = 'Jason Swails'
 
-__all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils', 'Structure',
+__all__ = ['exceptions', 'periodic_table', 'residue', 'unit', 'utils', 'Structure', 'entos',
            'StructureView', 'amber', 'charmm', 'namd', 'gromacs', 'tinker', 'openmm', 'rosetta',
            'rdkit', 'formats', 'Vec3', 'ParameterSet', 'load_file', 'read_PDB', 'read_CIF',
            'load_rosetta', 'load_rdkit', 'download_PDB', 'download_CIF', 'tools', 'version']
@@ -21,7 +21,7 @@ from . import exceptions, periodic_table, residue
 from . import unit, utils
 from .topologyobjects import *
 from .structure import Structure, StructureView
-from . import amber, charmm, gromacs, namd, openmm, rosetta, tinker
+from . import amber, charmm, gromacs, namd, openmm, rosetta, tinker, entos
 from . import formats
 from .vec3 import Vec3
 from .parameters import ParameterSet
