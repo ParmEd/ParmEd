@@ -1,22 +1,14 @@
 import os
+import shutil
 import sys
 import versioneer
 import struct
 
-if sys.version_info < (2, 7):
-    sys.stderr.write('You must have at least Python 2.7 for ParmEd to work '
-                     'correctly.\n')
-    sys.exit(1)
+if sys.version_info < (3, 6):
+    sys.exit('You must have at least Python 3.6 for ParmEd to work correctly.')
 
-try:
-    if '--no-setuptools' in sys.argv:
-        sys.argv.remove('--no-setuptools')
-        raise ImportError() # Don't import setuptools...
-    from setuptools import setup, Extension
-    kws = {"entry_points" : {"console_scripts" : ["parmed = parmed.scripts:clapp"]}}
-except ImportError:
-    from distutils.core import setup, Extension
-    kws = {'scripts' : [os.path.join('scripts', 'parmed')]}
+from setuptools import setup, Extension
+kws = {"entry_points" : {"console_scripts" : ["parmed = parmed.scripts:clapp"]}}
 
 from distutils.command.clean import clean as Clean
 
@@ -83,7 +75,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta', 'parmed.rdkit',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
             'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
-            'parmed.tools.simulations']
+            'parmed.tools.simulations', 'parmed.entos']
 
 # Optimized readparm
 sources = [os.path.join('src', '_rdparm.cpp'),
@@ -108,65 +100,11 @@ extensions = [Extension('parmed.amber._rdparm',
 
 if __name__ == '__main__':
 
-    import shutil
-
     # See if we have the Python development headers.  If not, don't build the
     # optimized prmtop parser extension
     from distutils import sysconfig
-    if not is_pypy and not os.path.exists(
-            os.path.join(sysconfig.get_config_vars()['INCLUDEPY'], 'Python.h')):
+    if not is_pypy and not os.path.exists(os.path.join(sysconfig.get_config_vars()['INCLUDEPY'], 'Python.h')):
         extensions = []
-
-    # Delete old versions with old names of scripts and packages (chemistry and
-    # ParmedTools for packages, parmed.py and xparmed.py for scripts)
-    def deldir(folder):
-        try:
-            shutil.rmtree(folder)
-        except OSError:
-            sys.stderr.write(
-                f'Could not remove old package {folder}; you should make sure\n'
-                'this is completely removed in order to make sure you\n'
-                'do not accidentally use the old version of ParmEd\n'
-            )
-    def delfile(file):
-        try:
-            os.unlink(file)
-        except OSError:
-            sys.stderr.write(
-                f'Could not remove old script {file}; you should make sure\n'
-                'this is completely removed in order to make sure you\n'
-                'do not accidentally use the old version of ParmEd\n'
-            )
-
-    for folder in sys.path:
-        folder = os.path.realpath(os.path.abspath(folder))
-        if folder == os.path.realpath(os.path.abspath('.')): continue
-        chem = os.path.join(folder, 'chemistry')
-        pmdtools = os.path.join(folder, 'ParmedTools')
-        pmd = os.path.join(folder, 'parmed.py')
-        xpmd = os.path.join(folder, 'xparmed.py')
-        xpmd2 = os.path.join(folder, 'xparmed')
-        pmdc = os.path.join(folder, 'parmed.pyc')
-        xpmdc = os.path.join(folder, 'xparmed.pyc')
-        if os.path.isdir(chem): deldir(chem)
-        if os.path.isdir(pmdtools): deldir(pmdtools)
-        if os.path.exists(pmd): delfile(pmd)
-        if os.path.exists(xpmd): delfile(xpmd)
-        if os.path.exists(xpmd2): delfile(xpmd2)
-        if os.path.exists(pmdc): delfile(pmdc)
-        if os.path.exists(xpmdc): delfile(xpmdc)
-
-    for folder in os.getenv('PATH').split(os.pathsep):
-        pmd = os.path.join(folder, 'parmed.py')
-        xpmd = os.path.join(folder, 'xparmed.py')
-        xpmd2 = os.path.join(folder, 'xparmed')
-        pmdc = os.path.join(folder, 'parmed.pyc')
-        xpmdc = os.path.join(folder, 'xparmed.pyc')
-        if os.path.exists(pmd): delfile(pmd)
-        if os.path.exists(xpmd): delfile(xpmd)
-        if os.path.exists(xpmd2): delfile(xpmd2)
-        if os.path.exists(pmdc): delfile(pmdc)
-        if os.path.exists(xpmdc): delfile(xpmdc)
 
     cmdclass = dict(clean=CleanCommand)
     cmdclass.update(versioneer.get_cmdclass())
