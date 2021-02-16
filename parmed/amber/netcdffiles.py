@@ -237,7 +237,7 @@ class NetCDFRestart(metaclass=FileFormatType):
     @property
     def coordinates(self):
         coords = self._ncfile.variables['coordinates'][:]
-        return coords.reshape((1, self.atom, 3))
+        return coords.reshape((-1, self.atom, 3))
 
     @coordinates.setter
     def coordinates(self, stuff):

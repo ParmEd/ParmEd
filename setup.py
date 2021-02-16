@@ -75,7 +75,7 @@ packages = ['parmed', 'parmed.amber', 'parmed.modeller',
             'parmed.charmm', 'parmed.formats.pdbx', 'parmed.rosetta', 'parmed.rdkit',
             'parmed.formats', 'parmed.utils.fortranformat', 'parmed.openmm',
             'parmed.utils', 'parmed.gromacs', 'parmed.tools', 'parmed.namd',
-            'parmed.tools.simulations', 'parmed.entos']
+            'parmed.tools.simulations', 'parmed.entos', 'parmed.dlpoly']
 
 # Optimized readparm
 sources = [os.path.join('src', '_rdparm.cpp'),

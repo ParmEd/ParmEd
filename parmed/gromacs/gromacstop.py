@@ -161,7 +161,110 @@ class _Defaults(object):
         else:
             raise IndexError(f'Index {idx} out of range')
 
-class GromacsTopologyFile(Structure, metaclass=FileFormatType):
+class TopFromStructureMixin:
+
+    @classmethod
+    def from_structure(cls, struct, copy=False):
+        """ Instantiates a GromacsTopologyFile instance from a Structure
+
+        Parameters
+        ----------
+        struct : :class:`parmed.Structure`
+            The input structure to generate from
+        copy : bool, optional
+            If True, assign from a *copy* of ``struct`` (this is a lot slower).
+            Default is False
+
+        Returns
+        -------
+        gmxtop : :class:`GromacsTopologyFile`
+            The topology file defined by the given struct
+        """
+        from copy import copy as _copy
+        clstop = cls()
+        if copy:
+            struct = _copy(struct)
+            struct.join_dihedrals()
+        clstop.atoms = struct.atoms
+        clstop.residues = struct.residues
+        clstop.bonds = struct.bonds
+        clstop.angles = struct.angles
+        clstop.dihedrals = struct.dihedrals
+        clstop.impropers = struct.impropers
+        clstop.cmaps = struct.cmaps
+        clstop.rb_torsions = struct.rb_torsions
+        clstop.urey_bradleys = struct.urey_bradleys
+        clstop.adjusts = struct.adjusts
+        clstop.bond_types = struct.bond_types
+        clstop.angle_types = struct.angle_types
+        clstop.dihedral_types = struct.dihedral_types
+        clstop.improper_types = struct.improper_types
+        clstop.cmap_types = struct.cmap_types
+        clstop.rb_torsion_types = struct.rb_torsion_types
+        clstop.urey_bradley_types = struct.urey_bradley_types
+        clstop.adjust_types = struct.adjust_types
+        clstop.combining_rule = struct.combining_rule
+        clstop.box = struct.box
+        clstop.nrexcl = struct.nrexcl
+        if (struct.trigonal_angles or
+                struct.out_of_plane_bends or
+                struct.pi_torsions or
+                struct.stretch_bends or
+                struct.torsion_torsions or
+                struct.chiral_frames or
+                struct.multipole_frames):
+            raise TypeError('GromacsTopologyFile does not support Amoeba FF')
+        # Now check what the 1-4 scaling factors should be
+        if hasattr(struct, 'defaults') and isinstance(struct.defaults, _Defaults):
+            clstop.defaults = struct.defaults
+        else:
+            scee_values = set()
+            scnb_values = set()
+            if struct.adjusts:
+                for adjust in struct.adjusts:
+                    if adjust.type is None: continue
+                    scee_values.add(1/adjust.type.chgscale)
+                    # Do not add scnb_values, since we can just set explicit
+                    # exception pair parameters in GROMACS (which this structure
+                    # already has)
+                # In order to specify specific pair parameters, we need to set
+                # gen_pairs to 'no' so that the pair-specific L-J parameters are
+                # printed to the topology file (rather than being auto-created)
+                clstop.defaults.gen_pairs = 'no'
+            else:
+                for dihedral in struct.dihedrals:
+                    if dihedral.type is None or dihedral.ignore_end: continue
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        for dt in dihedral.type:
+                            if dt.scee:
+                                scee_values.add(dt.scee)
+                            if dt.scnb:
+                                scnb_values.add(dt.scnb)
+                    else:
+                        if dihedral.type.scee:
+                            scee_values.add(dihedral.type.scee)
+                        if dihedral.type.scnb:
+                            scnb_values.add(dihedral.type.scnb)
+            if len(set('%.5f' % x for x in scee_values)) > 1:
+                raise GromacsError('Structure has mixed 1-4 scaling which is '
+                                   'not supported by Gromacs')
+            scee_values = list(scee_values)
+            scnb_values = list(scnb_values)
+            if len(set('%.5f' % x for x in scee_values)) == 1:
+                clstop.defaults.fudgeQQ = 1/scee_values[0]
+            else:
+                clstop.defaults.fudgeQQ = 1.0
+            if len(set('%.5f' % x for x in scnb_values)) == 1:
+                clstop.defaults.fudgeLJ = 1/scnb_values[0]
+            else:
+                clstop.defaults.fudgeLJ = 1.0
+        if clstop.combining_rule == 'geometric':
+            clstop.defaults.comb_rule = 3
+
+        clstop.parameterset = ParameterSet.from_structure(struct, allow_unequal_duplicates=True)
+        return clstop
+
+class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormatType):
     """ Class providing a parser and writer for a GROMACS topology file
 
     Parameters
@@ -1185,111 +1288,6 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
 
     #===================================================
 
-    @classmethod
-    def from_structure(cls, struct, copy=False):
-        """ Instantiates a GromacsTopologyFile instance from a Structure
-
-        Parameters
-        ----------
-        struct : :class:`parmed.Structure`
-            The input structure to generate from
-        copy : bool, optional
-            If True, assign from a *copy* of ``struct`` (this is a lot slower).
-            Default is False
-
-        Returns
-        -------
-        gmxtop : :class:`GromacsTopologyFile`
-            The topology file defined by the given struct
-        """
-        from copy import copy as _copy
-        gmxtop = cls()
-        if copy:
-            struct = _copy(struct)
-            struct.join_dihedrals()
-        gmxtop.atoms = struct.atoms
-        gmxtop.residues = struct.residues
-        gmxtop.bonds = struct.bonds
-        gmxtop.angles = struct.angles
-        gmxtop.dihedrals = struct.dihedrals
-        gmxtop.impropers = struct.impropers
-        gmxtop.cmaps = struct.cmaps
-        gmxtop.rb_torsions = struct.rb_torsions
-        gmxtop.urey_bradleys = struct.urey_bradleys
-        gmxtop.adjusts = struct.adjusts
-        gmxtop.bond_types = struct.bond_types
-        gmxtop.angle_types = struct.angle_types
-        gmxtop.dihedral_types = struct.dihedral_types
-        gmxtop.improper_types = struct.improper_types
-        gmxtop.cmap_types = struct.cmap_types
-        gmxtop.rb_torsion_types = struct.rb_torsion_types
-        gmxtop.urey_bradley_types = struct.urey_bradley_types
-        gmxtop.adjust_types = struct.adjust_types
-        gmxtop.combining_rule = struct.combining_rule
-        gmxtop.box = struct.box
-        gmxtop.nrexcl = struct.nrexcl
-        if (struct.trigonal_angles or
-                struct.out_of_plane_bends or
-                struct.pi_torsions or
-                struct.stretch_bends or
-                struct.torsion_torsions or
-                struct.chiral_frames or
-                struct.multipole_frames):
-            raise TypeError('GromacsTopologyFile does not support Amoeba FF')
-        # Now check what the 1-4 scaling factors should be
-        if hasattr(struct, 'defaults') and isinstance(struct.defaults,
-                                                      _Defaults):
-            gmxtop.defaults = struct.defaults
-        else:
-            scee_values = set()
-            scnb_values = set()
-            if struct.adjusts:
-                for adjust in struct.adjusts:
-                    if adjust.type is None: continue
-                    scee_values.add(1/adjust.type.chgscale)
-                    # Do not add scnb_values, since we can just set explicit
-                    # exception pair parameters in GROMACS (which this structure
-                    # already has)
-                # In order to specify specific pair parameters, we need to set
-                # gen_pairs to 'no' so that the pair-specific L-J parameters are
-                # printed to the topology file (rather than being auto-created)
-                gmxtop.defaults.gen_pairs = 'no'
-            else:
-                for dihedral in struct.dihedrals:
-                    if dihedral.type is None or dihedral.ignore_end: continue
-                    if isinstance(dihedral.type, DihedralTypeList):
-                        for dt in dihedral.type:
-                            if dt.scee:
-                                scee_values.add(dt.scee)
-                            if dt.scnb:
-                                scnb_values.add(dt.scnb)
-                    else:
-                        if dihedral.type.scee:
-                            scee_values.add(dihedral.type.scee)
-                        if dihedral.type.scnb:
-                            scnb_values.add(dihedral.type.scnb)
-            if len(set('%.5f' % x for x in scee_values)) > 1:
-                raise GromacsError('Structure has mixed 1-4 scaling which is '
-                                   'not supported by Gromacs')
-            scee_values = list(scee_values)
-            scnb_values = list(scnb_values)
-            if len(set('%.5f' % x for x in scee_values)) == 1:
-                gmxtop.defaults.fudgeQQ = 1/scee_values[0]
-            else:
-                gmxtop.defaults.fudgeQQ = 1.0
-            if len(set('%.5f' % x for x in scnb_values)) == 1:
-                gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
-            else:
-                gmxtop.defaults.fudgeLJ = 1.0
-        if gmxtop.combining_rule == 'geometric':
-            gmxtop.defaults.comb_rule = 3
-
-        gmxtop.parameterset = ParameterSet.from_structure(struct,
-                                            allow_unequal_duplicates=True)
-        return gmxtop
-
-    #===================================================
-
     def write(self, dest, combine=None, parameters='inline', molfile=None, itp=False):
         """ Write a Gromacs Topology File from a Structure
 
@@ -1362,8 +1360,7 @@ class GromacsTopologyFile(Structure, metaclass=FileFormatType):
         elif hasattr(parameters, 'write'):
             parfile = parameters
         else:
-            raise ValueError('parameters must be "inline", a file name, or '
-                             'a file-like object')
+            raise ValueError('parameters must be "inline", a file name, or a file-like object')
 
         # Determine where to write the molecules
         if itp :
