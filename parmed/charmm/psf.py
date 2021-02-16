@@ -6,6 +6,7 @@ import re
 import warnings
 from copy import copy as _copy
 from functools import wraps
+from ..periodic_table import AtomicNum, element_by_mass
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
                                UnassignedAtomType)
@@ -231,7 +232,8 @@ class CharmmPsfFile(Structure):
                 charge = self._convert(words[6], float, 'partial charge')
                 mass = self._convert(words[7], float, 'atomic mass')
                 props = words[8:]
-                atom = Atom(name=name, type=attype, charge=charge, mass=mass)
+                atom = Atom(name=name, type=attype, charge=charge, mass=mass,
+                            atomic_number=AtomicNum[element_by_mass(mass)])
                 atom.props = props
                 self.add_atom(atom, resname, resid, chain=segid, inscode=inscode, segid=segid)
             # Now get the number of bonds

@@ -254,6 +254,14 @@ class TestCharmmPsf(TestCharmmBase):
         for res in (firstres * 3).residues:
             self.assertEqual(res.segid, firstres.residues[0].segid)
 
+    def test_psf_atomic_number_assignment(self):
+        """ Checks that atomic number is assigned if just PSF is read """
+        psf1 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        psf2 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
+        psf2.load_parameters(parmset=self.param22)
+        for a1, a2 in zip(psf1.atoms, psf2.atoms):
+            self.assertEqual(a1.atomic_number, a2.atomic_number)
+
     def test_xplor_psf(self):
         """ Test Xplor-format CHARMM PSF file parsing """
         # Atom types are strings, not integers like in charmm
