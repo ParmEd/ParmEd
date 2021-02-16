@@ -2,17 +2,12 @@
 This module contains functionality relevant to loading and parsing DLPOLY CONFIG
 (coordinate) files and building a stripped-down Structure from it
 """
-from __future__ import print_function, division, absolute_import
-
 from ..constants import TINY
 from ..formats.registry import FileFormatType
-from ..geometry import (box_lengths_and_angles_to_vectors,
-                             reduce_box_vectors)
+from ..geometry import box_lengths_and_angles_to_vectors, reduce_box_vectors
 from ..utils.io import genopen
-from ..utils.six import add_metaclass, string_types
 
-@add_metaclass(FileFormatType)
-class DlpolyConfigFile(object):
+class DlpolyConfigFile(metaclass=FileFormatType):
     """ Writes Dlpoly CONFIG files """
     #===================================================
 
@@ -53,7 +48,7 @@ class DlpolyConfigFile(object):
                 dest.write('\n')
 
         own_handle = False
-        if isinstance(dest, string_types):
+        if isinstance(dest, str):
             dest = genopen(dest, 'w')
             own_handle = True
         elif not hasattr(dest, 'write'):
@@ -68,8 +63,7 @@ class DlpolyConfigFile(object):
             dest.write('         0')
         # Periodic Boundary Key
         if struct.box is not None:
-            a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(
-                            *struct.box))
+            a, b, c = reduce_box_vectors(*box_lengths_and_angles_to_vectors(*struct.box))
             if all([abs(x-90) < TINY for x in struct.box[3:]]):
                 if (a[0] == b[1] and b[1] == c[2]):
                     dest.write('         1')
@@ -138,8 +132,7 @@ class DlpolyConfigFile(object):
             for atom in struct.atoms:
                 resid = (atom.residue.idx + 1) % 100000
                 atid = (atom.idx + 1) % 100000
-                _write_atom_line(
-                    atom, atid, resid, has_vels, dest, precision)
+                _write_atom_line(atom, atid, resid, has_vels, dest, precision)
 
         if own_handle:
             dest.close()
