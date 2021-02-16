@@ -16,11 +16,9 @@ Note, id_format must be IMPLEMENTED for each class added to the registry, not
 simply inherited from a base class (unless that base class is not a metaclass of
 FileFormatType)
 """
-from __future__ import division, print_function, absolute_import
 from contextlib import closing
-from parmed.utils.io import genopen
-from parmed.utils.six import iteritems
-from parmed.exceptions import FormatNotFound
+from ..utils.io import genopen
+from ..exceptions import FormatNotFound
 import os
 
 PARSER_REGISTRY = dict()
@@ -102,7 +100,7 @@ def load_file(filename, *args, **kwargs):
         - ``.gz`` : gzip compressed file
         - ``.bz2`` : bzip2 compressed file
 
-    SDF file is loaded via `rdkit` package. 
+    SDF file is loaded via `rdkit` package.
 
     Examples
     --------
@@ -146,7 +144,7 @@ def load_file(filename, *args, **kwargs):
 
     Raises
     ------
-    IOError
+    FileNotFoundError
         If ``filename`` does not exist
 
     parmed.exceptions.FormatNotFound
@@ -165,17 +163,17 @@ def load_file(filename, *args, **kwargs):
         with closing(genopen(filename)) as f:
             assert f
     elif not os.path.exists(filename):
-        raise IOError('%s does not exist' % filename)
+        raise FileNotFoundError('%s does not exist' % filename)
     elif not os.access(filename, os.R_OK):
-        raise IOError('%s does not have read permissions set' % filename)
+        raise FileNotFoundError('%s does not have read permissions set' % filename)
 
-    for name, cls in iteritems(PARSER_REGISTRY):
+    for name, cls in PARSER_REGISTRY.items():
         if not hasattr(cls, 'id_format'):
             continue
         try:
             if cls.id_format(filename):
                 break
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, SyntaxError):
             continue
     else:
         # We found no file format
@@ -185,8 +183,7 @@ def load_file(filename, *args, **kwargs):
     other_args = PARSER_ARGUMENTS[name]
     for arg in other_args:
         if not arg in kwargs:
-            raise TypeError('%s constructor expects %s keyword argument' %
-                            name, arg)
+            raise TypeError('%s constructor expects %s keyword argument' % name, arg)
     # Pass on the following keywords IFF the target function accepts a target
     # keyword. Otherwise, get rid of it: structure, natom, hasbox, skip_bonds
     if hasattr(cls, 'parse'):

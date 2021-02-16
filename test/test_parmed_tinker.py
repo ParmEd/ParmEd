@@ -2,13 +2,10 @@
 Tests the functionality in the tinker subpackage
 """
 import numpy as np
-import utils
+from utils import get_fn
 import unittest
 import parmed as pmd
 from parmed.tinker import parameterfile, system, tinkerfiles
-from parmed.utils.six.moves import zip
-
-get_fn = utils.get_fn
 
 class TestTinkerFiles(unittest.TestCase):
 

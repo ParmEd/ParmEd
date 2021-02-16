@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+
+jobs:
+  build:
+    name: Build (${{ matrix.python-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        python-version: ["3.8", "3.9"]
+
+    steps:
+    - name: Check out source code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: false
+        python-version: ${{ matrix.python-version }}
+        environment-file: devtools/environment-dev.yaml
+        activate-environment: parmed-dev
+
+    - name: Environment Information
+      shell: bash -l {0}
+      run: |
+        conda info
+        conda list
+
+    - name: Install and test
+      shell: bash -lex {0}
+      run: |
+        bash -ex devtools/ci/install.sh
+
+    - name: Upload Coverage Results
+      uses: codecov/codecov-action@v1
+      if: endsWith(github.ref, '/master')
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        directory: test/
+        fail_ci_if_error: true

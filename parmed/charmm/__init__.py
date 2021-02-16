@@ -26,6 +26,6 @@ __contributors__ = 'Jason Deckman'
 __all__ = ['psf', 'parameters', 'charmmcrds', 'CharmmPsfFile',
            'CharmmParameterSet', 'CharmmCrdFile', 'CharmmRstFile']
 
-from parmed.charmm.psf import CharmmPsfFile
-from parmed.charmm.parameters import CharmmParameterSet
-from parmed.charmm.charmmcrds import CharmmCrdFile, CharmmRstFile
+from .psf import CharmmPsfFile
+from .parameters import CharmmParameterSet
+from .charmmcrds import CharmmCrdFile, CharmmRstFile

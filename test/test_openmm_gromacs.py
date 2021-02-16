@@ -1,30 +1,18 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division, print_function, absolute_import
-import utils
-
-try:
-    import simtk.openmm as mm
-    import simtk.openmm.app as app
-    HAS_OPENMM = True
-    CPU = mm.Platform.getPlatformByName('CPU')
-except ImportError:
-    from parmed.amber.readparm import AmberParm, ChamberParm, Rst7
-    HAS_OPENMM = False
-
 from parmed import load_file, ExtraPoint, openmm, gromacs
 from parmed.gromacs import GromacsTopologyFile, GromacsGroFile
 from parmed.openmm.utils import energy_decomposition
 from parmed.exceptions import GromacsWarning, ParmedError, OpenMMWarning
 import parmed.unit as u
-from parmed.utils.six.moves import range, zip
 from parmed.vec3 import Vec3
 import os
 import unittest
 import warnings
-from utils import (get_fn, CPU, has_openmm, mm, app, TestCaseRelative,
-                   run_all_tests)
+from utils import (
+    get_fn, CPU, has_openmm, mm, app, TestCaseRelative, run_all_tests, QuantityTestCase, HAS_GROMACS
+)
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -57,13 +45,10 @@ def zero_ep_frc(frc, struct):
         if isinstance(atom, ExtraPoint):
             frc[i] = vec0
 
-@unittest.skipUnless(HAS_OPENMM, "Cannot test without OpenMM")
-@unittest.skipUnless(utils.HAS_GROMACS, "Cannot test without GROMACS")
-class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+@unittest.skipUnless(HAS_GROMACS, "Cannot test without GROMACS")
+class TestGromacsTop(TestCaseRelative, QuantityTestCase):
     """ Test ParmEd's energies vs. Gromacs energies as run by Lee-Ping """
-
-    def setUp(self):
-        warnings.filterwarnings('always', category=GromacsWarning)
 
     def test_tiny(self):
         """ Test tiny Gromacs system nrg and frc (no PBC) """
@@ -250,7 +235,6 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
     def test_dppc(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
         # We know what we're doing
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
                         xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -330,7 +314,6 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
         """ Test ParmEd -> OpenMM round trip with Gromacs system """
         # Use DPPC to get RB-torsions tested. Also check that it initially fails
         # with the CustomNonbondedForce
-        warnings.filterwarnings('ignore', category=GromacsWarning)
         top = load_file(os.path.join(get_fn('12.DPPC'), 'topol.top'),
                         xyz=os.path.join(get_fn('12.DPPC'), 'conf.gro'))
         self.assertEqual(top.combining_rule, 'lorentz')
@@ -338,10 +321,7 @@ class TestGromacsTop(utils.TestCaseRelative, utils.QuantityTestCase):
         system = top.createSystem()
         def bad_system():
             return openmm.load_topology(top.topology, system).createSystem()
-        warnings.filterwarnings('ignore', category=OpenMMWarning)
-        self.assertTrue(
-                openmm.load_topology(top.topology, system).unknown_functional
-        )
+        self.assertTrue(openmm.load_topology(top.topology, system).unknown_functional)
         self.assertRaises(ParmedError, bad_system)
         for i in range(len(system.getForces())):
             if isinstance(system.getForce(i), mm.CustomNonbondedForce):

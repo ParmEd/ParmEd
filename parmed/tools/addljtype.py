@@ -1,8 +1,6 @@
 " This command adds a new Lennard Jones atom type from the selected atoms. "
-
 from math import sqrt
-from parmed.constants import NTYPES
-from parmed.utils.six.moves import range
+from ..constants import PrmtopPointers
 
 def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     """ Adds a new Lennard Jones type to a topology file """
@@ -15,7 +13,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
             parm.parm_data['ATOM_TYPE_INDEX'][i] = parm.ptr('ntypes') + 1
 
     # Now increment NTYPES
-    parm.parm_data['POINTERS'][NTYPES] += 1
+    parm.parm_data['POINTERS'][PrmtopPointers.NTYPES] += 1
     parm.pointers['NTYPES'] += 1
    
     # Now create a whole new array for NONBONDED_PARM_INDEX
@@ -24,8 +22,7 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     old_ntypes = parm.ptr('ntypes') - 1
     for i in range(old_ntypes):
         # Copy over the first ntypes terms
-        parm.parm_data['NONBONDED_PARM_INDEX'].insert(
-                                    parm.ptr('ntypes')*(i+1)-1, current_idx)
+        parm.parm_data['NONBONDED_PARM_INDEX'].insert(parm.ptr('ntypes')*(i+1)-1, current_idx)
         current_idx += 1
 
     # Now add the interaction of the last type with every other

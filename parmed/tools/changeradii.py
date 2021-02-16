@@ -1,4 +1,4 @@
-from parmed.tools.exceptions import ChangeRadiiError
+from .exceptions import ChangeRadiiError
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -31,7 +31,7 @@ def bondi(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
 
@@ -79,7 +79,7 @@ def amber6(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
@@ -126,7 +126,7 @@ def mbondi(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
@@ -170,7 +170,7 @@ def mbondi2(parm):
         elif atom.atomic_number == 16:
             atom.solvent_radius = 1.8
         elif atom.atomic_number == 17:
-            atom.solvent_radius = 1.5
+            atom.solvent_radius = 1.7
         else:
             atom.solvent_radius = 1.5
     try:
@@ -288,8 +288,6 @@ _call_method = dict(bondi=bondi, mbondi=mbondi, mbondi2=mbondi2,
                     mbondi3=mbondi3, amber6=amber6)
 
 def ChRad(parm, radii_set):
-    global _call_method
     if radii_set not in _call_method:
-        raise ChangeRadiiError("You must choose from %s radii sets" %
-                               ', '.join(_call_method.keys()))
+        raise ChangeRadiiError(f"You must choose from {list(_call_method.keys())} radii sets")
     _call_method[radii_set](parm)

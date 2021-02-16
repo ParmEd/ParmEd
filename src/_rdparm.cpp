@@ -3,18 +3,13 @@
 
 #include <Python.h>
 
-// Support versions of Python older than 2.5 that didn't define Py_ssize_t
-#if PY_VERSION_HEX < 0x02050000 && !defined(PY_SSIZE_T_MIN)
-typedef int Py_ssize_t;
-#   define PY_SSIZE_T_MAX INT_MAX
-#   define PY_SSIZE_T_MIN INT_MIN
-#endif
-
-// A set of macros for use with Py3
-#include "CompatibilityMacros.h"
-
 // Optimized readparm
 #include "readparm.h"
+
+void SetItem_PyDict_AndDecref(PyObject *dict, const char* key, PyObject *value) {
+    PyDict_SetItemString(dict, key, value);
+    Py_DECREF(value);
+}
 
 static PyObject* rdparm(PyObject *self, PyObject *args) {
 
@@ -33,9 +28,14 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     ParmFormatMap parmFormats;
     std::vector<std::string> flagList;
     std::string version;
+    ExitStatus retval;
 
-    ExitStatus retval = readparm(fname, flagList, parmData, parmComments,
-                                 unkParmData, parmFormats, version);
+    Py_BEGIN_ALLOW_THREADS
+
+    retval = readparm(fname, flagList, parmData, parmComments,
+                      unkParmData, parmFormats, version);
+
+    Py_END_ALLOW_THREADS
 
     if (retval == NOOPEN) {
         error_message = "Could not open " + fname + " for reading";
@@ -86,7 +86,7 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
             case INTEGER:
                 for (Py_ssize_t j = 0; j < listSize; j++) {
                     long val = (long) parmData[flag][(size_t)j].i;
-                    PyList_SET_ITEM(list, j, PyInt_FromLong(val));
+                    PyList_SET_ITEM(list, j, PyLong_FromLong(val));
                 }
                 break;
             case FLOAT:
@@ -97,47 +97,46 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
                 break;
             case HOLLERITH:
                 for (Py_ssize_t j = 0; j < listSize; j++) {
-                    PyList_SET_ITEM(list, j,
-                            PyString_FromString(parmData[flag][(size_t)j].c));
+                    PyList_SET_ITEM(list, j, PyUnicode_FromString(parmData[flag][(size_t)j].c));
                 }
                 break;
             case UNKNOWN:
                 for (Py_ssize_t j = 0; j < listSize; j++) {
                     std::string line = unkParmData[flag][(size_t) j];
-                    PyList_SET_ITEM(list, j, PyString_FromString(line.c_str()));
+                    PyList_SET_ITEM(list, j, PyUnicode_FromString(line.c_str()));
                 }
                 // Add this to the list of unknown flags
                 PyList_SET_ITEM(unknown_flags, unkFlagNum++,
-                                PyString_FromString(flag.c_str()));
+                                PyUnicode_FromString(flag.c_str()));
                 break;
             default:
                 // Should not be here
                 PyErr_SetString(PyExc_RuntimeError, "This should be unreachable");
                 return NULL;
         }
-        PyDict_SetItemString(parm_data, flag.c_str(), list);
+        SetItem_PyDict_AndDecref(parm_data, flag.c_str(), list);
 
         // Now comments
         if (parmComments.count(flag) == 0) {
-            PyDict_SetItemString(comments, flag.c_str(), PyList_New(0));
+            SetItem_PyDict_AndDecref(comments, flag.c_str(), PyList_New(0));
         } else {
             int ncom = parmComments[flag].size();
             PyObject *commentList = PyList_New(ncom);
             for (Py_ssize_t j = 0; j < ncom; j++) {
                 std::string line = parmComments[flag][(size_t)j];
                 PyList_SET_ITEM(commentList, j,
-                                PyString_FromString(line.c_str()));
+                                PyUnicode_FromString(line.c_str()));
             }
-            PyDict_SetItemString(comments, flag.c_str(), commentList);
+            SetItem_PyDict_AndDecref(comments, flag.c_str(), commentList);
         }
 
         // Now formats
-        PyObject *fmt = PyString_FromString(parmFormats[flag].fmt.c_str());
-        PyDict_SetItemString(formats, flag.c_str(), fmt);
+        PyObject *fmt = PyUnicode_FromString(parmFormats[flag].fmt.c_str());
+        SetItem_PyDict_AndDecref(formats, flag.c_str(), fmt);
 
         // Now flag list
         PyList_SET_ITEM(flag_list, (Py_ssize_t)i,
-                        PyString_FromString(flag.c_str()));
+                        PyUnicode_FromString(flag.c_str()));
     }
 
     PyObject *ret = PyTuple_New(6);
@@ -146,7 +145,7 @@ static PyObject* rdparm(PyObject *self, PyObject *args) {
     PyTuple_SET_ITEM(ret, 2, formats);
     PyTuple_SET_ITEM(ret, 3, unknown_flags);
     PyTuple_SET_ITEM(ret, 4, flag_list);
-    PyTuple_SET_ITEM(ret, 5, PyString_FromString(version.c_str()));
+    PyTuple_SET_ITEM(ret, 5, PyUnicode_FromString(version.c_str()));
 
     return ret;
 }
@@ -158,7 +157,6 @@ optrdparmMethods[] = {
     { NULL },
 };
 
-#if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef moduledef = {
     PyModuleDef_HEAD_INIT,
     "_rdparm",                          // m_name
@@ -170,22 +168,11 @@ static struct PyModuleDef moduledef = {
     NULL,
     NULL,
 };
-#endif
 
-#if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC
 PyInit__rdparm(void) {
-#else
-PyMODINIT_FUNC
-init_rdparm(void) {
-#endif
     PyObject *m;
 
-#if PY_MAJOR_VERSION >= 3
     m = PyModule_Create(&moduledef);
     return m;
-#else
-    m = Py_InitModule3("_rdparm", optrdparmMethods,
-            "Optimized prmtop file reading library written in C++");
-#endif
 }

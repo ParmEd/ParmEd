@@ -1,13 +1,9 @@
 """
 Tests the functionality in the parmed.unit package.
 """
-from __future__ import division
-
 import utils
 import numpy as np
 from parmed import unit as u
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
 import copy
 import math
 import unittest
@@ -19,8 +15,7 @@ class TestUnits(utils.QuantityTestCase):
         """ Tests the creation of a base unit furlong """
         furlong = u.BaseUnit(u.length_dimension, "furlong", "fur")
         furlong.define_conversion_factor_to(u.meter_base_unit, 201.168)
-        self.assertEqual(furlong.conversion_factor_to(u.angstrom_base_unit),
-                         201.168e10)
+        self.assertEqual(furlong.conversion_factor_to(u.angstrom_base_unit), 201.168e10)
 
     def testIsUnit(self):
         """ Tests the unit.is_unit introspective function """
@@ -84,15 +79,13 @@ class TestUnits(utils.QuantityTestCase):
 
     def testUnitSystem(self):
         """ Tests the creation of a UnitSystem and its behavior """
-        us = u.UnitSystem([u.ScaledUnit(1.0, u.coulomb/u.second, 'ampere', 'A'),
-                           u.second_base_unit])
+        us = u.UnitSystem([u.ScaledUnit(1.0, u.coulomb/u.second, 'ampere', 'A'), u.second_base_unit])
         self.assertEqual(us.express_unit(u.second), u.second)
         self.assertEqual(us.express_unit(u.hour), u.second)
         self.assertNotEqual(u.hour, u.second)
         self.assertEqual(us.express_unit(u.coulomb/u.second), u.ampere)
         self.assertEqual(us.express_unit(u.meter/u.second), u.meter/u.second)
-        self.assertEqual(us.express_unit(u.kilometer/u.hour),
-                         u.kilometer/u.second)
+        self.assertEqual(us.express_unit(u.kilometer/u.hour), u.kilometer/u.second)
         x = 100 * u.millimeters
         self.assertEqual(x.value_in_unit_system(u.si_unit_system), 0.1)
         self.assertEqual(x.value_in_unit_system(u.cgs_unit_system), 10.0)
@@ -100,8 +93,7 @@ class TestUnits(utils.QuantityTestCase):
         y = 20 * u.millimeters / u.millisecond**2
         self.assertAlmostEqual(y.value_in_unit_system(u.si_unit_system), 2e4)
         self.assertAlmostEqual(y.value_in_unit_system(u.cgs_unit_system), 2e6)
-        self.assertAlmostEqual(y.value_in_unit_system(u.md_unit_system), 2e-11,
-                               places=18)
+        self.assertAlmostEqual(y.value_in_unit_system(u.md_unit_system), 2e-11, places=18)
         kcal = 1 * u.md_kilocalorie / u.mole
         self.assertEqual(kcal.value_in_unit_system(u.md_unit_system), 4.184)
 
@@ -113,8 +105,7 @@ class TestUnits(utils.QuantityTestCase):
     def testQuantitySqrt(self):
         """ Tests taking the square root of quantities """
         self.assertEqual((9.0*u.meters**2).sqrt(), 3.0*u.meters)
-        self.assertEqual((9.0*u.meters**2/u.second**2).sqrt(),
-                         3.0*u.meters/u.second)
+        self.assertEqual((9.0*u.meters**2/u.second**2).sqrt(), 3.0*u.meters/u.second)
 
     def testUnitBadSqrt(self):
         """ Tests that illegal sqrt calls on incompatible units fails """
@@ -146,17 +137,13 @@ class TestUnits(utils.QuantityTestCase):
     def testPresetUnitSystems(self):
         """ Tests some of the pre-set UnitSystem's """
         self.assertEqual(u.angstrom.in_unit_system(u.si_unit_system), u.meter)
-        self.assertEqual(u.angstrom.in_unit_system(u.cgs_unit_system),
-                         u.centimeter)
-        self.assertEqual(u.angstrom.in_unit_system(u.md_unit_system),
-                         u.nanometer)
+        self.assertEqual(u.angstrom.in_unit_system(u.cgs_unit_system), u.centimeter)
+        self.assertEqual(u.angstrom.in_unit_system(u.md_unit_system), u.nanometer)
         mps = u.meter / u.second**2
         self.assertEqual(str(mps), 'meter/(second**2)')
         self.assertEqual(mps.in_unit_system(u.si_unit_system), mps)
-        self.assertEqual(mps.in_unit_system(u.cgs_unit_system),
-                         u.centimeter/u.second**2)
-        self.assertEqual(mps.in_unit_system(u.md_unit_system),
-                         u.nanometer/u.picosecond**2)
+        self.assertEqual(mps.in_unit_system(u.cgs_unit_system), u.centimeter/u.second**2)
+        self.assertEqual(mps.in_unit_system(u.md_unit_system), u.nanometer/u.picosecond**2)
 
     def testIsCompatible(self):
         """ Tests the is_compatible attribute of units """
@@ -179,10 +166,8 @@ class TestUnits(utils.QuantityTestCase):
     def testUnitString(self):
         """ Test the Unit->str casting functionality """
         # Always alphabetical order
-        self.assertEqual(str(u.meter * u.second * u.second * u.kilogram),
-                         'kilogram*meter*second**2')
-        self.assertEqual(str(u.meter / u.second / u.second / u.kilogram),
-                         'meter/(kilogram*second**2)')
+        self.assertEqual(str(u.meter * u.second * u.second * u.kilogram), 'kilogram*meter*second**2')
+        self.assertEqual(str(u.meter / u.second / u.second / u.kilogram), 'meter/(kilogram*second**2)')
         self.assertEqual(str(u.meter**3), 'meter**3')
 
     def testToBaseUnit(self):
@@ -310,8 +295,7 @@ class TestUnits(utils.QuantityTestCase):
         t = s.in_units_of(u.nanometers)
         self.assertEqual(s, t)
         t[0] = 1 * u.meters
-        self.assertAlmostEqualQuantities(t,
-                u.Quantity([1e9, 2, 3, 4], u.nanometers))
+        self.assertAlmostEqualQuantities(t, u.Quantity([1e9, 2, 3, 4], u.nanometers))
         self.assertEqual(s, u.Quantity([1, 2, 3, 4], u.nanometers))
 
     def testQuantityMaths(self):
@@ -330,10 +314,8 @@ class TestUnits(utils.QuantityTestCase):
         self.assertEqual(d1 - d1, 0.0*u.meters)
         self.assertEqual(d1 / d1, 1.0)
         self.assertEqual(d1 * u.meters, 2.0*u.meters**2)
-        self.assertEqual(u.kilograms*(d1/u.seconds)*(d1/u.seconds),
-                         4*u.kilograms*u.meters**2/u.seconds**2)
-        self.assertEqual(u.kilograms*(d1/u.seconds)**2,
-                         4*u.kilograms*u.meters**2/u.seconds**2)
+        self.assertEqual(u.kilograms*(d1/u.seconds)*(d1/u.seconds), 4*u.kilograms*u.meters**2/u.seconds**2)
+        self.assertEqual(u.kilograms*(d1/u.seconds)**2, 4*u.kilograms*u.meters**2/u.seconds**2)
         self.assertEqual(d1**3, 8.0*u.meters**3)
         x = d1**(3/2)
         self.assertAlmostEqual(x._value, math.sqrt(2)**3)
@@ -385,11 +367,9 @@ class TestUnits(utils.QuantityTestCase):
         self.assertEqual(str(u1/u2), '/meter')
         self.assertEqual(u1**x1, u.kilogram**2*u.meter**2/(u.second**4))
         self.assertEqual(u1**(1/x1), u.kilogram**0.5*u.meter**0.5/u.second)
-        self.assertEqual(u1**x2,
-                         u.kilogram**(1+1/3)*u.meter**(1+1/3)/u.second**(2+2/3))
+        self.assertEqual(u1**x2, u.kilogram**(1+1/3)*u.meter**(1+1/3)/u.second**(2+2/3))
         q = 1.0 * u.md_kilocalorie/u.mole/u.angstrom
-        self.assertEqual(str(q.in_units_of(u.md_kilojoule/u.mole/u.nanometer)),
-                         '41.84 kJ/(nm mol)')
+        self.assertEqual(str(q.in_units_of(u.md_kilojoule/u.mole/u.nanometer)), '41.84 kJ/(nm mol)')
 
     def testQuantityComparisons(self):
         """ Tests binary comparison operators between Quantity """
@@ -431,8 +411,7 @@ class TestUnits(utils.QuantityTestCase):
         self.assertAlmostEqualQuantities(n, 2.05834818672e-17 * u.mole)
         self.assertAlmostEqualQuantities(V, 5.2359833333333e-19 * u.meters**3)
         self.assertEqual(str(T), '310.0 K')
-        self.assertEqual(str(u.MOLAR_GAS_CONSTANT_R.format('%.4f')),
-                         '8.3145 J/(K mol)')
+        self.assertEqual(str(u.MOLAR_GAS_CONSTANT_R.format('%.4f')), '8.3145 J/(K mol)')
         self.assertTrue(u.is_quantity(V))
         # Checks trouble with complicated unit conversion factors
         p1 = 1.0 * u.atmospheres
@@ -451,8 +430,7 @@ class TestUnits(utils.QuantityTestCase):
         self.assertEqual(1.0*u.radians / u.degrees, 180 / math.pi)
         self.assertTrue(u.is_quantity(1.0*u.radians))
         self.assertTrue(u.is_quantity(1.0*u.degrees))
-        self.assertEqual((1.0*u.radians).in_units_of(u.degrees),
-                         (180 / math.pi)*u.degrees)
+        self.assertEqual((1.0*u.radians).in_units_of(u.degrees), (180 / math.pi)*u.degrees)
         self.assertEqual(90*u.degrees/u.radians, math.pi/2)
         q = 90 * u.degrees + 0.3 * u.radians
         self.assertEqual(q._value, 90 + 180*0.3/math.pi)
@@ -510,10 +488,8 @@ class TestUnits(utils.QuantityTestCase):
 
     def testUnitMathModule(self):
         """ Tests the unit_math functions on Quantity objects """
-        self.assertEqual(u.sqrt(1.0*u.kilogram*u.joule),
-                         1.0*u.kilogram*u.meter/u.second)
-        self.assertEqual(u.sqrt(1.0*u.kilogram*u.calorie),
-                         math.sqrt(4.184)*u.kilogram*u.meter/u.second)
+        self.assertEqual(u.sqrt(1.0*u.kilogram*u.joule), 1.0*u.kilogram*u.meter/u.second)
+        self.assertEqual(u.sqrt(1.0*u.kilogram*u.calorie), math.sqrt(4.184)*u.kilogram*u.meter/u.second)
         self.assertEqual(u.sqrt(9), 3) # Test on a scalar
         self.assertEqual(u.sin(90*u.degrees), 1)
         self.assertEqual(u.sin(math.pi/2*u.radians), 1)
@@ -552,27 +528,23 @@ class TestUnits(utils.QuantityTestCase):
 
     def testBadQuantityConversions(self):
         """ Tests that conversions to incompatible units fails """
-        self.assertRaises(TypeError,
-                lambda: (1.0*u.meters).in_units_of(u.seconds))
-        self.assertRaises(TypeError,
-                lambda: (1.0*u.meters).value_in_unit(u.seconds))
+        with self.assertRaises(TypeError):
+            (1.0*u.meters).in_units_of(u.seconds)
+        with self.assertRaises(TypeError):
+            (1.0*u.meters).value_in_unit(u.seconds)
 
     def testCreateNewBaseUnit(self):
         """ Tests creating a new base unit """
         ms = u.milli * u.second_base_unit
         self.assertIsInstance(ms, u.BaseUnit)
-        self.assertEqual(repr(ms),
-                'BaseUnit(base_dim=BaseDimension("time"), name="millisecond", '
-                'symbol="ms")')
+        self.assertEqual(repr(ms), 'BaseUnit(base_dim=BaseDimension("time"), name="millisecond", symbol="ms")')
         self.assertEqual(ms.conversion_factor_to(u.second_base_unit), 0.001)
 
     def testCreateNewScaledUnit(self):
         """ Tests creating a new ScaledUnit """
         mC = u.milli * u.ScaledUnit(4.184, u.joule, "calorie", "cal")
         self.assertIsInstance(mC, u.ScaledUnit)
-        self.assertEqual(repr(mC),
-                "ScaledUnit(factor=0.004184, master=joule, name='millicalorie',"
-                " symbol='mcal')")
+        self.assertEqual(repr(mC), "ScaledUnit(factor=0.004184, master=joule, name='millicalorie', symbol='mcal')")
         self.assertFalse(u.is_unit(mC))
 
     def testCreateNewUnit(self):
@@ -654,11 +626,11 @@ class TestNumpyUnits(utils.QuantityTestCase):
         """ Tests the internal _is_string method with numpy Quantities """
         a = np.array([[1, 2, 3], [4, 5, 6]])
         self.assertIsInstance("", str)
-        self.assertTrue(isinstance("", string_types))
-        self.assertTrue(isinstance("t", string_types))
-        self.assertTrue(isinstance("test", string_types))
-        self.assertFalse(isinstance(3, string_types))
-        self.assertFalse(isinstance(a, string_types))
+        self.assertTrue(isinstance("", str))
+        self.assertTrue(isinstance("t", str))
+        self.assertTrue(isinstance("test", str))
+        self.assertFalse(isinstance(3, str))
+        self.assertFalse(isinstance(a, str))
 
     def testNumpyFunctions(self):
         """ Tests various numpy attributes that they result in Quantities """
@@ -676,6 +648,3 @@ class TestNumpyUnits(utils.QuantityTestCase):
         x = np.array([1]) * u.liters
         self.assertIsInstance(x, u.Quantity)
         self.assertIsInstance(np.arange(10) * x, u.Quantity)
-
-if __name__ == '__main__':
-    unittest.main()

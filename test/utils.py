@@ -2,15 +2,17 @@
 Useful functions for the test cases
 """
 import os
-import numpy as np
+from os.path import join, split, abspath
 import random
+import tempfile
 import unittest
 import warnings
-from os.path import join, split, abspath
-from parmed import gromacs
-from parmed.utils.six import string_types
-from parmed.utils.six.moves import zip
-warnings.filterwarnings('error', category=DeprecationWarning, module='parmed')
+from pathlib import Path
+from typing import Union
+
+import numpy as np
+
+from parmed import gromacs, openmm
 
 try:
     from simtk import openmm as mm
@@ -22,6 +24,18 @@ try:
 except ImportError:
     has_openmm = False
     app = openmm_version = CPU = Reference = mm = None
+
+try:
+    import networkx as nx
+    has_networkx = True
+except ImportError:
+    has_networkx = False
+
+try:
+    from lxml import etree
+    has_lxml = True
+except ImportError:
+    has_lxml = False
 
 try:
     from string import uppercase
@@ -61,42 +75,51 @@ class TestCaseRelative(unittest.TestCase):
             if delta is None:
                 if abs(round(ratio - 1, places)) == 0:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, 10**-places, ratio)
-                )
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, 10**-places, ratio))
             else:
                 if abs(ratio - 1) < delta:
                     return
-                raise self.failureException(
-                            '%s != %s with relative tolerance %g (%f)' %
-                            (val1, val2, delta, ratio))
+                raise self.failureException('%s != %s with relative tolerance %g (%f)' %
+                                            (val1, val2, delta, ratio))
+
+class EnergyTestCase(TestCaseRelative):
+
+    def check_energies(self, parm1, con1, parm2, con2):
+        ene1 = openmm.utils.energy_decomposition(parm1, con1)
+        ene2 = openmm.utils.energy_decomposition(parm2, con2)
+
+        all_terms = set(ene1.keys()) | set(ene2.keys())
+
+        for term in all_terms:
+            if term not in ene1:
+                self.assertAlmostEqual(ene2[term], 0)
+            elif term not in ene2:
+                self.assertAlmostEqual(ene1[term], 0)
+            else:
+                self.assertRelativeEqual(ene2[term], ene1[term], places=5)
 
 class FileIOTestCase(unittest.TestCase):
 
     def setUp(self):
-        self._empty_writes()
-        try:
-            os.makedirs(get_fn('writes'))
-        except OSError:
-            pass
+        self._temporary_directory = tempfile.TemporaryDirectory(suffix="pmdtest")
 
     def tearDown(self):
-        self._empty_writes()
-        try:
-            os.rmdir(get_fn('writes'))
-        except OSError:
-            pass
+        self._temporary_directory.cleanup()
+
+    def get_fn(self, filename: str, written: bool = False, saved: bool = False):
+        assert not (written and saved), "Cannot get saved and written"
+        if written:
+            return join(self._temporary_directory.name, filename)
+        elif saved:
+            return str(Path(__file__).parent / "files" / "saved" / filename)
+        return get_fn(filename)
 
     def _empty_writes(self):
-        """ Empty the "writes" directory """
-        try:
-            for f in os.listdir(get_fn('writes')):
-                os.unlink(get_fn(f, written=True))
-        except OSError:
-            pass
+        for fname in os.listdir(self._temporary_directory.name):
+            os.unlink(os.path.join(self._temporary_directory.name, fname))
 
-def get_fn(filename, written=False):
+def get_fn(filename):
     """
     Gets the full path of the file name for a particular test file
 
@@ -113,10 +136,7 @@ def get_fn(filename, written=False):
     str
         Name of the test file with the full path location
     """
-    if written:
-        return join(split(abspath(__file__))[0], 'files', 'writes', filename)
-    else:
-        return join(split(abspath(__file__))[0], 'files', filename)
+    return str(Path(__file__).parent / "files" / filename)
 
 def get_saved_fn(filename):
     """
@@ -133,7 +153,7 @@ def get_saved_fn(filename):
     str
         Name of the test file with the full path location
     """
-    return join(split(abspath(__file__))[0], 'files', 'saved', filename)
+    return str(Path(__file__).parent / "files" / "saved" / filename)
 
 def diff_files(file1, file2, ignore_whitespace=True,
                absolute_error=None, relative_error=None,
@@ -175,7 +195,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
         raise ValueError('Cannot specify absolute_error AND relative_error')
     if absolute_error is not None: absolute_error = float(absolute_error)
     if relative_error is not None: relative_error = float(relative_error)
-    if isinstance(file1, string_types):
+    if isinstance(file1, str):
         try:
             f1 = open(file1, 'r')
         except IOError:
@@ -184,7 +204,7 @@ def diff_files(file1, file2, ignore_whitespace=True,
     else:
         f1 = file1
         file1 = str(file1)
-    if isinstance(file2, string_types):
+    if isinstance(file2, str):
         try:
             f2 = open(file2, 'r')
         except IOError:
@@ -259,21 +279,23 @@ def detailed_diff(l1, l2, absolute_error=None, relative_error=None, spacechar=No
             l2 = l2.replace(char, ' ')
     w1 = l1.split()
     w2 = l2.split()
-    if len(w1) != len(w2): return False
+    if len(w1) != len(w2):
+        return False
     for wx, wy in zip(w1, w2):
         try:
             wx = float(wx)
             wy = float(wy)
         except ValueError:
-            if isinstance(wx, float) or (wx != wy and not
-                    (wx.startswith(fdir) or wy.startswith(fdir))):
+            y_is_filename = wy.startswith(fdir) or wy.startswith(tempfile.tempdir)
+            x_is_filename = isinstance(wx, str) and (wx.startswith(fdir) or wx.startswith(tempfile.tempdir))
+            if isinstance(wx, float) or (wx != wy and not (y_is_filename and x_is_filename)):
                 return False
         else:
             if wx != wy:
-                if absolute_error is not None and abs(wx-wy) > absolute_error:
+                if absolute_error is not None and abs(wx - wy) > absolute_error:
                     return False
                 elif relative_error is not None:
-                    if wx == 0 or wy == 0 and abs(wx-wy) > relative_error:
+                    if wx == 0 or wy == 0 and abs(wx - wy) > relative_error:
                         return False
                     if abs((wx / wy) - 1) > relative_error:
                         return False
@@ -529,3 +551,17 @@ def equal_atoms(tester, a1, a2):
                 tester.assertEqual(getattr(a1, key), getattr(a2, key))
         else:
             tester.assertFalse(hasattr(a1, key))
+
+def is_jenkins():
+    return 'JENKINS_URL' in os.environ
+
+def has_old_vec3():
+    from parmed.vec3 import Vec3
+    v1 = Vec3(1, 2, 3)
+    if not hasattr(v1, 'x') or v1.x != 1:
+        return True
+    try:
+        v2 = -v1
+    except TypeError:
+        return True
+    return False

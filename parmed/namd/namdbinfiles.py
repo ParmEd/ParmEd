@@ -3,15 +3,12 @@ This module contains classes for reading and writing (single frame) NAMD binary
 files.  The main functionality is currently aimed at manipulation rather than
 analysis.
 """
-from __future__ import division
-
-from parmed import unit as u
+from .. import unit as u
 from struct import unpack, pack
 
 import numpy as np
 
-
-class NamdBinFile(object):
+class NamdBinFile:
     """From the NAMD manual:
 
         NAMD uses a trivial double-precision binary file format for
@@ -24,9 +21,10 @@ class NamdBinFile(object):
     effectively arbitrary, but for convenience derived classes are provided
     which alias the values to more descriptive names (e.g. "coordinates").
 
-    See also
+    See Also
     --------
-    :class:`NamdBinCoor` and :class:`NamdBinVel`
+    :class:`NamdBinCoor`
+    :class:`NamdBinVel`
     """
     _SCALE_FACTOR = 1.0
     def __init__(self, values=[]):
@@ -73,9 +71,7 @@ class NamdBinFile(object):
         else:
             values = np.zeros(3*natoms)
         hinge = 3*start_index
-        newvalues = np.concatenate(
-            (self._values[:hinge],values,self._values[hinge:])
-        )
+        newvalues = np.concatenate((self._values[:hinge],values,self._values[hinge:]))
         self._values = newvalues
 
     def copyatoms(self, start_index, natoms):

@@ -1,25 +1,22 @@
 """
 Tests parmed.formats package
 """
-from __future__ import division
 import utils
+from io import StringIO
 
+from copy import copy
 import numpy as np
 import parmed as pmd
-from parmed import amber, charmm, exceptions, formats, gromacs, residue
-from parmed import (Structure, read_PDB, read_CIF, download_PDB, download_CIF,
-                    topologyobjects, Atom, write_PDB, write_CIF)
+from parmed import (amber, charmm, exceptions, formats, gromacs, residue, Structure, read_PDB, Atom,
+                    read_CIF, download_PDB, download_CIF, topologyobjects)
 from parmed.symmetry import Symmetry
 from parmed.modeller import ResidueTemplate, ResidueTemplateContainer
 from parmed.utils import PYPY
-from parmed.utils.six import iteritems, add_metaclass
-from parmed.utils.six.moves import zip, StringIO, range
 import random
 import os
 import sys
 import unittest
-from utils import (get_fn, diff_files, get_saved_fn, run_all_tests,
-                   HAS_GROMACS, FileIOTestCase)
+from utils import get_fn, diff_files, run_all_tests, is_jenkins, HAS_GROMACS, FileIOTestCase
 import warnings
 
 def reset_stringio(io):
@@ -42,17 +39,17 @@ class TestFileLoader(FileIOTestCase):
     def test_load_blank_file(self):
         """ Makes sure that a blank file does not match any id_format """
         from parmed.formats.registry import PARSER_REGISTRY
-        fn = get_fn('test', written=True)
+        fn = self.get_fn('test', written=True)
         with open(fn, 'w'):
             pass
-        for name, cls in iteritems(PARSER_REGISTRY):
+        for name, cls in PARSER_REGISTRY.items():
             self.assertFalse(cls.id_format(fn))
 
     def test_load_off(self):
         """ Tests automatic loading of OFF files """
         off = formats.load_file(get_fn('amino12.lib'))
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_load_amber_prmtop(self):
@@ -80,6 +77,17 @@ class TestFileLoader(FileIOTestCase):
         """ Tests automatic loading of Amber ASCII restart file """
         parm = formats.load_file(get_fn('trx.inpcrd'))
         self.assertIsInstance(parm, amber.AmberAsciiRestart)
+
+    def test_load_amber_restart_ascii_as_structure(self):
+        """ Tests automatic loading of Amber ASCII restart file to Structure """
+        parm = pmd.load_file(get_fn('ala3_solv.rst7'), structure=True)
+        inpcrd = pmd.load_file(get_fn('ala3_solv.rst7'))
+        self.assertIsInstance(parm, Structure)
+        np.testing.assert_almost_equal(parm.box, inpcrd.box)
+        np.testing.assert_almost_equal(parm.coordinates, inpcrd.coordinates[0])
+        # dummy testing to assign box
+        # issue #778
+        parm.box = [0.]*6
 
     def test_load_amber_traj_ascii(self):
         """ Tests automatic loading of Amber mdcrd file """
@@ -135,6 +143,25 @@ class TestFileLoader(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 1)
         self.assertEqual(pdb.residues[0].name, 'SAM')
 
+    def test_load_pdb_with_negative_resnum(self):
+        """ Tests negative residue numbers in PDB writing """
+        # Make a random structure
+        struct = read_PDB(get_fn('4lzt.pdb'))
+        for i, residue in enumerate(struct.residues):
+            residue.number = i - 2
+        for i, atom in enumerate(struct.atoms):
+            atom.number = i - 2
+        mypdb = self.get_fn('negative_indexes.pdb', written=True)
+        struct.save(mypdb, renumber=False)
+        struct2 = read_PDB(mypdb)
+        self.assertEqual(len(struct.atoms), len(struct2.atoms))
+        self.assertEqual(len(struct.residues), len(struct2.residues))
+        # Now make sure the numbers are still negative
+        for i, atom in enumerate(struct2.atoms):
+            self.assertEqual(atom.number, i-2)
+        for i, residue in enumerate(struct2.residues):
+            self.assertEqual(residue.number, i-2)
+
     def test_load_cif(self):
         """ Tests automatic loading of PDBx/mmCIF files """
         cif = formats.load_file(get_fn('4LZT.cif'))
@@ -157,7 +184,7 @@ class TestFileLoader(FileIOTestCase):
         mol2 = formats.load_file(get_fn('tripos4.mol2'), structure=True)
         self.assertIsInstance(mol2, Structure)
         # Check bad file detection
-        fn = get_fn('junk_file', written=True)
+        fn = self.get_fn('junk_file', written=True)
         with open(fn, 'w') as f:
             f.write('\n')
         self.assertFalse(formats.mol2.Mol2File.id_format(fn))
@@ -201,8 +228,8 @@ class TestFileLoader(FileIOTestCase):
 
     def test_misdetect_pqr(self):
         """ Check that PQR autodetection does not identify a PDB file """
-        pdb = formats.PDBFile.download('3p4a')
-        fname = get_fn('3p4a_chainA.pdb', written=True)
+        pdb = read_PDB(get_fn('3p4a.pdb'))
+        fname = self.get_fn('3p4a_chainA.pdb', written=True)
         pdb['A',:,:].save(fname)
         self.assertFalse(formats.PQRFile.id_format(fname))
 
@@ -220,13 +247,12 @@ class TestFileLoader(FileIOTestCase):
 
     def test_negative_residue_number(self):
         """ Tests automatic detection of PDB file with negative residue #s """
-        pdb = download_PDB('1kx5', saveto=get_fn('1kx5.pdb', written=True))
-        pdb2 = formats.load_file(get_fn('1kx5.pdb', written=True))
-        self.assertEqual(len(pdb.atoms), len(pdb2.atoms))
-        for a1, a2 in zip(pdb.atoms, pdb2.atoms):
-            self.assertEqual(a1.name, a2.name)
-            self.assertEqual(a1.residue.name, a2.residue.name)
-        np.testing.assert_allclose(pdb.coordinates, pdb2.coordinates)
+        pdb = formats.load_file(get_fn('1kx5.pdb'))
+        self.assertTrue(any(res.number < 0 for res in pdb.residues))
+
+    def test_dbref_keyword(self):
+        """ Tests automatic detection of PDB file with DBREF record(s) """
+        self.assertTrue(formats.PDBFile.id_format(get_fn('3p49.pdb')))
 
     def test_natom_hasbox_keywords(self):
         """ Tests that the hasbox/natom arguments are special-cased in load_file """
@@ -273,24 +299,17 @@ class TestPDBStructure(FileIOTestCase):
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
-        self.ATOMLINE = ("ATOM  %5s %4s%1s%3s %1s%4s%-2s  "
-                             "%8s%8s%8s%6s%6s          %-2s%2s\n")
-        self.ANISOULINE = ('ANISOU%5s %-4s%1s%-4s%1s%4s%-2s%7s%7s%7s%7s%7s%7s'
-                           '      %2s%-2s\n')
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
-        FileIOTestCase.setUp(self)
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=exceptions.PDBWarning)
-        FileIOTestCase.tearDown(self)
+        self.ATOMLINE = "ATOM  %5s %4s%1s%3s %1s%4s%-2s  %8s%8s%8s%6s%6s          %-2s%2s\n"
+        self.ANISOULINE = "ANISOU%5s %-4s%1s%-4s%1s%4s%-2s%7s%7s%7s%7s%7s%7s      %2s%-2s\n"
+        super().setUp()
 
     def test_pdb_anisou_inscode(self):
         """ Tests that PDB files with ANISOU records on inscodes work """
-        download_PDB('1gdu')
+        formats.PDBFile.parse(get_fn('1gdu.pdb'))
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         pdbtext1 = "%-5s%d    %10.6f%10.6f%10.6f     %10.5f\n" + self.ATOMLINE
         with open(fn, 'w') as f:
             f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', '', 'ALA',
@@ -341,6 +360,7 @@ class TestPDBStructure(FileIOTestCase):
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
@@ -348,9 +368,10 @@ class TestPDBStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
         self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
-        fname = get_fn('downloaded.pdb', written=True)
+        fname = self.get_fn('downloaded.pdb', written=True)
         self._check4lzt(download_PDB('4lzt', saveto=fname))
         self._check4lzt(read_PDB(fname))
 
@@ -390,7 +411,7 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_residue_overflow(self):
         """ Tests PDB file where residue number overflows """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         pdbtext = self.ATOMLINE * 7
         with open(fn, 'w') as f:
             f.write('CRYST1%9.3f%9.3f%9.3f\n' % (10, 10, 10))
@@ -409,13 +430,16 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb.residues[0].number, 9999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb.residues[1].number, 10000)
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 10003)
-        self.assertEqual(pdb.residues[5].number, 65535)
-        self.assertEqual(pdb.residues[6].number, 65536) # inferred
-        # Now check error raised if the overflow is not just ****
+        self.assertEqual(pdb.residues[5].number, 10004)
+        self.assertEqual(pdb.residues[6].number, 10005)
+        # Non-numerical residue numbers are only checked for uniqueness to compare with previous
+        # residue to see if a new one should be created
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (1, 'CA', ' ', 'RE1', 'A', 9999, '', 1, 1, 1, 1, 1, '', '',
@@ -426,7 +450,9 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'CA', ' ', 'RE6', 'A', 'ffff', '', 1, 1, 1, 1, 1, '', '',
                  7, 'CA', ' ', 'RE7', 'A', '>:-O', '', 1, 1, 1, 1, 1, '', '')
             )
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
         # Now check if the residue sequence field is simply expanded
         with open(fn, 'w') as f:
             f.write(pdbtext %
@@ -447,8 +473,8 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(pdb.residues[2].number, 10001)
         self.assertEqual(pdb.residues[3].number, 10002)
         self.assertEqual(pdb.residues[4].number, 99999)
-        self.assertEqual(pdb.residues[5].number, 100000)
-        self.assertEqual(pdb.residues[6].number, 100001)
+        self.assertEqual(pdb.residues[5].number, 10000)
+        self.assertEqual(pdb.residues[6].number, 10000)
 
         # Check proper residue distinguishing for overflowed case. NR marks
         # atoms that *should* be turned into a new residue because there's a
@@ -463,15 +489,17 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'XX', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '', # NR
                  7, 'EP', ' ', 'RE4', 'A', '****', '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
+        # In the above, the PDB parser should recognize at the very least that there are at least
+        # 5 distinct residues. Atoms 4 and 5 have the same residue name *and* atom name (and the
+        # same residue number) so it's reasonable to treat them as the same or different residues
         pdb = formats.PDBFile.parse(fn)
-        self.assertEqual(len(pdb.residues), 6)
-        self.assertEqual([len(r) for r in pdb.residues], [1, 1, 1, 1, 1, 2])
-        self.assertIsInstance(pdb[6], topologyobjects.ExtraPoint)
+        self.assertGreaterEqual(len(pdb.residues), 5)
+        self.assertEqual([len(r) for r in pdb.residues[:3]], [1, 1, 1])
+        self.assertIsInstance(pdb.atoms[6], topologyobjects.ExtraPoint)
 
     def test_atom_number_overflow(self):
         """ Tests PDB file where residue number overflows """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         pdbtext = self.ATOMLINE * 7
         with open(fn, 'w') as f:
             f.write(pdbtext %
@@ -488,12 +516,14 @@ class TestPDBStructure(FileIOTestCase):
         self.assertEqual(len(pdb.residues), 7)
         self.assertEqual(len(pdb.atoms), 7)
         self.assertEqual(pdb[0].number, 99999)
+        # Parser no longer tries to retain gaps in overflow PDB files. Make sure atoms are
+        # numbered seqeuentially
         self.assertEqual(pdb[1].number, 100000)
         self.assertEqual(pdb[2].number, 100001)
         self.assertEqual(pdb[3].number, 100002)
         self.assertEqual(pdb[4].number, 100003)
-        self.assertEqual(pdb[5].number, 1048575)
-        self.assertEqual(pdb[6].number, 1048576)
+        self.assertEqual(pdb[5].number, 100004)
+        self.assertEqual(pdb[6].number, 100005)
         with open(fn, 'w') as f:
             f.write(pdbtext %
                 (99999, 'CA', ' ', 'RE1', 'A', 1, '', 1, 1, 1, 1, 1, '', '',
@@ -504,12 +534,16 @@ class TestPDBStructure(FileIOTestCase):
                  'fffff', 'CA', ' ', 'RE6', 'A', 6, '', 1, 1, 1, 1, 1, '', '',
                  '*a***', 'CA', ' ', 'RE7', 'A', 7, '', 1, 1, 1, 1, 1, '', '')
             )
-        # Check the parsing
-        self.assertRaises(ValueError, lambda: formats.PDBFile.parse(fn))
+        # Check the parsing. PDB file no longer cares if atom number is not numeric
+        pdb = formats.PDBFile.parse(fn)
+        self.assertEqual(len(pdb.residues), 7)
+        self.assertEqual(len(pdb.atoms), 7)
+        self.assertEqual(pdb.atoms[-1].name, 'CA')
+        self.assertEqual(pdb.atoms[-1].residue.name, 'RE7')
 
     def test_pdb_with_models(self):
         """ Test parsing of PDB files with multiple models """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         # Test working version
         with open(fn, 'w') as f:
             f.write("MODEL        1\n")
@@ -560,11 +594,10 @@ class TestPDBStructure(FileIOTestCase):
                  7, 'CC', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '')
             )
             f.write('ENDMDL\n')
-        self.assertRaises(exceptions.PDBWarning, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PDBFile.parse(fn)
         pdb = formats.PDBFile.parse(fn)
         self.assertEqual(pdb.get_coordinates().shape[0], 2)
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
 
         with open(fn, 'w') as f:
             f.write("MODEL        1\n")
@@ -665,9 +698,7 @@ class TestPDBStructure(FileIOTestCase):
                  6, 'CB', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '')
             )
             f.write("MODEL        3\n")
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
         self.assertRaises(exceptions.PDBError, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
 
         # Make sure it still error checking works without ENDMDL on last MODEL
         with open(fn, 'w') as f:
@@ -700,9 +731,7 @@ class TestPDBStructure(FileIOTestCase):
                  5, 'CA', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '',
                  6, 'CB', ' ', 'RE2', 'A', 2, '', 1, 1, 1, 1, 1, '', '')
             )
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
         self.assertRaises(exceptions.PDBError, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
 
         with open(fn, 'w') as f:
             f.write('ENDMDL\n')
@@ -710,13 +739,10 @@ class TestPDBStructure(FileIOTestCase):
 
     def test_anisou_error_handling(self):
         """ Tests error detection/handling for bad ANISOU records in PDBs """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         with open(fn, 'w') as f:
-            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '',
-                                     1, 1, 1, 1, 1, '', ''))
-            f.write(self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  1, '',
-                                       10000, 20000, 30000, 40000, 50000, 60000,
-                                       '', ''))
+            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '', 1, 1, 1, 1, 1, '', ''))
+            f.write(self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  1, '', 10000, 20000, 30000, 40000, 50000, 60000, '', ''))
         pdb = formats.PDBFile.parse(fn)
         self.assertEqual(len(pdb.atoms), 1)
         np.testing.assert_equal(pdb.atoms[0].anisou, [1, 2, 3, 4, 5, 6])
@@ -728,32 +754,29 @@ class TestPDBStructure(FileIOTestCase):
             f.write(self.ANISOULINE % ('a', 'CA', '', 'ALA', 'A',  1, '',
                                        10000, 20000, 30000, 40000, 50000, 60000,
                                        '', ''))
-        self.assertRaises(exceptions.PDBWarning, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PDBFile.parse(fn)
         self.assertIs(formats.PDBFile.parse(fn).atoms[0].anisou, None)
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
         # Bad residue number
         with open(fn, 'w') as f:
-            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '',
-                                     1, 1, 1, 1, 1, '', ''))
-            f.write(self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  'a', '',
-                                       10000, 20000, 30000, 40000, 50000, 60000,
-                                       '', ''))
-        self.assertRaises(exceptions.PDBWarning, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '', 1, 1, 1, 1, 1, '', ''))
+            f.write(
+                self.ANISOULINE % (
+                    1, 'CA', '', 'ALA', 'A',  'a', '', 10000, 20000, 30000, 40000, 50000, 60000, '', ''
+                )
+            )
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PDBFile.parse(fn)
         self.assertIs(formats.PDBFile.parse(fn).atoms[0].anisou, None)
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
         # Bad U11
         with open(fn, 'w') as f:
-            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '',
-                                     1, 1, 1, 1, 1, '', ''))
-            f.write(self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  1, '',
-                                       'a', 20000, 30000, 40000, 50000, 60000,
-                                       '', ''))
-        self.assertRaises(exceptions.PDBWarning, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '', 1, 1, 1, 1, 1, '', ''))
+            f.write(
+                self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  1, '', 'a', 20000, 30000, 40000, 50000, 60000, '', '')
+            )
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PDBFile.parse(fn)
         self.assertIs(formats.PDBFile.parse(fn).atoms[0].anisou, None)
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
         # Orphaned ANISOU
         with open(fn, 'w') as f:
             f.write(self.ANISOULINE % (1, 'CA', '', 'ALA', 'A',  1, '',
@@ -761,15 +784,12 @@ class TestPDBStructure(FileIOTestCase):
                                        '', ''))
         # Non-matching ANISOU
         with open(fn, 'w') as f:
-            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '',
-                                     1, 1, 1, 1, 1, '', ''))
+            f.write(self.ATOMLINE % (1, 'CA', '', 'ALA', 'A', 1, '', 1, 1, 1, 1, 1, '', ''))
             f.write(self.ANISOULINE % (1, 'CB', '', 'ALA', 'A',  1, '',
-                                       10000, 20000, 30000, 40000, 50000, 60000,
-                                       '', ''))
-        self.assertRaises(exceptions.PDBWarning, lambda: formats.PDBFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+                                       10000, 20000, 30000, 40000, 50000, 60000, '', ''))
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PDBFile.parse(fn)
         self.assertIs(formats.PDBFile.parse(fn).atoms[0].anisou, None)
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
 
     def test_pdb_write_simple(self):
         """ Test PDB file writing on a very simple input structure """
@@ -810,7 +830,7 @@ class TestPDBStructure(FileIOTestCase):
         oatom.xx, oatom.xy, oatom.xz = 2, 2, 2
         struct.add_atom(atom, 'RESIDUE', 1, 'A')
         struct.atoms[-1].other_locations['B'] = oatom
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         struct.write_pdb(fn)
         pdb = formats.PDBFile.parse(fn)
         self.assertEqual(pdb.atoms[0].name, 'CBDE')
@@ -837,12 +857,12 @@ class TestPDBStructure(FileIOTestCase):
         """ Tests that the addition of TER cards is correct in PDB writing """
         pdbfile = read_PDB(get_fn('ala_ala_ala.pdb'))
         pdbfile *= 5 # This should make us need 5 TER cards
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         pdbfile.write_pdb(fn)
         with open(fn, 'r') as f:
             self.assertEqual(sum([l.startswith('TER') for l in f]), 5)
         # Make sure TER cards *don't* get added for water
-        pdbfile = download_PDB('4lzt')
+        pdbfile = read_PDB(get_fn('4lzt.pdb'))
         pdbfile.write_pdb(fn)
         with open(fn, 'r') as f:
             for line in f:
@@ -856,6 +876,36 @@ class TestPDBStructure(FileIOTestCase):
                 self.assertFalse(line.startswith('ATOM'))
                 has_hetatms = has_hetatms or line.startswith('HETATM')
             self.assertTrue(has_hetatms)
+
+    def test_ter_copy(self):
+        """ Test that copying a Structure preserves TER card presence """
+        pdbfile = read_PDB(get_fn('ala_ala_ala.pdb')) * 5
+        fn = self.get_fn('test.pdb', written=True)
+        pdbfile.write_pdb(fn)
+        parsed = read_PDB(fn)
+        self.assertEqual(sum([r.ter for r in parsed.residues]), 5)
+        self.assertEqual(sum([r.ter for r in copy(parsed).residues]), 5)
+
+    def test_ter_not_increase_tercount(self):
+        s = """
+ATOM      1  N   CYX L   1      57.464  29.769  15.871  1.00 25.39           N
+ATOM      2  SG  CYX L   1      56.982  27.807  18.150  1.00 14.20           S
+TER       3      CYX L   1
+ATOM      4  N   CYX H   2      36.233  17.035  12.739  1.00 10.49           N
+ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
+"""
+        parm = pmd.read_PDB(StringIO(s))
+        buf = StringIO()
+        parm.write_pdb(buf)
+        buf.seek(0)
+        content = buf.read()
+        assert "TER       3      CYX L   1" in content
+
+        buf = StringIO()
+        parm.write_pdb(buf, increase_tercount=False)
+        buf.seek(0)
+        content = buf.read()
+        assert "TER       2      CYX L   1" in content
 
     def test_pdb_big_coordinates(self):
         """ Test proper PDB coordinate parsing for large coordinates """
@@ -947,6 +997,30 @@ class TestPDBStructure(FileIOTestCase):
         self.assertNotIn('WAT', resname_set)
         self.assertIn('HOH', resname_set)
 
+    def test_pdb_write_hetatoms(self):
+        """Tests HETATM/ATOM tag writing"""
+        structure = Structure()
+        a = Atom(name='CA', atomic_number=6)
+        structure.add_atom(copy(a), 'ASH', 2, 'A')
+        structure.add_atom(copy(a), 'DG', 2, 'A')
+        structure.add_atom(copy(a), 'T', 2, 'A')
+        structure.add_atom(copy(a), 'MOL', 2, 'A')
+
+        coordinates = np.zeros((len(structure.atoms), 3))
+
+        output = StringIO()
+
+        tests = [{"use_hetatoms": True, "tags": ['ATOM', 'ATOM', 'ATOM', 'HETATM']},
+                 {"use_hetatoms": False, "tags": ['ATOM', 'ATOM', 'ATOM', 'ATOM']}]
+
+        for test in tests:
+            output.seek(0)
+            structure.write_pdb(output, use_hetatoms=test["use_hetatoms"], coordinates=coordinates)
+            output.seek(0)
+
+            for tag in test["tags"]:
+                assert output.readline().startswith(tag)
+
     def test_anisou_read(self):
         """ Tests that read_PDB properly reads ANISOU records """
         pdbfile = read_PDB(self.pdb)
@@ -1008,11 +1082,17 @@ class TestPDBStructure(FileIOTestCase):
     def test_pdb_write_format(self):
         """ Test PDB atom names are properly justified per PDB standard """
         pdbfile = read_PDB(self.format_test)
-        f = get_fn('pdb_format_test.pdb', written=True)
+        f = self.get_fn('pdb_format_test.pdb', written=True)
         pdbfile.write_pdb(f, write_anisou=True)
-        self.assertTrue(diff_files(get_saved_fn('SCM_A_formatted.pdb'), f))
+        self.assertTrue(diff_files(self.get_fn('SCM_A_formatted.pdb', saved=True), f))
+
+    def test_pdb_multimodel_parsing_bug_820(self):
+        """ Test model failing in parsing due to bug #820 in GitHub """
+        # Just make sure it does not raise an exception
+        self.assertEqual(len(read_PDB(get_fn('1aaf.pdb')).atoms), 893)
 
     def test_pdb_write_symmetry_data(self):
+        """ Tests writing PDB file with symmetry data """
         def assert_remark_290(parm, remark_290_lines):
             output = StringIO()
             parm.write_pdb(output)
@@ -1032,7 +1112,7 @@ REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000
         assert_remark_290(parm, remark_290_lines)
 
         # 2idg
-        parm = pmd.download_PDB('2igd')
+        parm = read_PDB(get_fn('2igd.pdb'))
         remark_290_lines = """
 REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000
 REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000
@@ -1064,7 +1144,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         self.assertEqual(pdbfile.atoms[5161].residue.segid, 'PROA')
         self.assertEqual(pdbfile.atoms[5162].residue.segid, 'PROB')
         self.assertEqual(pdbfile.atoms[-1].residue.segid, 'CLA')
-        f = get_fn('pdb_segid_test.pdb', written=True)
+        f = self.get_fn('pdb_segid_test.pdb', written=True)
         pdbfile.write_pdb(f, charmm=True)
         pdbfile2 = read_PDB(f)
         for residue in pdbfile2.residues:
@@ -1088,11 +1168,39 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
         for res in residue.RNAResidue.all_residues:
             self.assertEqual(formats.pdb._standardize_resname(res.abbr), (res.abbr, False))
 
-    def test_deprecations(self):
-        fn = get_fn('blah', written=True)
-        parm = formats.load_file(get_fn('ash.parm7'), get_fn('ash.rst7'))
-        self.assertRaises(DeprecationWarning, lambda: write_PDB(parm, fn))
-        self.assertRaises(DeprecationWarning, lambda: write_CIF(parm, fn))
+    def test_link(self):
+        """ Tests proper handling and processing of LINK records in PDB files """
+        parm = pmd.load_file(get_fn('5qk8.pdb'))
+        # This PDB file has 47 LINK records, all have symmetry operations 1555
+        self.assertEqual(len(parm.links), 47) # 47 LINK records in this PDB file
+        # Here are the first few lines of those LINK records:
+        # LINK         O   ALA A  96                MG    MG A 301     1555   1555  2.09  
+        # LINK         OE2 GLU A 112                MG    MG A 302     1555   1555  2.06  
+        # Check these by hand
+        link1, link2 = parm.links[:2]
+        self.assertEqual(link1.atom1.name, 'O')
+        self.assertEqual(link1.atom2.name, 'MG')
+        self.assertEqual(link1.atom1.residue.name, 'ALA')
+        self.assertEqual(link1.atom1.residue.number, 96)
+        self.assertEqual(link1.atom2.residue.name, 'MG')
+        self.assertEqual(link1.atom2.residue.number, 301)
+        self.assertEqual(link1.symmetry_op1, '1555')
+        self.assertEqual(link1.symmetry_op2, '1555')
+
+        self.assertEqual(link2.atom1.name, 'OE2')
+        self.assertEqual(link2.atom2.name, 'MG')
+        self.assertEqual(link2.atom1.residue.name, 'GLU')
+        self.assertEqual(link2.atom1.residue.number, 112)
+        self.assertEqual(link2.atom2.residue.name, 'MG')
+        self.assertEqual(link2.atom2.residue.number, 302)
+        self.assertEqual(link2.symmetry_op1, '1555')
+        self.assertEqual(link2.symmetry_op2, '1555')
+
+        # Now test writing
+        written_file = self.get_fn('link.pdb', written=True)
+        parm.write_pdb(written_file, write_links=True, renumber=False)
+        parm2 = pmd.load_file(written_file)
+        self.assertEqual(len(parm2.links), 47)
 
     # Private helper test functions
     def _compareInputOutputPDBs(self, pdbfile, pdbfile2, reordered=False,
@@ -1104,7 +1212,7 @@ REMARK 290   SMTRY3   4  0.000000  0.000000 -1.000000        0.00000
                 a1idx = a1.idx
             elif altloc_option == 'occupancy':
                 a, occ = a1, a1.occupancy
-                for key, oa in iteritems(a1.other_locations):
+                for key, oa in a1.other_locations.items():
                     if oa.occupancy > occ:
                         occ = oa.occupancy
                         a = oa
@@ -1214,16 +1322,11 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.ATOMLINE = "ATOM  %5s %4s %3s %1s %4s %7s %7s %7s %5s %5s\n"
         self.ATOMLINE2 = "ATOM  %5s %4s %3s %1s %4s %7s %7s %7s %5s %5s   %s %s\n"
         self.ATOMLINE3 = "ATOM  %5s %4s %3s %4s %7s %7s %7s %5s %5s\n"
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
-        FileIOTestCase.setUp(self)
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=exceptions.PDBWarning)
-        FileIOTestCase.tearDown(self)
+        super().setUp()
 
     def test_pqr_parsing(self):
         """ Tests parsing a PQR file """
-        fn = get_fn('test.pqr', written=True)
+        fn = self.get_fn('test.pqr', written=True)
         self._check_adk_pqr(formats.PQRFile.parse(get_fn('adk_open.pqr')))
         with open(get_fn('adk_open.pqr'), 'r') as f:
             self._check_adk_pqr(formats.PQRFile.parse(f))
@@ -1247,7 +1350,7 @@ class TestParmedPQRStructure(FileIOTestCase):
 
     def test_pqr_with_cryst1(self):
         """ Tests parsing PQR files with CRYST1 record """
-        fn = get_fn('test.pqr', written=True)
+        fn = self.get_fn('test.pqr', written=True)
         with open(fn, 'w') as f:
             f.write('CRYST1   10.0   10.0   10.0   109.47  109.47   109.47\n')
             f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
@@ -1263,63 +1366,50 @@ class TestParmedPQRStructure(FileIOTestCase):
 
     def test_pqr_parsing_with_models(self):
         """ Tests parsing PQR files with multiple models """
-        fn = get_fn('test.pqr', written=True)
+        fn = self.get_fn('test.pqr', written=True)
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
         pqr = formats.PQRFile.parse(fn)
         self.assertEqual(pqr.get_coordinates().shape, (2, 1, 3))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
-        self.assertRaises(exceptions.PDBWarning, lambda:
-                formats.PQRFile.parse(fn))
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.PQRFile.parse(fn)
         pqr = formats.PQRFile.parse(fn)
         self.assertEqual(pqr.get_coordinates().shape, (2, 1, 3))
         # Check some error catching
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CB', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CB', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
             f.write('ENDMDL\n')
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
@@ -1327,44 +1417,31 @@ class TestParmedPQRStructure(FileIOTestCase):
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('MODEL   3\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
             f.write('MODEL   3\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
         with open(fn, 'w') as f:
             f.write('MODEL   1\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('MODEL   2\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000',
-                                      '  1.000', ' -0.500', ' 1.200'))
-            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100',
-                                      '  2.100', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  1.000', '  1.000', '  1.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (2, 'CB', 'ALA', 1, '  2.100', '  2.100', '  2.100', ' -0.500', ' 1.200'))
             f.write('MODEL   3\n')
-            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000',
-                                      '  2.000', ' -0.500', ' 1.200'))
+            f.write(self.ATOMLINE3 % (1, 'CA', 'ALA', 1, '  2.000', '  2.000', '  2.000', ' -0.500', ' 1.200'))
         self.assertRaises(exceptions.PDBError, lambda: formats.PQRFile.parse(fn))
 
     def _check_adk_pqr(self, pqr):
@@ -1383,7 +1460,7 @@ class TestParmedPQRStructure(FileIOTestCase):
     def test_pqr_writer(self):
         """ Tests writing a PQR file with charges and radii """
         parm = formats.load_file(get_fn('trx.prmtop'), get_fn('trx.inpcrd'))
-        fn = get_fn('test.pqr', written=True)
+        fn = self.get_fn('test.pqr', written=True)
         # Create multiple models
         coords = []
         coords.append(parm.coordinates)
@@ -1404,11 +1481,9 @@ class TestParmedPQRStructure(FileIOTestCase):
                                    parm.get_coordinates(0), atol=2e-3)
         # Pass coordinates explicitly
         formats.PQRFile.write(parm, fn, coordinates=np.vstack(coords[:2]))
-        self.assertEqual(formats.PQRFile.parse(fn).get_coordinates().shape,
-                         (2, len(parm.atoms), 3))
-        self.assertRaises(TypeError, lambda:
-                formats.PQRFile.write(parm, fn, coordinates=[1, 2, 3])
-        )
+        self.assertEqual(formats.PQRFile.parse(fn).get_coordinates().shape, (2, len(parm.atoms), 3))
+        with self.assertRaises(TypeError):
+            formats.PQRFile.write(parm, fn, coordinates=[1, 2, 3])
 
     def test_pqr_standard_resnames(self):
         """ Test standard residue name replacement in PQR writing """
@@ -1432,7 +1507,7 @@ class TestParmedPQRStructure(FileIOTestCase):
 
     def test_pqr_format_detection(self):
         """ Tests PDB file detection from contents """
-        fn = get_fn('test.pdb', written=True)
+        fn = self.get_fn('test.pdb', written=True)
         pdbtext1 = "%s%d    %9.6f %9.6f %9.6f     %10.5f\n" + self.ATOMLINE
         with open(fn, 'w') as f:
             f.write(pdbtext1 % ('ORIGX', 1, 10, 10, 10, 10, 1, 'CA', 'ALA',
@@ -1464,20 +1539,14 @@ class TestCIFStructure(FileIOTestCase):
         self.lztpdb = get_fn('4lzt.pdb')
         self.lzt = get_fn('4LZT.cif')
         self.largecif = get_fn('1ffk.cif')
-        warnings.filterwarnings('error', category=exceptions.PDBWarning)
-        FileIOTestCase.setUp(self)
-
-    def tearDown(self):
-        warnings.filterwarnings('always', category=exceptions.PDBWarning)
-        FileIOTestCase.tearDown(self)
+        super().setUp()
 
     def test_write_cif(self):
         """ Test CIF writing capabilities """
         cif = read_CIF(self.lzt)
-        written = get_fn('test.cif', written=True)
-        self.assertRaises(TypeError, lambda:
-                cif.write_cif(written, coordinates=[1, 2, 3])
-        )
+        written = self.get_fn('test.cif', written=True)
+        with self.assertRaises(TypeError):
+            cif.write_cif(written, coordinates=[1, 2, 3])
         cif.write_cif(written, renumber=False, write_anisou=True)
         cif2 = read_CIF(written)
         # cif and cif2 should have equivalent atom properties (basically,
@@ -1553,7 +1622,7 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_cif_detection(self):
         """ Tests CIF file auto-detection """
-        fn = get_fn('test.cif', written=True)
+        fn = self.get_fn('test.cif', written=True)
         with open(fn, 'w') as f:
             pass
         self.assertFalse(formats.CIFFile.id_format(fn))
@@ -1562,17 +1631,31 @@ class TestCIFStructure(FileIOTestCase):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
         self._check4lzt(read_CIF(self.lzt))
 
+    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
     def test_download(self):
         """ Test CIF downloading on 4LZT """
-        fn = get_fn('4lzt.cif', written=True)
+        fn = self.get_fn('4lzt.cif', written=True)
         self._check4lzt(download_CIF('4lzt', saveto=fn))
         self._check4lzt(read_CIF(fn))
         self.assertRaises(ValueError, lambda: download_CIF('illegal'))
         self.assertRaises(IOError, lambda: download_CIF('#@#%'))
 
+    def test_cif_symmetry(self):
+        """ Tests that symmetry is parsed from mmCIF files correctly """
+        self.assertEqual(read_CIF(get_fn('1aki.cif')).space_group, 'P 21 21 21')
+
+    def test_cif_space_group_written_from_structure(self):
+        """ Tests CIF file writing with space groups """
+        parm = pmd.load_file(get_fn('SCM_A.pdb'))
+        self.assertEqual(parm.space_group, 'P 1 21 1')
+        written = self.get_fn('test.cif', written=True)
+        parm.write_cif(written)
+        parm2 = pmd.load_file(written)
+        self.assertEqual(parm2.space_group, 'P 1 21 1')
+
     def test_cif_models(self):
         """ Test CIF parsing/writing NMR structure with 20 models (2koc) """
-        cif = download_CIF('2koc')
+        cif = read_CIF(get_fn('2koc.cif'))
         self.assertEqual(cif.get_coordinates('all').shape, (20, 451, 3))
         self.assertEqual(len(cif.atoms), 451)
         output = StringIO()
@@ -1603,7 +1686,7 @@ class TestCIFStructure(FileIOTestCase):
         # Create a composite CIF file from sample.cif and models.cif (both small
         # files). sample.cif has an extra anisotropic B-factor that is used for
         # error detection. It is the last line of the file, so discard it.
-        fn = get_fn('test.cif', written=True)
+        fn = self.get_fn('test.cif', written=True)
         with open(get_fn('sample.cif'), 'r') as sf, \
                 open(get_fn('model.cif'), 'r') as mf, open(fn, 'w') as f:
             nlines = sum(1 for line in sf)
@@ -1628,10 +1711,8 @@ class TestCIFStructure(FileIOTestCase):
 
     def test_parse_cif_element_determination(self):
         """ Test element assignment for CIF files with bad element symbols """
-        self.assertRaises(exceptions.PDBWarning, lambda:
-                formats.CIFFile.parse(get_fn('sample.cif'))
-        )
-        warnings.filterwarnings('ignore', category=exceptions.PDBWarning)
+        with self.assertWarns(exceptions.PDBWarning):
+            formats.CIFFile.parse(get_fn('sample.cif'))
         cif = formats.CIFFile.parse(get_fn('sample.cif'))
         self.assertEqual(cif[0].atomic_number, 30) # element XX, atom name ZN
         self.assertEqual(cif[1].atomic_number, 6)  # element XX, atom name CA
@@ -1679,9 +1760,8 @@ class TestCIFStructure(FileIOTestCase):
         self.assertEqual(pdb.atoms[0].xy, 3)
         self.assertEqual(pdb.atoms[0].xz, 3)
         # Bad input
-        self.assertRaises(ValueError, lambda:
-                struct.write_cif(get_fn('test.cif', written=True), altlocs='bad')
-        )
+        with self.assertRaises(ValueError):
+            struct.write_cif(self.get_fn('test.cif', written=True), altlocs='bad')
 
     def _check4lzt(self, cif):
         pdb = read_PDB(self.lztpdb)
@@ -1880,14 +1960,14 @@ class TestMol2File(FileIOTestCase):
         Tests writing mol2 file of multi residues from ResidueTemplateContainer
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
-        formats.Mol2File.write(mol2, get_fn('test_multi.mol2', written=True))
-        fn = get_fn('test_multi_sep.mol2', written=True)
+        formats.Mol2File.write(mol2, self.get_fn('test_multi.mol2', written=True))
+        fn = self.get_fn('test_multi_sep.mol2', written=True)
         formats.Mol2File.write(mol2, fn, split=True)
-        fnsq = get_fn('test_multi_sep_squashed.mol2', written=True)
+        fnsq = self.get_fn('test_multi_sep_squashed.mol2', written=True)
         formats.Mol2File.write(mol2, fnsq, split=True, compress_whitespace=True)
-        self.assertTrue(diff_files(get_saved_fn('test_multi.mol2'),
-                                   get_fn('test_multi.mol2', written=True)))
-        self.assertTrue(diff_files(get_saved_fn('test_multi_sep.mol2'), fn))
+        self.assertTrue(diff_files(self.get_fn('test_multi.mol2', saved=True),
+                                   self.get_fn('test_multi.mol2', written=True)))
+        self.assertTrue(diff_files(self.get_fn('test_multi_sep.mol2', saved=True), fn))
         # Make sure the squashed lines all fall below 80 characters
         with open(fnsq) as f, open(fn) as f2:
             for line1, line2 in zip(f, f2):
@@ -1924,12 +2004,12 @@ class TestMol2File(FileIOTestCase):
     def test_mol2_multi_write_from_structure(self):
         """ Tests writing mol2 file of multi residues from Structure """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('test_multistruct.mol2', written=True),
-                                   get_saved_fn('test_multistruct.mol2')))
-        fn = get_fn('test_splitmultistruct.mol2', written=True)
+        formats.Mol2File.write(mol2, self.get_fn('test_multistruct.mol2', written=True))
+        self.assertTrue(diff_files(self.get_fn('test_multistruct.mol2', written=True),
+                                   self.get_fn('test_multistruct.mol2', saved=True)))
+        fn = self.get_fn('test_splitmultistruct.mol2', written=True)
         formats.Mol2File.write(mol2, fn, split=True)
-        self.assertTrue(diff_files(fn, get_saved_fn('test_splitmultistruct.mol2')))
+        self.assertTrue(diff_files(fn, self.get_fn('test_splitmultistruct.mol2', saved=True)))
         # Make residue names unrecognizable as amino or nucleic acids
         for i, res in enumerate(mol2.residues):
             res.name = '%03d' % i
@@ -1952,47 +2032,43 @@ class TestMol2File(FileIOTestCase):
         Tests writing mol3 file of multi residues from ResidueTemplateContainer
         """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'))
-        formats.Mol2File.write(mol2, get_fn('test_multi.mol3', written=True),
-                               mol3=True)
-        self.assertTrue(diff_files(get_fn('test_multi.mol3', written=True),
-                                   get_saved_fn('test_multi.mol3')))
+        formats.Mol2File.write(mol2, self.get_fn('test_multi.mol3', written=True), mol3=True)
+        self.assertTrue(diff_files(self.get_fn('test_multi.mol3', written=True),
+                                   self.get_fn('test_multi.mol3', saved=True)))
 
     def test_mol3_multi_write_from_structure(self):
         """ Tests writing mol3 file of multi residues from Structure """
         mol2 = formats.Mol2File.parse(get_fn('test_multi.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('test_multistruct.mol3', written=True),
-                               mol3=True)
-        self.assertTrue(diff_files(get_fn('test_multistruct.mol3', written=True),
-                                   get_saved_fn('test_multistruct.mol3')))
+        formats.Mol2File.write(mol2, self.get_fn('test_multistruct.mol3', written=True), mol3=True)
+        self.assertTrue(diff_files(self.get_fn('test_multistruct.mol3', written=True),
+                                   self.get_fn('test_multistruct.mol3', saved=True)))
 
     def test_mol2_single_write(self):
         """ Tests writing mol2 file of single ResidueTemplate """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
-        formats.Mol2File.write(mol2, get_fn('tripos9.mol2', written=True))
-        self.assertTrue(diff_files(get_fn('tripos9.mol2', written=True),
-                                   get_saved_fn('tripos9.mol2')))
+        formats.Mol2File.write(mol2, self.get_fn('tripos9.mol2', written=True))
+        self.assertTrue(diff_files(self.get_fn('tripos9.mol2', written=True),
+                                   self.get_fn('tripos9.mol2', saved=True)))
 
     def test_mol2_single_write_struct(self):
         """ Tests writing mol2 file of single-residue Structure """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
         self.assertIs(mol2.box, None)
-        fn = get_fn('tripos9struct.mol2', written=True)
+        fn = self.get_fn('tripos9struct.mol2', written=True)
         formats.Mol2File.write(mol2, fn)
-        self.assertTrue(diff_files(fn, get_saved_fn('tripos9struct.mol2')))
+        self.assertTrue(diff_files(fn, self.get_fn('tripos9struct.mol2', saved=True)))
         self.assertIs(formats.Mol2File.parse(fn, structure=True).box, None)
         # Now add a box
         mol2.box = [10, 10, 10, 90, 90, 90]
         formats.Mol2File.write(mol2, fn)
-        np.testing.assert_equal(formats.Mol2File.parse(fn, structure=True).box,
-                                [10, 10, 10, 90, 90, 90])
+        np.testing.assert_equal(formats.Mol2File.parse(fn, structure=True).box, [10, 10, 10, 90, 90, 90])
 
     def test_mol3_single_write(self):
         """ Tests writing mol3 file of single ResidueTemplate """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'))
-        formats.Mol2File.write(mol2, get_fn('tripos9.mol3', written=True),
-                               mol3=True)
-        self.assertTrue(diff_files(get_fn('tripos9.mol3', written=True),
-                                   get_saved_fn('tripos9.mol3')))
+        formats.Mol2File.write(mol2, self.get_fn('tripos9.mol3', written=True), mol3=True)
+        self.assertTrue(diff_files(self.get_fn('tripos9.mol3', written=True),
+                                   self.get_fn('tripos9.mol3', saved=True)))
         # Now make sure it can write a ResidueTemplate with a connection
         mol2.connections.append(mol2.atoms[2])
         fobj = StringIO()
@@ -2005,10 +2081,9 @@ class TestMol2File(FileIOTestCase):
     def test_mol3_single_write_struct(self):
         """ Tests writing mol3 file of single-residue Structure """
         mol2 = formats.Mol2File.parse(get_fn('tripos9.mol2'), structure=True)
-        formats.Mol2File.write(mol2, get_fn('tripos9struct.mol3', written=True),
-                               mol3=True)
-        self.assertTrue(diff_files(get_fn('tripos9struct.mol3', written=True),
-                                   get_saved_fn('tripos9struct.mol3')))
+        formats.Mol2File.write(mol2, self.get_fn('tripos9struct.mol3', written=True), mol3=True)
+        self.assertTrue(diff_files(self.get_fn('tripos9struct.mol3', written=True),
+                                   self.get_fn('tripos9struct.mol3', written=True)))
 
     def test_mol2_atomic_number_assignment(self):
         """ Tests assignment of atomic numbers for mol2 files """
@@ -2019,7 +2094,7 @@ class TestMol2File(FileIOTestCase):
             self.assertEqual(a1.atomic_number, a2.atomic_number)
         # Now check that element assignment from GRO files (which has good
         # element assignment routines) matches what the mol2 does
-        fn = get_fn('test.gro', written=True)
+        fn = self.get_fn('test.gro', written=True)
         mol2.save(fn, overwrite=True)
         for a1, a2 in zip(formats.load_file(fn).atoms, mol2.atoms):
             self.assertEqual(a1.atomic_number, a2.atomic_number)
@@ -2045,7 +2120,7 @@ class TestMol2File(FileIOTestCase):
     def test_mol2_bond_order(self):
         """ Tests that mol2 file parsing remembers bond order/type """
         mol2 = formats.Mol2File.parse(get_fn('multimol.mol2'))[0]
-        fn = get_fn('test.mol2', written=True)
+        fn = self.get_fn('test.mol2', written=True)
         mol2.save(fn)
         with open(fn, 'r') as f:
             for line in f:
@@ -2068,7 +2143,7 @@ class TestMol2File(FileIOTestCase):
         """ Tests writing mol3 file w/ disulfide (for RESIDUECONNECT) """
         top = formats.load_file(get_fn('1aki.ff99sbildn.top'))['!:SOL']
         top.coordinates = formats.load_file(get_fn('1aki.ff99sbildn.gro')).coordinates
-        fn = get_fn('hewl.mol3', written=True)
+        fn = self.get_fn('hewl.mol3', written=True)
         formats.Mol2File.write(top, fn, mol3=True)
         with open(fn, 'r') as f:
             for line in f:
@@ -2083,8 +2158,7 @@ class TestRegistry(FileIOTestCase):
     def test_file_format_type(self):
         """ Tests the FileFormatType metaclass """
         def create_metaclass():
-            @add_metaclass(formats.registry.FileFormatType)
-            class PDBFile(object):
+            class PDBFile(metaclass=formats.registry.FileFormatType):
                 def id_format(fname):
                     return False
                 def parse(fname):
@@ -2095,7 +2169,7 @@ class TestRegistry(FileIOTestCase):
 
     def test_load_file_errors(self):
         """ Test error handling in load_file """
-        fn = get_fn('test.file', written=True)
+        fn = self.get_fn('test.file', written=True)
         with open(fn, 'w') as f:
             pass
         os.chmod(fn, int('311', 8))
@@ -2112,7 +2186,7 @@ class TestFileDownloader(unittest.TestCase):
         self.assertTrue(amber.AmberOFFLibrary.id_format(self.url + 'amino12.lib'))
         off = amber.AmberOFFLibrary.parse(self.url + 'amino12.lib')
         self.assertIsInstance(off, dict)
-        for key, item in iteritems(off):
+        for key, item in off.items():
             self.assertIsInstance(item, ResidueTemplate)
 
     def test_download_amber_prmtop(self):

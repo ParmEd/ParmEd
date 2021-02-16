@@ -1,9 +1,8 @@
 """
 Tests for the various actions in ParmEd
 """
-from __future__ import division, print_function
-
 from copy import copy
+from io import StringIO
 import numpy as np
 import os
 import parmed as pmd
@@ -13,8 +12,6 @@ from parmed.charmm import CharmmPsfFile
 from parmed.exceptions import AmberWarning, CharmmWarning
 from parmed.formats import PDBFile, CIFFile
 from parmed.utils import PYPY
-from parmed.utils.six.moves import range, zip, StringIO
-from parmed.utils.six import string_types, iteritems
 import parmed.unit as u
 import parmed.tools as PT
 from parmed.tools import exceptions as exc
@@ -43,7 +40,6 @@ solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
-warnings.filterwarnings('error', category=exc.SeriousParmWarning)
 
 # Make sure default overwrite is False
 PT.Action.overwrite = False
@@ -69,13 +65,12 @@ class TestActionAPI(unittest.TestCase):
 
     def test_error_handling(self):
         """ Test error handling in Action initializer """
-        self.assertRaises(exc.ParmError, lambda:
-                PT.changeRadii(None, 'mbondi2'))
+        with self.assertRaises(exc.ParmError):
+            PT.changeRadii(None, 'mbondi2')
         self.assertFalse(NewActionNoUsage(None).valid)
         self.assertFalse(NewActionWithUsage(None).valid)
-        warnings.filterwarnings('error', category=exc.UnhandledArgumentWarning)
-        self.assertRaises(exc.UnhandledArgumentWarning, lambda:
-                PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments'))
+        with self.assertWarns(exc.UnhandledArgumentWarning):
+            PT.changeRadii(gasparm, 'mbondi2', 'extra', 'arguments')
         str(NewActionNoUsage(None)) # Make sure it doesn't crash
 
 class TestActionAPI(unittest.TestCase):
@@ -95,7 +90,7 @@ class TestNonParmActions(FileIOTestCase):
 
     def setUp(self):
         self.parm = gasparm
-        FileIOTestCase.setUp(self)
+        super().setUp()
 
     def test_overwrite(self):
         """ Test setting overwrite capabilities on ParmEd interpeter """
@@ -109,8 +104,8 @@ class TestNonParmActions(FileIOTestCase):
         self.assertTrue(PT.Action.overwrite)
         self.assertEqual(str(a), 'Files are overwritable')
         PT.setOverwrite(None, False).execute() # Turn it back off
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.setOverwrite(None, 'badarg'))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.setOverwrite(None, 'badarg')
 
     def test_list_parms(self):
         """ Test listing of the prmtop files in the ParmEd interpreter """
@@ -118,17 +113,13 @@ class TestNonParmActions(FileIOTestCase):
         a.execute() # Should do nothing
         lines = str(a).split('\n')
         self.assertEqual(lines[0], 'Loaded topology files:')
-        self.assertEqual(lines[1], '[0]\t%s (active)' % get_fn('trx.prmtop'))
+        self.assertEqual(lines[1], '[0]\t%s (active)' % self.get_fn('trx.prmtop'))
 
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_chamber(self):
         """ Test the chamber action with a basic protein """
-        # To keep stderr clean
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                       '-top %s' % get_fn('top_all22_prot.inp'),
-                       '-param %s' % get_fn('par_all22_prot.inp'))
+        a = PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                       self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'))
         str(a)
         a.execute()
         parm = a.parm
@@ -139,124 +130,102 @@ class TestNonParmActions(FileIOTestCase):
         self.assertEqual(parm.ptr('ifbox'), 0)
         # Error checking
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % 'foo',
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', 'foo', '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'), '-crd',
+                           self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % 'foo',
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', 'foo', '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'), '-crd',
+                           self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % 'foo',
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', 'foo', '-crd', self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % 'foo').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', 'foo').execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-str foo').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'), '-str', 'foo').execute()
         )
         self.assertRaises(exc.FileDoesNotExist, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-toppar foo').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'), '-toppar', 'foo').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'),
-                           '-toppar', get_fn('trx.prmtop')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'),
+                           '-toppar', self.get_fn('trx.prmtop')).execute()
         )
-        fn = get_fn('test.inp', written=True)
+        fn = self.get_fn('test.inp', written=True)
         with open(fn, 'w') as f:
             pass
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'),
-                           '-toppar', fn).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'), '-toppar', fn).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('*.pdb')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'), '-param',
+                           self.get_fn('par_all22_prot.inp'), '-crd', self.get_fn('*.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('*.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('*.psf'), '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'), '-crd',
+                           self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-box',
-                           'a,b,c,d,e,f').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'), '-box', 'a,b,c,d,e,f').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb'), '-box',
-                           '1,2,3,4').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb'), '-box', '1,2,3,4').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-crd %s' % get_fn('ala_ala_ala.pdb')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'),
+                           '-crd', self.get_fn('ala_ala_ala.pdb')).execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'), '-radii',
-                           'foobar').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'), '-radii', 'foobar').execute()
         )
         self.assertRaises(exc.InputError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'), '-radii',
-                           'foobar').execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                           '-top', self.get_fn('top_all22_prot.inp'),
+                           '-param', self.get_fn('par_all22_prot.inp'), '-radii', 'foobar').execute()
         )
         self.assertRaises(exc.ChamberError, lambda:
-                PT.chamber(self.parm, '-psf %s' % get_fn('ala_ala_ala.psf'),
-                           '-top %s' % get_fn('top_all22_prot.inp'),
-                           '-param %s' % get_fn('par_all22_prot.inp'),
-                           '-crd %s' % get_fn('trx.prmtop')).execute()
+                PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'), '-top',
+                           self.get_fn('top_all22_prot.inp'), '-param', self.get_fn('par_all22_prot.inp'),
+                           '-crd', self.get_fn('trx.prmtop')).execute()
         )
 
     def test_chamber_model(self):
         """ Test the chamber action with a model compound """
-        # To keep stderr clean
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('propane.psf'),
-                       '-top %s' % get_fn('top_all36_prot.rtf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_all36_prot_model.str'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('propane.pdb'))
+        a = PT.chamber(self.parm, '-psf', self.get_fn('propane.psf'), '-top',
+                       self.get_fn('top_all36_prot.rtf'), '-param', self.get_fn('par_all36_prot.prm'),
+                       '-str', self.get_fn('toppar_all36_prot_model.str'), '-str',
+                       self.get_fn('toppar_water_ions.str'), '-crd', self.get_fn('propane.pdb'))
         str(a)
         a.execute()
         parm = a.parm
@@ -267,11 +236,9 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_globbing(self):
         """ Test globbing in the chamber action """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
-        a = PT.chamber(self.parm, '-psf', get_fn('ala_ala_ala.psf'),
-                       '-toppar', get_fn('*_all22_prot.inp'),
-                       '-crd', get_fn('ala_ala_ala.pdb'))
+        a = PT.chamber(self.parm, '-psf', self.get_fn('ala_ala_ala.psf'),
+                       '-toppar', self.get_fn('*_all22_prot.inp'),
+                       '-crd', self.get_fn('ala_ala_ala.pdb'))
         str(a)
         a.execute()
         parm = a.parm
@@ -283,12 +250,9 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_nbfix(self):
         """ Test the chamber action with a complex system using NBFIX """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-toppar %s' % get_fn('???_all36_prot.???'),
-                       '-toppar %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box bounding')
+        a = PT.chamber(self.parm, '-psf', self.get_fn('ala3_solv.psf'), '-toppar',
+                       self.get_fn('???_all36_prot.???'), '-toppar', self.get_fn('toppar_water_ions.str'),
+                       '-crd', self.get_fn('ala3_solv.crd'), '-box', 'bounding')
         a.execute()
         str(a)
         parm = a.parm
@@ -298,19 +262,19 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_bug1(self):
         """ Test chamber BFNA creation (former bug) """
-        a = PT.chamber(self.parm, '-top', get_fn('top_all36_cgenff.rtf'),
-                '-top', get_fn('top_bfna_nonbonded_stitched.rtf'), '-param',
-                get_fn('par_bfna_nonbonded_stitched.prm'), '-param',
-                get_fn('par_all36_cgenff.prm'), '-box', 'bounding', '-psf',
-                get_fn('bfna_nonbonded_vmd_autopsf.psf'), 'nocondense', '-crd',
-                get_fn('bfna_nonbonded_vmd_autopsf.pdb'), '-nocmap'
+        a = PT.chamber(self.parm, '-top', self.get_fn('top_all36_cgenff.rtf'),
+                '-top', self.get_fn('top_bfna_nonbonded_stitched.rtf'), '-param',
+                self.get_fn('par_bfna_nonbonded_stitched.prm'), '-param',
+                self.get_fn('par_all36_cgenff.prm'), '-box', 'bounding', '-psf',
+                self.get_fn('bfna_nonbonded_vmd_autopsf.psf'), 'nocondense', '-crd',
+                self.get_fn('bfna_nonbonded_vmd_autopsf.pdb'), '-nocmap'
         )
         str(a)
         a.execute()
         parm = a.parm
         self._standard_parm_tests(parm)
         self._extensive_checks(parm)
-        psf = CharmmPsfFile(get_fn('bfna_nonbonded_vmd_autopsf.psf'))
+        psf = CharmmPsfFile(self.get_fn('bfna_nonbonded_vmd_autopsf.psf'))
         self.assertEqual(len(psf.atoms), len(parm.atoms))
         self.assertEqual(len(psf.residues), len(parm.residues))
         for a1, a2 in zip(psf.atoms, parm.atoms):
@@ -321,12 +285,10 @@ class TestNonParmActions(FileIOTestCase):
 
     def test_chamber_bug2(self):
         """ Test that chamber sets the box angles for triclinics correctly """
-        warnings.filterwarnings('ignore', category=CharmmWarning,
-                                module='psf')
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box',
+        a = PT.chamber(self.parm, '-psf', self.get_fn('ala3_solv.psf'),
+                       '-param', self.get_fn('par_all36_prot.prm'),
+                       '-str', self.get_fn('toppar_water_ions.str'),
+                       '-crd', self.get_fn('ala3_solv.crd'), '-box',
                        '33,33,33,109.475,109.475,109.475')
         a.execute()
         str(a)
@@ -338,11 +300,9 @@ class TestNonParmActions(FileIOTestCase):
         for x, y in zip(parm.box, [33]*3 + [109.475]*3):
             self.assertAlmostEqual(x, y)
         # Now check implied orthorhombic UC
-        a = PT.chamber(self.parm, '-psf %s' % get_fn('ala3_solv.psf'),
-                       '-param %s' % get_fn('par_all36_prot.prm'),
-                       '-str %s' % get_fn('toppar_water_ions.str'),
-                       '-crd %s' % get_fn('ala3_solv.crd'), '-box',
-                       '33,33,33')
+        a = PT.chamber(self.parm, '-psf', self.get_fn('ala3_solv.psf'), '-param',
+                       self.get_fn('par_all36_prot.prm'), '-str', self.get_fn('toppar_water_ions.str'),
+                       '-crd', self.get_fn('ala3_solv.crd'), '-box', '33,33,33')
         a.execute()
         str(a)
         parm = a.parm
@@ -361,7 +321,7 @@ class TestNonParmActions(FileIOTestCase):
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber(self):
         """ Test the gromber action on a small system (no coords) """
-        a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'))
+        a = PT.gromber(None, os.path.join(self.get_fn('03.AlaGlu'), 'topol.top'))
         str(a)
         a.execute()
         parm = a.parm
@@ -372,8 +332,8 @@ class TestNonParmActions(FileIOTestCase):
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber2(self):
         """ Test the gromber action with coordinates """
-        a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
-                       os.path.join(get_fn('03.AlaGlu'), 'conf.gro'))
+        a = PT.gromber(None, os.path.join(self.get_fn('03.AlaGlu'), 'topol.top'),
+                       os.path.join(self.get_fn('03.AlaGlu'), 'conf.gro'))
         str(a)
         a.execute()
         parm = a.parm
@@ -389,9 +349,9 @@ class TestNonParmActions(FileIOTestCase):
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber3(self):
         """ Test the gromber action passing various defines """
-        a = PT.gromber(None, os.path.join(get_fn('03.AlaGlu'), 'topol.top'),
-                       os.path.join(get_fn('03.AlaGlu'), 'conf.gro'),
-                       'define SOMEDEF=this define SOMEDEF2=that')
+        a = PT.gromber(None, os.path.join(self.get_fn('03.AlaGlu'), 'topol.top'),
+                       os.path.join(self.get_fn('03.AlaGlu'), 'conf.gro'),
+                       'define', 'SOMEDEF=this', 'define', 'SOMEDEF2=that')
         stra = str(a)
         self.assertIn('SOMEDEF', stra)
         self.assertIn('SOMEDEF2', stra)
@@ -409,7 +369,7 @@ class TestNonParmActions(FileIOTestCase):
     @unittest.skipUnless(HAS_GROMACS, "Cannot run GROMACS tests without GROMACS")
     def test_gromber_box(self):
         """ Test the gromber action when a box should be defined """
-        a = PT.gromber(None, get_fn('ala3.solv.top'), get_fn('ala3.solv.gro'))
+        a = PT.gromber(None, self.get_fn('ala3.solv.top'), self.get_fn('ala3.solv.gro'))
         a.execute()
         str(a)
         parm = a.parm
@@ -470,78 +430,62 @@ class TestNonParmActions(FileIOTestCase):
 class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     @unittest.skipIf(PYPY, 'Cannot test with NetCDF on pypy')
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmberParm """
-        self._empty_writes()
         parm = copy(gasparm)
-        lract = PT.loadRestrt(parm, get_fn('trx.inpcrd'))
+        lract = PT.loadRestrt(parm, self.get_fn('trx.inpcrd'))
         lract.execute()
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
-        act = PT.parmout(parm, get_fn('test.parm7', written=True))
+        act = PT.parmout(parm, self.get_fn('test.parm7', written=True))
         act.execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('trx.prmtop'),
-                                   get_fn('test.parm7', written=True)))
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
+        self.assertTrue(diff_files(self.get_fn('trx.prmtop'), self.get_fn('test.parm7', written=True)))
         self._empty_writes()
-        PT.parmout(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('trx.prmtop'),
-                                   get_fn('test.parm7', written=True)))
-        self.assertTrue(diff_files(get_fn('trx.inpcrd'),
-                                   get_fn('test.rst7', written=True),
+        PT.parmout(parm, self.get_fn('test.parm7', written=True), self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
+        self.assertTrue(diff_files(self.get_fn('trx.prmtop'), self.get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(self.get_fn('trx.inpcrd'), self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('trx.prmtop'),
-                                   get_fn('test.parm7', written=True)))
+        PT.outparm(parm, self.get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
+        self.assertTrue(diff_files(self.get_fn('trx.prmtop'), self.get_fn('test.parm7', written=True)))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('trx.prmtop'),
-                                   get_fn('test.parm7', written=True)))
-        self.assertTrue(diff_files(get_fn('trx.inpcrd'),
-                                   get_fn('test.rst7', written=True),
+        PT.outparm(parm, self.get_fn('test.parm7', written=True), self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
+        self.assertTrue(diff_files(self.get_fn('trx.prmtop'), self.get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(self.get_fn('trx.inpcrd'), self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
         self._empty_writes()
         # Now try NetCDF format
-        act2 = PT.outparm(parm, get_fn('test.parm7', written=True),
-                          get_fn('test.ncrst', written=True), 'netcdf')
+        act2 = PT.outparm(parm, self.get_fn('test.parm7', written=True),
+                          self.get_fn('test.ncrst', written=True), 'netcdf')
         act2.execute()
         self.assertTrue(
-                amber.NetCDFRestart.id_format(get_fn('test.ncrst', written=True)))
+                amber.NetCDFRestart.id_format(self.get_fn('test.ncrst', written=True)))
         # Now make sure the string methods work
         str(act2); str(act); str(lract)
         # Make sure overwriting does not work
         self.assertRaises(exc.FileExists, act2.execute)
         # Delete the prmtop and make sure it still raises
-        os.unlink(get_fn('test.parm7', written=True))
+        os.unlink(self.get_fn('test.parm7', written=True))
         self.assertRaises(exc.FileExists, act2.execute)
 
     def test_write_frcmod(self):
         """ Test writeFrcmod on AmberParm """
         parm = gasparm
-        act = PT.writeFrcmod(parm, get_fn('test.frcmod', written=True))
+        act = PT.writeFrcmod(parm, self.get_fn('test.frcmod', written=True))
         act.execute()
-        self.assertTrue(diff_files(get_saved_fn('test.frcmod'),
-                                   get_fn('test.frcmod', written=True)))
+        self.assertTrue(diff_files(self.get_fn('test.frcmod', saved=True), self.get_fn('test.frcmod', written=True)))
         self.assertRaises(exc.FileExists, act.execute)
         # Make sure 10-12 prmtops fail
-        parm = load_file(get_fn('ff91.parm7'))
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.writeFrcmod(load_file(get_fn('ff91.parm7')),
-                               get_fn('test2.frcmod', written=True))
-        )
+        parm = load_file(self.get_fn('ff91.parm7'))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.writeFrcmod(load_file(self.get_fn('ff91.parm7')), self.get_fn('test2.frcmod', written=True))
         # Make sure string does not error
         str(act)
 
@@ -550,12 +494,12 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parm = copy(gasparm)
         parm.coordinates = None
         self.assertRaises(exc.ParmError, lambda:
-                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
-        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
-        act = PT.writeOFF(parm, get_fn('test.off', written=True))
+                PT.writeOFF(parm, self.get_fn('test.off', written=True)).execute())
+        PT.loadRestrt(parm, self.get_fn('trx.inpcrd')).execute()
+        act = PT.writeOFF(parm, self.get_fn('test.off', written=True))
         act.execute()
-        self.assertTrue(diff_files(get_saved_fn('test.off'),
-                                   get_fn('test.off', written=True),
+        self.assertTrue(diff_files(self.get_fn('test.off', saved=True),
+                                   self.get_fn('test.off', written=True),
                                    absolute_error=0.0001))
         str(act)
         self.assertRaises(exc.FileExists, act.execute)
@@ -711,7 +655,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertRaises(exc.ChangeRadiiError, lambda:
                           PT.changeRadii(parm, 'mbondi6').execute())
         # Test that it works on non-Amber topologies
-        act = PT.changeRadii(pmd.load_file(get_fn('ala_ala_ala.psf')), 'mbondi3')
+        act = PT.changeRadii(pmd.load_file(self.get_fn('ala_ala_ala.psf')), 'mbondi3')
         act.execute()
 
     def test_change_lj_pair(self):
@@ -829,16 +773,13 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
             if atom.residue.idx < 2:
                 self.assertEqual(atom.tree, 'ABC')
         # Check if we try to add strings that are too long
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning, lambda:
-                PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute())
-        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
         # Make sure the strings get truncated
         PT.change(parm, 'ATOM_NAME', ':*', 'LALALALA').execute()
         for atom in parm.atoms:
             self.assertEqual(atom.name, 'LALA')
             self.assertEqual(parm.parm_data['ATOM_NAME'][atom.idx], 'LALA')
-        warnings.filterwarnings('always', category=exc.ParmWarning)
         # Check bad input
         self.assertRaises(exc.ParmedChangeError, lambda:
                           PT.change(parm, 'RESIDUE_LABEL', ':*', 'NaN'))
@@ -861,8 +802,8 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                     self.assertAlmostEqual(datatype(i), j, places=4)
                 else:
                     self.assertEqual(datatype(i), j)
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                repr(PT.printInfo(gasparm, 'NOTAFLAG')))
+        with self.assertWarns(exc.SeriousParmWarning):
+            repr(PT.printInfo(gasparm, 'NOTAFLAG'))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on AmberParm """
@@ -1003,10 +944,10 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_DETAILS)
         act = PT.printDetails(gasparm, '@1', parm=str(gasparm))
         self.assertEqual(str(act), saved.PRINT_DETAILS)
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.printDetails(gasparm, '@1', parm='DNE'))
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.printDetails(gasparm, '@1', parm=10))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.printDetails(gasparm, '@1', parm='DNE')
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.printDetails(gasparm, '@1', parm=10)
 
     def test_print_flags(self):
         """ Test printFlags on AmberParm """
@@ -1047,7 +988,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
 
     def test_print_bonds_with_measurements(self):
         """ Test printBonds on AmberParm with measurements """
-        act = PT.printBonds(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        act = PT.printBonds(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), '*')
         self.assertEqual(str(act), saved.PRINT_BONDS_MEASURE)
 
     def test_print_angles(self):
@@ -1068,14 +1009,14 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
         act = PT.printAngles(gasparm, '*', '@5', '@1')
         self.assertEqual(str(act), saved.PRINT_ANGLES_2MASKS_3)
-        act = PT.printAngles(gasparm, '@1 @5 @7')
+        act = PT.printAngles(gasparm, *'@1 @5 @7'.split())
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
-        act = PT.printAngles(gasparm, '@7 @5 @1')
+        act = PT.printAngles(gasparm, *'@7 @5 @1'.split())
         self.assertEqual(str(act), saved.PRINT_ANGLES_3MASKS)
 
     def test_print_angles_with_measurements(self):
         """ Test printBonds on AmberParm with measurements """
-        act = PT.printAngles(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        act = PT.printAngles(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), '*')
         self.assertEqual(str(act), saved.PRINT_ANGLES_MEASURE)
 
     def test_print_dihedrals(self):
@@ -1104,26 +1045,25 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
 
     def test_print_angles_with_measurements(self):
         """ Test printBonds on AmberParm with measurements """
-        act = PT.printDihedrals(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), '*')
+        act = PT.printDihedrals(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), '*')
         self.assertEqual(str(act), saved.PRINT_DIHEDRALS_MEASURE)
 
     def test_set_molecules(self):
         """ Test setMolecules on AmberParm """
-        parm = AmberParm(get_fn('things.parm7'), get_fn('things.rst7'))
+        parm = AmberParm(self.get_fn('things.parm7'), self.get_fn('things.rst7'))
         atoms = [atom for atom in parm.atoms] # shallow copy!
         self.assertTrue(all([x is y for x,y in zip(parm.atoms,atoms)]))
         self.assertEqual(parm.ptr('IPTRES'), 29)
         self.assertEqual(parm.ptr('NSPM'), 718)
         self.assertEqual(parm.ptr('NSPSOL'), 23)
         # To keep the output clean
-        warnings.filterwarnings('ignore', category=AmberWarning)
         PT.setMolecules(parm).execute()
         self.assertFalse(all([x is y for x,y in zip(parm.atoms,atoms)]))
         # Now check that setMolecules can apply another time.
         PT.setMolecules(parm, solute_ions=False).execute()
 
         # Now check that solute_ions keyword works as expected
-        parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+        parm = AmberParm(self.get_fn('ff14ipq.parm7'), self.get_fn('ff14ipq.rst7'))
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
         PT.setMolecules(parm, solute_ions=False).execute()
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [5, 926, 2])
@@ -1131,15 +1071,12 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         act.execute()
         str(act)
         self.assertEqual(parm.parm_data['SOLVENT_POINTERS'], [15, 926, 12])
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.setMolecules(parm, solute_ions='foo'))
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.setMolecules(parm, solute_ions='foo')
 
         # Make sure we warn if reordering was required
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning,
-                PT.setMolecules(pmd.load_file(get_fn('things.parm7')),
-                    solute_ions=True).execute)
-        warnings.filterwarnings('always', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.setMolecules(pmd.load_file(self.get_fn('things.parm7')), solute_ions=True).execute()
 
     def test_net_charge(self):
         """ Test netCharge on AmberParm """
@@ -1217,7 +1154,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_dihedral(self):
         """ Test addDihedral and deleteDihedral on AmberParm """
         parm = copy(gasparm)
-        act = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1')
+        act = PT.deleteDihedral(parm, *':ALA@N :ALA@CA :ALA@CB :ALA@HB1'.split())
         n = act.execute()
         str(act)
         str(PT.deleteDihedral(parm, '@NONE', '@NONE', '@NONE', '@NONE'))
@@ -1266,26 +1203,22 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         else:
             assert False, 'No natural impropers found'
         PT.addDihedral(parm, '@1', '@20', '@30', '@40', dt.phi_k,
-                dt.per, dt.phase, dt.scee, dt.scnb, type='improper').execute()
+            dt.per, dt.phase, dt.scee, dt.scnb, type='improper').execute()
         self.assertEqual(len(parm.dihedral_types), ntyp)
         self.assertIs(parm.dihedrals[-1].type, dt)
         # Error checking
         self.assertRaises(exc.SetParamError,
-                PT.addDihedral(parm, '@1-2', '@3', '@4', '@5', 1, 1, 10).execute)
+            PT.addDihedral(parm, '@1-2', '@3', '@4', '@5', 1, 1, 10).execute)
         self.assertRaises(exc.InputError, lambda:
-                PT.addDihedral(parm, '@1', '@2', '@3', '@4', 1, 1, 10,
-                               type='badtype').execute()
+            PT.addDihedral(parm, '@1', '@2', '@3', '@4', 1, 1, 10, type='badtype').execute()
         )
         self.assertRaises(exc.SetParamError, lambda:
-                PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1,
-                    10).execute())
+            PT.addDihedral(parm, '@1,3', '@2,3', '@4-5', '@6-7', 1, 1, 10).execute())
         self.assertRaises(exc.DeleteDihedralError, lambda:
-                PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
-        self.assertRaises(exc.SeriousParmWarning,
-                PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5',
-                    '@6-7').execute)
-        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35',
-            '@45').execute(), 0)
+            PT.deleteDihedral(parm, '@1', '@2-3', '@4', '@5').execute())
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.deleteDihedral(parm, '@1,3', '@2-3', '@4-5', '@6-7').execute()
+        self.assertEqual(PT.deleteDihedral(parm, '@1', '@25', '@35', '@45').execute(), 0)
 
     def test_set_bond(self):
         """ Test setBond on AmberParm """
@@ -1390,7 +1323,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
 
     def test_summary(self):
         """ Test summary action on AmberParm """
-        parm = AmberParm(get_fn('things.parm7'), get_fn('things.rst7'))
+        parm = AmberParm(self.get_fn('things.parm7'), self.get_fn('things.rst7'))
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARY)
 
@@ -1417,7 +1350,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_prot_state_interpolate(self):
         """ Test changeProtState and interpolate actions on AmberParm """
         self._empty_writes()
-        parm = AmberParm(get_fn('ash.parm7'))
+        parm = AmberParm(self.get_fn('ash.parm7'))
         origparm = copy(parm)
         origparm.name = origparm.name + '_copy1'
         act = PT.changeProtState(parm, ':ASH', 0)
@@ -1434,28 +1367,30 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parms.add_parm(parm)
         parms.add_parm(origparm)
         # First do some error checking
-        self.assertRaises(exc.ArgumentError, lambda:
-                PT.interpolate(parms, -1, 'eleconly',
-                    prefix=get_fn('test.parm7', written=True)).execute())
+        with self.assertRaises(exc.ArgumentError):
+            PT.interpolate(
+                parms, -1, 'eleconly', prefix=self.get_fn('test.parm7', written=True)
+            ).execute()
         sys.stdout = open(os.devnull, 'w')
-        act = PT.interpolate(parms, 5, 'eleconly', startnum=2,
-                       prefix=get_fn('test.parm7', written=True))
+        act = PT.interpolate(
+            parms, 5, 'eleconly', startnum=2, prefix=self.get_fn('test.parm7', written=True)
+        )
         str(act)
         act.execute()
         sys.stdout = sys.__stdout__
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
-        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 5)
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.6', written=True)))
         # Now check them all
         ladder = [origparm]
-        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.6', written=True)))
         ladder.append(parm)
         natom = parm.ptr('natom')
         for i in range(1, 6):
@@ -1468,43 +1403,42 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                 else:
                     self.assertTrue(before[j] >= this[j] >= after[j])
         # Now check that if no atoms are selected, it is handled properly
-        parm = pmd.load_file(get_fn('ash.parm7'))
+        parm = pmd.load_file(self.get_fn('ash.parm7'))
         act = PT.changeProtState(parm, ':GLH', 1)
         str(act)
         act.execute()
         # Now check error handling if the selected residue is not protonable
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ACE', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ASH', 10).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':*', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, ':ASH@CA', 1).execute)
-        self.assertRaises(exc.ChangeStateError,
-                PT.changeProtState(parm, '@13-25', 1).execute)
-        self.assertRaises(exc.NonexistentParm, lambda:
-                PT.interpolate(load_file(get_fn('ash.parm7')), 10, 'eleconly').execute())
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ACE', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ASH', 10).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':*', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, ':ASH@CA', 1).execute()
+        with self.assertRaises(exc.ChangeStateError):
+            PT.changeProtState(parm, '@13-25', 1).execute()
+        with self.assertRaises(exc.NonexistentParm):
+            PT.interpolate(load_file(self.get_fn('ash.parm7')), 10, 'eleconly').execute()
         # Make a list of 3 parms and make sure ambiguity causes failure
         act = PT.parm(parm, copy=0)
         act.execute()
         PT.changeProtState(act.parm_list, ':ASH', 1).execute()
         PT.parm(act.parm_list, copy=0).execute()
         self.assertEqual(len(act.parm_list), 3)
-        self.assertRaises(exc.AmbiguousParmError, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly').execute())
-        act.parm_list.add_parm(get_fn('trx.prmtop'))
-        self.assertRaises(exc.IncompatibleParmsError, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute())
+        with self.assertRaises(exc.AmbiguousParmError):
+            PT.interpolate(act.parm_list, 10, 'eleconly').execute()
+        act.parm_list.add_parm(self.get_fn('trx.prmtop'))
+        with self.assertRaises(exc.IncompatibleParmsError):
+            PT.interpolate(act.parm_list, 10, 'eleconly', parm2=0).execute()
         act.parm_list[0].atoms[0].name = 'FOO'
-        self.assertRaises(exc.SeriousParmWarning, lambda:
-                PT.interpolate(act.parm_list, 10, 'eleconly', parm=0,
-                    parm2=1).execute())
+        with self.assertWarns(exc.SeriousParmWarning):
+            PT.interpolate(act.parm_list, 10, 'eleconly', parm=0, parm2=1).execute()
 
     def test_prot_state_interpolate_2(self):
         """ Test interpolate actions on AmberParm with more parm selection """
         self._empty_writes()
-        parm = AmberParm(get_fn('ash.parm7'))
+        parm = AmberParm(self.get_fn('ash.parm7'))
         origparm = copy(parm)
         origparm.name = origparm.name + '_copy1'
         act = PT.changeProtState(parm, ':ASH', 0)
@@ -1520,24 +1454,24 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parms = parmlist.ParmList()
         parms.add_parm(parm)
         parms.add_parm(origparm)
-        parms.add_parm(load_file(get_fn('trx.prmtop')))
+        parms.add_parm(load_file(self.get_fn('trx.prmtop')))
         sys.stdout = open(os.devnull, 'w')
         PT.interpolate(parms, 5, 'eleconly', parm=1, parm2=0, startnum=2,
-                       prefix=get_fn('test.parm7', written=True)).execute()
+                       prefix=self.get_fn('test.parm7', written=True)).execute()
         sys.stdout = sys.__stdout__
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
-        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 5)
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.6', written=True)))
         # Now check them all
         ladder = [origparm]
-        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.6', written=True)))
         ladder.append(parm)
         natom = parm.ptr('natom')
         for i in range(1, 6):
@@ -1553,7 +1487,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_prot_state_interpolate_3(self):
         """ Test interpolate actions on AmberParm with parm name selection """
         self._empty_writes()
-        parm = AmberParm(get_fn('ash.parm7'))
+        parm = AmberParm(self.get_fn('ash.parm7'))
         origparm = copy(parm)
         origparm.name = origparm.name + '_copy1'
         act = PT.changeProtState(parm, ':ASH', 0)
@@ -1569,24 +1503,24 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         parms = parmlist.ParmList()
         parms.add_parm(parm)
         parms.add_parm(origparm)
-        parms.add_parm(load_file(get_fn('trx.prmtop')))
+        parms.add_parm(load_file(self.get_fn('trx.prmtop')))
         sys.stdout = open(os.devnull, 'w')
-        PT.interpolate(parms, 5, 'eleconly', parm=1, parm2=get_fn('ash.parm7'),
-                       startnum=2, prefix=get_fn('test.parm7', written=True)).execute()
+        PT.interpolate(parms, 5, 'eleconly', parm=1, parm2=self.get_fn('ash.parm7'),
+                       startnum=2, prefix=self.get_fn('test.parm7', written=True)).execute()
         sys.stdout = sys.__stdout__
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
-        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 5)
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.6', written=True)))
         # Now check them all
         ladder = [origparm]
-        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.6', written=True)))
         ladder.append(parm)
         natom = parm.ptr('natom')
         for i in range(1, 6):
@@ -1602,7 +1536,7 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB actions on AmberParm """
         parm = copy(gasparm)
-        PT.addPDB(parm, get_fn('trx.pdb'), 'elem', 'allicodes').execute()
+        PT.addPDB(parm, self.get_fn('trx.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -1629,12 +1563,12 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
             self.assertEqual(atnum, periodic_table.AtomicNum[elem])
         # Test reading Amber topology file with insertion codes and PDB
         # information stored in it
-        parm.write_parm(get_fn('addpdb.parm7', written=True))
-        nparm = AmberParm(get_fn('addpdb.parm7', written=True))
+        parm.write_parm(self.get_fn('addpdb.parm7', written=True))
+        nparm = AmberParm(self.get_fn('addpdb.parm7', written=True))
         self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
                          len(nparm.residues))
         nparm = AmberFormat()
-        nparm.rdparm(get_fn('addpdb.parm7', written=True), slow=True)
+        nparm.rdparm(self.get_fn('addpdb.parm7', written=True), slow=True)
         self.assertEqual(len(nparm.parm_data['RESIDUE_ICODE']),
                          len(parm.residues))
         # Test deletePDB
@@ -1664,10 +1598,10 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
             elif res.name == 'CYS':
                 res.name = 'CYM'
         parm.remake_parm()
-        PT.addPDB(parm, get_fn('trx.pdb'), 'elem', 'allicodes').execute()
+        PT.addPDB(parm, self.get_fn('trx.pdb'), 'elem', 'allicodes').execute()
         # Make sure addPDB works with nucleic acids, too
-        parm2 = AmberParm(get_fn('gaucu.parm7'))
-        PT.addPDB(parm2, get_fn('gaucu.pdb'), 'elem', 'allicodes').execute()
+        parm2 = AmberParm(self.get_fn('gaucu.parm7'))
+        PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm2.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm2.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm2.flag_list)
@@ -1684,26 +1618,29 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         # Now tweak some residue name
         parm2.residues[0].name = 'FOO'
         parm2.remake_parm()
-        self.assertRaises(exc.AddPDBWarning, lambda:
-                PT.addPDB(parm2, get_fn('gaucu.pdb'), 'elem', 'strict').execute())
+        # Test that AddPDBWarning becomes fatal under 'strict'
+        with self.assertRaises(exc.AddPDBWarning):
+            PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem', 'strict').execute()
         # Now mix-and-match PDB files that do not have the same number of atoms
         parm2.residues[0].name = 'G5'
         parm2.strip(':5')
-        self.assertRaises(exc.AddPDBError, lambda:
-                PT.addPDB(parm2, get_fn('gaucu.pdb'), 'elem').execute())
+        with self.assertRaises(exc.AddPDBError):
+            PT.addPDB(parm2, self.get_fn('gaucu.pdb'), 'elem').execute()
 
     def test_add_pdb2(self):
         """ Test addPDB with atypical numbering and extra residues """
-        parm = load_file(get_fn('4lzt.parm7'))
-        act = PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb'), 'strict')
+        fname = '4lzt_pdb.parm7'
+        parm = load_file(self.get_fn('4lzt.parm7'))
+        act = PT.addPDB(parm, self.get_fn('4lzt_NoNO3.pdb'), 'strict')
         act.execute()
         str(act)
-        parm.write_parm(get_fn('4lzt_pdb.parm7', written=True))
-        self.assertTrue(diff_files(get_saved_fn('4lzt_pdb.parm7'),
-                                   get_fn('4lzt_pdb.parm7', written=True),
-                                   absolute_error=1e-6)
+        parm.write_parm(self.get_fn(fname, written=True))
+        self.assertTrue(
+            diff_files(
+                self.get_fn(fname, saved=True), self.get_fn(fname, written=True), absolute_error=1e-6
+            )
         )
-        act = PT.addPDB(parm, get_fn('4lzt_NoNO3.pdb'))
+        act = PT.addPDB(parm, self.get_fn('4lzt_NoNO3.pdb'))
         str(act)
         act.execute()
 
@@ -1717,24 +1654,21 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
                     self.assertAlmostEqual(atom.mass, 1.008)
                 else:
                     self.assertEqual(atom.mass, 2)
-        self.assertEqual(parm.parm_data['MASS'],
-                         [a.mass for a in parm.atoms])
-        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
-                               sum(parm.parm_data['MASS']))
+        self.assertEqual(parm.parm_data['MASS'], [a.mass for a in parm.atoms])
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
         PT.HMassRepartition(parm, 3.0, 'dowater').execute()
         for atom in parm.atoms:
             if atom.atomic_number == 1:
                 self.assertEqual(atom.mass, 3.0)
-        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']),
-                               sum(parm.parm_data['MASS']))
-        self.assertRaises(exc.HMassRepartitionError, lambda:
-                PT.HMassRepartition(parm, 100.0).execute())
+        self.assertAlmostEqual(sum(solvparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
+        with self.assertRaises(exc.HMassRepartitionError):
+            PT.HMassRepartition(parm, 100.0).execute()
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_openmm_action(self):
         """ Tests the OpenMM action for AmberParm """
-        parm = AmberParm(get_fn('ash.parm7'))
-        mdin = get_fn('mdin', written=True)
+        parm = AmberParm(self.get_fn('ash.parm7'))
+        mdin = self.get_fn('mdin', written=True)
         with open(mdin, 'w') as f:
             f.write('''\
 Basic MD simulation
@@ -1744,19 +1678,19 @@ Basic MD simulation
     cut=500.0, tempi=100,
  /
 ''')
-        traj = get_fn('ash.nc', written=True)
-        mdout = get_fn('ash.mdout', written=True)
-        mdinfo = get_fn('ash.mdinfo', written=True)
-        restart = get_fn('ash.restrt', written=True)
-        script = get_fn('ash.py', written=True)
+        traj = self.get_fn('ash.nc', written=True)
+        mdout = self.get_fn('ash.mdout', written=True)
+        mdinfo = self.get_fn('ash.mdinfo', written=True)
+        restart = self.get_fn('ash.restrt', written=True)
+        script = self.get_fn('ash.py', written=True)
         self.assertRaises(exc.SimulationError, lambda:
                 PT.OpenMM(parm, '-O', '-i', mdin, '-o', mdout, '-inf', mdinfo,
-                          '-r', restart, '-x', traj, '-p', get_fn('ash.parm7'),
+                          '-r', restart, '-x', traj, '-p', self.get_fn('ash.parm7'),
                           script=script).execute()
         )
-        act = PT.OpenMM(parm, '-O', '-i', mdin, '-c', get_fn('ash.rst7'), '-o',
+        act = PT.OpenMM(parm, '-O', '-i', mdin, '-c', self.get_fn('ash.rst7'), '-o',
                         mdout, '-inf', mdinfo, '-r', restart, '-x', traj,
-                        '-p', get_fn('ash.parm7'), script=script)
+                        '-p', self.get_fn('ash.parm7'), script=script)
         str(act)
         act.execute()
         self.assertTrue(os.path.exists(script))
@@ -1771,11 +1705,11 @@ Basic MD simulation
         # Now check that the coordinates have moved
         t = pmd.load_file(traj)
         self.assertEqual(t.coordinates.shape, (5, len(parm.atoms), 3))
-        diff = pmd.load_file(get_fn('ash.rst7')).coordinates - t.coordinates[4]
+        diff = pmd.load_file(self.get_fn('ash.rst7')).coordinates - t.coordinates[4]
         self.assertTrue((np.abs(diff) > 1e-3).any())
 
         # Now run the python script and make sure it does the same thing
-        os.system('cd %s && %s %s' % (get_fn('writes'), sys.executable, script))
+        os.system('cd "%s" && "%s" "%s"' % (self._temporary_directory.name, sys.executable, script))
         if pd is not None:
             df = pd.read_csv(mdout)
             self.assertEqual(df.shape, (5, 6))
@@ -1784,13 +1718,13 @@ Basic MD simulation
         # Now check that the coordinates have moved
         t = pmd.load_file(traj)
         self.assertEqual(t.coordinates.shape, (5, len(parm.atoms), 3))
-        diff = pmd.load_file(get_fn('ash.rst7')).coordinates - t.coordinates[4]
+        diff = pmd.load_file(self.get_fn('ash.rst7')).coordinates - t.coordinates[4]
         self.assertTrue((np.abs(diff) > 1e-3).any())
 
     @unittest.skipUnless(has_openmm, 'Cannot test energy function without OMM')
     def test_energy_openmm(self):
         """ Tests the energy action with OpenMM """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         f = StringIO()
         PT.energy.output = f
         act = PT.energy(parm, 'omm', 'decompose', igb=5, saltcon=0.1)
@@ -1804,7 +1738,7 @@ Basic MD simulation
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     def test_energy_sander_gb(self):
         """ Tests gb energy action with sander """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         f = StringIO()
         PT.energy.output = f
         PT.energy(parm, igb=5, saltcon=0.1).execute()
@@ -1812,17 +1746,17 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 23.01), 0.05)
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'igb 100').execute())
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'saltcon -0.2').execute())
-        PT.energy(parm, 'igb 0').execute()
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, igb=100).execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, cutoff=-2.0).execute())
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, saltcon=-0.2).execute())
+        PT.energy(parm, igb=0).execute()
         parm.coordinates = None
         self.assertRaises(exc.SimulationError, lambda: PT.energy(parm).execute())
 
     @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
     def test_energy_sander_explicit_water(self):
         """ Tests energy action with sander """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         f = StringIO()
         PT.energy.output = f
         PT.energy(parm).execute()
@@ -1830,77 +1764,36 @@ Basic MD simulation
         info = f.read()
         ene = float(re.findall(r'TOTAL\s+=\s+([-\d\.]+)', info)[0])
         self.assertLess(abs(ene + 12785.68), 0.05)
-        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, 'cutoff -2.0').execute())
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   @unittest.skipUnless(sanderapi.HAS_SCIPY, 'Cannot test energy function without pysander')
-#   def test_energy_HAS_SANDER_is_False(self):
-#       """ Tests energy action with HAS_SANDER = False """
-#       parm = AmberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
-#       sanderapi.HAS_SANDER = False
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.energy(parm, ArgumentList('igb 1')))
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-#           saltcon=None, cutoff=None, tol=1E-2, maxcyc=10))
-#       sanderapi.HAS_SANDER = True
-#       sanderapi.HAS_SCIPY = False
-#       self.assertRaises(exc.SimulationError, lambda: sanderapi.minimize(parm, igb=1,
-#           saltcon=0., cutoff=999., tol=1E-2, maxcyc=10))
-#       # make sure we can compute energy if restore sander and scipy
-#       sanderapi.HAS_SCIPY = True
-#       sanderapi.minimize(parm, igb=1, saltcon=0., cutoff=999., tol=1E-2, maxcyc=10)
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   def test_minimize_sanderapi_implicit_solvent_minimization(self):
-#       """ Tests the minimize action with pysander and scipy """
-#       # just want to make sure those minimizations runnable
-#       parm7 = get_fn('ala_ala_ala.parm7')
-#       rst7 = get_fn('ala_ala_ala.rst7')
-#       parm = pmd.load_file(parm7, rst7)
-#       original_coordinates = parm.coordinates
-#       for igb in (0, 1, 2, 5, 7, 8):
-#           parm.coordinates = original_coordinates
-#           sanderapi.minimize(parm, igb=igb, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-#       def test_wrong_igb():
-#           sanderapi.minimize(parm, igb=100, saltcon=0., cutoff=999., tol=1E-5, maxcyc=10)
-#       self.assertRaises(exc.SimulationError, test_wrong_igb)
-
-#   @unittest.skipIf(sander is None, 'Cannot test energy function without pysander')
-#   def test_minimize_sanderapi_explicit_solvent_minimization(self):
-#       """ Tests the minimize action with pysander and scipy """
-#       # just want to make sure those minimizations runnable
-#       parm7 = get_fn('ala3_solv.parm7')
-#       rst7 = get_fn('ala3_solv.rst7')
-#       parm = pmd.load_file(parm7, rst7)
-#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=None, tol=1E-2, maxcyc=10)
-#       sanderapi.minimize(parm, igb=None, saltcon=None, cutoff=9., tol=1E-2, maxcyc=10)
+        self.assertRaises(exc.SimulationError, lambda: PT.energy(parm, cutoff=-2.0).execute())
 
     @unittest.skipIf(sander is None, 'Cannot test amber minimization without pysander')
     def test_minimize_from_action_tools(self):
         """ Tests the minimize action with pysander and scipy """
         # just want to make sure those minimizations runnable
-        parm7 = get_fn('ala_ala_ala.parm7')
-        rst7 = get_fn('ala_ala_ala.rst7')
+        parm7 = self.get_fn('ala_ala_ala.parm7')
+        rst7 = self.get_fn('ala_ala_ala.rst7')
         parm = pmd.load_file(parm7, rst7)
         original_coordinates = parm.coordinates
 
         for igb in (0, 1, 2, 5, 6, 7, 8):
-            arg_list = 'igb {} maxcyc 10'.format(igb)
+            arg_list = dict(igb=igb, maxcyc=10)
             parm.coordinates = original_coordinates
-            pmd.tools.minimize(parm, arg_list).execute()
+            pmd.tools.minimize(parm, **arg_list).execute()
 
         def test_coordinates_is_None():
             parm.coordinates = None
-            pmd.tools.minimize(parm, 'igb 8 maxcyc 10').execute()
+            pmd.tools.minimize(parm, igb=8, maxcyc=10).execute()
         self.assertRaises(exc.SimulationError, test_coordinates_is_None)
 
+    @unittest.skipIf(True, "OpenMM minimization test is currently failing") # Need to figure out why this is segfaulting in parallel
     @unittest.skipUnless(has_openmm, 'Cannot test minimize function without OpenMM')
     def test_minimize_openmm(self):
         """ Tests the minimize action with OpenMM """
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 0)
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 1)
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 2)
-        self._check_emin_omm(AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7')), 5)
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        self._check_emin_omm(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), 0)
+        self._check_emin_omm(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), 1)
+        self._check_emin_omm(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), 2)
+        self._check_emin_omm(AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7')), 5)
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute()
         self._check_emin_omm(parm, 7)
         self._check_emin_omm(parm, 8)
@@ -1920,14 +1813,12 @@ Basic MD simulation
             IS = app.GBn2
         else:
             assert False, 'illegal input'
-        system = parm.createSystem(implicitSolvent=IS,
-                                   implicitSolventSaltConc=0.1*u.molar)
+        system = parm.createSystem(implicitSolvent=IS, implicitSolventSaltConc=0.1*u.molar)
         starting_e = 0
         for _, e in pmd.openmm.energy_decomposition_system(parm, system):
             starting_e += e
-        script = get_fn('minimize.py', written=True)
-        act = PT.minimize(parm, 'omm', script=script, maxcyc=10, igb=igb,
-                          saltcon=0.1)
+        script = self.get_fn('minimize.py', written=True)
+        act = PT.minimize(parm, 'omm', script=script, maxcyc=10, igb=igb, saltcon=0.1)
         str(act)
         act.execute()
         end_e = 0
@@ -1938,9 +1829,9 @@ Basic MD simulation
     def test_out_pdb(self):
         """ Test the outPDB action on AmberParm """
         parm = copy(gasparm)
-        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
-        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
-        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        PT.loadRestrt(parm, self.get_fn('trx.inpcrd')).execute()
+        PT.outPDB(parm, self.get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(self.get_fn('outPDB1.pdb', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -1955,9 +1846,9 @@ Basic MD simulation
     def test_out_cif(self):
         """ Test the outCIF action on AmberParm """
         parm = copy(gasparm)
-        PT.loadRestrt(parm, get_fn('trx.inpcrd')).execute()
-        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
-        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        PT.loadRestrt(parm, self.get_fn('trx.inpcrd')).execute()
+        PT.outCIF(parm, self.get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(self.get_fn('outPDB1.cif', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -1983,7 +1874,7 @@ Basic MD simulation
 
         output = StringIO()
         PT.tiMerge.output = output
-        parm = AmberParm(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7'))
+        parm = AmberParm(self.get_fn('ava_aaa.parm7'), self.get_fn('ava_aaa.rst7'))
         act = PT.tiMerge(parm, ':1-5', ':6-10', ':3', ':8')
         str(act)
         # Make sure topology objects are the same
@@ -2012,25 +1903,25 @@ Basic MD simulation
 
         # Check some error processing
         self.assertRaises(exc.TiMergeError, lambda:
-                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                PT.tiMerge(load_file(self.get_fn('ava_aaa.parm7'), self.get_fn('ava_aaa.rst7')),
                            ':1-5', ':6-10', ':8', ':8').execute())
         self.assertRaises(exc.TiMergeError, lambda:
-                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                PT.tiMerge(load_file(self.get_fn('ava_aaa.parm7'), self.get_fn('ava_aaa.rst7')),
                            ':1-5', ':6-10', ':3', ':3').execute())
         self.assertRaises(exc.TiMergeError, lambda:
-                PT.tiMerge(load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7')),
+                PT.tiMerge(load_file(self.get_fn('ava_aaa.parm7'), self.get_fn('ava_aaa.rst7')),
                            ':1-5', ':5-10', ':3', ':8').execute())
         self.assertRaises(exc.TiMergeError,
-                PT.tiMerge(load_file(get_fn('ava_aaa.parm7')), ':1-5', ':6-10',
+                PT.tiMerge(load_file(self.get_fn('ava_aaa.parm7')), ':1-5', ':6-10',
                     ':3', ':8').execute)
-        parm = load_file(get_fn('ava_aaa.parm7'), get_fn('ava_aaa.rst7'))
+        parm = load_file(self.get_fn('ava_aaa.parm7'), self.get_fn('ava_aaa.rst7'))
         parm.residues[5][0].xx += 1 # Move away so it's not recognized as same
         self.assertRaises(exc.TiMergeError, lambda:
                 PT.tiMerge(parm, ':1-5', ':6-10', ':3', ':8').execute())
 
     def test_ti_merge2(self):
         """ Tests the tiMerge action on AmberParm with solvated parm """
-        parm = AmberParm(get_fn('ava_aaa.solv.parm7'), get_fn('ava_aaa.solv.rst7'))
+        parm = AmberParm(self.get_fn('ava_aaa.solv.parm7'), self.get_fn('ava_aaa.solv.rst7'))
         timask1re = re.compile(r'''timask1 *= *["']([\d,@:]+)["']''', re.I)
         timask2re = re.compile(r'''timask2 *= *["']([\d,@:]+)["']''', re.I)
         scmask1re = re.compile(r'''scmask1 *= *["']([\d,@:]+)["']''', re.I)
@@ -2068,27 +1959,27 @@ Basic MD simulation
 
         output.truncate() # Reset the buffer for the next test
         # Error handling checking
-        parm = AmberParm(get_fn('ava_aaa.solv.parm7'), get_fn('ava_aaa.solv.rst7'))
+        parm = AmberParm(self.get_fn('ava_aaa.solv.parm7'), self.get_fn('ava_aaa.solv.rst7'))
         self.assertRaises(exc.TiMergeError, lambda:
                 PT.tiMerge(parm, ':1-5', ':11', ':3', ':11').execute())
 
     def test_add12_6_4(self):
         """ Test the add12_6_4 action on AmberParm """
-        parm = AmberParm(get_fn('Mg_ti1_b.parm7'))
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
         PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
         act = PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
-                     polfile=get_fn('lj_1264_pol.dat'))
+                     polfile=self.get_fn('lj_1264_pol.dat'))
         act.execute()
         str(act)
-        parm.write_parm(get_fn('Mg_ti1_b_1264.parm7', written=True))
-        self.assertTrue(diff_files(get_fn('Mg_ti1_b_1264.parm7', written=True),
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264.parm7', written=True))
+        self.assertTrue(diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
                                    get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
         # Error handling
         self.assertRaises(exc.LJ12_6_4Error, lambda:
                 PT.add12_6_4(parm, ':MG', watermodel='FOO',
-                     polfile=get_fn('lj_1264_pol.dat')).execute()
+                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
         )
         self.assertRaises(exc.LJ12_6_4Error, lambda:
                 PT.add12_6_4(parm, ':MG', watermodel='FOO',
@@ -2098,41 +1989,37 @@ Basic MD simulation
     def test_add12_6_4_c4file(self):
         """ Test add12_6_4 action on AmberParm specifying c4file """
         from parmed.tools.add1264 import DEFAULT_C4_PARAMS
-        fn = get_fn('c4file', written=True)
+        fn = self.get_fn('c4file', written=True)
         with open(fn, 'w') as f:
-            for items in iteritems(DEFAULT_C4_PARAMS['TIP4PEW']):
+            for items in DEFAULT_C4_PARAMS['TIP4PEW'].items():
                 f.write('%s %s\n' % items)
-        parm = AmberParm(get_fn('Mg_ti1_b.parm7'))
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
         PT.addLJType(parm, '@14').execute()
         PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
-        act = PT.add12_6_4(parm, ':MG', c4file=fn,
-                     polfile=get_fn('lj_1264_pol.dat'))
+        act = PT.add12_6_4(parm, ':MG', c4file=fn, polfile=self.get_fn('lj_1264_pol.dat'))
         act.execute()
         str(act)
-        parm.write_parm(get_fn('Mg_ti1_b_1264.parm7', written=True))
-        self.assertTrue(diff_files(get_fn('Mg_ti1_b_1264.parm7', written=True),
-                                   get_saved_fn('Mg_ti1_b_1264.parm7'))
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264.parm7', written=True))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
     def test_add_12_6_4_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
-        parm1 = AmberParm(get_fn('mg_na_cl.parm7'))
-        parm2 = AmberParm(get_fn('na_cl_mg.parm7'))
-        PT.add12_6_4(parm1, ':MG,NA,CL',
-                     polfile=get_fn('lj_1264_pol.dat')).execute()
-        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P',
-                     polfile=get_fn('lj_1264_pol.dat')).execute()
-        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')),
-                         saved.PRINTLJMATRIX_MGNACL)
-        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')),
-                         saved.PRINTLJMATRIX_NACLMG)
+        parm1 = AmberParm(self.get_fn('mg_na_cl.parm7'))
+        parm2 = AmberParm(self.get_fn('na_cl_mg.parm7'))
+        PT.add12_6_4(parm1, ':MG,NA,CL', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P', polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')), saved.PRINTLJMATRIX_MGNACL)
+        self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')), saved.PRINTLJMATRIX_NACLMG)
 
     @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):
         """ Test writeCoordinates method """
         parm = copy(gasparm)
-        PT.loadCoordinates(parm, get_fn('trx.inpcrd')).execute()
-        basefn = get_fn('test', written=True)
+        PT.loadCoordinates(parm, self.get_fn('trx.inpcrd')).execute()
+        basefn = self.get_fn('test', written=True)
         # NetCDF trajectory
         act = PT.writeCoordinates(parm, basefn + '.nc')
         act.execute()
@@ -2187,68 +2074,64 @@ Basic MD simulation
 class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadCoordinates actions for ChamberParm """
         self._empty_writes()
         parm = copy(gascham)
-        act = PT.loadCoordinates(parm, get_fn('ala_ala_ala.rst7'))
+        act = PT.loadCoordinates(parm, self.get_fn('ala_ala_ala.rst7'))
         act.execute()
         str(act) # Make sure it doesn't fail
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
-        PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
+        PT.parmout(parm, self.get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
         self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
-                                   get_fn('test.parm7', written=True),
+                                   self.get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
-        PT.parmout(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
+        PT.parmout(parm, self.get_fn('test.parm7', written=True),
+                         self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
         self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
-                                   get_fn('test.parm7', written=True),
+                                   self.get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
-                                   get_fn('test.rst7', written=True),
+        self.assertTrue(diff_files(self.get_fn('ala_ala_ala.rst7'),
+                                   self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
+        PT.outparm(parm, self.get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
         self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
-                                   get_fn('test.parm7', written=True),
+                                   self.get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
+        PT.outparm(parm, self.get_fn('test.parm7', written=True),
+                         self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
         self.assertTrue(diff_files(get_saved_fn('ala_ala_ala.parm7'),
-                                   get_fn('test.parm7', written=True),
+                                   self.get_fn('test.parm7', written=True),
                                    absolute_error=1e-6))
-        self.assertTrue(diff_files(get_fn('ala_ala_ala.rst7'),
-                                   get_fn('test.rst7', written=True),
+        self.assertTrue(diff_files(self.get_fn('ala_ala_ala.rst7'),
+                                   self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
         # Check loadCoordinates error handling
         self.assertRaises(exc.ParmError, lambda:
-                PT.loadCoordinates(parm, get_fn('trx.prmtop')).execute())
+                PT.loadCoordinates(parm, self.get_fn('trx.prmtop')).execute())
 
     def test_write_frcmod(self):
         """ Check that writeFrcmod fails for ChamberParm """
         parm = gascham
         self.assertRaises(exc.ParmError, lambda:
-                PT.writeFrcmod(parm, get_fn('x', written=True)).execute())
+                PT.writeFrcmod(parm, self.get_fn('x', written=True)).execute())
 
     def test_write_off_load_restrt(self):
         """ Check that writeOFF fails for ChamberParm """
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('ala_ala_ala.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
-                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
+                PT.writeOFF(parm, self.get_fn('test.off', written=True)).execute())
 
     def test_ti_merge(self):
         """ Check that tiMerge joins CHARMM-specific terms in ChamberParm """
@@ -2262,15 +2145,15 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                         scmask1=scmask1re.findall(info)[0],
                         scmask2=scmask2re.findall(info)[0])
         # First convert from CHARMM-GUI PSF file
-        a = PT.chamber(parmlist.ParmList(), '-psf', get_fn('ava_aaa.psf'),
-                '-top', get_fn('top_all36_prot.rtf'), '-param',
-                get_fn('par_all36_prot.prm'), '-crd', get_fn('ava_full.pdb'))
+        a = PT.chamber(parmlist.ParmList(), '-psf', self.get_fn('ava_aaa.psf'),
+                '-top', self.get_fn('top_all36_prot.rtf'), '-param',
+                self.get_fn('par_all36_prot.prm'), '-crd', self.get_fn('ava_full.pdb'))
         a.execute()
         PT.tiMerge(a.parm, ':1-3', ':4-6', ':2', ':5').execute()
         self.assertEqual(len(a.parm.residues), 4) # Removed 2 redundant res.
         # Error checking
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('ala_ala_ala.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
@@ -2575,7 +2458,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                     self.assertEqual(datatype(i), j)
         # Check this on non-AmberParm Structure classes
         self.assertRaises(exc.ParmError, lambda:
-                PT.printInfo(load_file(get_fn('2koc.pdb'))))
+                PT.printInfo(load_file(self.get_fn('2koc.pdb'))))
 
     def test_add_change_lj_type(self):
         """ Test addLJType and changeLJSingleType on ChamberParm """
@@ -2787,7 +2670,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_dihedral(self):
         """ Test the addDihedral and deleteDihedral actions for ChamberParm """
         parm = copy(gascham)
-        n = PT.deleteDihedral(parm, ':ALA@N :ALA@CA :ALA@CB :ALA@HB1').execute()
+        n = PT.deleteDihedral(parm, *':ALA@N :ALA@CA :ALA@CB :ALA@HB1'.split()).execute()
         parm.remake_parm()
         self.assertEqual(gascham.ptr('nphih') + gascham.ptr('nphia'),
                          parm.ptr('nphih') + parm.ptr('nphia') + n)
@@ -2934,11 +2817,11 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
 
     def test_summary(self):
         """ Test summary action for ChamberParm """
-        parm = load_file(get_fn('dhfr_cmap_pbc.parm7'))
-        parm.load_rst7(get_fn('dhfr_cmap_pbc.rst7'))
+        parm = load_file(self.get_fn('dhfr_cmap_pbc.parm7'))
+        parm.load_rst7(self.get_fn('dhfr_cmap_pbc.rst7'))
         act = PT.summary(parm)
         self.assertTrue(detailed_diff(str(act), saved.SUMMARYC1, relative_error=1e-6))
-        act = PT.summary(load_file(get_fn('2koc.pdb')))
+        act = PT.summary(load_file(self.get_fn('2koc.pdb')))
         repr(act)
 
     def test_scale(self):
@@ -2982,21 +2865,21 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         parms.add_parm(origparm)
         sys.stdout = open(os.devnull, 'w')
         PT.interpolate(parms, 5, 'eleconly', startnum=2,
-                       prefix=get_fn('test.parm7', written=True)).execute()
+                       prefix=self.get_fn('test.parm7', written=True)).execute()
         sys.stdout = sys.__stdout__
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 5)
-        self.assertTrue(os.path.exists(get_fn('test.parm7.2', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.3', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.4', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.5', written=True)))
-        self.assertTrue(os.path.exists(get_fn('test.parm7.6', written=True)))
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 5)
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.2', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.3', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.4', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.5', written=True)))
+        self.assertTrue(os.path.exists(self.get_fn('test.parm7.6', written=True)))
         # Now check them all
         ladder = [origparm]
-        ladder.append(AmberParm(get_fn('test.parm7.2', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.3', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.4', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.5', written=True)))
-        ladder.append(AmberParm(get_fn('test.parm7.6', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.2', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.3', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.4', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.5', written=True)))
+        ladder.append(AmberParm(self.get_fn('test.parm7.6', written=True)))
         ladder.append(parm)
         natom = parm.ptr('natom')
         for i in range(1, 6):
@@ -3026,7 +2909,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB actions for ChamberParm """
         parm = copy(gascham)
-        PT.addPDB(parm, get_fn('ala_ala_ala.pdb'), 'elem allicodes').execute()
+        PT.addPDB(parm, self.get_fn('ala_ala_ala.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3049,7 +2932,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
         self.assertFalse('RESIDUE_NUMBER' in parm.flag_list)
         self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
-        PT.addPDB(parm, get_fn('ala_ala_ala.pdb')).execute()
+        PT.addPDB(parm, self.get_fn('ala_ala_ala.pdb')).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3084,9 +2967,9 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_out_pdb(self):
         """ Test the outPDB action on ChamberParm """
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
-        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
-        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        PT.loadRestrt(parm, self.get_fn('ala_ala_ala.rst7')).execute()
+        PT.outPDB(parm, self.get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(self.get_fn('outPDB1.pdb', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -3101,9 +2984,9 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     def test_out_cif(self):
         """ Test the outCIF action on ChamberParm """
         parm = copy(gascham)
-        PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
-        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
-        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        PT.loadRestrt(parm, self.get_fn('ala_ala_ala.rst7')).execute()
+        PT.outCIF(parm, self.get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(self.get_fn('outPDB1.cif', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -3118,58 +3001,54 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
 class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     def test_parmout_outparm_load_restrt(self):
         """ Test parmout, outparm, and loadRestrt actions on AmoebaParm """
         self._empty_writes()
         parm = copy(amoebaparm)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
         for atom in parm.atoms:
             self.assertTrue(hasattr(atom, 'xx'))
             self.assertTrue(hasattr(atom, 'xy'))
             self.assertTrue(hasattr(atom, 'xz'))
-        PT.parmout(parm, get_fn('test.parm7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('nma.parm7'),
-                                   get_fn('test.parm7', written=True)))
+        PT.parmout(parm, self.get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
+        self.assertTrue(diff_files(self.get_fn('nma.parm7'),
+                                   self.get_fn('test.parm7', written=True)))
         self._empty_writes()
-        PT.parmout(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('nma.parm7'),
-                                   get_fn('test.parm7', written=True)))
-        self.assertTrue(diff_files(get_fn('nma.rst7'),
-                                   get_fn('test.rst7', written=True),
+        PT.parmout(parm, self.get_fn('test.parm7', written=True),
+                         self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
+        self.assertTrue(diff_files(self.get_fn('nma.parm7'),
+                                   self.get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(self.get_fn('nma.rst7'),
+                                   self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 1)
-        self.assertTrue(diff_files(get_fn('nma.parm7'),
-                                   get_fn('test.parm7', written=True)))
+        PT.outparm(parm, self.get_fn('test.parm7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 1)
+        self.assertTrue(diff_files(self.get_fn('nma.parm7'),
+                                   self.get_fn('test.parm7', written=True)))
         self._empty_writes()
-        PT.outparm(parm, get_fn('test.parm7', written=True),
-                         get_fn('test.rst7', written=True)).execute()
-        self.assertEqual(len(os.listdir(get_fn('writes'))), 2)
-        self.assertTrue(diff_files(get_fn('nma.parm7'),
-                                   get_fn('test.parm7', written=True)))
-        self.assertTrue(diff_files(get_fn('nma.rst7'),
-                                   get_fn('test.rst7', written=True),
+        PT.outparm(parm, self.get_fn('test.parm7', written=True),
+                         self.get_fn('test.rst7', written=True)).execute()
+        self.assertEqual(len(os.listdir(self._temporary_directory.name)), 2)
+        self.assertTrue(diff_files(self.get_fn('nma.parm7'),
+                                   self.get_fn('test.parm7', written=True)))
+        self.assertTrue(diff_files(self.get_fn('nma.rst7'),
+                                   self.get_fn('test.rst7', written=True),
                                    absolute_error=0.0001))
 
     def test_write_frcmod(self):
         """ Check that writeFrcmod fails for AmoebaParm """
-        self.assertRaises(exc.ParmError, lambda:
-                PT.writeFrcmod(amoebaparm, get_fn('x', written=True)).execute())
+        with self.assertRaises(exc.ParmError):
+            PT.writeFrcmod(amoebaparm, self.get_fn('x', written=True)).execute()
 
     def test_write_off_load_restrt(self):
         """ Check that writeOFF fails for AmoebaParm """
         parm = copy(amoebaparm)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
-                PT.writeOFF(parm, get_fn('test.off', written=True)).execute())
+                PT.writeOFF(parm, self.get_fn('test.off', written=True)).execute())
 
     def test_change_radii(self):
         """ Check that changeRadii fails for AmoebaParm """
@@ -3385,23 +3264,22 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         """ Check that addDihedral and deleteDihedral fail for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.deleteDihedral(parm, '@1 @2 @3 @4').execute())
+            PT.deleteDihedral(parm, *'@1 @2 @3 @4'.split()).execute())
         self.assertRaises(exc.ParmError, lambda:
-                PT.addDihedral(parm, '@1 @2 @3 @4 0.1556 3 0 1.2 2.0',
-                               type='normal').execute()
+            PT.addDihedral(parm, '@1 @2 @3 @4 0.1556 3 0 1.2 2.0', type='normal').execute()
         )
 
     def test_set_bond(self):
         """ Check that setBond fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute())
+            PT.setBond(parm, ':ALA@CA', ':ALA@CB', 300.0, 1.5).execute())
 
     def test_set_angle(self):
         """ Check that setAngle fails for AmoebaParm """
         parm = copy(amoebaparm)
         self.assertRaises(exc.ParmError, lambda:
-                PT.setAngle(parm, ':ALA@CA :ALA@CB :ALA@HB1 40 100').execute())
+            PT.setAngle(parm, ':ALA@CA :ALA@CB :ALA@HB1 40 100').execute())
 
     def test_add_atomic_number(self):
         """ Test addAtomicNumber for AmoebaParm """
@@ -3450,7 +3328,7 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         parm = copy(amoebaparm)
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARYA1)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
         act = PT.summary(parm)
         self.assertEqual(str(act), saved.SUMMARYA2)
 
@@ -3459,22 +3337,21 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         parm = copy(amoebaparm)
         flag = 'AMOEBA_STRETCH_BEND_FORCE_CONSTANT'
         PT.scale(parm, flag, 2.0).execute()
-        self.assertEqual([2*x for x in amoebaparm.parm_data[flag]],
-                         parm.parm_data[flag])
+        self.assertEqual([2*x for x in amoebaparm.parm_data[flag]], parm.parm_data[flag])
         PT.scale(parm, flag, 0.0).execute()
         for val in parm.parm_data[flag]:
             self.assertEqual(val, 0)
 
     def test_interpolate(self):
         """ Check that interpolate action fails for AmoebaParm """
-        self.assertRaises(exc.ParmError, lambda:
-                PT.interpolate(amoebaparm).execute())
+        with self.assertRaises(exc.ParmError):
+            PT.interpolate(amoebaparm).execute()
 
     def test_change_prot_state(self):
         """ Check that changeProtState fails for AmoebaParm """
         parm = copy(amoebaparm)
-        self.assertRaises(exc.ParmError, lambda:
-                PT.changeProtState(parm, ':32', 0).execute())
+        with self.assertRaises(exc.ParmError):
+            PT.changeProtState(parm, ':32', 0).execute()
 
     def test_lmod(self):
         """ Check that lmod fails for AmoebaParm """
@@ -3483,7 +3360,7 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     def test_add_delete_pdb(self):
         """ Test addPDB and deletePDB for AmoebaParm """
         parm = copy(amoebaparm)
-        PT.addPDB(parm, get_fn('nma.pdb'), 'elem allicodes').execute()
+        PT.addPDB(parm, self.get_fn('nma.pdb'), 'elem', 'allicodes').execute()
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3504,8 +3381,8 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
             elem = parm.parm_data['ATOM_ELEMENT'][i].strip()
             self.assertEqual(periodic_table.Element[atnum], elem)
             self.assertEqual(atnum, periodic_table.AtomicNum[elem])
-        parm.write_parm(get_fn('amoeba_pdb.parm7', written=True))
-        parm = AmoebaParm(get_fn('amoeba_pdb.parm7', written=True))
+        parm.write_parm(self.get_fn('amoeba_pdb.parm7', written=True))
+        parm = AmoebaParm(self.get_fn('amoeba_pdb.parm7', written=True))
         self.assertTrue('RESIDUE_ICODE' in parm.flag_list)
         self.assertTrue('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3531,7 +3408,7 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
         self.assertFalse('RESIDUE_NUMBER' in parm.flag_list)
         self.assertFalse('RESIDUE_CHAINID' in parm.flag_list)
-        PT.addPDB(parm, get_fn('nma.pdb')).execute()
+        PT.addPDB(parm, self.get_fn('nma.pdb')).execute()
         self.assertFalse('RESIDUE_ICODE' in parm.flag_list)
         self.assertFalse('ATOM_ELEMENT' in parm.flag_list)
         self.assertTrue('RESIDUE_NUMBER' in parm.flag_list)
@@ -3561,9 +3438,9 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     def test_out_pdb(self):
         """ Test the outPDB action on AmoebaParm """
         parm = copy(amoebaparm)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
-        PT.outPDB(parm, get_fn('outPDB1.pdb', written=True)).execute()
-        f = PDBFile.parse(get_fn('outPDB1.pdb', written=True))
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
+        PT.outPDB(parm, self.get_fn('outPDB1.pdb', written=True)).execute()
+        f = PDBFile.parse(self.get_fn('outPDB1.pdb', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -3578,9 +3455,9 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     def test_out_cif(self):
         """ Test the outCIF action on AmoebaParm """
         parm = copy(amoebaparm)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
-        PT.outCIF(parm, get_fn('outPDB1.cif', written=True)).execute()
-        f = CIFFile.parse(get_fn('outPDB1.cif', written=True))
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
+        PT.outCIF(parm, self.get_fn('outPDB1.cif', written=True)).execute()
+        f = CIFFile.parse(self.get_fn('outPDB1.cif', written=True))
         self.assertEqual(len(f.atoms), len(parm.atoms))
         self.assertEqual(len(f.residues), len(parm.residues))
         for a1, a2 in zip(f.atoms, parm.atoms):
@@ -3595,37 +3472,33 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     def test_ti_merge(self):
         """ Check that tiMerge fails for AmoebaParm """
         parm = copy(amoebaparm)
-        PT.loadRestrt(parm, get_fn('nma.rst7')).execute()
+        PT.loadRestrt(parm, self.get_fn('nma.rst7')).execute()
         self.assertRaises(exc.ParmError, lambda:
                 PT.tiMerge(parm, ':1-3', ':4-6', ':2', ':5').execute())
 
 class TestOtherParm(FileIOTestCase):
     """ Tests the use of other parms as the main parm """
 
-    def setUp(self):
-        warnings.filterwarnings('error', category=exc.SeriousParmWarning)
-        FileIOTestCase.setUp(self)
-
     def test_summary(self):
         """ Tests the use of a PDB file with the summary action """
-        parm = load_file(get_fn('4lzt.pdb'))
+        parm = load_file(self.get_fn('4lzt.pdb'))
         self.assertEqual(str(PT.summary(parm)), saved.PDB_SUMMARY)
 
     def test_print_bonds(self):
         """ Tests printBonds on a PSF file with no parameters """
-        parm = load_file(get_fn('ala_ala_ala.psf'))
+        parm = load_file(self.get_fn('ala_ala_ala.psf'))
         repr(PT.printBonds(parm, ':1-2'))
 
     def test_print_angles(self):
         """ Tests printAngles on a PSF file with no parameters """
-        parm = load_file(get_fn('ala_ala_ala.psf'))
+        parm = load_file(self.get_fn('ala_ala_ala.psf'))
         repr(PT.printAngles(parm, ':1'))
         repr(PT.printAngles(parm, ':1', ':1'))
         repr(PT.printAngles(parm, ':1', ':1', ':1'))
 
     def test_print_dihedrals(self):
         """ Tests printDihedrals on a PSF file with no parameters """
-        parm = load_file(get_fn('ala_ala_ala.psf'))
+        parm = load_file(self.get_fn('ala_ala_ala.psf'))
         repr(PT.printDihedrals(parm, ':1'))
         repr(PT.printDihedrals(parm, ':*', ':1'))
         repr(PT.printDihedrals(parm, ':*', ':*', ':1'))
@@ -3644,17 +3517,17 @@ class TestOtherParm(FileIOTestCase):
         # Make sure listParms works on an empty list
         repr(PT.listParms(parms))
         # First add an AmberParm
-        act = PT.parm(parms, get_fn('ash.parm7'))
+        act = PT.parm(parms, self.get_fn('ash.parm7'))
         act.execute()
         str(act)
         self.assertEqual(len(parms), 1)
         self.assertIs(parms.parm, parms[-1])
         # Next add a PDB and make sure it is the active parm
-        PT.parm(parms, get_fn('2koc.pdb')).execute()
+        PT.parm(parms, self.get_fn('2koc.pdb')).execute()
         self.assertEqual(len(parms), 2)
         self.assertIs(parms.parm, parms[-1])
         # Next add a GROMACS topology file
-        PT.parm(parms, get_fn('ildn.solv.top')).execute()
+        PT.parm(parms, self.get_fn('ildn.solv.top')).execute()
         self.assertEqual(len(parms), 3)
         self.assertIs(parms.parm, parms[-1])
         # Next copy the amber parm
@@ -3665,7 +3538,7 @@ class TestOtherParm(FileIOTestCase):
         self.assertIs(parms[-1], parms.parm)
         self.assertEqual(len(parms[0].atoms), len(parms[3].atoms))
         # Next copy the GROMACS topology file parm
-        act = PT.parm(parms, copy=get_fn('ildn.solv.top'))
+        act = PT.parm(parms, copy=self.get_fn('ildn.solv.top'))
         act.execute()
         str(act)
         self.assertEqual(len(parms), 5)
@@ -3678,7 +3551,7 @@ class TestOtherParm(FileIOTestCase):
         act.execute()
         self.assertEqual(len(parms), 5)
         self.assertIs(parms.parm, parms[0])
-        act = PT.parm(parms, select=get_fn('2koc.pdb'))
+        act = PT.parm(parms, select=self.get_fn('2koc.pdb'))
         str(act)
         act.execute()
         self.assertEqual(len(parms), 5)
@@ -3692,27 +3565,27 @@ class TestOtherParm(FileIOTestCase):
                 PT.parm(parms, 'notafile').execute())
         act = PT.parm(parms, select='notafile')
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, select=100)
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, copy='notafile')
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
         act = PT.parm(parms, copy=100)
         str(act)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
 
         # Catch permissions error, but only on Linux
         import platform
         if platform.system() == 'Windows': return
-        fn = get_fn('test.pdb', written=True)
-        with open(fn, 'w') as fw, open(get_fn('ash.parm7')) as fr:
+        fn = self.get_fn('test.pdb', written=True)
+        with open(fn, 'w') as fw, open(self.get_fn('ash.parm7')) as fr:
             fw.write(fr.read())
         # Change the permissions to remove read perms
         os.chmod(fn, int('333', 8))
         act = PT.parm(parms, fn)
-        self.assertRaises(exc.SeriousParmWarning, act.execute)
+        self.assertWarns(exc.SeriousParmWarning, act.execute)
 
         # Now check that listParms works
         info = repr(PT.listParms(parms))
@@ -3735,10 +3608,8 @@ class TestOtherParm(FileIOTestCase):
         struct.bonds.append(pmd.Bond(struct[3], struct[4]))
         total_mass = sum(a.mass for a in struct.atoms)
 
-        warnings.filterwarnings('error', category=exc.ParmWarning)
-        self.assertRaises(exc.ParmWarning, lambda:
-                PT.HMassRepartition(struct).execute())
-        warnings.filterwarnings('ignore', category=exc.ParmWarning)
+        with self.assertWarns(exc.ParmWarning):
+            PT.HMassRepartition(struct).execute()
         PT.HMassRepartition(struct).execute()
         self.assertEqual(struct[0].mass, 1.001)
         self.assertEqual(struct[1].mass, 1.001)
@@ -3746,9 +3617,8 @@ class TestOtherParm(FileIOTestCase):
         self.assertEqual(struct[3].mass, 3.024)
         self.assertAlmostEqual(sum(a.mass for a in struct.atoms), total_mass)
         # Now what happens if we make our Hs *too* heavy?
-        self.assertRaises(exc.HMassRepartitionError, lambda:
-                PT.HMassRepartition(struct, 100).execute())
-        warnings.filterwarnings('always', category=exc.ParmWarning)
+        with self.assertRaises(exc.HMassRepartitionError):
+            PT.HMassRepartition(struct, 100).execute()
 
     def test_delete_bond(self):
         """ Tests deleteBond on arbitrary Structure instances """

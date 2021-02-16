@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit.unit_operators
+Module openmm.unit.unit_operators
 
 Physical quantities with units, intended to produce similar functionality
 to Boost.Units package in C++ (but with a runtime cost).
@@ -9,7 +9,7 @@ but different internals to satisfy our local requirements.
 In particular, there is no underlying set of 'canonical' base
 units, whereas in Scientific.Physics.PhysicalQuantities all
 units are secretly in terms of SI units.  Also, it is easier
-to add new fundamental dimensions to simtk.dimensions.  You
+to add new fundamental dimensions to basedimension.  You
 might want to make new dimensions for, say, "currency" or
 "information".
 
@@ -129,8 +129,6 @@ def _unit_class_mul(self, other):
         return Quantity(value, unit).reduce_unit(self)
     else:
         # print "scalar * unit"
-        value = other
-        unit = self
         # Is reduce_unit needed here?  I hope not, there is a performance issue...
         # return Quantity(other, self).reduce_unit(self)
         return Quantity(other, self)

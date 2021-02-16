@@ -2,8 +2,6 @@
 Physical quantities with units for dimensional analysis and automatic unit
 conversion.
 """
-from __future__ import division
-
 __docformat__ = "epytext en"
 
 __author__ = "Christopher M. Bruns"
@@ -24,21 +22,19 @@ __email__ = "cmbruns@stanford.edu"
 try:
     from simtk.unit import *
 except ImportError:
-    from parmed.unit.unit import Unit, is_unit
-    from parmed.unit.quantity import Quantity, is_quantity
-    from parmed.unit.unit_math import *
-    from parmed.unit.unit_definitions import *
-    from parmed.unit.constants import *
+    from .unit import Unit, is_unit
+    from .quantity import Quantity, is_quantity
+    from .unit_math import *
+    from .unit_definitions import *
+    from .constants import *
 
 # Now create the AKMA unit system, which is in common use by a number of
 # programs (like Amber and CHARMM). Most complicated thing to get is the time.
 # Do it from the kJ->kcal conversion
 
-_time_scale = (daltons * angstroms**2 /
-               kilocalories_per_mole).conversion_factor_to(picoseconds**2)
+_time_scale = (daltons * angstroms**2 / kilocalories_per_mole).conversion_factor_to(picoseconds**2)
 akma_time_base_unit = BaseUnit(time_dimension, "akma_time_unit", "akma-s")
-akma_time_base_unit.define_conversion_factor_to(picosecond_base_unit,
-            1 / sqrt(_time_scale))
+akma_time_base_unit.define_conversion_factor_to(picosecond_base_unit, sqrt(_time_scale))
 del _time_scale
 
 akma_unit_system = UnitSystem([

@@ -1,23 +1,18 @@
 """
 This module contains classes for reading and writing PQR files
 """
-from __future__ import absolute_import, print_function, division
-
 from contextlib import closing
 import numpy as np
-from parmed.exceptions import PDBError, PDBWarning
-from parmed.formats.registry import FileFormatType
-from parmed.formats.pdb import _standardize_resname, PDBFile, _is_hetatm
-from parmed.periodic_table import AtomicNum, Mass, Element, element_by_name
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom, ExtraPoint
-from parmed.utils.io import genopen
-from parmed.utils.six import string_types, add_metaclass
-from parmed.utils.six.moves import range
+from .registry import FileFormatType
+from .pdb import _standardize_resname, PDBFile, _is_hetatm
+from ..exceptions import PDBError, PDBWarning
+from ..periodic_table import AtomicNum, Mass, Element, element_by_name
+from ..structure import Structure
+from ..topologyobjects import Atom, ExtraPoint
+from ..utils.io import genopen
 import warnings
 
-@add_metaclass(FileFormatType)
-class PQRFile(object):
+class PQRFile(metaclass=FileFormatType):
     """ Standard PDB file format parser and writer """
     #===================================================
 
@@ -112,7 +107,7 @@ class PQRFile(object):
             the PDB file.  No bonds or other topological features are added by
             default.
         """
-        if isinstance(filename, string_types):
+        if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
         else:
@@ -137,7 +132,8 @@ class PQRFile(object):
                         chn = ''
                     elif len(words) >= 11:
                         _, num, nam, res, chn, resn, x, y, z, chg, rad = (
-                                words[i] for i in range(11))
+                            words[i] for i in range(11)
+                        )
                         # If the radius is not a float (but rather a letter,
                         # like the element or something), then the chain might
                         # be missing. In this case, shift all tokens "back" one
@@ -173,10 +169,10 @@ class PQRFile(object):
                             raise PDBError('Extra atom in MODEL %d' % modelno)
                         if (orig_atom.residue.name != res.strip()
                                 or orig_atom.name != nam.strip()):
-                            raise PDBError('Atom %d differs in MODEL %d [%s %s '
-                                           'vs. %s %s]' % (atomno, modelno,
-                                           orig_atom.residue.name,
-                                           orig_atom.name, res, nam))
+                            raise PDBError(
+                                f'Atom {atomno} differs in MODEL {modelno} [{orig_atom.residue.name} '
+                                f'{orig_atom.name} vs. {res} {nam}]'
+                            )
                     coordinates.extend([atom.xx, atom.xy, atom.xz])
                 elif words[0] == 'ENDMDL':
                     # End the current model
@@ -184,8 +180,7 @@ class PQRFile(object):
                         raise PDBError('MODEL ended before any atoms read in')
                     modelno += 1
                     if len(struct.atoms)*3 != len(coordinates):
-                        raise PDBError(
-                                'Inconsistent atom numbers in some PDB models')
+                        raise PDBError('Inconsistent atom numbers in some PDB models')
                     all_coordinates.append(coordinates)
                     atomno = 0
                     coordinates = []
@@ -193,8 +188,7 @@ class PQRFile(object):
                     if modelno == 1 and len(struct.atoms) == 0: continue
                     if len(coordinates) > 0:
                         if len(struct.atoms)*3 != len(coordinates):
-                            raise PDBError('Inconsistent atom numbers in '
-                                           'some PDB models')
+                            raise PDBError('Inconsistent atom numbers in some PDB models')
                         warnings.warn('MODEL not explicitly ended', PDBWarning)
                         all_coordinates.append(coordinates)
                         coordinates = []
@@ -208,17 +202,17 @@ class PQRFile(object):
                         A = B = C = 90.0
                     struct.box = [a, b, c, A, B, C]
         finally:
-            if own_handle: fileobj.close()
+            if own_handle:
+                fileobj.close()
 
         struct.unchange()
         if not skip_bonds:
             struct.assign_bonds()
         if coordinates:
-            if len(coordinates) != 3*len(struct.atoms):
+            if len(coordinates) != 3 * len(struct.atoms):
                 raise PDBError('bad number of atoms in some PQR models')
             all_coordinates.append(coordinates)
-        struct._coordinates = np.array(all_coordinates).reshape(
-                        (-1, len(struct.atoms), 3))
+        struct._coordinates = np.array(all_coordinates).reshape((-1, len(struct.atoms), 3))
         return struct
 
     #===================================================

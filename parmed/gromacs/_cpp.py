@@ -1,19 +1,18 @@
 """
-A little utiltity for performing C-like preprocessing using standard CPP
+A little utility for performing C-like preprocessing using some standard CPP
 directives like #if, #ifdef, and #define.
 
 Written by Jason Swails
 """
-from parmed.exceptions import PreProcessorError, PreProcessorWarning
-from parmed.utils.io import genopen
-from parmed.utils.six import string_types, iteritems, wraps
-from collections import OrderedDict
-from os import path
 import re
 import warnings
+from functools import wraps
+from collections import OrderedDict
+from os import path
+from ..exceptions import PreProcessorError, PreProcessorWarning
+from ..utils.io import genopen
 
-ppre = re.compile(r'#\s*(ifdef|ifndef|if|else|elif|endif|define|undef|include)'
-                  r'\s*(.+)?')
+ppre = re.compile(r'#\s*(ifdef|ifndef|if|else|elif|endif|define|undef|include)\s*(.+)?')
 ppcomments = re.compile(r'(?://.+|/\*(?:.*)\*/)')
 includere = re.compile(r'[<"](.+)[>"]')
 novarcharre = re.compile(r'\W')
@@ -109,7 +108,7 @@ class CPreProcessor(object):
     """
 
     def __init__(self, fname, defines=None, includes=None, notfound_fatal=True):
-        if isinstance(fname, string_types):
+        if isinstance(fname, str):
             self._fileobj = genopen(fname, 'r')
             self._ownhandle = True
             curpath = path.abspath(path.split(fname)[0])
@@ -128,7 +127,7 @@ class CPreProcessor(object):
         else:
             # Convert every define to a string
             self.defines = OrderedDict()
-            for define, value in iteritems(defines):
+            for define, value in defines.items():
                 self.defines[define] = str(value)
         self._notfound_fatal = notfound_fatal
 
@@ -213,11 +212,10 @@ class CPreProcessor(object):
             return
         words = args.split()
         if len(words) == 0:
-            raise PreProcessorError('Bad #ifdef syntax: "#ifdef %s"' % args)
+            raise PreProcessorError(f'Bad #ifdef syntax: "#ifdef {args}"')
         elif len(words) > 1:
-            warnings.warn('Ignored tokens in #ifdef: %s' % ', '.join(words[1:]),
-                          PreProcessorWarning)
-        self._ifstack.append('%s in self.defines' % words[0])
+            warnings.warn("Ignored tokens in #ifdef: {', '.join(words[1:])}", PreProcessorWarning)
+        self._ifstack.append(f'{words[0]} in self.defines')
         self._elsestack.append(_IN_IF)
         self._satisfiedstack.append(words[0] in self.defines)
 
@@ -228,11 +226,10 @@ class CPreProcessor(object):
             return
         words = args.split()
         if len(words) == 0:
-            raise PreProcessorError('Bad #ifndef syntax: "#ifndef %s"' % args)
+            raise PreProcessorError(f'Bad #ifndef syntax: "#ifndef {args}"')
         elif len(words) > 1:
-            warnings.warn('Ignored tokens in #ifndef: %s' % ', '.join(words[1:]),
-                          PreProcessorWarning)
-        self._ifstack.append('%s not in self.defines' % words[0])
+            warnings.warn(f"Ignored tokens in #ifndef: {', '.join(words[1:])}", PreProcessorWarning)
+        self._ifstack.append(f'{words[0]} not in self.defines')
         self._elsestack.append(_IN_IF)
         self._satisfiedstack.append(words[0] not in self.defines)
 
@@ -248,8 +245,7 @@ class CPreProcessor(object):
             raise PreProcessorError('#else missing #if(def)')
         words = args.split()
         if len(words) > 0:
-            warnings.warn('Ignored tokens in #else: %s' % ', '.join(words[1:]),
-                          PreProcessorWarning)
+            warnings.warn(f"Ignored tokens in #else: {', '.join(words[1:])}", PreProcessorWarning)
         if self._elsestack[-1] == _IN_ELSE:
             raise PreProcessorError('#else following #else')
         self._elsestack[-1] = _IN_ELSE
@@ -261,8 +257,7 @@ class CPreProcessor(object):
             self._num_ignoring_if -= 1
             return
         if args.strip():
-            warnings.warn('Ignored tokens in #endif: %s' % args.strip(),
-                          PreProcessorWarning)
+            warnings.warn(f'Ignored tokens in #endif: {args.strip()}', PreProcessorWarning)
         if not self._ifstack:
             raise PreProcessorError('#endif missing #if(def)')
         self._ifstack.pop()
@@ -285,9 +280,9 @@ class CPreProcessor(object):
                 break
         else:
             if self._notfound_fatal:
-                raise PreProcessorError('Could not find %s' % includefile)
-            warnings.warn('Could not find %s; skipping' % includefile,
-                          PreProcessorWarning)
+                raise PreProcessorError(f'Could not find {includefile}')
+            warnings.warn(f'Could not find {includefile}; skipping', PreProcessorWarning)
+            return
         self._includefile = CPreProcessor(testfile,
                                           defines=self.defines,
                                           includes=self._includes,
@@ -303,8 +298,7 @@ class CPreProcessor(object):
             raise PreProcessorError('Nothing defined in #define')
         # Warn about a double-define
         if words[0] in self.defines:
-            warnings.warn('%s already defined; overwriting' % words[0],
-                          PreProcessorWarning)
+            warnings.warn(f'{words[0]} already defined; overwriting', PreProcessorWarning)
         if len(words) == 1:
             self.defines[words[0]] = '1'
         elif len(words) >= 2:
@@ -323,8 +317,7 @@ class CPreProcessor(object):
                 # Undefining an undefined variable is a no-op
                 pass
         elif len(words) > 1:
-            warnings.warn('Ignored tokens in #undef: %s' % ', '.join(words[1:]),
-                          PreProcessorWarning)
+            warnings.warn(f"Ignored tokens in #undef: {', '.join(words[1:])}", PreProcessorWarning)
         elif len(words) == 0:
             raise PreProcessorError('Nothing defined in #undef')
 

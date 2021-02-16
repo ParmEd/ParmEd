@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit.prefix
+Module openmm.unit.prefix
 
 This is part of the OpenMM molecular simulation toolkit originating from
 Simbios, the NIH National Center for Physics-Based Simulation of
@@ -140,7 +140,7 @@ def define_prefixed_units(base_unit, module = sys.modules[__name__]):
 
     Parameters
      - base_unit (BaseUnit) existing base unit to use as a basis for prefixed units
-     - module (Module) module which will contain the new attributes.  Defaults to simtk.unit module.
+     - module (Module) module which will contain the new attributes.  Defaults to openmm.unit module.
     """
     for prefix in si_prefixes:
         new_base_unit = prefix * base_unit

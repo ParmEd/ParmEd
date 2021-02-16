@@ -2,7 +2,7 @@
 Contains classes for parsing GROMACS topology and parameter files
 """
 import os as _os
-from parmed.utils import which as _which
+from ..utils import which as _which
 
 __all__ = ['GROMACS_TOPDIR', 'GromacsTopologyFile', 'GromacsGroFile']
 
@@ -13,8 +13,7 @@ if _os.getenv('GMXDATA') is not None and _os.path.isdir(
     GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXDATA'), 'top')
 elif _os.getenv('GMXBIN') is not None and _os.path.isdir(
         _os.path.join(_os.getenv('GMXBIN'), '..', 'share', 'gromacs', 'top')):
-    GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXBIN'), '..', 'share',
-                                  'gromacs', 'top')
+    GROMACS_TOPDIR = _os.path.join(_os.getenv('GMXBIN'), '..', 'share', 'gromacs', 'top')
 else:
     for _testdir in ['/usr', '/usr/local', '/opt/local', '/opt']:
         if _os.path.isdir(_os.path.join(_testdir, 'share', 'gromacs')):
@@ -42,5 +41,5 @@ except NameError:
     pass
 del _os, _which
 
-from parmed.gromacs.gromacstop import GromacsTopologyFile
-from parmed.gromacs.gromacsgro import GromacsGroFile
+from .gromacstop import GromacsTopologyFile
+from .gromacsgro import GromacsGroFile

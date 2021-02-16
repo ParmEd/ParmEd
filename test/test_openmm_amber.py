@@ -1,8 +1,6 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division, print_function, absolute_import
-
 from collections import defaultdict
 from copy import copy
 from math import sqrt
@@ -12,7 +10,6 @@ from parmed.exceptions import ParameterError
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
-from parmed.utils.six.moves import range, zip
 import parmed.tools as PT
 import sys
 import unittest
@@ -39,7 +36,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_ep_energy(self):
         """ Tests AmberParm handling of extra points in TIP4P water """
-        parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+        parm = AmberParm(self.get_fn('tip4p.parm7'), self.get_fn('tip4p.rst7'))
         repr(parm) # Make sure it doesn't crash
         parm.join_dihedrals() # Make sure join_dihedrals doesn't do anything w/ no dihedrals
         self.assertEqual(parm.combining_rule, 'lorentz')
@@ -89,7 +86,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
     @unittest.skipUnless(run_all_tests, "Skipping long tests")
     def test_round_trip_ep(self):
         """ Test ParmEd -> OpenMM round trip with Amber EPs and PME """
-        parm = AmberParm(get_fn('tip4p.parm7'), get_fn('tip4p.rst7'))
+        parm = AmberParm(self.get_fn('tip4p.parm7'), self.get_fn('tip4p.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -131,7 +128,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_ep_energy2(self):
         """ Tests AmberParm handling of extra points in TIP5P water """
-        parm = AmberParm(get_fn('tip5p.parm7'), get_fn('tip5p.rst7'))
+        parm = AmberParm(self.get_fn('tip5p.parm7'), self.get_fn('tip5p.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -175,7 +172,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gas_energy(self):
         """ Compare Amber and OpenMM gas phase energies """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -196,7 +193,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
     def test_improper_dihedrals(self):
         """ Test splitting improper/proper dihedrals in AmberParm """
         to_delete = []
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         for i, d in enumerate(parm.dihedrals):
             if d.improper:
                 continue
@@ -211,7 +208,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_round_trip(self):
         """ Test ParmEd -> OpenMM round trip with Amber gas phase """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem()
         system2 = load_topology(parm.topology, system).createSystem()
@@ -228,10 +225,10 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_round_trip_xml(self):
         """ Test ParmEd -> OpenMM round trip with Amber gas phase via XML """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem()
-        fname = get_fn('ash.xml', written=True)
+        fname = self.get_fn('ash.xml', written=True)
         with open(fname, 'w') as f:
             f.write(mm.XmlSerializer.serialize(system))
         system2 = load_topology(parm.topology, fname).createSystem()
@@ -248,7 +245,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gb1_energy(self): # HCT (igb=1)
         """ Compare Amber and OpenMM GB (igb=1) energies (w/ and w/out salt) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -282,7 +279,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gb2_energy(self): # OBC1 (igb=2)
         """ Compare Amber and OpenMM GB (igb=2) energies (w/ and w/out salt) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -316,7 +313,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gb5_energy(self): # OBC2 (igb=5)
         """ Compare Amber and OpenMM GB (igb=5) energies (w/ and w/out salt) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -350,10 +347,10 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gb7_energy(self): # GBn (igb=7)
         """ Compare Amber and OpenMM GB (igb=7) energies (w/ and w/out salt) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
-        PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
+        PT.loadRestrt(parm, self.get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
@@ -386,10 +383,10 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gb8_energy(self): # GBn2 (igb=8)
         """ Compare Amber and OpenMM GB (igb=8) energies (w/ and w/out salt) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
-        PT.loadRestrt(parm, get_fn('ash.rst7')).execute() # Load crds into copy
+        PT.loadRestrt(parm, self.get_fn('ash.rst7')).execute() # Load crds into copy
         system = parm.createSystem(implicitSolvent=app.GBn2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
         sim = app.Simulation(parm.topology, system, integrator, platform=CPU)
@@ -422,7 +419,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_energy_decomp_system(self):
         """ Tests the energy_decomposition_system function """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         system = parm.createSystem(implicitSolvent=app.GBn2)
         energies = energy_decomposition_system(parm, system)
@@ -444,7 +441,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
         self.assertRelativeEqual(energies[3][1], -30.238225, places=3)
         self.assertRelativeEqual(energies[4][1], -23.464687, places=3)
         self.assertEqual(energies[5][1], 0)
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
         energies = energy_decomposition_system(parm, system, platform='CPU')
@@ -452,7 +449,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
     @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_ewald(self):
         """ Compare Amber and OpenMM Ewald energies """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.Ewald,
                                    nonbondedCutoff=8*u.angstroms,
@@ -468,7 +465,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_pme(self):
         """ Compare Amber and OpenMM PME energies """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -488,7 +485,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_dispersion_correction(self):
         """ Compare Amber and OpenMM PME energies w/out vdW correction """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         sys.stdout.flush()
         system = parm.createSystem(nonbondedMethod=app.PME,
@@ -513,7 +510,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_shake(self):
         """ Compare Amber and OpenMM PME energies excluding SHAKEn bonds """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -533,7 +530,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
     def test_nbfix(self):
         """ Compare Amber and OpenMM PME energies with NBFIX modifications """
         # For now, long-range correction is not available
-        parm = AmberParm(get_fn('ff14ipq.parm7'), get_fn('ff14ipq.rst7'))
+        parm = AmberParm(self.get_fn('ff14ipq.parm7'), self.get_fn('ff14ipq.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         self.assertTrue(parm.has_NBFIX())
         PT.change(parm, 'CHARGE', ':*', 0).execute() # only check LJ energies
@@ -664,7 +661,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_1264(self):
         """ Testing the 12-6-4 LJ potential in OpenMM """
-        parm = AmberParm(get_fn('znf_1264.prmtop'), get_fn('znf.rst'))
+        parm = AmberParm(self.get_fn('znf_1264.prmtop'), self.get_fn('znf.rst'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff)
         for force in system.getForces():
@@ -682,7 +679,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_1012(self):
         """ Testing the 10-12 LJ H-bond potential in OpenMM """
-        parm = AmberParm(get_fn('ff91.parm7'), get_fn('ff91.rst7'))
+        parm = AmberParm(self.get_fn('ff91.parm7'), self.get_fn('ff91.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms)
@@ -731,7 +728,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
         # This used to be a bug
         # Constrain just bonds. Make sure 1000 angles remain, and we have 2000
         # constraints
-        parm = AmberParm(get_fn('gaffwat.parm7'))
+        parm = AmberParm(self.get_fn('gaffwat.parm7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -767,7 +764,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_interface_pbc(self):
         """ Testing all AmberParm.createSystem options (periodic) """
-        parm = AmberParm(get_fn('solv2.parm7'), get_fn('solv2.rst7'))
+        parm = AmberParm(self.get_fn('solv2.parm7'), self.get_fn('solv2.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -884,7 +881,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_dihedral_splitting(self):
         """ Tests proper splitting of torsions into proper/improper groups """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         prop, improp = parm.omm_dihedral_force(split=True)
         self.assertEqual(improp.getNumTorsions(), 5)
         self.assertEqual(prop.getNumTorsions(), len(parm.dihedrals)-5)
@@ -893,7 +890,7 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_interface_no_pbc(self):
         """ Testing all AmberParm.createSystem options (non-periodic) """
-        parm = AmberParm(get_fn('ash.parm7'), get_fn('ash.rst7'))
+        parm = AmberParm(self.get_fn('ash.parm7'), self.get_fn('ash.rst7'))
         PT.changeRadii(parm, 'mbondi3').execute()
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
@@ -1041,8 +1038,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gas_energy(self):
         """ Compare OpenMM and CHAMBER gas phase energies """
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1077,8 +1073,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gb1_energy(self): # HCT (igb=1)
         """Compare OpenMM and CHAMBER GB (igb=1) energies (w/ and w/out salt)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.HCT)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1120,8 +1115,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gb2_energy(self): # OBC1 (igb=2)
         """Compare OpenMM and CHAMBER GB (igb=2) energies (w/ and w/out salt)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC1)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1163,8 +1157,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gb5_energy(self): # OBC2 (igb=5)
         """Compare OpenMM and CHAMBER GB (igb=5) energies (w/ and w/out salt)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(implicitSolvent=app.OBC2)
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1206,8 +1199,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gb7_energy(self): # GBn (igb=7)
         """Compare OpenMM and CHAMBER GB (igb=7) energies (w/ and w/out salt)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
@@ -1251,8 +1243,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_gb8_energy(self): # GBn2 (igb=8)
         """Compare OpenMM and CHAMBER GB (igb=8) energies (w/ and w/out salt)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         PT.changeRadii(parm, 'mbondi3').execute() # Need new radius set
         PT.loadRestrt(parm, get_fn('ala_ala_ala.rst7')).execute()
@@ -1296,8 +1287,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_rst7(self):
         """ Test using OpenMMRst7 to provide coordinates (CHAMBER) """
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -1401,8 +1391,7 @@ class TestChamberParm(TestCaseRelative):
     @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_pme(self):
         """ Compare OpenMM and CHAMBER PME energies on big system """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'), get_fn('dhfr_cmap_pbc.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1429,8 +1418,7 @@ class TestChamberParm(TestCaseRelative):
     @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_dispersion_correction(self):
         """ Compare OpenMM and CHAMBER w/out vdW corr on big system """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'), get_fn('dhfr_cmap_pbc.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1460,8 +1448,7 @@ class TestChamberParm(TestCaseRelative):
     @unittest.skipUnless(run_all_tests, "Skipping OMM tests on large systems")
     def test_big_shake(self):
         """ Compare OpenMM and CHAMBER PME excluding SHAKEn bonds (big) """
-        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'),
-                           get_fn('dhfr_cmap_pbc.rst7'))
+        parm = ChamberParm(get_fn('dhfr_cmap_pbc.parm7'), get_fn('dhfr_cmap_pbc.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=8*u.angstroms,
@@ -1480,8 +1467,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_interface_pbc(self):
         """ Testing all ChamberParm.createSystem options (periodic) """
-        parm = ChamberParm(get_fn('ala3_solv.parm7'),
-                           get_fn('ala3_solv.rst7'))
+        parm = ChamberParm(get_fn('ala3_solv.parm7'), get_fn('ala3_solv.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.PME,
                                    nonbondedCutoff=10.0*u.angstroms,
@@ -1621,8 +1607,7 @@ class TestChamberParm(TestCaseRelative):
 
     def test_interface_no_pbc(self):
         """Testing all ChamberParm.createSystem options (non-periodic)"""
-        parm = ChamberParm(get_fn('ala_ala_ala.parm7'),
-                           get_fn('ala_ala_ala.rst7'))
+        parm = ChamberParm(get_fn('ala_ala_ala.parm7'), get_fn('ala_ala_ala.rst7'))
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem(nonbondedMethod=app.NoCutoff,
                                    constraints=app.HBonds,
@@ -1715,12 +1700,9 @@ class TestChamberParm(TestCaseRelative):
             if isinstance(f, mm.NonbondedForce):
                 self.assertEqual(f.getNonbondedMethod(), 0)
         # Test some illegal options
-        self.assertRaises(ValueError, lambda:
-                parm.createSystem(nonbondedMethod=app.PME))
-        self.assertRaises(ValueError, lambda:
-                parm.createSystem(nonbondedMethod=app.CutoffPeriodic))
-        self.assertRaises(ValueError, lambda:
-                parm.createSystem(nonbondedMethod=app.Ewald))
+        for nbmethod in (app.PME, app.CutoffPeriodic, app.Ewald):
+            with self.assertRaises(ValueError):
+                parm.createSystem(nonbondedMethod=nbmethod)
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
 class TestAmoebaParm(TestCaseRelative):
@@ -1729,17 +1711,12 @@ class TestAmoebaParm(TestCaseRelative):
     def test_amoeba_forces(self):
         """ Test creation of some AMOEBA forces """
         parm = load_file(get_fn('amoeba.parm7'))
-        self.assertIsInstance(parm.omm_bond_force(rigidWater=False),
-                              mm.AmoebaBondForce)
+        self.assertIsInstance(parm.omm_bond_force(rigidWater=False), mm.AmoebaBondForce)
         self.assertIsInstance(parm.omm_angle_force(), mm.AmoebaAngleForce)
-        self.assertIsInstance(parm.omm_trigonal_angle_force(),
-                              mm.AmoebaInPlaneAngleForce)
-        self.assertIsInstance(parm.omm_out_of_plane_bend_force(),
-                              mm.AmoebaOutOfPlaneBendForce)
-        self.assertIsInstance(parm.omm_pi_torsion_force(),
-                              mm.AmoebaPiTorsionForce)
-        self.assertIsInstance(parm.omm_stretch_bend_force(),
-                              mm.AmoebaStretchBendForce)
+        self.assertIsInstance(parm.omm_trigonal_angle_force(), mm.AmoebaInPlaneAngleForce)
+        self.assertIsInstance(parm.omm_out_of_plane_bend_force(), mm.AmoebaOutOfPlaneBendForce)
+        self.assertIsInstance(parm.omm_pi_torsion_force(), mm.AmoebaPiTorsionForce)
+        self.assertIsInstance(parm.omm_stretch_bend_force(), mm.AmoebaStretchBendForce)
 
         # Now some error handling
         # Trigonal angles

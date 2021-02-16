@@ -1,17 +1,14 @@
-ParmEd
-======
+# ParmEd
 
 Cross-program parameter and topology file editor and molecular mechanical
 simulator engine.
 
-Badges
-======
+## Badges
 
-[![Build/Test Status](https://travis-ci.org/ParmEd/ParmEd.svg?branch=master)](https://travis-ci.org/ParmEd/ParmEd)
-[![Coverage Status](https://coveralls.io/repos/github/ParmEd/ParmEd/badge.svg?branch=master)](https://coveralls.io/github/ParmEd/ParmEd?branch=master)
+![(Build/Test Status)](https://github.com/ParmEd/ParmEd/workflows/Tests/badge.svg)
+[![codecov](https://codecov.io/gh/ParmEd/ParmEd/branch/master/graph/badge.svg)](https://codecov.io/gh/ParmEd/ParmEd)
 
-Description
-===========
+## Description
 
 ParmEd is a package designed to facilitate creating and easily manipulating
 molecular systems that are fully described by a common classical force field.
@@ -35,15 +32,14 @@ The API also provides bindings to the [OpenMM](https://simtk.org/home/openmm)
 library, permitting you to carry out full molecular dynamics investigations
 using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
 
-Installing ParmEd
-=================
+## Installing ParmEd
 
 To install ParmEd, either clone this git repository or download [the latest
 release](https://github.com/ParmEd/ParmEd/releases) and unpack the resulting
 tarball. This should create a new ParmEd source code directory. Change to that
 directory and build ParmEd with the command
 
-```
+```sh
 python setup.py install
 ```
 
@@ -53,14 +49,22 @@ it to your home directory. I would suggest the latter choice.
 
 AMBER user can overwrite installed version by
 
-```
+```sh
 python setup.py install --prefix=$AMBERHOME
 ```
 
-Examples
-========
+## Testing ParmEd
 
-```bash
+In order to automatically run the ParmEd tests, execute the following:
+
+```sh
+cd test
+py.test .
+```
+
+## Examples
+
+```python
 import parmed as pmd
 
 # convert GROMACS topology to AMBER format
@@ -70,13 +74,17 @@ gmx_top.save('pmaa.crd', format='rst7')
 
 # convert AMBER topology to GROMACS, CHARMM formats
 amber = pmd.load_file('prmtop', 'inpcrd')
-# Save a GROMACS topology and GRO file
+# Save a GROMACS topology and GRO files
 amber.save('gromacs.top')
 amber.save('gromacs.gro')
 
-# Save a CHARMM PSF and crd file
+# Save a CHARMM PSF and crd files
 amber.save('charmm.psf')
 amber.save('charmm.crd')
+
+# Save a DLPOLY FIELD and CONFIG files
+amber.save('dlpoly.field')
+amber.save('dlpoly.config')
 
 # convert mol2 to pdb file
 mol2_parm = pmd.load_file('my.mol2')
@@ -85,15 +93,13 @@ mol2_parm.save('my.pdb')
 # and many more
 ```
 
-Documentation
-=============
+## Documentation
 
 Want to learn more?  Visit the ParmEd documentation page at
 https://parmed.github.io/ParmEd for examples, descriptions, and API
 documentation.
 
-Authors and Contributors
-========================
+## Authors and Contributors
 
 The following people have contributed directly to the coding and validation
 efforts in ParmEd (in alphabetical order).  And a special thanks to all of you
@@ -108,8 +114,7 @@ other general comments!
 * Lee-Ping Wang
 * Pawel Janowski
 
-License
-=======
+## License
 
 ```
                     LESSER GPL LICENSE INFO

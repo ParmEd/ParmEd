@@ -16,3 +16,8 @@ several examples.
 
 .. image:: images/nglview_tz2.png
     :width: 300
+
+- Visualize structure minimization
+
+.. image:: images/nglview_tz2_min.gif
+    :width: 300

@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit
+Module openmm.unit
 
 Contains classes Unit and ScaledUnit.
 
@@ -32,8 +32,6 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from __future__ import division, print_function, absolute_import
-from parmed.utils.six import iterkeys
-from parmed.utils.six.moves import range
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
@@ -42,7 +40,6 @@ __version__ = "0.5"
 import math
 import sys
 from .mymatrix import MyMatrix, zeros
-from .basedimension import BaseDimension
 from .baseunit import BaseUnit
 from .standard_dimensions import *
 
@@ -56,9 +53,12 @@ class Unit(object):
     def __init__(self, base_or_scaled_units):
         """Create a new Unit.
 
-        Parameters:
-         - self (Unit) The newly created Unit.
-         - base_or_scaled_units (dict) Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).
+        Parameters
+        ----------
+        self : Unit
+            The newly created Unit.
+        base_or_scaled_units : dict
+            Keys are BaseUnits or ScaledUnits.  Values are exponents (numbers).
         """
         # Unit contents are of two types: BaseUnits and ScaledUnits
         self._top_base_units = {}
@@ -104,10 +104,10 @@ class Unit(object):
         # TODO - also handle non-simple units, i.e. units with multiple BaseUnits/ScaledUnits
         assert len(self._top_base_units) == 1
         assert len(self._scaled_units) == 0
-        dimension = next(iterkeys(self._top_base_units))
+        dimension = next(iter(self._top_base_units))
         base_unit_dict = self._top_base_units[dimension]
         assert len(base_unit_dict) == 1
-        parent_base_unit = next(iterkeys(base_unit_dict))
+        parent_base_unit = next(iter(base_unit_dict))
         parent_exponent = base_unit_dict[parent_base_unit]
         new_base_unit = BaseUnit(parent_base_unit.dimension, name, symbol)
         # BaseUnit scale might be different depending on exponent
@@ -124,9 +124,7 @@ class Unit(object):
         """
         # There might be two units with the same dimension? No.
         for dimension in sorted(self._all_base_units.keys()):
-            exponent = 0
-            for base_unit in sorted(self._all_base_units[dimension].keys()):
-                exponent += self._all_base_units[dimension][base_unit]
+            exponent = sum(self._all_base_units[dimension].values())
             if exponent != 0:
                 yield (dimension, exponent)
 
@@ -180,7 +178,7 @@ class Unit(object):
         return self.get_name() == other.get_name()
 
     def __ne__(self, other):
-        return not self.__eq__(other)
+        return not self == other
 
     def __lt__(self, other):
         """Compare two Units.
@@ -192,6 +190,15 @@ class Unit(object):
         if not self.is_compatible(other):
             raise TypeError('Unit "%s" is not compatible with Unit "%s".', (self, other))
         return self.conversion_factor_to(other) < 1.0
+
+    def __le__(self, other):
+        return self.__lt__(other) or self.__eq__(other)
+
+    def __gt__(self, other):
+        return other.__lt__(self) 
+
+    def __ge__(self, other):
+        return other.__lt__(self) or other.__eq__(self)
 
     def __hash__(self):
         """
@@ -364,23 +371,38 @@ class Unit(object):
         assert self.is_compatible(other)
         factor *= self.get_conversion_factor_to_base_units()
         factor /= other.get_conversion_factor_to_base_units()
-        # Organize both units' base units by dimension
+
+        # Organize both units' base units by dimension.  Since so many conversion factors
+        # are powers of ten, we accumulate them separately as an integer power to reduce
+        # numerical error.
 
         canonical_units = {} # dimension: BaseUnit
+        powers_of_ten = 0
         for unit, power in self.iter_all_base_units():
             d = unit.dimension
             if d in canonical_units:
                 if unit != canonical_units[d]:
-                    factor *= unit.conversion_factor_to(canonical_units[d])**power
+                    conversion = unit.conversion_factor_to(canonical_units[d])
+                    log_conversion = math.log10(conversion)
+                    if log_conversion == int(log_conversion):
+                        powers_of_ten += power*int(log_conversion)
+                    else:
+                        factor *= conversion**power
             else:
                 canonical_units[d] = unit
         for unit, power in other.iter_all_base_units():
             d = unit.dimension
             if d in canonical_units:
                 if unit != canonical_units[d]:
-                    factor /= unit.conversion_factor_to(canonical_units[d])**power
+                    conversion = unit.conversion_factor_to(canonical_units[d])
+                    log_conversion = math.log10(conversion)
+                    if log_conversion == int(log_conversion):
+                        powers_of_ten -= power*int(log_conversion)
+                    else:
+                        factor /= conversion**power
             else:
                 canonical_units[d] = unit
+        factor *= 10**powers_of_ten
         if not self in Unit._conversion_factor_cache:
             Unit._conversion_factor_cache[self] = {}
         Unit._conversion_factor_cache[self][other] = factor
@@ -393,7 +415,8 @@ class Unit(object):
         Strips off any ScaledUnits in the Unit, leaving only BaseUnits.
 
         Parameters
-         - system: a dictionary of (BaseDimension, BaseUnit) pairs
+        ----------
+        system : a dictionary of (BaseDimension, BaseUnit) pairs
         """
         return system.express_unit(self)
 
@@ -587,7 +610,7 @@ class UnitSystem(object):
 
     Parameters
     ----------
-    units: ``list``
+    units : list
         List of base units from which to construct the unit system
     """
     def __init__(self, units):
@@ -604,8 +627,7 @@ class UnitSystem(object):
         if not len(self.base_units) == len(self.units):
             raise ArithmeticError("UnitSystem must have same number of units as base dimensions")
         # self.dimensions is a dict of {BaseDimension: index}
-        dimensions = list(base_units.keys())
-        dimensions.sort()
+        dimensions = sorted(base_units.keys())
         self.dimensions = {}
         for d in range(len(dimensions)):
             self.dimensions[dimensions[d]] = d
@@ -619,6 +641,10 @@ class UnitSystem(object):
         try:
             self.from_base_units = ~to_base_units
         except ArithmeticError as e:
+        # for compatibility between python 2.5 and python 3.0,
+        # try replacing line above with the following two lines:
+        # except ArithmeticError:
+        #     e=sys.exc_info[1]
             raise ArithmeticError("UnitSystem is not a valid basis set.  " + str(e))
 
     def __iter__(self):
@@ -679,7 +705,7 @@ def is_unit(x):
     Returns True if x is a Unit, False otherwise.
 
     Examples
-
+    --------
     >>> is_unit(16)
     False
     """

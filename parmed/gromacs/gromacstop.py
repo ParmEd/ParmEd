@@ -2,8 +2,6 @@
 This module contains functionality relevant to loading a GROMACS topology file
 and building a Structure from it
 """
-from __future__ import print_function, division, absolute_import
-
 from collections import OrderedDict, defaultdict
 from contextlib import closing
 import copy
@@ -11,34 +9,32 @@ from datetime import datetime
 import math
 import os
 import re
-try:
-    from string import letters
-except ImportError:
-    from string import ascii_letters as letters
+from string import ascii_letters
 import sys
 import warnings
 
-from parmed.constants import TINY, DEG_TO_RAD
-from parmed.exceptions import GromacsError, GromacsWarning, ParameterError
-from parmed.formats.registry import FileFormatType
-from parmed.parameters import ParameterSet, _find_ureybrad_key
-from parmed.gromacs._gromacsfile import GromacsFile
-from parmed.structure import Structure
-from parmed.topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
+from ..constants import TINY, DEG_TO_RAD
+from ..exceptions import GromacsError, GromacsWarning, ParameterError
+from ..formats.registry import FileFormatType
+from ..parameters import ParameterSet, _find_ureybrad_key
+from ._gromacsfile import GromacsFile
+from ..structure import Structure
+from ..topologyobjects import (Atom, Bond, Angle, Dihedral, Improper,
             NonbondedException, ExtraPoint, BondType, Cmap, NoUreyBradley,
             AngleType, DihedralType, DihedralTypeList, ImproperType, CmapType,
             RBTorsionType, ThreeParticleExtraPointFrame, AtomType, UreyBradley,
             TwoParticleExtraPointFrame, OutOfPlaneExtraPointFrame,
             NonbondedExceptionType, UnassignedAtomType)
-from parmed.periodic_table import element_by_mass, AtomicNum
-from parmed import unit as u
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types, iteritems
-from parmed.utils.six.moves import range
+from ..periodic_table import element_by_mass, AtomicNum
+from .. import unit as u
+from ..utils.io import genopen
 
 try:
     import pwd
-    _username = pwd.getpwuid(os.getuid())[0]
+    try:
+        _username = pwd.getpwuid(os.getuid())[0]
+    except KeyError:
+        _username = 'username'
     _userid = os.getuid()
     _uname = os.uname()[1]
 except ImportError:
@@ -47,6 +43,7 @@ except ImportError:
     _userid = 0                     # pragma: no cover
     import platform                 # pragma: no cover
     _uname = platform.node()        # pragma: no cover
+
 
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
@@ -95,8 +92,7 @@ _sectionre = re.compile(r'\[ (\w+) \]\s*$')
 
 class _Defaults(object):
     """ Global properties of force fields as implemented in GROMACS """
-    def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='no',
-                 fudgeLJ=1.0, fudgeQQ=1.0):
+    def __init__(self, nbfunc=1, comb_rule=2, gen_pairs='no', fudgeLJ=1.0, fudgeQQ=1.0):
         if int(nbfunc) not in (1, 2):
             raise ValueError('nbfunc must be 1 (L-J) or 2 (Buckingham)')
         if int(comb_rule) not in (1, 2, 3):
@@ -121,12 +117,17 @@ class _Defaults(object):
     def __getitem__(self, idx):
         # Treat it like the array that it is in the topology file
         if idx < 0: idx += 5
-        if idx == 0: return self.nbfunc
-        if idx == 1: return self.comb_rule
-        if idx == 2: return self.gen_pairs
-        if idx == 3: return self.fudgeLJ
-        if idx == 4: return self.fudgeQQ
-        raise IndexError('Index %d out of range' % idx)
+        if idx == 0:
+            return self.nbfunc
+        if idx == 1:
+            return self.comb_rule
+        if idx == 2:
+            return self.gen_pairs
+        if idx == 3:
+            return self.fudgeLJ
+        if idx == 4:
+            return self.fudgeQQ
+        raise IndexError(f'Index {idx} out of range')
 
     def __eq__(self, other):
         return (self.nbfunc == other.nbfunc and
@@ -158,10 +159,112 @@ class _Defaults(object):
                 raise ValueError('fudgeQQ must be non-negative')
             self.fudgeQQ = value
         else:
-            raise IndexError('Index %d out of range' % idx)
+            raise IndexError(f'Index {idx} out of range')
 
-@add_metaclass(FileFormatType)
-class GromacsTopologyFile(Structure):
+class TopFromStructureMixin:
+
+    @classmethod
+    def from_structure(cls, struct, copy=False):
+        """ Instantiates a GromacsTopologyFile instance from a Structure
+
+        Parameters
+        ----------
+        struct : :class:`parmed.Structure`
+            The input structure to generate from
+        copy : bool, optional
+            If True, assign from a *copy* of ``struct`` (this is a lot slower).
+            Default is False
+
+        Returns
+        -------
+        gmxtop : :class:`GromacsTopologyFile`
+            The topology file defined by the given struct
+        """
+        from copy import copy as _copy
+        clstop = cls()
+        if copy:
+            struct = _copy(struct)
+            struct.join_dihedrals()
+        clstop.atoms = struct.atoms
+        clstop.residues = struct.residues
+        clstop.bonds = struct.bonds
+        clstop.angles = struct.angles
+        clstop.dihedrals = struct.dihedrals
+        clstop.impropers = struct.impropers
+        clstop.cmaps = struct.cmaps
+        clstop.rb_torsions = struct.rb_torsions
+        clstop.urey_bradleys = struct.urey_bradleys
+        clstop.adjusts = struct.adjusts
+        clstop.bond_types = struct.bond_types
+        clstop.angle_types = struct.angle_types
+        clstop.dihedral_types = struct.dihedral_types
+        clstop.improper_types = struct.improper_types
+        clstop.cmap_types = struct.cmap_types
+        clstop.rb_torsion_types = struct.rb_torsion_types
+        clstop.urey_bradley_types = struct.urey_bradley_types
+        clstop.adjust_types = struct.adjust_types
+        clstop.combining_rule = struct.combining_rule
+        clstop.box = struct.box
+        clstop.nrexcl = struct.nrexcl
+        if (struct.trigonal_angles or
+                struct.out_of_plane_bends or
+                struct.pi_torsions or
+                struct.stretch_bends or
+                struct.torsion_torsions or
+                struct.chiral_frames or
+                struct.multipole_frames):
+            raise TypeError('GromacsTopologyFile does not support Amoeba FF')
+        # Now check what the 1-4 scaling factors should be
+        if hasattr(struct, 'defaults') and isinstance(struct.defaults, _Defaults):
+            clstop.defaults = struct.defaults
+        else:
+            scee_values = set()
+            scnb_values = set()
+            if struct.adjusts:
+                for adjust in struct.adjusts:
+                    if adjust.type is None: continue
+                    scee_values.add(1/adjust.type.chgscale)
+                    # Do not add scnb_values, since we can just set explicit
+                    # exception pair parameters in GROMACS (which this structure
+                    # already has)
+                # In order to specify specific pair parameters, we need to set
+                # gen_pairs to 'no' so that the pair-specific L-J parameters are
+                # printed to the topology file (rather than being auto-created)
+                clstop.defaults.gen_pairs = 'no'
+            else:
+                for dihedral in struct.dihedrals:
+                    if dihedral.type is None or dihedral.ignore_end: continue
+                    if isinstance(dihedral.type, DihedralTypeList):
+                        for dt in dihedral.type:
+                            if dt.scee:
+                                scee_values.add(dt.scee)
+                            if dt.scnb:
+                                scnb_values.add(dt.scnb)
+                    else:
+                        if dihedral.type.scee:
+                            scee_values.add(dihedral.type.scee)
+                        if dihedral.type.scnb:
+                            scnb_values.add(dihedral.type.scnb)
+            if len(set('%.5f' % x for x in scee_values)) > 1:
+                raise GromacsError('Structure has mixed 1-4 scaling which is '
+                                   'not supported by Gromacs')
+            scee_values = list(scee_values)
+            scnb_values = list(scnb_values)
+            if len(set('%.5f' % x for x in scee_values)) == 1:
+                clstop.defaults.fudgeQQ = 1/scee_values[0]
+            else:
+                clstop.defaults.fudgeQQ = 1.0
+            if len(set('%.5f' % x for x in scnb_values)) == 1:
+                clstop.defaults.fudgeLJ = 1/scnb_values[0]
+            else:
+                clstop.defaults.fudgeLJ = 1.0
+        if clstop.combining_rule == 'geometric':
+            clstop.defaults.comb_rule = 3
+
+        clstop.parameterset = ParameterSet.from_structure(struct, allow_unequal_duplicates=True)
+        return clstop
+
+class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormatType):
     """ Class providing a parser and writer for a GROMACS topology file
 
     Parameters
@@ -237,9 +340,8 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    def __init__(self, fname=None, defines=None, parametrize=True,
-                 xyz=None, box=None):
-        from parmed import load_file
+    def __init__(self, fname=None, defines=None, parametrize=True, xyz=None, box=None):
+        from .. import load_file
         super(GromacsTopologyFile, self).__init__()
         self.parameterset = None
         self.defaults = _Defaults(gen_pairs='yes') # make ParmEd's default yes
@@ -247,11 +349,10 @@ class GromacsTopologyFile(Structure):
             self.read(fname, defines, parametrize)
             # Fill in coordinates and unit cell information if appropriate
             if xyz is not None:
-                if isinstance(xyz, string_types):
+                if isinstance(xyz, str):
                     f = load_file(xyz, skip_bonds=True)
                     if not hasattr(f, 'coordinates') or f.coordinates is None:
-                        raise TypeError('File %s does not have coordinates' %
-                                        xyz)
+                        raise TypeError(f'File {xyz} does not have coordinates')
                     self.coordinates = f.coordinates
                     if box is None and hasattr(f, 'box'):
                         self.box = f.box
@@ -267,20 +368,20 @@ class GromacsTopologyFile(Structure):
 
     def read(self, fname, defines=None, parametrize=True):
         """ Reads the topology file into the current instance """
-        from parmed import gromacs as gmx
+        from .. import gromacs as gmx
         params = self.parameterset = ParameterSet()
-        molecules = dict()
+        molecules = self.molecules = dict()
         bond_types = dict()
         angle_types = dict()
         ub_types = dict()
         dihedral_types = dict()
         exc_types = dict()
         structure_contents = []
+        molnames = []
         if defines is None:
             defines = OrderedDict(FLEXIBLE=1)
         proper_multiterm_dihedrals = dict()
-        with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR],
-                                 defines=defines)) as f:
+        with closing(GromacsFile(fname, includes=[gmx.GROMACS_TOPDIR], defines=defines)) as f:
             current_section = None
             for line in f:
                 line = line.strip()
@@ -292,10 +393,10 @@ class GromacsTopologyFile(Structure):
                     molname, nrexcl = line.split()
                     nrexcl = int(nrexcl)
                     if molname in molecules:
-                        raise GromacsError('Duplicate definition of molecule %s'
-                                           % molname)
+                        raise GromacsError(f'Duplicate definition of molecule {molname}')
                     molecule = Structure()
                     molecules[molname] = (molecule, nrexcl)
+                    molnames.append(molname)
                     molecule.nrexcl = nrexcl
                     bond_types = dict()
                     angle_types = dict()
@@ -305,22 +406,20 @@ class GromacsTopologyFile(Structure):
                 elif current_section == 'atoms':
                     molecule.add_atom(*self._parse_atoms(line, params))
                 elif current_section == 'bonds':
-                    bond, bond_type = self._parse_bonds(line, bond_types,
-                                                        molecule.atoms)
+                    bond, bond_type = self._parse_bonds(line, bond_types, molecule.atoms)
                     molecule.bonds.append(bond)
                     if bond_type is not None:
                         molecule.bond_types.append(bond_type)
                         bond_type.list = molecule.bond_types
                 elif current_section == 'pairs':
-                    nbe, nbet = self._parse_pairs(line, exc_types,
-                                                  molecule.atoms)
+                    nbe, nbet = self._parse_pairs(line, exc_types, molecule.atoms)
                     molecule.adjusts.append(nbe)
                     if nbet is not None:
                         molecule.adjust_types.append(nbet)
                         nbet.list = molecule.adjust_types
                 elif current_section == 'angles':
-                    ang, ub, angt, ubt = self._parse_angles(line, angle_types,
-                                                     ub_types, molecule.atoms)
+                    ang, ub, angt, ubt = self._parse_angles(line, angle_types, ub_types,
+                                                            molecule.atoms)
                     molecule.angles.append(ang)
                     if ub is not None:
                         molecule.urey_bradleys.append(ub)
@@ -331,8 +430,8 @@ class GromacsTopologyFile(Structure):
                         molecule.urey_bradley_types.append(ubt)
                         ubt.list = molecule.urey_bradley_types
                 elif current_section == 'dihedrals':
-                    self._parse_dihedrals(line, dihedral_types,
-                                          proper_multiterm_dihedrals, molecule)
+                    self._parse_dihedrals(line, dihedral_types, proper_multiterm_dihedrals,
+                                          molecule)
                 elif current_section == 'cmap':
                     cmap = self._parse_cmaps(line, molecule.atoms)
                     molecule.cmaps.append(cmap)
@@ -343,8 +442,8 @@ class GromacsTopologyFile(Structure):
                     if len(words) < 2: # 3, 4, and 5 fields are optional
                         raise GromacsError('Too few fields in [ defaults ]')
                     if words[0] != '1':
-                        warnings.warn('Unsupported nonbonded type; unknown '
-                                      'functional', GromacsWarning)
+                        warnings.warn('Unsupported nonbonded type; unknown functional',
+                                      GromacsWarning)
                         self.unknown_functional = True
                     if words[1] in ('1', '3'):
                         self.combining_rule = 'geometric'
@@ -362,7 +461,7 @@ class GromacsTopologyFile(Structure):
                     try:
                         b, bt = self._parse_vsites3(line, molecule.atoms, params)
                     except KeyError:
-                        raise GromacsError('Cannot determine vsite geometry'
+                        raise GromacsError('Cannot determine vsite geometry '
                                            'without parameter types')
                     molecule.bonds.append(b)
                     molecule.bond_types.append(bt)
@@ -423,6 +522,13 @@ class GromacsTopologyFile(Structure):
                     params.pair_types[(a, b)] = params.pair_types[(b, a)] = t
             itplist = f.included_files
 
+        # If the file did not contain the molecules section, perhaps
+        # because it was an itp-file. We assume that each molecule loaded
+        # should be contained once in this structure
+        if not structure_contents :
+            for name in molnames :
+                structure_contents.append((name, 1))
+
         # Combine first, then parametrize. That way, we don't have to create
         # copies of the ParameterType instances in self.parameterset
         for molname, num in structure_contents:
@@ -473,13 +579,9 @@ class GromacsTopologyFile(Structure):
                 atomic_number = attype.atomic_number
             else:
                 atomic_number = AtomicNum[element_by_mass(mass)]
-        if len(words) < 7:
-            charge = None
-        else:
-            charge = float(words[6])
+        charge = float(words[6]) if len(words) > 6 else None
         if atomic_number == 0:
-            atom = ExtraPoint(name=words[4], type=words[1],
-                              charge=charge)
+            atom = ExtraPoint(name=words[4], type=words[1], charge=charge)
         else:
             atom = Atom(atomic_number=atomic_number, name=words[4],
                         type=words[1], charge=charge, mass=mass)
@@ -528,11 +630,8 @@ class GromacsTopologyFile(Structure):
             if (sig, eps) in exc_types:
                 nbe.type = exc_types[(sig, eps)]
             else:
-                nbet = NonbondedExceptionType(
-                        sig*u.nanometers,
-                        eps*u.kilojoules_per_mole,
-                        self.defaults.fudgeQQ,
-                )
+                nbet = NonbondedExceptionType(sig*u.nanometers, eps*u.kilojoules_per_mole,
+                                              self.defaults.fudgeQQ)
                 exc_types[(sig, eps)] = nbe.type = nbet
         return nbe, nbet
 
@@ -712,8 +811,7 @@ class GromacsTopologyFile(Structure):
     def _parse_atomtypes(self, line):
         """ Parses line from atomtypes section, returns str, AtomType """
         words = line.split()
-        # Support the following spec, found in the Gromacs source
-        # code:
+        # Support the following spec, found in the Gromacs source code:
         # Field 0 (mandatory) : nonbonded type name (string)
         # Field 1 (optional)  : bonded type (string)
         # Field 2 (optional)  : atomic number (int)
@@ -721,19 +819,22 @@ class GromacsTopologyFile(Structure):
         # Field 4 (mandatory) : charge (float)
         # Field 5 (mandatory) : particle type (single character)
         attype = words[0]
-        if len(words[3]) == 1 and words[3] in letters:
+        if len(words[3]) == 1 and words[3] in ascii_letters:
+            # Field 1 and Field 2 are both missing
             atnum = -1
             sigidx = 4
 #           ptypeidx = 3 # ... unused
             massidx = 1
             bond_type = None
-        elif len(words[5]) == 1 and words[5] in letters:
+        elif len(words[5]) == 1 and words[5] in ascii_letters:
+            # Both Field 1 and Field 2 are present
             sigidx = 6
 #           ptypeidx = 5 # ... unused
             massidx = 3
             atnum = int(words[2])
             bond_type = words[1]
         else:
+            # One of Field 1 or 2 are missing
 #           ptypeidx = 4 # ... unused
             massidx = 2
             sigidx = 5
@@ -751,8 +852,7 @@ class GromacsTopologyFile(Structure):
 #       ptype = words[ptypeidx] # ... unused
         sig = float(words[sigidx]) * u.nanometers
         eps = float(words[sigidx+1]) * u.kilojoules_per_mole
-        typ = AtomType(attype, None, mass, atnum,
-                       bond_type=bond_type, charge=chg)
+        typ = AtomType(attype, None, mass, atnum, bond_type=bond_type, charge=chg)
         typ.set_lj_params(eps, sig*2**(1/6)/2)
         return attype, typ
 
@@ -942,7 +1042,7 @@ class GromacsTopologyFile(Structure):
         params = copy.copy(self.parameterset)
         def update_typelist_from(ptypes, types):
             added_types = set(id(typ) for typ in types)
-            for k, typ in iteritems(ptypes):
+            for k, typ in ptypes.items():
                 if not typ.used: continue
                 if id(typ) in added_types: continue
                 added_types.add(id(typ))
@@ -1188,111 +1288,7 @@ class GromacsTopologyFile(Structure):
 
     #===================================================
 
-    @classmethod
-    def from_structure(cls, struct, copy=False):
-        """ Instantiates a GromacsTopologyFile instance from a Structure
-
-        Parameters
-        ----------
-        struct : :class:`parmed.Structure`
-            The input structure to generate from
-        copy : bool, optional
-            If True, assign from a *copy* of ``struct`` (this is a lot slower).
-            Default is False
-
-        Returns
-        -------
-        gmxtop : :class:`GromacsTopologyFile`
-            The topology file defined by the given struct
-        """
-        from copy import copy as _copy
-        gmxtop = cls()
-        if copy:
-            struct = _copy(struct)
-            struct.join_dihedrals()
-        gmxtop.atoms = struct.atoms
-        gmxtop.residues = struct.residues
-        gmxtop.bonds = struct.bonds
-        gmxtop.angles = struct.angles
-        gmxtop.dihedrals = struct.dihedrals
-        gmxtop.impropers = struct.impropers
-        gmxtop.cmaps = struct.cmaps
-        gmxtop.rb_torsions = struct.rb_torsions
-        gmxtop.urey_bradleys = struct.urey_bradleys
-        gmxtop.adjusts = struct.adjusts
-        gmxtop.bond_types = struct.bond_types
-        gmxtop.angle_types = struct.angle_types
-        gmxtop.dihedral_types = struct.dihedral_types
-        gmxtop.improper_types = struct.improper_types
-        gmxtop.cmap_types = struct.cmap_types
-        gmxtop.rb_torsion_types = struct.rb_torsion_types
-        gmxtop.urey_bradley_types = struct.urey_bradley_types
-        gmxtop.adjust_types = struct.adjust_types
-        gmxtop.combining_rule = struct.combining_rule
-        gmxtop.box = struct.box
-        if (struct.trigonal_angles or
-                struct.out_of_plane_bends or
-                struct.pi_torsions or
-                struct.stretch_bends or
-                struct.torsion_torsions or
-                struct.chiral_frames or
-                struct.multipole_frames):
-            raise TypeError('GromacsTopologyFile does not support Amoeba FF')
-        # Now check what the 1-4 scaling factors should be
-        if hasattr(struct, 'defaults') and isinstance(struct.defaults,
-                                                      _Defaults):
-            gmxtop.defaults = struct.defaults
-        else:
-            scee_values = set()
-            scnb_values = set()
-            if struct.adjusts:
-                for adjust in struct.adjusts:
-                    if adjust.type is None: continue
-                    scee_values.add(1/adjust.type.chgscale)
-                    # Do not add scnb_values, since we can just set explicit
-                    # exception pair parameters in GROMACS (which this structure
-                    # already has)
-                # In order to specify specific pair parameters, we need to set
-                # gen_pairs to 'no' so that the pair-specific L-J parameters are
-                # printed to the topology file (rather than being auto-created)
-                gmxtop.defaults.gen_pairs = 'no'
-            else:
-                for dihedral in struct.dihedrals:
-                    if dihedral.type is None or dihedral.ignore_end: continue
-                    if isinstance(dihedral.type, DihedralTypeList):
-                        for dt in dihedral.type:
-                            if dt.scee:
-                                scee_values.add(dt.scee)
-                            if dt.scnb:
-                                scnb_values.add(dt.scnb)
-                    else:
-                        if dihedral.type.scee:
-                            scee_values.add(dihedral.type.scee)
-                        if dihedral.type.scnb:
-                            scnb_values.add(dihedral.type.scnb)
-            if len(set('%.5f' % x for x in scee_values)) > 1:
-                raise GromacsError('Structure has mixed 1-4 scaling which is '
-                                   'not supported by Gromacs')
-            scee_values = list(scee_values)
-            scnb_values = list(scnb_values)
-            if len(set('%.5f' % x for x in scee_values)) == 1:
-                gmxtop.defaults.fudgeQQ = 1/scee_values[0]
-            else:
-                gmxtop.defaults.fudgeQQ = 1.0
-            if len(set('%.5f' % x for x in scnb_values)) == 1:
-                gmxtop.defaults.fudgeLJ = 1/scnb_values[0]
-            else:
-                gmxtop.defaults.fudgeLJ = 1.0
-        if gmxtop.combining_rule == 'geometric':
-            gmxtop.defaults.comb_rule = 3
-
-        gmxtop.parameterset = ParameterSet.from_structure(struct,
-                                            allow_unequal_duplicates=True)
-        return gmxtop
-
-    #===================================================
-
-    def write(self, dest, combine=None, parameters='inline'):
+    def write(self, dest, combine=None, parameters='inline', molfile=None, itp=False):
         """ Write a Gromacs Topology File from a Structure
 
         Parameters
@@ -1312,17 +1308,37 @@ class GromacsTopologyFile(Structure):
             top of `dest`. If it is a file-like object, parameters will be
             written there.  If parameters is the same as ``dest``, then the
             parameter types will be written to the same topologyfile.
+        molfile : None or str of file-like object, optional
+            If specified as other than None, the molecules will be written to a
+            separate file that is included in the main topology file. The
+            name of this file will be the provided srting. If None or
+            the same as the ``dest'', the molecules will be written into the
+            body of the topology file. If it is a file-like object,
+            the molecules will be written there. Using this option can make
+            it easier to combine multiple molecules into the same topology.
+            This will change where the following topology sections are
+            written: moleculetype, atoms, bonds, pairs, angles, dihedrals,
+            cmap, settles, virtual_sites2, virtual_sites3 and exclusions.
+        itp : bool, optional
+            If True the following topology sections are not written:
+            defaults, atomtypes, nonbond_params, bondtypes, pairtypes,
+            angletypes, dihedraltypes, cmaptypes, system and molecules
+            Thus only the individual molecules will be written in a stand-alone
+            fashion, i.e. an itp-file.
+            If True the molfile parameter will be set to None
 
         Raises
         ------
         ValueError if the same molecule number appears in multiple combine lists
+        TypeError if the dest input cannot be parsed
+        ValueError if the combine, parameters, or molfile input cannot be parsed
         """
         import parmed.gromacs as gmx
-        from parmed import __version__
+        from .. import __version__
         own_handle = False
         fname = ''
         params = ParameterSet.from_structure(self, allow_unequal_duplicates=True)
-        if isinstance(dest, string_types):
+        if isinstance(dest, str):
             fname = '%s ' % dest
             dest = genopen(dest, 'w')
             own_handle = True
@@ -1334,7 +1350,7 @@ class GromacsTopologyFile(Structure):
         include_parfile = None
         if parameters == 'inline':
             parfile = dest
-        elif isinstance(parameters, string_types):
+        elif isinstance(parameters, str):
             if parameters == fname.strip():
                 parfile = dest
             else:
@@ -1344,12 +1360,35 @@ class GromacsTopologyFile(Structure):
         elif hasattr(parameters, 'write'):
             parfile = parameters
         else:
-            raise ValueError('parameters must be "inline", a file name, or '
+            raise ValueError('parameters must be "inline", a file name, or a file-like object')
+
+        # Determine where to write the molecules
+        if itp :
+            molfile = None
+        own_molfile_handle = False
+        include_molfile = None
+        if molfile is None:
+            _molfile = dest
+        elif isinstance(molfile, str):
+            if molfile == fname.strip():
+                _molfile = dest
+            else:
+                own_molfile_handle = True
+                _molfile = genopen(molfile, 'w')
+                include_molfile = molfile
+        elif hasattr(molfile, 'write'):
+            _molfile = molfile
+            include_molfile = _molfile.name
+            # I assume the file should still be included even if it's not passed
+            # in as a file name. I'm not sure if all `write`-able objects have a
+            # `name` property, though.
+        else:
+            raise ValueError('molfile must be "top", a file name, or '
                              'a file-like object')
 
         # Error-checking for combine
         if combine is not None:
-            if isinstance(combine, string_types):
+            if isinstance(combine, str):
                 if combine.lower() != 'all':
                     raise ValueError('combine must be None, list of indices, '
                                      'or "all"')
@@ -1364,115 +1403,124 @@ class GromacsTopologyFile(Structure):
         try:
             # Write the header
             now = datetime.now()
-            dest.write('''\
+            dest.write(f'''\
 ;
-;   File %s was generated
-;   By user: %s (%d)
-;   On host: %s
-;   At date: %s
+;   File {fname} was generated
+;   By user: {_username} ({_userid})
+;   On host:{_uname} 
+;   At date:{now.strftime('%a. %B  %w %X %Y')} 
 ;
 ;   This is a standalone topology file
 ;
 ;   Created by:
-;   ParmEd:       %s, VERSION %s
-;   Executable:   %s
-;   Library dir:  %s
+;   ParmEd:       {os.path.split(sys.argv[0])[1]}, VERSION{__version__} 
+;   Executable:   {os.path.split(sys.argv[0])[1]}
+;   Library dir:  {gmx.GROMACS_TOPDIR}
 ;   Command line:
-;     %s
+;     {(' '.join(sys.argv)).encode('unicode_escape').decode('utf-8')}
 ;
-''' % (fname, _username, _userid, _uname, now.strftime('%a. %B  %w %X %Y'),
-       os.path.split(sys.argv[0])[1], __version__,
-       os.path.split(sys.argv[0])[1], gmx.GROMACS_TOPDIR,
-       (' '.join(sys.argv)).encode('utf8').decode('unicode_escape')))
-            dest.write('\n[ defaults ]\n')
-            dest.write('; nbfunc        comb-rule       gen-pairs       '
-                        'fudgeLJ fudgeQQ\n')
-            dest.write('%-15d %-15d %-15s %-7g %7g\n\n' %
-                        (self.defaults.nbfunc, self.defaults.comb_rule,
-                        self.defaults.gen_pairs, self.defaults.fudgeLJ,
-                        self.defaults.fudgeQQ))
+''')
+            if not itp :
+                dest.write('\n[ defaults ]\n')
+                dest.write('; nbfunc        comb-rule       gen-pairs       '
+                            'fudgeLJ fudgeQQ\n')
+                dest.write(
+                    f'{self.defaults.nbfunc:<15d} {self.defaults.comb_rule:<15d} {self.defaults.gen_pairs:<15s} '
+                    f'{self.defaults.fudgeLJ:<12.8g} {self.defaults.fudgeQQ:<12.8g}\n\n'
+                )
             if include_parfile is not None:
-                dest.write('#include "%s"\n\n' % include_parfile)
+                dest.write(f'#include "{include_parfile}"\n\n')
             # Print all atom types
-            parfile.write('[ atomtypes ]\n')
-            if any(typ._bond_type is not None
-                    for key, typ in iteritems(params.atom_types)):
-                print_bond_types = True
-            else:
-                print_bond_types = False
-            if all(typ.atomic_number != -1
-                    for key, typ in iteritems(params.atom_types)):
-                print_atnum = True
-            else:
-                print_atnum = False
-            parfile.write('; name    ')
-            if print_bond_types:
-                parfile.write('bond_type ')
-            if print_atnum:
-                parfile.write('at.num    ')
-            parfile.write('mass    charge ptype  sigma      epsilon\n')
-            econv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            for key, atom_type in iteritems(params.atom_types):
-                parfile.write('%-7s ' % atom_type)
+            if not itp :
+                parfile.write('[ atomtypes ]\n')
+                if any(typ._bond_type is not None
+                        for key, typ in params.atom_types.items()):
+                    print_bond_types = True
+                else:
+                    print_bond_types = False
+                if all(typ.atomic_number != -1
+                        for key, typ in params.atom_types.items()):
+                    print_atnum = True
+                else:
+                    print_atnum = False
+                parfile.write('; name    ')
                 if print_bond_types:
-                    parfile.write('%-8s ' % atom_type.bond_type)
+                    parfile.write('bond_type ')
                 if print_atnum:
-                    parfile.write('%8d ' % atom_type.atomic_number)
-                parfile.write('%10.5f  %10.6f  A %13.6g %13.6g\n' % (
-                              atom_type.mass, atom_type.charge, atom_type.sigma/10,
-                              atom_type.epsilon*econv))
-            parfile.write('\n')
+                    parfile.write('at.num    ')
+                parfile.write('mass    charge ptype  sigma      epsilon\n')
+                econv = u.kilocalories.conversion_factor_to(u.kilojoules)
+                for key, atom_type in params.atom_types.items():
+                    parfile.write(f'{str(atom_type):<7s} ')
+                    if print_bond_types:
+                        parfile.write(f'{str(atom_type.bond_type):<8s} ')
+                    if print_atnum:
+                        parfile.write('%8d ' % atom_type.atomic_number)
+                    parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
+                                  atom_type.mass, atom_type.charge, atom_type.sigma/10,
+                                  atom_type.epsilon*econv))
+                parfile.write('\n')
+            # Nonbonded parameters
+            if not itp and self.has_NBFIX():
+                typemap = dict(self.parameterset.nbfix_types)
+                types_in_system = self.parameterset.atom_types.keys()
+                dest.write('[ nonbond_params ]\n')
+                eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
+                for key, val in typemap.items():
+                    if key[0] in types_in_system and key[1] in types_in_system:
+                        eps = val[0] # kcal
+                        sig = val[1] # Angstrom
+                        eps *= eps_conversion
+                        sig *= 0.1
+                        dest.write(f'{key[0]} {key[1]} 1 {sig / 2**(1/6)} {eps}\n')
             # Print all parameter types unless we asked for inline
-            if parameters != 'inline':
+            if not itp and parameters != 'inline':
                 if params.bond_types:
                     parfile.write('[ bondtypes ]\n')
                     parfile.write('; i    j  func       b0          kb\n')
                     used_keys = set()
                     conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
                                 u.kilojoule/u.nanometer**2) * 2
-                    for key, param in iteritems(params.bond_types):
+                    for key, param in params.bond_types.items():
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s    1   %.5f   %f\n' % (key[0],
-                                      key[1], param.req/10, param.k*conv))
+                        parfile.write(f'{key[0]:<5s} {key[1]:<5s}    1   {param.req / 10:.5f}   {param.k * conv:f}\n')
                     parfile.write('\n')
                 if params.pair_types and self.defaults.gen_pairs == 'no':
                     parfile.write('[ pairtypes ]\n')
-                    parfile.write('; i j   func    sigma1-4    epsilon1-4 ;'
-                                  ' ; THESE ARE 1-4 INTERACTIONS\n')
+                    parfile.write('; i j   func    sigma1-4    epsilon1-4 ; THESE ARE 1-4 INTERACTIONS\n')
                     econv = u.kilocalorie.conversion_factor_to(u.kilojoule)
                     lconv = u.angstrom.conversion_factor_to(u.nanometer)
                     used_keys = set()
-                    for key, param in iteritems(params.pair_types):
-                        if key in used_keys: continue
+                    for key, param in params.pair_types.items():
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-5s %-5s  1  %.8f %.8f\n' %
-                                      (key[0], key[1], param.sigma*lconv,
-                                       param.epsilon*econv))
+                        parfile.write(
+                            f'{key[0]:<5s} {key[1]:<5s}  1  {param.sigma * lconv:.9f} {param.epsilon * econv:.9f}\n'
+                        )
                     parfile.write('\n')
                 if params.angle_types:
                     parfile.write('[ angletypes ]\n')
-                    parfile.write(';  i    j    k  func       th0       cth '
-                                  '   rub         kub\n')
+                    parfile.write(';  i    j    k  func       th0       cth    rub         kub\n')
                     used_keys = set()
                     conv = (u.kilocalorie/u.radian**2).conversion_factor_to(
                                 u.kilojoule/u.radian**2) * 2
                     bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
                                 u.kilojoule/u.nanometer**2) * 2
-                    for key, param in iteritems(params.angle_types):
-                        if key in used_keys: continue
+                    for key, param in params.angle_types.items():
+                        if key in used_keys:
+                            continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        part = '%-5s %-5s %-5s    %%d   %8.3f   %8.3f' % (
-                                key[0], key[1], key[2], param.theteq,
-                                param.k*conv)
+                        part = '%-5s %-5s %-5s    %%d   %12.7f   %12.7f' % (
+                                key[0], key[1], key[2], param.theteq, param.k*conv)
                         if key in params.urey_bradley_types:
                             ub = params.urey_bradley_types[key]
                             parfile.write(part % 5)
-                            parfile.write('  %8.3f  %8.3f\n' % (ub.req/10,
-                                          ub.k*bconv))
+                            parfile.write('  %12.7f  %12.7f\n' % (0.1*ub.req, ub.k*bconv))
                         else:
                             parfile.write(part % 1)
                             parfile.write('\n')
@@ -1484,29 +1532,26 @@ class GromacsTopologyFile(Structure):
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
                     fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
-                    for key, param in iteritems(params.dihedral_types):
+                    for key, param in params.dihedral_types.items():
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         for dt in param:
-                            parfile.write(fmt % (key[0], key[1], key[2],
-                                          key[3], 9, dt.phase,
+                            parfile.write(fmt % (key[0], key[1], key[2], key[3], 9, dt.phase,
                                           dt.phi_k*conv, int(dt.per)))
                     parfile.write('\n')
                 if params.improper_periodic_types:
                     parfile.write('[ dihedraltypes ]\n')
-                    parfile.write(';i  j   k  l  func      phase      kd      '
-                                  'pn\n')
+                    parfile.write(';i  j   k  l  func      phase      kd      pn\n')
                     used_keys = set()
                     conv = u.kilojoules.conversion_factor_to(u.kilocalories)
                     fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
-                    for key, param in iteritems(params.improper_periodic_types):
+                    for key, param in params.improper_periodic_types.items():
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
                         parfile.write(fmt % (key[0], key[1], key[2], key[3],
-                                      4, param.phase, param.phi_k*conv,
-                                      int(param.per)))
+                                      4, param.phase, param.phi_k*conv, int(param.per)))
                     parfile.write('\n')
                 if params.improper_types:
                     # BUGBUG -- The ordering is borked here because that made it
@@ -1515,33 +1560,34 @@ class GromacsTopologyFile(Structure):
                     parfile.write('[ dihedraltypes ]\n')
                     parfile.write('; i  j       k       l       func     q0    '
                                   'cq\n')
-                    fmt = '%-6s %-6s %-6s %-6s    %d   %.4f   %.4f\n'
+                    fmt = '%-6s %-6s %-6s %-6s    %d   %.6f   %.6f\n'
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
-                    for key, param in iteritems(params.improper_types):
+                    for key, param in params.improper_types.items():
                         parfile.write(fmt % (key[0], key[1], key[2], key[3],
                                       2, param.psi_eq, param.psi_k*conv))
                     parfile.write('\n')
             # CMAP grids are never printed inline, so if we have them, we need
             # to write a dedicated section for them
-            if params.cmap_types:
+            if not itp and params.cmap_types:
                     parfile.write('[ cmaptypes ]\n\n')
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-                    for key, param in iteritems(params.cmap_types):
+                    for key, param in params.cmap_types.items():
                         if key in used_keys: continue
                         used_keys.add(key)
                         used_keys.add(tuple(reversed(key)))
-                        parfile.write('%-6s %-6s %-6s %-6s %-6s   1   '
-                                      '%4d %4d' % (key[0], key[1], key[2],
-                                      key[3], key[7], param.resolution,
-                                      param.resolution))
+                        parfile.write(
+                            f'{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {key[3]:<6s} {key[7]:<6s}   '
+                            f'1   {param.resolution:4d} {param.resolution:4d}'
+                        )
                         res2 = param.resolution * param.resolution
                         for i in range(0, res2, 10):
                             parfile.write('\\\n')
                             end = min(i+10, res2)
-                            parfile.write(' '.join(str(param.grid[j]*conv)
-                                          for j in range(i, end)))
+                            parfile.write(' '.join(str(param.grid[j]*conv) for j in range(i, end)))
                         parfile.write('\n\n')
+            if include_molfile is not None:
+                dest.write(f'#include "{include_molfile}"\n\n')
             if combine is None:
                 molecules = self.split()
                 sysnum = 1
@@ -1554,50 +1600,51 @@ class GromacsTopologyFile(Structure):
                             orig = title
                             sfx = 2
                             while title in nameset:
-                                title = '%s%d' % (orig, sfx)
+                                title = f'{orig}{sfx}'
                                 sfx += 1
                     else:
-                        title = 'system%d' % sysnum
+                        title = f'system{sysnum}'
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title,
-                                        params, parameters == 'inline')
-                # System
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title')
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(molecules):
-                        if i in lst:
-                            break
+                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params,
+                                                        parameters == 'inline')
+                if not itp :
+                    # System
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
                     else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
-            elif isinstance(combine, string_types) and combine.lower() == 'all':
-                GromacsTopologyFile._write_molecule(self, dest, 'system',
-                                    params, parameters == 'inline')
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title') # pragma: no cover
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                dest.write('%-15s %6d\n' % ('system', 1))
+                        dest.write('Generic title')
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    total_mols = sum(len(m[1]) for m in molecules)
+                    i = 0
+                    while i < total_mols:
+                        for j, (molecule, lst) in enumerate(molecules):
+                            if i in lst:
+                                break
+                        else:
+                            raise AssertionError(f'Could not find molecule {i:d} in list')
+                        ii = i
+                        while ii < total_mols and ii in lst:
+                            ii += 1
+                        dest.write(f'{names[j]:<15s} {ii - i:6d}\n')
+                        i = ii
+            elif isinstance(combine, str) and combine.lower() == 'all':
+                GromacsTopologyFile._write_molecule(self, _molfile, 'system', params,
+                                                    parameters == 'inline')
+                if not itp :
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
+                    else:
+                        dest.write('Generic title') # pragma: no cover
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    dest.write('%-15s %6d\n' % ('system', 1))
             else:
                 molecules = self.split()
                 nmols = sum(len(m[1]) for m in molecules)
@@ -1644,16 +1691,13 @@ class GromacsTopologyFile(Structure):
                 add = 0 # How many molecules to "skip" due to combining
                 for i in range(nmols):
                     ii = i + add
-                    if (cmc < len(combined_molecules) and
-                            combined_molecules[cmc][1] == ii):
-                        new_molecules.append([combined_molecules[cmc][0],
-                                              set([i])])
+                    if cmc < len(combined_molecules) and combined_molecules[cmc][1] == ii:
+                        new_molecules.append([combined_molecules[cmc][0], set([i])])
                         add += combined_molecules[cmc][2] - 1
                         cmc += 1
                     elif len(counts[id(moleculedict[ii])]) == 0:
                         counts[id(moleculedict[ii])].add(i)
-                        new_molecules.append([moleculedict[ii],
-                                              counts[id(moleculedict[ii])]])
+                        new_molecules.append([moleculedict[ii], counts[id(moleculedict[ii])]])
                     else:
                         counts[id(moleculedict[ii])].add(i)
                 sysnum = 1
@@ -1666,62 +1710,63 @@ class GromacsTopologyFile(Structure):
                             orig = title
                             sfx = 2
                             while title in nameset:
-                                title = '%s%d' % (orig, sfx)
+                                title = f'{orig:s}{sfx:d}'
                                 sfx += 1
                     else:
-                        title = 'system%d' % sysnum
+                        title = f'system{sysnum}'
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, dest, title,
-                                        params, parameters == 'inline')
-                # System
-                dest.write('[ system ]\n; Name\n')
-                if self.title:
-                    dest.write(self.title)
-                else:
-                    dest.write('Generic title') # pragma: no cover
-                dest.write('\n\n')
-                # Molecules
-                dest.write('[ molecules ]\n; Compound       #mols\n')
-                total_mols = sum(len(m[1]) for m in new_molecules)
-                i = 0
-                while i < total_mols:
-                    for j, (molecule, lst) in enumerate(new_molecules):
-                        if i in lst:
-                            break
+                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params,
+                                                        parameters == 'inline')
+                if not itp :
+                    # System
+                    dest.write('[ system ]\n; Name\n')
+                    if self.title:
+                        dest.write(self.title)
                     else:
-                        raise AssertionError('Could not find molecule %d '
-                                             'in list' % i)
-                    ii = i
-                    while ii < total_mols and ii in lst:
-                        ii += 1
-                    dest.write('%-15s %6d\n' % (names[j], ii-i))
-                    i = ii
+                        dest.write('Generic title') # pragma: no cover
+                    dest.write('\n\n')
+                    # Molecules
+                    dest.write('[ molecules ]\n; Compound       #mols\n')
+                    total_mols = sum(len(m[1]) for m in new_molecules)
+                    i = 0
+                    while i < total_mols:
+                        for j, (molecule, lst) in enumerate(new_molecules):
+                            if i in lst:
+                                break
+                        else:
+                            raise AssertionError(f'Could not find molecule {i} in list')
+                        ii = i
+                        while ii < total_mols and ii in lst:
+                            ii += 1
+                        dest.write(f'{names[j]:<15s} {ii - i:6d}\n')
+                        i = ii
         finally:
             if own_handle:
                 dest.close()
             if own_parfile_handle:
                 parfile.close()
+            if own_molfile_handle:
+                _molfile.close()
 
     #===================================================
 
     @staticmethod
     def _write_molecule(struct, dest, title, params, writeparams):
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
-        dest.write('%s          %d\n\n' % (title, struct.nrexcl))
+        dest.write(f'{title}          {struct.nrexcl}\n\n')
         dest.write('[ atoms ]\n')
         dest.write(';   nr       type  resnr residue  atom   cgnr    '
                    'charge       mass  typeB    chargeB      massB\n')
         runchg = 0
         for residue in struct.residues:
             dest.write('; residue %4d %s rtp %s q %.1f\n' %
-                       (residue.idx+1, residue.name, residue.name,
-                        sum(a.charge for a in residue)))
+                       (residue.idx+1, residue.name, residue.name, sum(a.charge for a in residue)))
             for atom in residue:
                 runchg += atom.charge
-                dest.write('%5d %10s %6d %6s %6s %6d %10.6f %10.4f   ; '
-                           'qtot %.4f\n' % (atom.idx+1, atom.type,
+                dest.write('%5d %10s %6d %6s %6s %6d %10.8f %10.6f   ; '
+                           'qtot %.6f\n' % (atom.idx+1, atom.type,
                             residue.idx+1, residue.name, atom.name,
                             atom.idx+1, atom.charge, atom.mass, runchg))
         dest.write('\n')
@@ -1744,19 +1789,16 @@ class GromacsTopologyFile(Structure):
             dest.write(';%6s %6s %5s %10s %10s %10s %10s\n' % ('ai', 'aj',
                        'funct', 'c0', 'c1', 'c2', 'c3'))
             for bond in struct.bonds:
-                if (isinstance(bond.atom1, ExtraPoint) or
-                        isinstance(bond.atom2, ExtraPoint)):
+                if (isinstance(bond.atom1, ExtraPoint) or isinstance(bond.atom2, ExtraPoint)):
                     continue # pragma: no cover
-                dest.write('%7d %6d %5d' % (bond.atom1.idx+1,
-                           bond.atom2.idx+1, bond.funct))
+                dest.write('%7d %6d %5d' % (bond.atom1.idx+1, bond.atom2.idx+1, bond.funct))
                 if bond.type is None:
                     dest.write('\n')
                     continue # pragma: no cover
                 key = (_gettype(bond.atom1), _gettype(bond.atom2))
                 if writeparams or key not in params.bond_types or \
                         bond.type != params.bond_types[key]:
-                    dest.write('   %.5f %f' % (bond.type.req/10,
-                                               bond.type.k*conv))
+                    dest.write('   %.5f %f' % (bond.type.req/10, bond.type.k*conv))
                 dest.write('\n')
             dest.write('\n')
         # Do the pair-exceptions
@@ -1768,14 +1810,11 @@ class GromacsTopologyFile(Structure):
             lconv = u.angstroms.conversion_factor_to(u.nanometer)
             for adjust in struct.adjusts:
                 key = (_gettype(adjust.atom1), _gettype(adjust.atom2))
-                dest.write('%7d %6d %5d' % (adjust.atom1.idx+1,
-                           adjust.atom2.idx+1, adjust.funct))
+                dest.write('%7d %6d %5d' % (adjust.atom1.idx+1, adjust.atom2.idx+1, adjust.funct))
                 if struct.defaults.gen_pairs == 'no' and (writeparams or
                         key not in params.pair_types or
-                        adjust.type != params.pair_types[key]) and \
-                        adjust.type is not None:
-                    dest.write(' %.8f %.8f' % (adjust.type.sigma*lconv,
-                                               adjust.type.epsilon*econv))
+                        adjust.type != params.pair_types[key]) and adjust.type is not None:
+                    dest.write(' %.9f %.9f' % (adjust.type.sigma*lconv, adjust.type.epsilon*econv))
                 dest.write('\n')
             dest.write('\n')
         elif struct.dihedrals:
@@ -1793,8 +1832,7 @@ class GromacsTopologyFile(Structure):
                     continue # pragma: no cover
                 dest.write('%7d %6d %5d' % (a1.idx+1, a2.idx+1, 1))
                 if struct.defaults.gen_pairs == 'no':
-                    dest.write('  %.5f  %.5f' %
-                               (0.5*(a1.sigma_14+a2.sigma_14)*lconv,
+                    dest.write('  %.9f  %.9f' % (0.5*(a1.sigma_14+a2.sigma_14)*lconv,
                                 math.sqrt(a1.epsilon_14*a2.epsilon_14)*econv))
                 dest.write('\n')
             dest.write('\n')
@@ -1808,16 +1846,13 @@ class GromacsTopologyFile(Structure):
             dest.write(';%6s %6s %6s %5s %10s %10s %10s %10s\n' %
                        ('ai', 'aj', 'ak', 'funct', 'c0', 'c1', 'c2', 'c3'))
             for angle in struct.angles:
-                dest.write('%7d %6d %6d %5d' % (angle.atom1.idx+1,
-                           angle.atom2.idx+1, angle.atom3.idx+1,
-                           angle.funct))
+                dest.write('%7d %6d %6d %5d' % (angle.atom1.idx+1, angle.atom2.idx+1,
+                           angle.atom3.idx+1, angle.funct))
                 if angle.type is None:
                     dest.write('\n')
                     continue
-                key = (_gettype(angle.atom1), _gettype(angle.atom2),
-                       _gettype(angle.atom3))
-                param_equal = (key in params.angle_types and
-                                    params.angle_types[key] == angle.type)
+                key = (_gettype(angle.atom1), _gettype(angle.atom2), _gettype(angle.atom3))
+                param_equal = params.angle_types.get(key) == angle.type
                 if angle.funct == 5:
                     # Find the Urey-Bradley term, if it exists
                     for ub in struct.urey_bradleys:
@@ -1826,28 +1861,23 @@ class GromacsTopologyFile(Structure):
                             break
                     else:
                         ubtype = NoUreyBradley
-                    param_equal = param_equal and (
-                            key in params.urey_bradley_types and
-                            ubtype == params.urey_bradley_types[key])
+                    param_equal = param_equal and params.urey_bradley_types.get(key) == ubtype
                 if writeparams or not param_equal:
-                    dest.write('   %.5f %f' % (angle.type.theteq,
-                                               angle.type.k*conv))
+                    dest.write('   %.7f %f' % (angle.type.theteq, angle.type.k*conv))
                     if angle.funct == 5:
-                        dest.write(' %.5f %f' % (ubtype.req/10, ubtype.k*conv2))
+                        dest.write(' %.7f %f' % (ubtype.req/10, ubtype.k*conv2))
                 dest.write('\n')
             dest.write('\n')
         # Dihedrals
         if struct.dihedrals:
             dest.write('[ dihedrals ]\n')
             dest.write((';%6s %6s %6s %6s %5s'+' %10s'*6) % ('ai', 'aj',
-                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3',
-                       'c4', 'c5'))
+                       'ak', 'al', 'funct', 'c0', 'c1', 'c2', 'c3', 'c4', 'c5'))
             dest.write('\n')
             conv = u.kilocalories.conversion_factor_to(u.kilojoules)
             for dihed in struct.dihedrals:
-                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
-                           dihed.atom2.idx+1, dihed.atom3.idx+1,
-                           dihed.atom4.idx+1, dihed.funct))
+                dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1, dihed.atom2.idx+1,
+                           dihed.atom3.idx+1, dihed.atom4.idx+1, dihed.funct))
                 if dihed.type is None:
                     dest.write('\n')
                     continue
@@ -1860,16 +1890,15 @@ class GromacsTopologyFile(Structure):
                 if writeparams or key not in typedict or \
                         _diff_diheds(dihed.type, typedict[key]):
                     if isinstance(dihed.type, DihedralTypeList):
-                        dest.write('  %.5f  %.5f  %d' % (dihed.type[0].phase,
+                        dest.write('  %.6f  %.6f  %d' % (dihed.type[0].phase,
                             dihed.type[0].phi_k*conv, int(dihed.type[0].per)))
                         for dt in dihed.type[1:]:
-                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.5f  %d' %
+                            dest.write('\n%7d %6d %6d %6d %5d  %.5f  %.7f  %d' %
                                     (dihed.atom1.idx+1, dihed.atom2.idx+1,
                                      dihed.atom3.idx+1, dihed.atom4.idx+1,
-                                     dihed.funct, dt.phase, dt.phi_k*conv,
-                                     int(dt.per)))
+                                     dihed.funct, dt.phase, dt.phi_k*conv, int(dt.per)))
                     else:
-                        dest.write('  %.5f  %.5f  %d' % (dihed.type.phase,
+                        dest.write('  %.7f  %.7f  %d' % (dihed.type.phase,
                             dihed.type.phi_k*conv, int(dihed.type.per)))
                 dest.write('\n')
             dest.write('\n')
@@ -1881,7 +1910,7 @@ class GromacsTopologyFile(Structure):
                        'c4', 'c5'))
             dest.write('\n')
             conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-            paramfmt = '  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f  %12.5f'
+            paramfmt = '  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f  %12.7f'
             for dihed in struct.rb_torsions:
                 dest.write('%7d %6d %6d %6d %5d' % (dihed.atom1.idx+1,
                            dihed.atom2.idx+1, dihed.atom3.idx+1,
@@ -1893,12 +1922,10 @@ class GromacsTopologyFile(Structure):
                         _gettype(dihed.atom3), _gettype(dihed.atom4))
                 if writeparams or key not in params.rb_torsion_types or \
                         params.rb_torsion_types[key] != dihed.type:
-                    dest.write(paramfmt % (dihed.type.c0*conv,
-                                           dihed.type.c1*conv,
-                                           dihed.type.c2*conv,
-                                           dihed.type.c3*conv,
-                                           dihed.type.c4*conv,
-                                           dihed.type.c5*conv))
+                    dest.write(paramfmt % (
+                        dihed.type.c0*conv, dihed.type.c1*conv, dihed.type.c2*conv,
+                        dihed.type.c3*conv, dihed.type.c4*conv, dihed.type.c5*conv
+                    ))
                     dest.write('\n')
             dest.write('\n')
         # Impropers
@@ -1918,8 +1945,7 @@ class GromacsTopologyFile(Structure):
                 # BUGBUG: We always write improper types since we don't
                 # currently store the correct ordering of the types in the
                 # improper section
-                dest.write('  %12.5f  %12.5f\n' % (dihed.type.psi_eq,
-                                                   dihed.type.psi_k*conv))
+                dest.write('  %12.7f  %12.7f\n' % (dihed.type.psi_eq, dihed.type.psi_k*conv))
             dest.write('\n')
         # Cmaps
         if struct.cmaps:
@@ -1954,7 +1980,7 @@ class GromacsTopologyFile(Structure):
                         break
                 else:
                     raise GromacsError('Cannot determine SETTLE geometry') # pragma: no cover
-            dest.write('1     1   %.5f   %.5f\n\n#endif\n\n' % (doh, dhh))
+            dest.write('1     1   %.8f   %.8f\n\n#endif\n\n' % (doh, dhh))
         # Virtual sites
         if EPs:
             ftypes = set(type(a.frame_type) for a in EPs)
@@ -1967,7 +1993,7 @@ class GromacsTopologyFile(Structure):
                         a1, a2 = EP.frame_type.get_atoms()
                         dest.write('%-5d %-4d %-4d %-4d   %.6f\n' %
                                    (EP.idx+1, a1.idx+1, a2.idx+1, 1,
-                                    EP.get_weights()[0]))
+                                    EP.frame_type.get_weights()[0]))
                     dest.write('\n')
                 elif ftype in (ThreeParticleExtraPointFrame,
                                OutOfPlaneExtraPointFrame):
@@ -1979,15 +2005,13 @@ class GromacsTopologyFile(Structure):
                             a1, a2, a3 = EP.frame_type.get_atoms()
                             junk, w1, w2 = EP.frame_type.get_weights()
                             dest.write('%-5d %-4d %-4d %-4d %-4d   %.6f  %.6f\n'
-                                    % (EP.idx+1, a1.idx+1, a2.idx+1, a3.idx+1,
-                                       1, w1, w2))
+                                       % (EP.idx+1, a1.idx+1, a2.idx+1, a3.idx+1, 1, w1, w2))
                         elif isinstance(EP.frame_type,
                                 OutOfPlaneExtraPointFrame):
                             a1, a2, a3 = EP.frame_type.get_atoms()
                             w1, w2, w3 = EP.frame_type.get_weights()
-                            dest.write('%-5d %-4d %-4d %-4d %-4d   %.6f  %.6f  '
-                                       '%.6f\n' % (EP.idx+1, a1.idx+1, a2.idx+1,
-                                       a3.idx+1, w1, w2, w3))
+                            dest.write('%-5d %-4d %-4d %-4d %-4d   %.6f  %.6f  %.6f\n' %
+                                      (EP.idx+1, a1.idx+1, a2.idx+1, a3.idx+1, w1, w2, w3))
                     dest.write('\n')
         # Do we need to list exclusions for systems with EPs?
         if EPs or settle:

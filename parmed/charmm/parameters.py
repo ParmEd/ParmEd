@@ -1,27 +1,24 @@
 """
 This module contains classes for parsing and processing CHARMM parameter,
 topology, and stream files.
-
-Author: Jason M. Swails
-Contributors:
-Date: Apr. 13, 2015
 """
-from __future__ import division, print_function, absolute_import
-from copy import copy as _copy
-from parmed import (Atom, AtomType, BondType, AngleType, DihedralType,
-                    DihedralTypeList, ImproperType, CmapType, NoUreyBradley)
-from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
-from parmed.constants import TINY
-from parmed.exceptions import CharmmError, ParameterWarning
-from parmed.modeller import ResidueTemplate, PatchTemplate
-from parmed.parameters import ParameterSet
-from parmed.periodic_table import AtomicNum, element_by_mass
-from parmed.utils.io import genopen
-from parmed.utils.six import iteritems, string_types, integer_types
-from parmed.utils.six.moves import zip
 import os
 import re
 import warnings
+from copy import copy as _copy
+from collections import OrderedDict
+from itertools import combinations
+
+from ..constants import TINY
+from ..exceptions import CharmmError, ParameterWarning
+from ..modeller import PatchTemplate, ResidueTemplate
+from ..parameters import ParameterSet
+from ..periodic_table import AtomicNum, element_by_mass
+from ..topologyobjects import (AngleType, Atom, AtomType, BondType, CmapType,
+                               DihedralType, DihedralTypeList, ImproperType,
+                               NoUreyBradley, DrudeAtom, DrudeAnisotropy)
+from ..utils.io import genopen
+from ._charmmfile import CharmmFile, CharmmStreamFile
 
 _penaltyre = re.compile(r'penalty\s*=\s*([\d\.]+)')
 
@@ -34,16 +31,49 @@ class _EmptyStringIterator(object):
         return ''
 
 def _typeconv(name):
-    if isinstance(name, integer_types):
+    if isinstance(name, int):
         return name
     if name.upper() == name:
         return name.replace('*', 'STR').replace('+', 'P').replace('-', 'M')[:6]
     # Lowercase letters present -- decorate the type name with LTU --
     # Lower To Upper
-    return ('%sLTU' % name.upper()).replace('*', 'STR').replace(
-            '+', 'P').replace('-', 'M')[:6]
+    return f'{name.upper()}LTU'.replace('*', 'STR').replace('+', 'P').replace('-', 'M')[:6]
 
-class CharmmParameterSet(ParameterSet):
+class CharmmImproperMatchingMixin(object):
+    """ Implements CHARMM-style improper matching """
+
+    def match_improper_type(self, a1, a2, a3, a4):
+        """ Matches an improper type based on atom type names """
+        typ = self._match_improper_with_typemap(self.improper_types, a1, a2, a3, a4)
+        if typ is None:
+            typ = self._match_improper_with_typemap(self.improper_periodic_types, a1, a2, a3, a4)
+        return typ
+
+    def _match_improper_with_typemap(self, typemap, a1, a2, a3, a4):
+
+        if (a1, a2, a3, a4) in typemap: return typemap[(a1, a2, a3, a4)]
+        if (a4, a3, a2, a1) in typemap: return typemap[(a4, a3, a2, a1)]
+
+        # Now try any of the sortings. The documented CHARMM ordering does not seem to work for
+        # all systems CHARMM supports :(
+
+        key = tuple(sorted([a1, a2, a3, a4]))
+        if self._improper_key_map.get(key, None) in typemap:
+            return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2, exact3 in combinations((a1, a2, a3, a4), 3):
+            key = tuple(sorted([exact1, exact2, exact3, 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        for exact1, exact2 in combinations((a1, a2, a3, a4), 2):
+            key = tuple(sorted([exact1, exact2, 'X', 'X']))
+            if self._improper_key_map.get(key, None) in typemap:
+                return typemap[self._improper_key_map[key]]
+
+        return None
+
+class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
     """
     Stores a parameter set defined by CHARMM files. It stores the equivalent of
     the information found in the MASS section of the CHARMM topology file
@@ -72,7 +102,7 @@ class CharmmParameterSet(ParameterSet):
         return other
 
     @staticmethod
-    def _convert(data, type, msg=''):
+    def _convert(data, type, msg='', line_index=None, line=None):
         """
         Converts a data type to a desired type, raising CharmmError if it
         fails
@@ -80,13 +110,17 @@ class CharmmParameterSet(ParameterSet):
         try:
             return type(data)
         except ValueError:
-            raise CharmmError('Could not convert %s to %s' % (msg, type))
+            msg = f'Could not convert {msg} to {type}\n'
+            if line_index is not None:
+                msg += f'input line {line_index}\n'
+            if line is not None:
+                msg += f'input line: {line}\n'
+            raise CharmmError(msg)
 
     def __init__(self, *args):
         # Instantiate the list types
         super(CharmmParameterSet, self).__init__()
         self.parametersets = []
-        self.patches = dict()
         self._declared_nbrules = False
 
         # Load all of the files
@@ -107,12 +141,15 @@ class CharmmParameterSet(ParameterSet):
                 elif 'top' in fname:
                     tops.append(arg)
                 else:
-                    raise ValueError('Unrecognized file type: %s' % arg)
+                    raise ValueError(f'Unrecognized file type: {arg}')
             else:
-                raise ValueError('Unrecognized file type: %s' % arg)
-        for top in tops: self.read_topology_file(top)
-        for par in pars: self.read_parameter_file(par)
-        for strf in strs: self.read_stream_file(strf)
+                raise ValueError(f'Unrecognized file type: {arg}')
+        for top in tops:
+            self.read_topology_file(top)
+        for par in pars:
+            self.read_parameter_file(par)
+        for strf in strs:
+            self.read_stream_file(strf)
 
     @classmethod
     def from_parameterset(cls, params, copy=False):
@@ -147,7 +184,7 @@ class CharmmParameterSet(ParameterSet):
         # Convert all parameters
         id_typemap = dict()
         def copy_paramtype(key, typ, dict):
-            if isinstance(key, string_types):
+            if isinstance(key, str):
                 key = _typeconv(key)
             elif isinstance(key, tuple):
                 key = tuple(_typeconv(k) for k in key)
@@ -161,32 +198,32 @@ class CharmmParameterSet(ParameterSet):
                 id_typemap[id(typ)] = newtype
                 dict[key] = newtype
 
-        for key, atom_type in iteritems(params.atom_types_tuple):
+        for key, atom_type in params.atom_types_tuple.items():
             atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(key, atom_type, new_params.atom_types_tuple)
-        for typename, atom_type in iteritems(params.atom_types):
+        for typename, atom_type in params.atom_types.items():
             atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(typename, atom_type, new_params.atom_types)
-        for idx, atom_type in iteritems(params.atom_types_int):
+        for idx, atom_type in params.atom_types_int.items():
             atom_type.name = _typeconv(atom_type.name)
             copy_paramtype(idx, atom_type, new_params.atom_types_int)
 
-        for key, typ in iteritems(params.bond_types):
+        for key, typ in params.bond_types.items():
             copy_paramtype(key, typ, new_params.bond_types)
-        for key, typ in iteritems(params.angle_types):
+        for key, typ in params.angle_types.items():
             copy_paramtype(key, typ, new_params.angle_types)
-        for key, typ in iteritems(params.urey_bradley_types):
+        for key, typ in params.urey_bradley_types.items():
             copy_paramtype(key, typ, new_params.urey_bradley_types)
-        for key, typ in iteritems(params.dihedral_types):
+        for key, typ in params.dihedral_types.items():
             copy_paramtype(key, typ, new_params.dihedral_types)
-        for key, typ in iteritems(params.improper_periodic_types):
+        for key, typ in params.improper_periodic_types.items():
             copy_paramtype(key, typ, new_params.improper_periodic_types)
-        for key, typ in iteritems(params.improper_types):
+        for key, typ in params.improper_types.items():
             copy_paramtype(key, typ, new_params.improper_types)
-        for key, typ in iteritems(params.cmap_types):
-            assert len(key) == 8, '%d-key cmap type detected!' % len(key)
+        for key, typ in params.cmap_types.items():
+            assert len(key) == 8, f'{len(key)}-key cmap type detected!'
             copy_paramtype(key, typ, new_params.cmap_types)
-        for key, typ in iteritems(params.nbfix_types):
+        for key, typ in params.nbfix_types.items():
             copy_paramtype(key, typ, new_params.nbfix_types)
 
         return new_params
@@ -223,8 +260,7 @@ class CharmmParameterSet(ParameterSet):
         periodicity found if no matching DihedralTypeList is found.
         """
         return cls.from_parameterset(
-                ParameterSet.from_structure(struct,
-                                            allow_unequal_duplicates=False)
+            ParameterSet.from_structure(struct, allow_unequal_duplicates=False)
         )
 
     @classmethod
@@ -259,7 +295,7 @@ class CharmmParameterSet(ParameterSet):
             inst.read_topology_file(tfile)
         if pfile is not None:
             inst.read_parameter_file(pfile)
-        if isinstance(sfiles, string_types):
+        if isinstance(sfiles, str):
             # The API docstring requests a list, but allow for users to pass a
             # string with a single filename instead
             inst.read_stream_file(sfiles)
@@ -349,31 +385,26 @@ class CharmmParameterSet(ParameterSet):
                 for i, word in enumerate(words):
                     if word.upper() == 'E14FAC':
                         try:
-                            scee = float(words[i+1])
+                            scee = 1 / float(words[i+1])
                         except (ValueError, IndexError):
-                            raise CharmmError(
-                                    'Could not parse 1-4 electrostatic scaling '
-                                    'factor from NONBONDED card'
-                            )
+                            raise CharmmError('Could not parse 1-4 electrostatic scaling factor '
+                                              'from NONBONDED card')
                         if self._declared_nbrules:
-                            # We already specified it -- make sure it's the same
-                            # as the one we specified before
-                            _, dt0 = next(iteritems(self.dihedral_types))
-                            diff = abs(dt0[0].scee - scee)
-                            if diff > TINY:
-                                raise CharmmError('Inconsistent 1-4 scalings')
+                            if len(self.dihedral_types) > 0:
+                                # We already specified it -- make sure it's the same
+                                # as the one we specified before
+                                _, dt0 = next(iter(self.dihedral_types.items()))
+                                diff = abs(dt0[0].scee - scee)
+                                if diff > TINY:
+                                    raise CharmmError('Inconsistent 1-4 scalings')
                         else:
-                            scee = 1 / scee
-                            for key, dtl in iteritems(self.dihedral_types):
+                            for key, dtl in self.dihedral_types.items():
                                 for dt in dtl:
                                     dt.scee = scee
                     elif word.upper().startswith('GEOM'):
-                        if (self._declared_nbrules and
-                                self.combining_rule != 'geometric'):
-                            raise CharmmError(
-                                    'Cannot combine parameter files with '
-                                    'different combining rules'
-                            )
+                        if self._declared_nbrules and self.combining_rule != 'geometric':
+                            raise CharmmError('Cannot combine parameter files with different '
+                                              'combining rules')
                         self.combining_rule = 'geometric'
                         declared_geometric = True
                 continue
@@ -381,6 +412,9 @@ class CharmmParameterSet(ParameterSet):
                 section = 'NBFIX'
                 continue
             if line.upper().startswith('HBOND'):
+                section = None
+                continue
+            if line.upper().startswith('THOLE'):
                 section = None
                 continue
             # It seems like files? sections? can be terminated with 'END'
@@ -402,22 +436,21 @@ class CharmmParameterSet(ParameterSet):
                 if words[0].upper() == 'END':
                     continue
                 try:
-                    idx = conv(words[1], int, 'atom type')
+                    idx = conv(words[1], int, 'atom type', line_index=i, line=line)
                     name = words[2].upper()
-                    mass = conv(words[3], float, 'atom mass')
+                    mass = conv(words[3], float, 'atom mass', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse MASS section.')
                 # The parameter file might or might not have an element name
                 try:
                     elem = words[4].upper()
-                    if len(elem) in (1, 2):
-                        elem = elem.lower(); elem[0] = elem[0].upper()
+                    if len(elem) == 2:
+                        elem = elem[0] + elem[1].lower()
                     atomic_number = AtomicNum[elem]
                 except (IndexError, KeyError):
                     # Figure it out from the mass
                     atomic_number = AtomicNum[element_by_mass(mass)]
-                atype = AtomType(name=name, number=idx, mass=mass,
-                                 atomic_number=atomic_number)
+                atype = AtomType(name=name, number=idx, mass=mass, atomic_number=atomic_number)
                 self.atom_types_str[atype.name] = atype
                 self.atom_types_int[atype.number] = atype
                 self.atom_types_tuple[(atype.name, atype.number)] = atype
@@ -429,18 +462,18 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     type1 = words[0].upper()
                     type2 = words[1].upper()
-                    k = conv(words[2], float, 'bond force constant')
-                    req = conv(words[3], float, 'bond equilibrium dist')
+                    k = conv(words[2], float, 'bond force constant', line_index=i, line=line)
+                    req = conv(words[3], float, 'bond equilibrium dist', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse bonds.')
                 key = (min(type1, type2), max(type1, type2))
                 bond_type = BondType(k, req)
                 if key in self.bond_types:
-                    # See if the existing bond type list has a different value and replaces it with a warning
+                    # See if existing bond type has a different value and replaces it with a warning
                     if self.bond_types[key] != bond_type:
                         # Replace. Warn if they are different
                         warnings.warn('Replacing bond %r, %r with %r' %
-                                              (key, self.bond_types[key], bond_type), ParameterWarning)
+                                      (key, self.bond_types[key], bond_type), ParameterWarning)
                         self.bond_types[(type1, type2)] = bond_type
                         self.bond_types[(type2, type1)] = bond_type
                 else: # key not present
@@ -456,8 +489,8 @@ class CharmmParameterSet(ParameterSet):
                     type1 = words[0].upper()
                     type2 = words[1].upper()
                     type3 = words[2].upper()
-                    k = conv(words[3], float, 'angle force constant')
-                    theteq = conv(words[4], float, 'angle equilibrium value')
+                    k = conv(words[3], float, 'angle force constant', line_index=i, line=line)
+                    theteq = conv(words[4], float, 'angle equilibrium value', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse angles.')
 
@@ -469,8 +502,7 @@ class CharmmParameterSet(ParameterSet):
                     if self.angle_types[key] != angle_type:
                         # Replace. Warn if they are different
                         warnings.warn('Replacing angle %r, %r with %r' %
-                                      (key, self.angle_types[key], angle_type),
-                                      ParameterWarning)
+                                      (key, self.angle_types[key], angle_type), ParameterWarning)
                         self.angle_types[(type1, type2, type3)] = angle_type
                         self.angle_types[(type3, type2, type1)] = angle_type
                 else: # key not present
@@ -478,8 +510,8 @@ class CharmmParameterSet(ParameterSet):
                     self.angle_types[(type3, type2, type1)] = angle_type
                 # See if we have a urey-bradley
                 try:
-                    ubk = conv(words[5], float, 'Urey-Bradley force constant')
-                    ubeq = conv(words[6], float, 'Urey-Bradley equil. value')
+                    ubk = conv(words[5], float, 'Urey-Bradley force constant', line_index=i, line=line)
+                    ubeq = conv(words[6], float, 'Urey-Bradley equil. value', line_index=i, line=line)
                     ubtype = BondType(ubk, ubeq)
                     ubtype.penalty = penalty
                 except IndexError:
@@ -497,9 +529,9 @@ class CharmmParameterSet(ParameterSet):
                     type2 = words[1].upper()
                     type3 = words[2].upper()
                     type4 = words[3].upper()
-                    k = conv(words[4], float, 'dihedral force constant')
-                    n = conv(words[5], float, 'dihedral periodicity')
-                    phase = conv(words[6], float, 'dihedral phase')
+                    k = conv(words[4], float, 'dihedral force constant', line_index=i, line=line)
+                    n = conv(words[5], float, 'dihedral periodicity', line_index=i, line=line)
+                    phase = conv(words[6], float, 'dihedral phase', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
                 key = (type1, type2, type3, type4)
@@ -515,8 +547,9 @@ class CharmmParameterSet(ParameterSet):
                         if dtype.per == dihedral.per:
                             # Replace. Warn if they are different
                             if dtype != dihedral:
-                                warnings.warn('Replacing dihedral %r with %r' %
-                                              (dtype, dihedral), ParameterWarning)
+                                warnings.warn(
+                                    f'Replacing dihedral {dtype} with {dihedral}', ParameterWarning
+                                )
                             self.dihedral_types[key][i] = dihedral
                             replaced = True
                             break
@@ -525,8 +558,8 @@ class CharmmParameterSet(ParameterSet):
                 else: # key not present
                     dtl = DihedralTypeList()
                     dtl.append(dihedral)
-                    self.dihedral_types[(type1,type2,type3,type4)] = dtl
-                    self.dihedral_types[(type4,type3,type2,type1)] = dtl
+                    self.dihedral_types[(type1, type2, type3, type4)] = dtl
+                    self.dihedral_types[(type4, type3, type2, type1)] = dtl
                 continue
             if section.upper() == 'IMPROPER':
                 words = line.split()
@@ -537,8 +570,8 @@ class CharmmParameterSet(ParameterSet):
                     type2 = words[1].upper()
                     type3 = words[2].upper()
                     type4 = words[3].upper()
-                    k = conv(words[4], float, 'improper force constant')
-                    theteq = conv(words[5], float, 'improper equil. value')
+                    k = conv(words[4], float, 'improper force constant', line_index=i, line=line)
+                    theteq = conv(words[5], float, 'improper equil. value', line_index=i, line=line)
                 except IndexError:
                     raise CharmmError('Could not parse dihedrals.')
                 # If we have a 7th column, that is the real psi0 (and the 6th
@@ -546,7 +579,7 @@ class CharmmParameterSet(ParameterSet):
                 # improper torsion (so it needs to be added to the
                 # improper_periodic_types list)
                 try:
-                    tmp = conv(words[6], float, 'improper equil. value')
+                    tmp = conv(words[6], float, 'improper equil. value', line_index=i, line=line)
                 except IndexError:
                     per = 0
                 else:
@@ -556,7 +589,8 @@ class CharmmParameterSet(ParameterSet):
                 # defined in the first place, so just have the key a fully
                 # sorted list. We still depend on the PSF having properly
                 # ordered improper atoms
-                key = tuple(sorted([type1, type2, type3, type4]))
+                key = (type1, type2, type3, type4)
+                self._improper_key_map[tuple(sorted(key))] = key
                 if per == 0:
                     improp = ImproperType(k, theteq)
                     self.improper_types[key] = improp
@@ -592,12 +626,12 @@ class CharmmParameterSet(ParameterSet):
                         type6 = words[5].upper()
                         type7 = words[6].upper()
                         type8 = words[7].upper()
-                        res = conv(words[8], int, 'CMAP resolution')
+                        res = conv(words[8], int, 'CMAP resolution', line_index=i, line=line)
                     except IndexError:
                         raise CharmmError('Could not parse CMAP data.')
                     # order the torsions independently
-                    k1 = [type1,type2,type3,type4,type5,type6,type7,type8]
-                    k2 = [type8,type7,type6,type5,type4,type3,type2,type1]
+                    k1 = [type1, type2, type3, type4, type5, type6, type7, type8]
+                    k2 = [type8, type7, type6, type5, type4, type3, type2, type1]
                     current_cmap = tuple(min(k1, k2))
                     current_cmap2 = tuple(max(k1, k2))
                     current_cmap_res = res
@@ -611,8 +645,8 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     atype = words[0].upper()
                     # 1st column is ignored
-                    epsilon = conv(words[2], float, 'vdW epsilon term')
-                    rmin = conv(words[3], float, 'vdW Rmin/2 term')
+                    epsilon = conv(words[2], float, 'vdW epsilon term', line_index=i, line=line)
+                    rmin = conv(words[3], float, 'vdW Rmin/2 term', line_index=i, line=line)
                 except (IndexError, CharmmError):
                     # If we haven't read our first nonbonded term yet, we may
                     # just be parsing the settings that should be used. So
@@ -621,31 +655,24 @@ class CharmmParameterSet(ParameterSet):
                     for i, word in enumerate(words):
                         if word.upper() == 'E14FAC':
                             try:
-                                scee = float(words[i+1])
+                                scee = 1 / float(words[i+1])
                             except (ValueError, IndexError):
-                                raise CharmmError(
-                                        'Could not parse electrostatic '
-                                        'scaling constant'
-                                )
+                                raise CharmmError('Could not parse electrostatic scaling constant')
                             if self._declared_nbrules:
                                 # We already specified it -- make sure it's the
                                 # same as the one we specified before
-                                _, dt0 = next(iteritems(self.dihedral_types))
+                                _, dt0 = next(iter(self.dihedral_types.items()))
                                 diff = abs(dt0[0].scee - scee)
                                 if diff > TINY:
-                                    raise CharmmError('Inconsistent 1-4 '
-                                                      'scalings')
+                                    raise CharmmError('Inconsistent 1-4 scalings')
                             else:
-                                scee = 1 / scee
-                                for key, dtl in iteritems(self.dihedral_types):
+                                for key, dtl in self.dihedral_types.items():
                                     for dt in dtl:
                                         dt.scee = scee
                         elif word.upper().startswith('GEOM'):
-                            if (self._declared_nbrules and
-                                    self.combining_rule != 'geometric'):
+                            if self._declared_nbrules and self.combining_rule != 'geometric':
                                 raise CharmmError(
-                                        'Cannot combine parameter files with '
-                                        'different combining rules'
+                                    'Cannot combine parameter files with different combining rules'
                                 )
                             self.combining_rule = 'geometric'
                             declared_geometric = True
@@ -656,9 +683,8 @@ class CharmmParameterSet(ParameterSet):
                     # not define GEOM if a previous file did, since
                     # Lorentz-Berthelot and geometric combining rules are
                     # incompatible
-                    if (self._declared_nbrules and
-                            self.combining_rule == 'geometric' and
-                            not declared_geometric):
+                    if (self._declared_nbrules and self.combining_rule == 'geometric' and
+                        not declared_geometric):
                         raise CharmmError('Cannot combine parameter files with '
                                           'different combining rules')
                     read_first_nonbonded = True
@@ -666,8 +692,8 @@ class CharmmParameterSet(ParameterSet):
                 # See if we have 1-4 parameters
                 try:
                     # 4th column is ignored
-                    eps14 = conv(words[5], float, '1-4 vdW epsilon term')
-                    rmin14 = conv(words[6], float, '1-4 vdW Rmin/2 term')
+                    eps14 = conv(words[5], float, '1-4 vdW epsilon term', line_index=i, line=line)
+                    rmin14 = conv(words[6], float, '1-4 vdW Rmin/2 term', line_index=i, line=line)
                 except IndexError:
                     eps14 = rmin14 = None
                 nonbonded_types[atype] = [epsilon, rmin, eps14, rmin14]
@@ -679,18 +705,16 @@ class CharmmParameterSet(ParameterSet):
                 try:
                     at1 = words[0].upper()
                     at2 = words[1].upper()
-                    emin = abs(conv(words[2], float, 'NBFIX Emin'))
-                    rmin = conv(words[3], float, 'NBFIX Rmin')
+                    emin = abs(conv(words[2], float, 'NBFIX Emin', line_index=i, line=line))
+                    rmin = conv(words[3], float, 'NBFIX Rmin', line_index=i, line=line)
                     try:
-                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4'))
-                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4')
+                        emin14 = abs(conv(words[4], float, 'NBFIX Emin 1-4', line_index=i, line=line))
+                        rmin14 = conv(words[5], float, 'NBFIX Rmin 1-4', line_index=i, line=line)
                     except IndexError:
                         emin14 = rmin14 = None
                     try:
-                        self.atom_types_str[at1].add_nbfix(at2, rmin, emin,
-                                                           rmin14, emin14)
-                        self.atom_types_str[at2].add_nbfix(at1, rmin, emin,
-                                                           rmin14, emin14)
+                        self.atom_types_str[at1].add_nbfix(at2, rmin, emin, rmin14, emin14)
+                        self.atom_types_str[at2].add_nbfix(at1, rmin, emin, rmin14, emin14)
                     except KeyError:
                         # Some stream files define NBFIX terms with an atom that
                         # is defined in another toppar file that does not
@@ -705,9 +729,9 @@ class CharmmParameterSet(ParameterSet):
         # If we had any CMAP terms, then the last one will not have been added
         # yet. Add it here
         if current_cmap is not None:
-            ty = CmapType(current_cmap_res, current_cmap_data)
-            self.cmap_types[current_cmap] = ty
-            self.cmap_types[current_cmap2] = ty
+            typ = CmapType(current_cmap_res, current_cmap_data)
+            self.cmap_types[current_cmap] = typ
+            self.cmap_types[current_cmap2] = typ
         # Now we're done. Load the nonbonded types into the relevant AtomType
         # instances. In order for this to work, all keys in nonbonded_types
         # must be in the self.atom_types_str dict. Raise a RuntimeError if this
@@ -716,10 +740,11 @@ class CharmmParameterSet(ParameterSet):
             for key in nonbonded_types:
                 self.atom_types_str[key].set_lj_params(*nonbonded_types[key])
         except KeyError:
-            warnings.warn('Atom type %s not present in AtomType list' % key,
-                          ParameterWarning)
-        if parameterset is not None: self.parametersets.append(parameterset)
-        if own_handle: f.close()
+            warnings.warn('Atom type %s not present in AtomType list' % key, ParameterWarning)
+        if parameterset is not None:
+            self.parametersets.append(parameterset)
+        if own_handle:
+            f.close()
 
     def read_topology_file(self, tfile):
         """
@@ -739,22 +764,24 @@ class CharmmParameterSet(ParameterSet):
             own_handle = False
             f = tfile
         hpatch = tpatch = None # default Head and Tail patches
-        residues = dict()
-        hpatches = dict()
-        tpatches = dict()
+        residues = OrderedDict()
+        patches = OrderedDict()
+        hpatches = OrderedDict()
+        tpatches = OrderedDict()
         line = next(f)
+        line_index = 0
+        skip_adding_residue = False
         try:
             while line:
                 line = line.strip()
                 if line[:4].upper() == 'MASS':
                     words = line.split()
                     try:
-                        idx = conv(words[1], int, 'atom type')
+                        idx = conv(words[1], int, 'atom type', line_index=line_index, line=line)
                         name = words[2].upper()
-                        mass = conv(words[3], float, 'atom mass')
+                        mass = conv(words[3], float, 'atom mass', line_index=line_index, line=line)
                     except IndexError:
-                        raise CharmmError('Could not parse MASS section of %s' %
-                                          tfile)
+                        raise CharmmError('Could not parse MASS section of %s' % tfile)
                     # The parameter file might or might not have an element name
                     try:
                         elem = words[4].upper()
@@ -764,8 +791,7 @@ class CharmmParameterSet(ParameterSet):
                     except (IndexError, KeyError):
                         # Figure it out from the mass
                         atomic_number = AtomicNum[element_by_mass(mass)]
-                    atype = AtomType(name=name, number=idx, mass=mass,
-                                     atomic_number=atomic_number)
+                    atype = AtomType(name=name, number=idx, mass=mass, atomic_number=atomic_number)
                     self.atom_types_str[atype.name] = atype
                     self.atom_types_int[atype.number] = atype
                     self.atom_types_tuple[(atype.name, atype.number)] = atype
@@ -774,8 +800,7 @@ class CharmmParameterSet(ParameterSet):
                 elif line[:4].upper() == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
-                        warnings.warn('DEFA line has %d tokens; expected 5' %
-                                      len(words))
+                        warnings.warn('DEFA line has %d tokens; expected 5' % len(words))
                     else:
                         it = iter(words[1:5])
                         for tok, val in zip(it, it):
@@ -786,28 +811,28 @@ class CharmmParameterSet(ParameterSet):
                             elif tok.upper() == 'LAST':
                                 tpatch = val
                             else:
-                                warnings.warn('DEFA patch %s unknown' % val)
+                                warnings.warn(f'DEFA patch {val} unknown')
                 elif line[:4].upper() in ('RESI', 'PRES'):
                     restype = line[:4].upper()
                     # Get the residue definition
                     words = line.split()
                     resname = words[1].upper()
                     if resname in self.residues:
-                        warnings.warn('Replacing residue %r' %
-                                              resname, ParameterWarning)
+                        warnings.warn(f'Replacing residue {resname}', ParameterWarning)
                     # Assign default patches
                     hpatches[resname] = hpatch
                     tpatches[resname] = tpatch
                     try:
                         charge = float(words[2])
                     except (IndexError, ValueError):
-                        warnings.warn('No charge for %s' % resname)
+                        warnings.warn(f'No charge for {resname}')
                     if restype == 'RESI':
                         res = ResidueTemplate(resname)
                     elif restype == 'PRES':
                         res = PatchTemplate(resname)
                     else:
                         assert False, 'restype != RESI or PRES'
+                    skip_adding_residue = False
                     line = next(f)
                     group = []
                     ictable = []
@@ -822,13 +847,51 @@ class CharmmParameterSet(ParameterSet):
                             name = words[1].upper()
                             type = words[2].upper()
                             charge = float(words[3])
-                            atom = Atom(name=name, type=type, charge=charge)
+                            if 'ALPHA' in words:
+                                # This is a polarizable atom.
+                                alpha = float(words[words.index('ALPHA')+1])
+                                thole = 1.3
+                                drude_type = 'DRUD'
+                                if 'THOLE' in words:
+                                    thole = float(words[words.index('THOLE')+1])
+                                if 'TYPE' in words:
+                                    drude_type = words[words.index('TYPE')+1]
+                                atom = DrudeAtom(
+                                    name=name,
+                                    type=type,
+                                    charge=charge,
+                                    alpha=alpha,
+                                    thole=thole,
+                                    drude_type=drude_type
+                                )
+                            else:
+                                atom = Atom(name=name, type=type, charge=charge)
                             group.append(atom)
                             res.add_atom(atom)
-                        elif line.strip().upper() and line.split()[0].upper() in \
-                                ('BOND', 'DOUBLE'):
+                        elif line[:6].upper() == 'DELETE':
+                            words = line.split()
+                            name = words[2].upper()
+                            entity_type = words[1].upper()
+                            if entity_type == 'ATOM':
+                                res.delete_atoms.append(name)
+                            elif entity_type == 'IMPR':
+                                res.delete_impropers.append(words[2:5])
+                            else:
+                                warnings.warn(
+                                    f'WARNING: Ignoring "{line.strip()}" because entity type '
+                                    f'{entity_type} not used.'
+                                )
+                        elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
                             for a1, a2 in zip(it, it):
+                                if restype == 'PRES':
+                                    # Patches can have bonds that refer to atoms not in the patch, so store these in a list of tuples
+                                    order = 1
+                                    if line.split()[0].upper() == 'DOUBLE':
+                                        order = 2
+                                    res.add_bonds.append( (a1, a2, order) )
+                                    continue
+
                                 if a1.startswith('-'):
                                     res.head = res[a2]
                                     continue
@@ -841,12 +904,6 @@ class CharmmParameterSet(ParameterSet):
                                 if a2.startswith('+'):
                                     res.tail = res[a1]
                                     continue
-                                # Apparently PRES objects do not need to put +
-                                # or - in front of atoms that belong to adjacent
-                                # residues
-                                if restype == 'PRES' and (a1 not in res or
-                                                          a2 not in res):
-                                    continue
                                 res.add_bond(a1, a2)
                         elif line[:4].upper() == 'CMAP':
                             pass
@@ -854,10 +911,32 @@ class CharmmParameterSet(ParameterSet):
                             pass
                         elif line[:6].upper() == 'ACCEPT':
                             pass
+                        elif line[:8].upper() == 'LONEPAIR':
+                            # See: https://www.charmm.org/charmm/documentation/by-version/c40b1/params/doc/lonepair/
+                            # TODO: This currently doesn't handle some formats, like Note 3 in the above URL
+                            words = line.split()
+                            lptype_keyword = words[1][0:4].upper()
+                            if not skip_adding_residue and lptype_keyword not in ['BISE', 'RELA']:
+                                warnings.warn(
+                                    f'LONEPAIR type {words[1]} not supported; only BISEctor and '
+                                     'RELAtive supported'
+                                )
+                                skip_adding_residue = True
+                                break
+                            a1, a2, a3, a4 = words[2:6]
+                            keywords = {words[index][0:4].upper() : float(words[index+1])
+                                        for index in range(6, len(words), 2) }
+                            r = keywords['DIST'] # angstrom
+                            theta = keywords['ANGL'] # degrees
+                            phi = keywords['DIHE'] # degrees
+                            lptypes = { 'BISE' : 'bisector', 'RELA' : 'relative' }
+                            lonepair = (lptypes[lptype_keyword], a1, a2, a3, a4, r, theta, phi) # TODO: Define a LonePair object?
+                            res.lonepairs.append(lonepair)
                         elif line[:2].upper() == 'IC':
                             words = line.split()[1:]
-                            ictable.append(([w.upper() for w in words[:4]],
-                                            [float(w) for w in words[4:]]))
+                            ictable.append(
+                                ([w.upper() for w in words[:4]], [float(w) for w in words[4:]])
+                            )
                         elif line[:3].upper() == 'END':
                             break
                         elif line[:5].upper() == 'PATCH':
@@ -868,23 +947,33 @@ class CharmmParameterSet(ParameterSet):
                                     hpatches[resname] = val
                                 elif tok.upper().startswith('LAST'):
                                     tpatches[resname] = val
-                        elif line[:5].upper() == 'DELETE':
-                            pass
-                        elif line[:4].upper() == 'IMPR':
-                            it = iter([w.upper() for w in line.split()[1:]])
+                        elif line[:4].upper() in ('IMPR', 'IMPH'):
+                            it = iter(w.upper() for w in line.split()[1:])
                             for a1, a2, a3, a4 in zip(it, it, it, it):
+                                res._impr.append((a1, a2, a3, a4))
                                 if a2[0] == '-' or a3[0] == '-' or a4 == '-':
                                     res.head = res[a1]
+                        elif line[:10].upper() == 'ANISOTROPY':
+                            words = line.split()
+                            atoms = [res[name] for name in words[1:5]]
+                            keywords = {words[index].upper() : float(words[index+1])
+                                        for index in range(5, len(words), 2)}
+                            a11 = float(keywords['A11'])
+                            a22 = float(keywords['A22'])
+                            atoms[0].anisotropy = DrudeAnisotropy(*atoms, a11=a11, a22=a22)
                         elif line[:4].upper() in ('RESI', 'PRES', 'MASS'):
                             # Back up a line and bail
                             break
                         line = next(f)
                     if group: res.groups.append(group)
                     _fit_IC_table(res, ictable)
-                    if restype == 'RESI':
+                    if skip_adding_residue:
+                        # Do not add this residue to the lookup library
+                        continue
+                    elif restype == 'RESI':
                         residues[resname] = res
                     elif restype == 'PRES':
-                        self.patches[resname] = res
+                        patches[resname] = res
                     else:
                         assert False, 'restype != RESI or PRES'
                     # We parsed a line we need to look at. So don't update the
@@ -892,21 +981,26 @@ class CharmmParameterSet(ParameterSet):
                     continue
                 # Get the next line and cycle through
                 line = next(f)
+                line_index += 1
         except StopIteration:
             pass
 
         # Go through the patches and add the appropriate one
-        for resname, res in iteritems(residues):
-            if hpatches[resname] is not None:
+        self.patches.update(patches)
+        for resname, res in residues.items():
+            patch_name = hpatches[resname]
+            if patch_name is not None:
                 try:
-                    res.first_patch = self.patches[hpatches[resname]]
+                    res.first_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn('Patch %s not found' % hpatches[resname])
-            if tpatches[resname] is not None:
+                    warnings.warn(f'Patch {patch_name} not found')
+
+            patch_name = tpatches[resname]
+            if patch_name is not None:
                 try:
-                    res.last_patch = self.patches[tpatches[resname]]
+                    res.last_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn('Patch %s not found' % tpatches[resname])
+                    warnings.warn(f'Patch {patch_name} not found')
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
 
@@ -938,7 +1032,7 @@ class CharmmParameterSet(ParameterSet):
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
 
-    def write(self, top=None, par=None, str=None):
+    def write(self, top=None, par=None, stream=None, **kwargs):
         """ Write a CHARMM parameter set to a file
 
         Parameters
@@ -958,11 +1052,22 @@ class CharmmParameterSet(ParameterSet):
         ------
         ValueError if both par and str are None
         """
-        if par is None and str is None:
+        if stream is None and kwargs.get("str") is not None:
+            warnings.warn(
+                "Use 'stream' instead of 'str' to write CHARMM parameters", DeprecationWarning
+            )
+            stream = kwargs["str"]
+        if stream is not None and kwargs.get("str") != stream:
+            warnings.warn(
+                f"Ignoring 'str' ({kwargs.get('str')}), using 'stream' ({stream}) instead",
+                DeprecationWarning,
+            )
+
+        if par is None and stream is None:
             raise ValueError('Must specify either par *or* str')
 
         if top is not None:
-            if isinstance(top, string_types):
+            if isinstance(top, str):
                 f = genopen(top, 'w')
                 ownhandle = True
             else:
@@ -973,7 +1078,7 @@ class CharmmParameterSet(ParameterSet):
             self._write_top_to(f, True)
             if ownhandle: f.close()
         if par is not None:
-            if isinstance(par, string_types):
+            if isinstance(par, str):
                 f = genopen(par, 'w')
                 ownhandle = True
             else:
@@ -983,15 +1088,16 @@ class CharmmParameterSet(ParameterSet):
             f.write('*\n\n')
             self._write_par_to(f)
             if ownhandle: f.close()
-        if str is not None:
-            if isinstance(str, string_types):
-                f = genopen(str, 'w')
+        if stream is not None:
+            if isinstance(stream, str):
+                f = genopen(stream, 'w')
                 ownhandle = True
             else:
-                f = str
+                f = stream
                 ownhandle = False
             self._write_str_to(f)
-            if ownhandle: f.close()
+            if ownhandle:
+                f.close()
 
     def _write_str_to(self, f):
         """ Private method to write stream items to open file object """
@@ -1006,8 +1112,8 @@ class CharmmParameterSet(ParameterSet):
             # This version is known to work
             f.write('36   1\n')
             f.write('\n')
-        for i, (_, atom) in enumerate(iteritems(self.atom_types)):
-            f.write('MASS %5d %-6s %9.5f\n' % (i+1, atom.name, atom.mass))
+        for i, (_, atom) in enumerate(self.atom_types.items()):
+            f.write(f'MASS {i + 1:5d} {atom.name:<6s} {atom.mass:9.5f}\n')
         if write_version:
             f.write('\nEND\n')
 
@@ -1016,11 +1122,14 @@ class CharmmParameterSet(ParameterSet):
         # Find out what the 1-4 electrostatic scaling factors and the 1-4
         # van der Waals scaling factors are
         scee, scnb = set(), set()
-        for _, typ in iteritems(self.dihedral_types):
+        for _, typ in self.dihedral_types.items():
             for t in typ:
-                if t.scee: scee.add(t.scee)
-                if t.scnb: scnb.add(t.scnb)
-        assert len(scee) == len(scnb) == 1, 'Mixed 1-4 scaling not supported'
+                if t.scee:
+                    scee.add(t.scee)
+                if t.scnb:
+                    scnb.add(t.scnb)
+        if len(scee) > 1 or len(scnb) > 1:
+            raise ValueError('Mixed 1-4 scaling not supported')
         scee = 1.0 if not scee else scee.pop()
         scnb = 1.0 if not scnb else scnb.pop()
 
@@ -1028,53 +1137,49 @@ class CharmmParameterSet(ParameterSet):
         self._write_top_to(f, False)
         f.write('\nBONDS\n')
         written = set()
-        for key, typ in iteritems(self.bond_types):
-            if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
-            f.write('%-6s %-6s %7.2f %10.4f\n' %
-                    (key[0], key[1], typ.k, typ.req))
+        for key, typ in self.bond_types.items():
+            if key in written:
+                continue
+            written.add(key)
+            written.add(tuple(reversed(key)))
+            f.write(f'{key[0]:<6s} {key[1]:<6s} {typ.k:7.2f} {typ.req:10.4f}\n')
         f.write('\nANGLES\n')
         written = set()
-        for key, typ in iteritems(self.angle_types):
+        for key, typ in self.angle_types.items():
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
-            f.write('%-6s %-6s %-6s %7.2f %8.2f\n' %
-                    (key[0], key[1], key[2], typ.k, typ.theteq))
+            written.add(key)
+            written.add(tuple(reversed(key)))
+            f.write(f'{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {typ.k:7.2f} {typ.theteq:8.2f}\n')
         f.write('\nDIHEDRALS\n')
         written = set()
-        for key, typ in iteritems(self.dihedral_types):
+        for key, typ in self.dihedral_types.items():
             if key in written: continue
-            written.add(key); written.add(tuple(reversed(key)))
-            for t in typ:
-                f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                        (key[0], key[1], key[2], key[3], t.phi_k,
-                         int(t.per), t.phase))
+            written.add(key)
+            written.add(tuple(reversed(key)))
+            for tor in typ:
+                f.write(
+                    f'{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {key[3]:<6s} {tor.phi_k:11.4f} {tor.per:2d} {tor.phase:8.2f}\n'
+                )
         f.write('\nIMPROPERS\n')
         written = set()
-        for key, typ in iteritems(self.improper_periodic_types):
-            sortkey = tuple(sorted(key))
-            if sortkey in written: continue
-            written.add(sortkey)
-            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                    (key[0], key[1], key[2], key[3], typ.phi_k,
-                     int(typ.per), typ.phase))
-        for key, typ in iteritems(self.improper_types):
-            if key[2] == 'X':
-                key = (key[0], key[2], key[3], key[1])
-            elif key[3] == 'X':
-                key = (key[0], key[3], key[1], key[2])
-            f.write('%-6s %-6s %-6s %-6s %11.4f %2d %8.2f\n' %
-                    (key[0], key[1], key[2], key[3], typ.psi_k,
-                     0, typ.psi_eq))
+        for key, typ in sorted(self.improper_periodic_types.items(), key=lambda x: x[0]):
+                f.write(
+                    f'{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {key[3]:<6s} {typ.phi_k:11.4f} {int(typ.per):2d} {typ.phase:8.2f}\n'
+                )
+        for key, typ in self.improper_types.items():
+            f.write(
+                f'{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {key[3]:<6s} {typ.psi_k:11.4f} {0:2d} {typ.psi_eq:8.2f}\n'
+            )
         if self.cmap_types:
             f.write('\nCMAPS\n')
             written = set()
-            for key, typ in iteritems(self.cmap_types):
+            for key, typ in self.cmap_types.items():
                 if key in written: continue
                 written.add(key); written.add(tuple(reversed(key)))
-                f.write('%-6s %-6s %-6s %-6s %-6s %-6s %-6s %-6s %5d\n\n' %
-                        (key[0], key[1], key[2], key[3], key[4], key[5], key[6],
-                         key[7], typ.resolution))
+                f.write(
+                    f"{key[0]:<6s} {key[1]:<6s} {key[2]:<6s} {key[3]:<6s} {key[4]:<6s} "
+                    f"{key[5]:<6s} {key[6]:<6s} {key[7]:<6s} {typ.resolution:5d}\n\n"
+                )
                 i = 0
                 for val in typ.grid:
                     if i:
@@ -1087,20 +1192,19 @@ class CharmmParameterSet(ParameterSet):
                             f.write('\n\n')
                             i = 0
                     i += 1
-                    f.write(' %13.6f' % val)
+                    f.write(f' {val:13.6f}')
                 f.write('\n\n\n')
-        f.write('\nNONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance '
-                'vfswitch -\ncutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 '
-                'e14fac %s wmin 1.5\n\n' % (1/scee))
-        for key, typ in iteritems(self.atom_types):
-            f.write('%-6s %14.6f %10.6f %14.6f' % (key, 0.0, -abs(typ.epsilon),
-                    typ.rmin))
+        comb_rule = " GEOM" if self.combining_rule == "geometric" else ""
+        f.write(
+            '\nNONBONDED  nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -\ncutnb 14.0 '
+            f'ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac {1/scee} wmin 1.5{comb_rule}\n\n'
+        )
+        for key, typ in self.atom_types.items():
+            f.write(f'{key:<6s} {0:14.6f} {-abs(typ.epsilon):10.6f} {typ.rmin:14.6f}')
             if typ.epsilon == typ.epsilon_14 and typ.rmin == typ.rmin_14:
-                f.write('%10.6f %10.6f %14.6f\n' %
-                        (0, -abs(typ.epsilon)/scnb, typ.rmin))
+                f.write(f'{0:10.6f} {-abs(typ.epsilon) / scnb:10.6f} {typ.rmin:14.6f}\n')
             else:
-                f.write('%10.6f %10.6f %14.6f\n' %
-                        (0, -abs(typ.epsilon_14), typ.rmin_14))
+                f.write(f'{0:10.6f} {-abs(typ.epsilon_14):10.6f} {typ.rmin_14:14.6f}\n')
         f.write('\nEND\n')
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

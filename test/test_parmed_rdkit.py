@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sys
 import parmed as pmd
 import unittest
@@ -10,9 +9,7 @@ try:
 except ImportError:
     has_rdkit = False
 
-is_linux = sys.platform.startswith('linux')
-
-@unittest.skipUnless(has_rdkit and is_linux, "Only test load_rdkit module on Linux")
+@unittest.skipUnless(has_rdkit, "Only test load_rdkit module on Linux")
 class TestRDKit(unittest.TestCase):
     """ Tests loading of an rdkit Mol object """
 
@@ -21,8 +18,7 @@ class TestRDKit(unittest.TestCase):
         from rdkit import Chem
         m1 = Chem.MolFromSmiles('C1=CC=CN=C1')
         parm = pmd.load_rdkit(m1)
-        self.assertEqual([atom.name for atom in parm.atoms], 
-                         ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
+        self.assertEqual([atom.name for atom in parm.atoms], ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
         self.assertEqual(parm.residues[0].name, 'UNL')
 
     def test_load_smiles(self):
@@ -31,12 +27,11 @@ class TestRDKit(unittest.TestCase):
 
         # coordinates = False
         parm = pmd.rdkit.from_smiles(smiles, coordinates=False)
-        self.assertEqual([atom.name for atom in parm.atoms], 
-                         ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
+        self.assertEqual([atom.name for atom in parm.atoms], ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
         self.assertEqual(parm.residues[0].name, 'UNL')
         self.assertIs(parm.coordinates, None)
         self.assertIs(parm.get_coordinates(), None)
 
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles)
-        np.testing.assert_allclose(parm.coordinates[0], [-1.076,  0.83 ,  0.011])
+        np.testing.assert_allclose(parm.coordinates[0], [-1.072,  0.829 ,  0.108])

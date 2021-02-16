@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-Module simtk.unit.quantity
+Module openmm.unit.quantity
 
 Physical quantities with units, intended to produce similar functionality
 to Boost.Units package in C++ (but with a runtime cost).
@@ -9,14 +9,14 @@ but different internals to satisfy our local requirements.
 In particular, there is no underlying set of 'canonical' base
 units, whereas in Scientific.Physics.PhysicalQuantities all
 units are secretly in terms of SI units.  Also, it is easier
-to add new fundamental dimensions to simtk.dimensions.  You
+to add new fundamental dimensions to basedimension.  You
 might want to make new dimensions for, say, "currency" or
 "information".
 
 Some features of this implementation:
   * Quantities are a combination of a value and a unit.  The value
     part can be any python type, including numbers, lists, numpy
-    arrays, and anything else.  The unit part must be a simtk.unit.Unit.
+    arrays, and anything else.  The unit part must be a openmm.unit.Unit.
   * Operations like adding incompatible units raises an error.
   * Multiplying or dividing units/quantities creates new units.
   * Users can create new Units and Dimensions, but most of the useful
@@ -73,8 +73,6 @@ __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
 
-from parmed.utils.six import string_types, PY3
-from parmed.utils.six.moves import range
 import math
 import copy
 from .standard_dimensions import *
@@ -102,7 +100,7 @@ class Quantity(object):
 
         Parameters
          - value: (any type, usually a number) Measure of this quantity
-         - unit: (Unit) the physical unit, e.g. simtk.unit.meters.
+         - unit: (Unit) the physical unit, e.g. openmm.unit.meters.
         """
         # When no unit is specified, bend over backwards to handle all one-argument possibilities
         if unit is None: # one argument version, copied from UList
@@ -114,13 +112,13 @@ class Quantity(object):
                 # Ulist of a Quantity is just the Quantity itself
                 unit = value.unit
                 value = value._value
-            elif isinstance(value, string_types):
+            elif _is_string(value):
                 unit = dimensionless
             else:
                 # Is value a container?
                 is_container = True
                 try:
-                    i = iter(value)
+                    _ = iter(value)
                 except TypeError:
                     is_container = False
                 if is_container:
@@ -269,7 +267,7 @@ class Quantity(object):
     def __ne__(self, other):
         """
         """
-        return not self.__eq__(other)
+        return not self == other
 
     def __lt__(self, other):
         """Compares two quantities.
@@ -288,6 +286,8 @@ class Quantity(object):
         return self._value <= (other.value_in_unit(self.unit))
     def __lt__(self, other):
         return self._value < (other.value_in_unit(self.unit))
+
+    __hash__ = None
 
     _reduce_cache = {}
 
@@ -739,8 +739,8 @@ class Quantity(object):
         # Delegate slices to one-at-a time ___setitem___
         if isinstance(key, slice): # slice
             indices = key.indices(len(self))
-            for i in range(*indices):
-                self[i] = value[i]
+            for value_idx, self_idx in enumerate(range(*indices)):
+                self[self_idx] = value[value_idx]
         else: # single index
             # Check unit compatibility
             if self.unit.is_dimensionless() and is_dimensionless(value):
@@ -783,8 +783,6 @@ class Quantity(object):
     # list.sort with no arguments will delegate correctly
     # list.sort with a comparison function cannot be done correctly
 
-if PY3:
-    del Quantity.__nonzero__
 
 def is_quantity(x):
     """
@@ -802,6 +800,25 @@ def is_dimensionless(x):
     else:
         # everything else in the universe is dimensionless
         return True
+
+# Strings can cause trouble
+# as can any container that has infinite levels of containment
+def _is_string(x):
+     # step 1) String is always a container
+     # and its contents are themselves containers.
+     if isinstance(x, str):
+         return True
+     try:
+         first_item = next(iter(x))
+         inner_item = next(iter(first_item))
+         if first_item is inner_item:
+             return True
+         else:
+             return False
+     except TypeError:
+         return False
+     except StopIteration:
+         return False
 
 # run module directly for testing
 if __name__=='__main__':
