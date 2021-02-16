@@ -256,11 +256,8 @@ class TestCharmmPsf(TestCharmmBase):
 
     def test_psf_atomic_number_assignment(self):
         """ Checks that atomic number is assigned if just PSF is read """
-        param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                                                get_fn('par_all22_prot.inp'))
-        psf1 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         psf2 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
-        psf2.load_parameters(parmset=param22)
+        psf2.load_parameters(parmset=self.param22)
         for a1, a2 in zip(psf1.atoms, psf2.atoms):
             self.assertEqual(a1.atomic_number, a2.atomic_number)
 
@@ -905,8 +902,6 @@ class TestCharmmParameters(TestCharmmBase):
 
     def test_parameters_from_structure(self):
         """ Test creation of CharmmParameterSet from a Structure """
-        param22 = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'),
-                                                get_fn('par_all22_prot.inp'))
         top = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         top.load_parameters(self.param22)
         params = parameters.CharmmParameterSet.from_structure(top)
