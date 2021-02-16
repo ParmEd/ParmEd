@@ -2,36 +2,15 @@
 This module contains a chamber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
-
-Copyright (C) 2010 - 2015  Jason Swails
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
 """
-from __future__ import absolute_import, division, print_function
-
 import copy as _copy
 import warnings
 from math import pi, sqrt
 
-from ..constants import DEG_TO_RAD, IFBOX, NATOM, NATYP, NTYPES, RAD_TO_DEG, SMALL, TINY
+from ..constants import DEG_TO_RAD, PrmtopPointers, RAD_TO_DEG, SMALL, TINY
 from ..exceptions import AmberError, AmberWarning
 from ..topologyobjects import BondType, ExtraPoint, Improper, ImproperType, UreyBradley
-from ..utils.six.moves import range, zip
 from ._amberparm import AmberParm
-
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -209,18 +188,18 @@ class ChamberParm(AmberParm):
             inst.LJ_14_depth[atom.nb_idx-1] = atom.epsilon_14
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
-        inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        inst.parm_data['POINTERS'][PrmtopPointers.NATOM] = len(inst.atoms)
         inst.box = _copy.copy(struct.box)
         if struct.box is None:
-            inst.parm_data['POINTERS'][IFBOX] = 0
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 0
             inst.pointers['IFBOX'] = 0
         elif (abs(struct.box[3] - 90) > TINY or abs(struct.box[4] - 90) > TINY
                 or abs(struct.box[5] - 90) > TINY):
-            inst.parm_data['POINTERS'][IFBOX] = 2
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 2
             inst.pointers['IFBOX'] = 2
             inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + list(struct.box[:3])
         else:
-            inst.parm_data['POINTERS'][IFBOX] = 1
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 1
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
@@ -508,8 +487,9 @@ class ChamberParm(AmberParm):
         self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0,
                       comments=['K_psi: kcal/mole/rad**2'])
         self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0, comments=['psi: radians'])
-        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
-        self.add_flag('SOLTY', '5E16.8', num_items=natyp)
+        self.pointers['NATYP'] = 1
+        self.parm_data['POINTERS'][PrmtopPointers.NATYP] = 1
+        self.add_flag('SOLTY', '5E16.8', num_items=1)
         self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
         self.add_flag('LENNARD_JONES_BCOEF', '3E24.16', num_items=0)
         self.add_flag('LENNARD_JONES_14_ACOEF', '3E24.16', num_items=0)
@@ -550,9 +530,9 @@ class ChamberParm(AmberParm):
 
     def _set_nonbonded_tables(self, nbfixes=None):
         """ Sets the tables of Lennard-Jones nonbonded interaction pairs """
-        from parmed.tools.actions import addLJType
+        from ..tools.actions import addLJType
         data = self.parm_data
-        ntypes = data['POINTERS'][NTYPES]
+        ntypes = data['POINTERS'][PrmtopPointers.NTYPES]
         ntypes2 = ntypes * ntypes
         # Set up the index lookup tables (not a unique solution)
         data['NONBONDED_PARM_INDEX'] = [0 for i in range(ntypes2)]
@@ -648,8 +628,7 @@ class ChamberParm(AmberParm):
             if not needed_split:
                 break
             # The following should never happen
-            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. ' \
-                   'Some unexpected problem with the algorithm'
+            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. This is a bug'
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway
         for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):

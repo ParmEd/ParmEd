@@ -2,6 +2,7 @@
 This module contains basic information and functionality related to individual
 residues in typical biopolymers.
 """
+from abc import ABC
 
 __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
            'ASP', 'CYS', 'GLU', 'GLN', 'GLY', 'HIS', 'HYP', 'ILE', 'LEU', 'LYS',
@@ -11,7 +12,7 @@ __all__ = ['AminoAcidResidue', 'RNAResidue', 'DNAResidue', 'ALA', 'ARG', 'ASN',
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class BiomolecularResidue(object):
+class BiomolecularResidue(ABC):
     """ Base class for different classes of biopolymer residues """
     _all_residues_by_name = dict()
     _all_residues_by_abbr = dict()
@@ -19,11 +20,11 @@ class BiomolecularResidue(object):
     all_residues = []
 
     def __init_(self, *args, **kwargs):
-        raise NotImplementedError('BiomolecularResidue must be subclassed')
+        super().__init__()
 
     @classmethod
     def get(cls, key):
-        raise NotImplementedError('BiomolecularResidue must be subclassed')
+        raise NotImplementedError()
 
     def __str__(self):
         return self.name
@@ -270,17 +271,11 @@ DG = DNAResidue('Guanine', 'DG', ['GUA', 'DG5', 'DG3', 'DGN'])
 DC = DNAResidue('Cytosine', 'DC', ['CYT', 'DC5', 'DC3', 'DCN', 'DCP'])
 DA = DNAResidue('Adenine', 'DA', ['ADE', 'DA5', 'DA3', 'DAN', 'DAP'])
 DT = DNAResidue('Thymine', 'DT', ['THY', 'DT5', 'DT3'])
-G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN', 'RG', 'RG3', 'RG5',
-                                'RGN', 'GF2', 'M2G', 'YYG', '7MG', 'OMG',
-                                '2MG',])
-C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN', 'RC', 'RC5',
-                                 'RC3', 'RCN', 'CFZ', '5MC', 'OMC',])
-A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN',
-                                'RA', 'RA3', 'RA5', 'AF2', '1MA'])
-U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5',
-                               'RUN', 'UFT', '5MU', 'H2U', 'PSU',])
-T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN',
-                                'RT', 'RT3', 'RT5', 'RTN'])
+G = RNAResidue('Guanine', 'G', ['GUA', 'G5', 'G3', 'GN', 'RG', 'RG3', 'RG5', 'RGN'])
+C = RNAResidue('Cytosine', 'C', ['CYT', 'CP', 'C5', 'C3', 'CN', 'RC', 'RC5', 'RC3', 'RCN'])
+A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN', 'RA', 'RA3', 'RA5'])
+U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5', 'RUN'])
+T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN', 'RT', 'RT3', 'RT5', 'RTN'])
 
 WATER_NAMES = {'WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC'}
 SOLVENT_NAMES = WATER_NAMES | {'SOL'}

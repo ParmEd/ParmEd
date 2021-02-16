@@ -15,7 +15,6 @@
 Test cases for reading PDBx/mmCIF data files PdbxReader class -
 
 """
-from __future__ import print_function, division
 import sys, unittest, traceback, os
 from utils import get_fn, get_saved_fn, diff_files, FileIOTestCase
 
@@ -23,7 +22,6 @@ import parmed as pmd
 from parmed.exceptions import PdbxSyntaxError
 from parmed.formats.pdbx import PdbxReader, PdbxWriter
 from parmed.formats.pdbx.PdbxContainers import *
-from parmed.utils.six.moves import range
 
 class PdbxReaderTests(unittest.TestCase):
     def setUp(self):
@@ -130,12 +128,12 @@ class PdbxWriterTests(FileIOTestCase):
         self.lfh=sys.stderr
         self.verbose=False
         self.pathPdbxDataFile = get_fn("1kip.cif")
-        self.pathOutputFile = get_fn("testOutputDataFile.cif", written=True)
+        self.pathOutputFile = self.get_fn("testOutputDataFile.cif", written=True)
 
     def test_write_data_file(self):
         """ Test writing CIF file """
         myDataList=[]
-        ofh = open(get_fn("test-output.cif", written=True), "w")
+        ofh = open(self.get_fn("test-output.cif", written=True), "w")
         curContainer=DataContainer("myblock")
         aCat=DataCategory("pdbx_seqtool_mapping_ref")
         aCat.appendAttribute("ordinal")
@@ -154,15 +152,19 @@ class PdbxWriterTests(FileIOTestCase):
         pdbxW=PdbxWriter(ofh)
         pdbxW.write(myDataList)
         ofh.close()
-        self.assertTrue(diff_files(get_saved_fn('test-output.cif'),
-                                   get_fn('test-output.cif', written=True)))
+        self.assertTrue(
+            diff_files(
+                self.get_fn('test-output.cif', saved=True),
+                self.get_fn('test-output.cif', written=True),
+            )
+        )
 
     def test_update_data_file(self):
         """ Test writing another CIF file """
         # Create a initial data file --
         #
         myDataList=[]
-        ofh = open(get_fn("test-output-1.cif", written=True), "w")
+        ofh = open(self.get_fn("test-output-1.cif", written=True), "w")
         curContainer=DataContainer("myblock")
         aCat=DataCategory("pdbx_seqtool_mapping_ref")
         aCat.appendAttribute("ordinal")
@@ -181,19 +183,19 @@ class PdbxWriterTests(FileIOTestCase):
         pdbxW=PdbxWriter(ofh)
         pdbxW.write(myDataList)
         ofh.close()
-        self.assertTrue(diff_files(get_saved_fn('test-output-1.cif'),
-                                   get_fn('test-output-1.cif', written=True)))
+        self.assertTrue(diff_files(self.get_fn('test-output-1.cif', saved=True),
+                                   self.get_fn('test-output-1.cif', written=True)))
         #
         # Read and update the data -
         # 
         myDataList=[]
-        ifh = open(get_fn("test-output-1.cif", written=True), "r")
+        ifh = open(self.get_fn("test-output-1.cif", written=True), "r")
         pRd=PdbxReader(ifh)
         pRd.read(myDataList)
         ifh.close()
         #
         myBlock=myDataList[0]
-        dest = open(get_fn('test_write_1.txt', written=True), 'w')
+        dest = open(self.get_fn('test_write_1.txt', written=True), 'w')
         myBlock.printIt(dest)
         myCat=myBlock.getObj('pdbx_seqtool_mapping_ref')
         myCat.printIt(dest)
@@ -201,14 +203,14 @@ class PdbxWriterTests(FileIOTestCase):
         for iRow in range(0,myCat.getRowCount()):
             myCat.setValue('some value', 'ref_mon_id',iRow)
             myCat.setValue(100, 'ref_mon_num',iRow)
-        ofh = open(get_fn("test-output-2.cif", written=True), "w")            
+        ofh = open(self.get_fn("test-output-2.cif", written=True), "w")            
         pdbxW=PdbxWriter(ofh)
         pdbxW.write(myDataList)
         ofh.close()
-        self.assertTrue(diff_files(get_saved_fn('test-output-2.cif'),
-                                   get_fn('test-output-2.cif', written=True)))
-        self.assertTrue(diff_files(get_saved_fn('test_write_1.txt'),
-                                   get_fn('test_write_1.txt', written=True)))
+        self.assertTrue(diff_files(self.get_fn('test-output-2.cif', saved=True),
+                                   self.get_fn('test-output-2.cif', written=True)))
+        self.assertTrue(diff_files(self.get_fn('test_write_1.txt', saved=True),
+                                   self.get_fn('test_write_1.txt', written=True)))
 
     def test_read_data_file(self):
         """ Test reading a CIF file (... again?) """

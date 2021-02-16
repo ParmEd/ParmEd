@@ -2,30 +2,28 @@
 This contains the basic residue template and residue building libraries
 typically used in modelling applications
 """
-
 from collections import OrderedDict, defaultdict
+from collections.abc import Sequence
 import copy as _copy
 import numpy as np
 import os
-from parmed.residue import AminoAcidResidue, RNAResidue, DNAResidue
-from parmed.structure import Structure
-from parmed.topologyobjects import Atom, Bond, AtomList, TrackedList
-from parmed.utils.six import iteritems
-from parmed.exceptions import IncompatiblePatchError, MoleculeError
+from ..residue import AminoAcidResidue, RNAResidue, DNAResidue
+from ..topologyobjects import Atom, Bond, AtomList, TrackedList
+from ..exceptions import IncompatiblePatchError, MoleculeError
 import warnings
 
-__all__ = ['PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate',
-           'ResidueTemplateContainer', 'PatchTemplate']
+__all__ = [
+    'PROTEIN', 'NUCLEIC', 'SOLVENT', 'UNKNOWN', 'ResidueTemplate', 'PatchTemplate',
+    'ResidueTemplateContainer'
+]
 
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-class _ResidueType(object):
+class _ResidueType:
     """ Singleton for various types of residues """
     def __init__(self, name):
         self.name = name
 
     def __repr__(self):
-        return '<ResidueType %s>' % self.name
+        return f'<ResidueType {self.name}>'
 
     def __str__(self):
         return self.name
@@ -34,8 +32,6 @@ PROTEIN = _ResidueType('PROTEIN')
 NUCLEIC = _ResidueType('NUCLEIC')
 SOLVENT = _ResidueType('SOLVENT')
 UNKNOWN = _ResidueType('UNKNOWN')
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ResidueTemplate(object):
     """
@@ -81,7 +77,7 @@ class ResidueTemplate(object):
     def __init__(self, name=''):
         self.atoms = AtomList()
         self.bonds = TrackedList()
-        self.lonepairs = list() # TODO: Should this be a TrackedList?
+        self.lonepairs = list()  # TODO: Should this be a TrackedList?
         self.anisotropies = list()
         self.name = name
         self.head = None
@@ -104,9 +100,7 @@ class ResidueTemplate(object):
             tail = self.tail.name
         else:
             tail = 'None'
-        return '<%s %s: %d atoms; %d bonds; head=%s; tail=%s>' % (
-                    type(self).__name__, self.name, len(self.atoms),
-                    len(self.bonds), head, tail)
+        return f'<{self.__class__.__name__} {self.name}: {len(self.atoms)} atoms; {len(self.bonds)} bonds; head={head}; tail={tail}>'
 
     @property
     def map(self):
@@ -126,7 +120,7 @@ class ResidueTemplate(object):
         residue already
         """
         if atom.name in self._map:
-            raise ValueError('Residue already has atom named %s' % atom.name)
+            raise ValueError(f'Residue already has atom named {atom.name}')
         atom.residue = self
         self.atoms.append(atom)
         self._map[atom.name] = atom
@@ -146,7 +140,9 @@ class ResidueTemplate(object):
             atom_name = atom.name
 
         if atom_name not in self._map:
-            raise KeyError("Could not find atom '%s' in ResidueTemplate, which contains atoms: %s" % (atom_name, list(self._map.keys())))
+            raise KeyError(
+                f"Could not find atom '{atom_name}' in ResidueTemplate, which contains atoms: {list(self._map.keys())}"
+            )
 
         atom = self._map[atom_name]
 
@@ -232,7 +228,7 @@ class ResidueTemplate(object):
             bond.delete()
             self.bonds.remove(bond)
         else:
-            raise ValueError('The specified bond {} does not belong to this residue {}'.format(bond, self))
+            raise ValueError(f'The specified bond {bond} does not belong to this residue {self}')
 
     @classmethod
     def from_residue(cls, residue):
@@ -265,8 +261,7 @@ class ResidueTemplate(object):
                         inst.tail = inst.atoms[idx]
                     elif oatom.residue.idx == residue.idx:
                         # Don't know WHAT to do with it
-                        warnings.warn('Cannot determine head/tail for '
-                                      'unordered residues.')
+                        warnings.warn('Cannot determine head/tail for unordered residues.')
                     else:
                         # Disulfide or something... not head or tail
                         inst.connections.append(inst.atoms[idx])
@@ -318,8 +313,7 @@ class ResidueTemplate(object):
     def net_charge(self):
         return sum([a.charge for a in self])
 
-    # Make ResidueTemplate look like a container of atoms, also indexable by the
-    # atom name
+    # Make ResidueTemplate look like a container of atoms, also indexable by the atom name
     def __len__(self):
         return len(self.atoms)
 
@@ -358,9 +352,9 @@ class ResidueTemplate(object):
             for atom in self.atoms:
                 if atom.name == idx:
                     return atom
-            raise IndexError('Atom %s not found in %s' % (idx, self.name))
-        elif isinstance(idx, (list, tuple)):
-            return [self[key] for key in  idx]
+            raise IndexError(f'Atom {idx} not found in {self.name}')
+        elif isinstance(idx, Sequence):
+            return [self[key] for key in idx]
         else:
             return self.atoms[idx]
 
@@ -464,12 +458,15 @@ class ResidueTemplate(object):
             try:
                 residue.delete_atom(atom_name)
                 modifications_made = True
-            except (KeyError, MoleculeError) as e:
+            except (KeyError, MoleculeError) as err:
                 if atom_name.startswith('D') and atom_name[1:] in self and atom_name[1:] in patch.delete_atoms:
                     # This is a Drude particle.  We're also deleting its parent atom, so don't report an error.
                     pass
                 else:
-                    raise IncompatiblePatchError('Atom %s could not be deleted from the patched residue: atoms are %s (exception: %s)' % (atom_name, list(residue._map.keys()), str(e)))
+                    raise IncompatiblePatchError(
+                        f'Atom {atom_name} could not be deleted from the patched residue: atoms '
+                        f'are {list(residue._map.keys())} (exception: {err})'
+                    ) from err
         # Add or replace atoms
         for atom in patch.atoms:
             if atom.name in residue:
@@ -491,26 +488,31 @@ class ResidueTemplate(object):
                 # Add bond
                 residue.add_bond(atom1_name, atom2_name, order)
                 modifications_made = True
-            except (IndexError, MoleculeError) as e:
-                raise IncompatiblePatchError('Bond %s-%s could not be added to patched residue: atoms are %s (exception: %s)' % (atom1_name, atom2_name, list(residue._map.keys()), str(e)))
+            except (IndexError, MoleculeError) as err:
+                raise IncompatiblePatchError(
+                    f'Bond {atom1_name}-{atom2_name} could not be added to patched residue: '
+                    f'atoms are {list(residue._map.keys())} (exception: {err})'
+                ) from err
         # Delete impropers
         for impr in patch.delete_impropers:
             try:
                 residue._impr.remove(impr)
                 # removal of impropers doesn't do anything as far as OpenMM is concerned, so don't note this as a modification having been made
             except ValueError as e:
-                raise IncompatiblePatchError('Improper %s was not found in residue to be patched.' % impr)
+                raise IncompatiblePatchError(f'Improper {impr} was not found in residue to be patched.')
         # Check that the net charge is integral.
         net_charge = residue.net_charge
         is_integral = (round(net_charge, precision) - round(net_charge)) == 0.0
         if not is_integral:
-            raise IncompatiblePatchError('Patch is not compatible with residue due to non-integral charge (charge was %f).' % net_charge)
+            raise IncompatiblePatchError(f'Patch is not compatible with residue due to non-integral charge (charge was {net_charge}).')
         # Ensure residue is connected
         import networkx as nx
         G = residue.to_networkx(False)
+        if nx.is_empty(G):
+            raise IncompatiblePatchError('Patch creates empty residue.')            
         if not nx.is_connected(G):
             components = [ c for c in nx.connected_components(G) ]
-            raise IncompatiblePatchError('Patched residue bond graph is not a connected graph: %s' % str(components))
+            raise IncompatiblePatchError(f'Patched residue bond graph is not a connected graph: {components}')
         # Make sure the patch has actually modified the residue
         if not modifications_made:
             raise IncompatiblePatchError('Patch did not modify residue.')
@@ -639,8 +641,7 @@ class ResidueTemplate(object):
         # Coordinates
         try:
             coords = pd.DataFrame(
-                    [[atom.xx, atom.xy, atom.xz] for atom in self.atoms],
-                    columns=['xx', 'xy', 'xz']
+                [[atom.xx, atom.xy, atom.xz] for atom in self.atoms], columns=['xx', 'xy', 'xz']
             )
         except AttributeError:
             pass
@@ -649,8 +650,7 @@ class ResidueTemplate(object):
         # Velocities
         try:
             vels = pd.DataFrame(
-                    [[atom.vx, atom.vy, atom.vz] for atom in self.atoms],
-                    columns=['vx', 'vy', 'vz']
+                [[atom.vx, atom.vy, atom.vz] for atom in self.atoms], columns=['vx', 'vy', 'vz']
             )
         except AttributeError:
             pass
@@ -669,13 +669,12 @@ class ResidueTemplate(object):
             The Structure with all of the bonds and connectivity of this
             template
         """
+        from ..structure import Structure
         struct = Structure()
         for atom in self:
             struct.add_atom(_copy.copy(atom), self.name, 0)
         for bond in self.bonds:
-            struct.bonds.append(Bond(struct.atoms[bond.atom1.idx],
-                                     struct.atoms[bond.atom2.idx])
-            )
+            struct.bonds.append(Bond(struct.atoms[bond.atom1.idx], struct.atoms[bond.atom2.idx]))
         return struct
 
     def save(self, fname, format=None, overwrite=False, **kwargs):
@@ -714,8 +713,8 @@ class ResidueTemplate(object):
         TypeError if the structure cannot be converted to the desired format for
         whatever reason
         """
-        from parmed.amber.offlib import AmberOFFLibrary
-        from parmed.formats.mol2 import Mol2File
+        from ..amber.offlib import AmberOFFLibrary
+        from ..formats.mol2 import Mol2File
         extmap = {
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
@@ -733,7 +732,7 @@ class ResidueTemplate(object):
             if ext in extmap:
                 format = extmap[ext]
             else:
-                raise ValueError('Could not determine file type of %s' % fname)
+                raise ValueError(f'Could not determine file type of {fname}')
         if format == 'MOL2':
             Mol2File.write(self, fname, mol3=False, **kwargs)
         elif format == 'MOL3':
@@ -741,12 +740,9 @@ class ResidueTemplate(object):
         elif format in ('OFFLIB', 'OFF'):
             AmberOFFLibrary.write({self.name : self}, fname, **kwargs)
         elif format in ('PDB', 'PQR'):
-            self.to_structure().save(fname, format=format, overwrite=overwrite,
-                                     **kwargs)
+            self.to_structure().save(fname, format=format, overwrite=overwrite, **kwargs)
         else:
             raise ValueError('Unrecognized format for ResidueTemplate save')
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PatchTemplate(ResidueTemplate):
     """
@@ -778,12 +774,10 @@ class PatchTemplate(ResidueTemplate):
     standard Residues
     """
     def __init__(self, name=''):
-        super(PatchTemplate, self).__init__(name)
+        super().__init__(name)
         self.add_bonds = []
         self.delete_atoms = []
         self.delete_impropers = []
-
-# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ResidueTemplateContainer(list):
     """
@@ -829,17 +823,17 @@ class ResidueTemplateContainer(list):
             if rt.head is None and rt.tail is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
                     if len(rt.name) != 4 or rt.name[0] != 'N':
-                        rt.name = 'N%s' % rt.name
+                        rt.name = f'N{rt.name}'
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
                     if rt.name[-1] != '5':
-                        rt.name = '%s5' % rt.name
+                        rt.name = f'{rt.name}5'
             elif rt.tail is None and rt.head is not None and term_decorate:
                 if AminoAcidResidue.has(rt.name):
                     if len(rt.name) != 4 or rt.name[0] != 'C':
-                        rt.name = 'C%s' % rt.name
+                        rt.name = f'C{rt.name}'
                 elif RNAResidue.has(rt.name) or DNAResidue.has(rt.name):
                     if rt.name[-1] != '3':
-                        rt.name = '%s3' % rt.name
+                        rt.name = f'{rt.name}3'
             inst.append(rt)
         inst.box = struct.box
         return inst
@@ -896,7 +890,8 @@ class ResidueTemplateContainer(list):
         """
         ret = OrderedDict()
         for res in self:
-            if res.name in ret: continue
+            if res.name in ret:
+                continue
             ret[res.name] = res
         return ret
 
@@ -930,9 +925,9 @@ class ResidueTemplateContainer(list):
         ResidueTemplate instance (or an instance of a subclass)
         """
         cont = cls()
-        for _, res in iteritems(library):
+        for _, res in library.items():
             if not isinstance(res, ResidueTemplate):
-                raise ValueError('%r is not a ResidueTemplate instance' % res)
+                raise ValueError(f'{res} is not a ResidueTemplate instance')
             if copy:
                 cont.append(_copy.copy(res))
             else:
@@ -976,8 +971,8 @@ class ResidueTemplateContainer(list):
         contrast, ``Structure.save`` will save a single @<MOLECULE> mol2 file
         with multiple residues if the mol2 format is requested.
         """
-        from parmed.amber.offlib import AmberOFFLibrary
-        from parmed.formats.mol2 import Mol2File
+        from ..amber.offlib import AmberOFFLibrary
+        from ..formats.mol2 import Mol2File
         extmap = {
                 '.mol2' : 'MOL2',
                 '.mol3' : 'MOL3',
@@ -993,7 +988,7 @@ class ResidueTemplateContainer(list):
             if ext in extmap:
                 format = extmap[ext]
             else:
-                raise ValueError('Could not determine file type of %s' % fname)
+                raise ValueError(f'Could not determine file type of {fname}')
         if format == 'MOL2':
             Mol2File.write(self, fname, mol3=False, split=True, **kwargs)
         elif format == 'MOL3':

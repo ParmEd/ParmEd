@@ -5,8 +5,6 @@ from collections import defaultdict
 import numpy as np
 import parmed as pmd
 import parmed.unit as u
-from parmed.utils.six import iteritems
-from parmed.utils.six.moves import range, zip
 import random
 import unittest
 import utils
@@ -54,7 +52,7 @@ class TestStructureSlicing(unittest.TestCase):
         chains = defaultdict(pmd.TrackedList)
         for res in pdb2.residues:
             chains[res.chain].append(res)
-        for chain_name, chain in iteritems(chains):
+        for chain_name, chain in chains.items():
             for i, res in enumerate(chain):
                 for j, atom in enumerate(res):
                     self.assertIs(atom, pdb2[chain_name, i, j])
@@ -317,7 +315,7 @@ class TestStructureViewSlicing(unittest.TestCase):
         chains = defaultdict(pmd.TrackedList)
         for res in pdb2.residues:
             chains[res.chain].append(res)
-        for chain_name, chain in iteritems(chains):
+        for chain_name, chain in chains.items():
             for i, res in enumerate(chain):
                 for j, atom in enumerate(res):
                     self.assertIs(atom, pdb2.view[chain_name, i, j])

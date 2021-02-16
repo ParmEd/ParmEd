@@ -2,16 +2,14 @@
 This module contains classes for reading and writing CHARMM- and XPLOR-style PSF
 files
 """
-from parmed.charmm import CharmmPsfFile
 # TODO -- move this functionality to a more centralized location
-from parmed.charmm.psf import set_molecules
-from parmed.formats.registry import FileFormatType
-from parmed.utils.io import genopen
-from parmed.utils.six import add_metaclass, string_types
-from parmed.utils.six.moves import range
+from contextlib import closing
+from ..charmm.psf import CharmmPsfFile
+from ..formats.registry import FileFormatType
+from ..utils import tag_molecules
+from ..utils.io import genopen
 
-@add_metaclass(FileFormatType)
-class PSFFile(object):
+class PSFFile(metaclass=FileFormatType):
     """
     CHARMM- or XPLOR-style PSF file parser and writer. This class is
     specifically a holder for the writing functionality and a vessel for
@@ -19,7 +17,6 @@ class PSFFile(object):
     directly, use :class:`parmed.charmm.CharmmPsfFile` or the
     :func:`parmed.formats.load_file` function instead.
     """
-    #===================================================
 
     @staticmethod
     def id_format(filename):
@@ -35,12 +32,8 @@ class PSFFile(object):
         is_fmt : bool
             True if it is a CHARMM or Xplor-style PSF file
         """
-        f = genopen(filename, 'r')
-        line = f.readline()
-        f.close()
-        return line.strip().startswith('PSF')
-
-    #===================================================
+        with closing(genopen(filename, 'r')) as f:
+            return f.readline().strip().startswith("PSF")
 
     @staticmethod
     def parse(filename):
@@ -57,8 +50,6 @@ class PSFFile(object):
             The PSF file instance with all information loaded
         """
         return CharmmPsfFile(filename)
-
-    #===================================================
 
     @staticmethod
     def write(struct, dest, vmd=False):
@@ -93,14 +84,14 @@ class PSFFile(object):
             xplor = 'XPLOR' in struct.flags
         except AttributeError:
             for atom in struct.atoms:
-                if isinstance(atom.type, string_types):
+                if isinstance(atom.type, str):
                     xplor = True
                     break
             else:
                 xplor = False
         own_handle = False
         # Index the atoms and residues TODO delete
-        if isinstance(dest, string_types):
+        if isinstance(dest, str):
             own_handle = True
             dest = genopen(dest, 'w')
 
@@ -123,7 +114,7 @@ class PSFFile(object):
             if xplor:
                 dest.write(' XPLOR')
         dest.write('\n\n')
-        if isinstance(struct.title, string_types):
+        if isinstance(struct.title, str):
             dest.write(intfmt % 1 + ' !NTITLE\n')
             dest.write('%s\n\n' % struct.title)
         else:
@@ -267,7 +258,7 @@ class PSFFile(object):
         # The next two sections are never found in VMD prmtops...
         if not vmd:
             # Molecule section; first set molecularity
-            set_molecules(struct.atoms)
+            tag_molecules(struct)
             mollist = [a.marked for a in struct.atoms]
             dest.write(intfmt % max(mollist) + ' !MOLNT\n')
             for i, atom in enumerate(struct.atoms):

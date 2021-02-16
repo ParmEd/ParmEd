@@ -2,8 +2,6 @@
 This module contains the core base class for all of the chemical structures with
 various topological and force field features.
 """
-from __future__ import absolute_import, division
-
 import logging
 import math
 import os
@@ -27,8 +25,6 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
                               UreyBradley, Link)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
-from .utils.six import integer_types, iteritems, string_types
-from .utils.six.moves import range, zip
 from .vec3 import Vec3
 
 # Try to import the OpenMM modules
@@ -36,8 +32,8 @@ try:
     from simtk.openmm import app
     from simtk import openmm as mm
     from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-except ImportError:  # pragma: no cover
-    app = mm = None  # pragma: no cover
+except ImportError:
+    mm = app = None
 
 LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +52,7 @@ def _strip_box_units(args):
                 new_args.append(arg.value_in_unit(u.degree))
             else:
                 new_args.append(arg.value_in_unit(u.angstroms))
-        elif isinstance(arg, string_types):
+        elif isinstance(arg, str):
             raise TypeError('Unit cell cannot have strings')
         else:
             try:
@@ -79,7 +75,7 @@ def _bondi(atom):
 def _mbondi(atom):
     if atom.atomic_number == 1:
         bondeds = atom.bond_partners
-        if bondeds[0].atomic_number in (6, 7):
+        if not bondeds or bondeds[0].atomic_number in (6, 7):
             return 1.3
         if bondeds[0].atomic_number in (8, 16):
             return 0.8
@@ -88,7 +84,7 @@ def _mbondi(atom):
 
 def _mbondi2(atom):
     if atom.atomic_number == 1:
-        if atom.bond_partners[0].atomic_number == 7:
+        if not atom.bond_partners or atom.bond_partners[0].atomic_number == 7:
             return 1.3
         return 1.2
     return _bondi(atom)
@@ -140,7 +136,7 @@ def _gb_rad_screen(atom, model):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class Structure(object):
+class Structure:
     """
     A chemical structure composed of atoms, bonds, angles, torsions, and other
     topological features
@@ -634,7 +630,7 @@ class Structure(object):
         --------
         :func:`parmed.utils.pandautils.create_dataframe`
         """
-        from parmed.utils.pandautils import create_dataframe
+        from .utils.pandautils import create_dataframe
         return create_dataframe(self)
 
     #===================================================
@@ -652,7 +648,7 @@ class Structure(object):
         --------
         :func:`parmed.utils.pandautils.load_dataframe`
         """
-        from parmed.utils.pandautils import load_dataframe
+        from .utils.pandautils import load_dataframe
         return load_dataframe(self, df)
 
     #===================================================
@@ -802,12 +798,12 @@ class Structure(object):
             selection of atoms. If it is an iterable, it must be the same length
             as the `atoms` list.
         """
-        from parmed.amber import AmberMask
+        from .amber import AmberMask
         if isinstance(selection, AmberMask):
             if selection.parm is not self:
                 raise TypeError('passed mask does not belong to Structure')
             sel = selection.Selection()
-        elif isinstance(selection, string_types):
+        elif isinstance(selection, str):
             sel = AmberMask(self, selection).Selection()
         else:
             try:
@@ -851,7 +847,7 @@ class Structure(object):
             knows about the standard amino acid, RNA, and DNA residues.
         """
         # Import here to avoid circular references
-        from parmed.modeller import StandardBiomolecularResidues
+        from .modeller import StandardBiomolecularResidues
         # Build a composite dict of all residue templates
         all_residues = copy(StandardBiomolecularResidues)
         for lib in reslibs:
@@ -1062,7 +1058,7 @@ class Structure(object):
         ``ValueError`` : if the selection is a boolean-like list and its length
                          is not the same as the number of atoms in the system
         """
-        if isinstance(selection, integer_types):
+        if isinstance(selection, int):
             return self.atoms[selection]
 
         selection = self._get_selection_array(selection)
@@ -1180,10 +1176,10 @@ class Structure(object):
         selection : selector (slice, tuple, ... etc.)
             The selection given to the [] operator
         """
-        from parmed.amber import AmberMask
+        from .amber import AmberMask
         # Now we select a subset of atoms. Convert "selection" into a natom list
         # with 0s and 1s, depending on what the input selection is
-        if isinstance(selection, string_types):
+        if isinstance(selection, str):
             mask = AmberMask(self, selection)
             selection = mask.Selection()
         elif isinstance(selection, slice):
@@ -1198,7 +1194,7 @@ class Structure(object):
                 # selection for speed -- orders of magnitude improvement in
                 # efficiency
                 ressel, atomsel = selection
-                if isinstance(ressel, integer_types) and isinstance(atomsel, integer_types):
+                if isinstance(ressel, int) and isinstance(atomsel, int):
                     return self.residues[ressel][atomsel]
                 has_chain = False
             elif len(selection) == 3:
@@ -1206,15 +1202,15 @@ class Structure(object):
                 chainmap = defaultdict(TrackedList)
                 for r in self.residues:
                     chainmap[r.chain].append(r)
-                if (isinstance(chainsel, string_types) and isinstance(ressel, integer_types) and
-                    isinstance(atomsel, integer_types)):
+                if (isinstance(chainsel, str) and isinstance(ressel, int) and
+                    isinstance(atomsel, int)):
                     # Special-case single-atom selection for efficiency
                     chainmap = dict(chainmap) # no longer defaultdict
                     try:
                         return chainmap[chainsel][ressel][atomsel]
                     except KeyError:
                         raise IndexError('No chain %s in Structure' % chainsel)
-                if isinstance(chainsel, string_types):
+                if isinstance(chainsel, str):
                     if chainsel in chainmap:
                         chainset = set([chainsel])
                     else:
@@ -1240,13 +1236,13 @@ class Structure(object):
             # Residue selection can either be by name or index
             if isinstance(ressel, slice):
                 resset = set(list(range(len(self.residues)))[ressel])
-            elif isinstance(ressel, string_types) or isinstance(ressel, integer_types):
+            elif isinstance(ressel, str) or isinstance(ressel, int):
                 resset = set([ressel])
             else:
                 resset = set(ressel)
             if isinstance(atomsel, slice):
                 atomset = set(list(range(len(self.atoms)))[atomsel])
-            elif isinstance(atomsel, string_types) or isinstance(atomsel, integer_types):
+            elif isinstance(atomsel, str) or isinstance(atomsel, int):
                 atomset = set([atomsel])
             else:
                 atomset = set(atomsel)
@@ -1256,7 +1252,7 @@ class Structure(object):
                     # chains, temporarily have the chainmap lists claim the
                     # residues. This must be reversed or the Structure will be
                     # broken
-                    for chain_name, chain in iteritems(chainmap):
+                    for chain_name, chain in chainmap.items():
                         chain.claim()
                     selection = [
                             (a.residue.chain in chainset) and
@@ -1427,7 +1423,7 @@ class Structure(object):
         ``overwrite`` is ``False``, the filesystem is read-only, or write
         permissions are not granted for the user
         """
-        from parmed import amber, charmm, formats, gromacs, dlpoly
+        from . import amber, charmm, formats, gromacs, dlpoly
         extmap = {
                 '.pdb' : 'PDB',
                 '.pqr' : 'PQR',
@@ -1458,7 +1454,7 @@ class Structure(object):
                 raise RuntimeError('Must provide supported format if using file-like object')
         all_ints = True
         for atom in self.atoms:
-            if (isinstance(atom.type, integer_types) and atom.atom_type is not UnassignedAtomType):
+            if (isinstance(atom.type, int) and atom.atom_type is not UnassignedAtomType):
                 atom.type = str(atom.atom_type)
             else:
                 all_ints = False
@@ -1634,9 +1630,7 @@ class Structure(object):
         # Set the unit cell dimensions
         if self.box is not None:
             top.setPeriodicBoxVectors(
-                    reducePeriodicBoxVectors(
-                        box_lengths_and_angles_to_vectors(*self.box)
-                    )
+                reducePeriodicBoxVectors(box_lengths_and_angles_to_vectors(*self.box))
             )
         return top
 
@@ -1875,7 +1869,7 @@ class Structure(object):
         # Now we have a map of all atom types that we have defined in our
         # system. Look through all of the atom types and see if any of their
         # NBFIX definitions are also keys in typemap
-        for key, type in iteritems(typemap):
+        for key, type in typemap.items():
             for key in type.nbfix:
                 if key in typemap:
                     return True
@@ -1936,8 +1930,8 @@ class Structure(object):
         ----------
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
-            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            CutoffNonPeriodic, CutoffPeriodic, PME, LJPME, or Ewald objects
+            from the simtk.openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2005,7 +1999,7 @@ class Structure(object):
             nonbondedMethod = app.NoCutoff
         system = mm.System()
         # Make sure periodic simulations have a box
-        if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald):
+        if nonbondedMethod in (app.CutoffPeriodic, app.PME, app.Ewald, app.LJPME):
             if self.box is None:
                 raise ValueError('No periodic boundary conditions detected')
         # Do hydrogen mass repartitioning if necessary
@@ -2550,12 +2544,16 @@ class Structure(object):
             force.setNonbondedMethod(mm.NonbondedForce.PME)
             force.setCutoffDistance(nonbondedCutoff)
             force.setEwaldErrorTolerance(ewaldErrorTolerance)
+        elif nonbondedMethod is app.LJPME:
+            force.setNonbondedMethod(mm.NonbondedForce.LJPME)
+            force.setCutoffDistance(nonbondedCutoff)
+            force.setEwaldErrorTolerance(ewaldErrorTolerance)
         elif nonbondedMethod is app.Ewald:
             force.setNonbondedMethod(mm.NonbondedForce.Ewald)
             force.setCutoffDistance(nonbondedCutoff)
             force.setEwaldErrorTolerance(ewaldErrorTolerance)
         else:
-            raise ValueError('Unrecognized nonbondedMethod (%s)' % nonbondedMethod)
+            raise ValueError(f'Unrecognized nonbondedMethod ({nonbondedMethod})')
         force.setReactionFieldDielectric(reactionFieldDielectric)
         # Now add the particles
         sigma_scale = length_conv * 2 * 2**(-1/6)
@@ -2738,21 +2736,19 @@ class Structure(object):
                 bcoef[i+num_lj_types*j] = 2 * wdij * rij6
         force = mm.CustomNonbondedForce('(a/r6)^2-b/r6; r6=r2*r2*r2; r2=r^2; '
                                         'a=acoef(type1, type2); b=bcoef(type1, type2)')
-        force.addTabulatedFunction('acoef',
-                mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
-        force.addTabulatedFunction('bcoef',
-                mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
+        force.addTabulatedFunction('acoef', mm.Discrete2DFunction(num_lj_types, num_lj_types, acoef))
+        force.addTabulatedFunction('bcoef', mm.Discrete2DFunction(num_lj_types, num_lj_types, bcoef))
         force.addPerParticleParameter('type')
         force.setForceGroup(self.NONBONDED_FORCE_GROUP)
-        if (nonbondedMethod is app.PME or nonbondedMethod is app.Ewald or
-                nonbondedMethod is app.CutoffPeriodic):
+        force.setUseLongRangeCorrection(True)
+        if nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic, app.LJPME):
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
         elif nonbondedMethod is app.NoCutoff:
             force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise AssertionError('Unrecognized nonbonded method [%s]' % nonbondedMethod)
+            raise ValueError(f'Unrecognized nonbonded method [{nonbondedMethod}]')
         # Add the particles
         for i in lj_idx_list:
             force.addParticle((i-1,))
@@ -2765,15 +2761,6 @@ class Structure(object):
             i, j, qq, ss, ee = nonbfrc.getExceptionParameters(ii)
             force.addExclusion(i, j)
         # Now transfer the other properties (cutoff, switching function, etc.)
-        force.setUseLongRangeCorrection(True)
-        if nonbondedMethod is app.NoCutoff:
-            force.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
-        elif nonbondedMethod is app.CutoffNonPeriodic:
-            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
-        elif nonbondedMethod in (app.PME, app.Ewald, app.CutoffPeriodic):
-            force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
-        else:
-            raise AssertionError('Unsupported nonbonded method %s' % nonbondedMethod)
         force.setCutoffDistance(nonbfrc.getCutoffDistance())
         if nonbfrc.getUseSwitchingFunction():
             force.setUseSwitchingFunction(True)
@@ -2818,7 +2805,7 @@ class Structure(object):
         elif nonbondedMethod is app.CutoffNonPeriodic:
             force.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
         else:
-            raise AssertionError('Unrecognized nonbonded method [%s]' % nonbondedMethod)
+            raise ValueError(f'Unrecognized nonbonded method [{nonbondedMethod}]')
         # Add the particles
         for atom in self.atoms:
             eps = math.sqrt(atom.epsilon*ene_conv) * 2
@@ -2892,13 +2879,9 @@ class Structure(object):
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
         """
-        from simtk.openmm.app.internal.customgbforces import (GBSAHCTForce,
-                GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force)
-        try:
-            from simtk.openmm.app.internal.customgbforces import convertParameters
-        except ImportError:
-            # Unnecessary in newer versions of OpenMM
-            convertParameters = lambda params, choice: params
+        from simtk.openmm.app.internal.customgbforces import (
+            GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
+        )
         if implicitSolvent is None: return None
         if useSASA:
             sasa = 'ACE'
@@ -2906,10 +2889,9 @@ class Structure(object):
             sasa = None
         if nonbondedMethod is None:
             nonbondedMethod = app.NoCutoff
-        if implicitSolvent not in (app.HCT, app.OBC1, app.OBC2, app.GBn,
-                app.GBn2):
+        if implicitSolvent not in (app.HCT, app.OBC1, app.OBC2, app.GBn, app.GBn2):
             raise ValueError('Unrecognized implicit solvent model')
-        gb_parms = convertParameters(self._get_gb_parameters(implicitSolvent), str(implicitSolvent))
+        gb_parms = self._get_gb_parameters(implicitSolvent)
         if implicitSolventKappa is None:
             if u.is_quantity(implicitSolventSaltConc):
                 sc = implicitSolventSaltConc.value_in_unit(u.moles/u.liter)
@@ -2919,8 +2901,8 @@ class Structure(object):
             # The constant is 1 / sqrt(eps_0 * kB / (2*NA*q^2*1000)) where NA is
             # Avogadro's number, eps_0 is the permittivity of free space, q is
             # the charge (this # matches Amber's conversion factor)
-            implicitSolventKappa = 50.33355 * math.sqrt(implicitSolventSaltConc
-                                          / solventDielectric / temperature)
+            scale = math.sqrt(implicitSolventSaltConc / solventDielectric / temperature)
+            implicitSolventKappa = 50.33355 * scale
             # Multiply by 0.73 to account for ion exclusions, and multiply by 10
             # to convert to 1/nm from 1/angstroms
             implicitSolventKappa *= 7.3
@@ -2934,20 +2916,15 @@ class Structure(object):
         else:
             cutoff = nonbondedCutoff
         if implicitSolvent is app.HCT:
-            force = GBSAHCTForce(solventDielectric, soluteDielectric, sasa,
-                                 cutoff, kappa=implicitSolventKappa)
+            force = GBSAHCTForce(solventDielectric, soluteDielectric, sasa, cutoff, kappa=implicitSolventKappa)
         elif implicitSolvent is app.OBC1:
-            force = GBSAOBC1Force(solventDielectric, soluteDielectric, sasa,
-                                  cutoff, kappa=implicitSolventKappa)
+            force = GBSAOBC1Force(solventDielectric, soluteDielectric, sasa, cutoff, kappa=implicitSolventKappa)
         elif implicitSolvent is app.OBC2:
-            force = GBSAOBC2Force(solventDielectric, soluteDielectric, sasa,
-                                  cutoff, kappa=implicitSolventKappa)
+            force = GBSAOBC2Force(solventDielectric, soluteDielectric, sasa, cutoff, kappa=implicitSolventKappa)
         elif implicitSolvent is app.GBn:
-            force = GBSAGBnForce(solventDielectric, soluteDielectric, sasa,
-                                 cutoff, kappa=implicitSolventKappa)
+            force = GBSAGBnForce(solventDielectric, soluteDielectric, sasa, cutoff, kappa=implicitSolventKappa)
         elif implicitSolvent is app.GBn2:
-            force = GBSAGBn2Force(solventDielectric, soluteDielectric, sasa,
-                                  cutoff, kappa=implicitSolventKappa)
+            force = GBSAGBn2Force(solventDielectric, soluteDielectric, sasa, cutoff, kappa=implicitSolventKappa)
         else:
             raise AssertionError('Unexpected implicit solvent model... should not be here')
         for atom, parms in zip(self.atoms, gb_parms):
@@ -3461,7 +3438,7 @@ class Structure(object):
     __rmul__ = __mul__
 
     def __imul__(self, ncopies, other=None):
-        if not isinstance(ncopies, integer_types):
+        if not isinstance(ncopies, int):
             return NotImplemented
         # The basic approach here is similar to what we used in __iadd__, except
         # we don't have to extend the type arrays at all -- we just point to the
@@ -3758,7 +3735,7 @@ class _StructureViewerCreator(object):
 
     def __getitem__(self, selection):
         struct = self.struct
-        if isinstance(selection, integer_types):
+        if isinstance(selection, int):
             return struct.atoms[selection]
 
         view = StructureView()
@@ -3920,7 +3897,7 @@ class StructureView(object):
         --------
         :func:`parmed.utils.pandautils.create_dataframe`
         """
-        from parmed.utils.pandautils import create_dataframe
+        from .utils.pandautils import create_dataframe
         return create_dataframe(self)
 
     def load_dataframe(self, df):
@@ -3936,7 +3913,7 @@ class StructureView(object):
         --------
         :func:`parmed.utils.pandautils.load_dataframe`
         """
-        from parmed.utils.pandautils import load_dataframe
+        from .utils.pandautils import load_dataframe
         return load_dataframe(self, df)
 
     @property

@@ -1,5 +1,4 @@
-__author__ = "Jason Swails <jason.swails@gmail.com>"
-
-from parmed.amber.mdin.mdin import Mdin
+""" Functionality for manipulating Amber input files """
+from .mdin import Mdin
 
 __all__ = ['Mdin']

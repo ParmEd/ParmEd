@@ -1,8 +1,6 @@
 """
 Contains unittests for running OpenMM calculations using the Amber file parsers
 """
-from __future__ import division, print_function, absolute_import
-
 from collections import defaultdict
 from copy import copy
 from math import sqrt
@@ -12,12 +10,10 @@ from parmed.exceptions import ParameterError
 from parmed.amber import AmberParm, ChamberParm, Rst7
 from parmed.openmm import load_topology, energy_decomposition_system
 import parmed.unit as u
-from parmed.utils.six.moves import range, zip
 import parmed.tools as PT
 import sys
 import unittest
-from utils import (get_fn, CPU, mm, app, has_openmm, FileIOTestCase,
-        TestCaseRelative, get_saved_fn, run_all_tests, QuantityTestCase)
+from utils import get_fn, CPU, mm, app, has_openmm, TestCaseRelative, QuantityTestCase
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -35,11 +31,13 @@ def energy_decomposition(parm, context):
     return ret
 
 @unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
-class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
+class TestAmberParm(TestCaseRelative, QuantityTestCase):
 
     def test_gas_energy_conf_1(self):
         """ Compare Amber and OpenMM gas phase energies and forces (topology 1) """
-        parm = AmberParm(get_fn('hydrogen-peroxide_T0_1.prmtop'), get_fn('hydrogen-peroxide_T0_1.rst7'))
+        parm = AmberParm(
+            get_fn('hydrogen-peroxide_T0_1.prmtop'), get_fn('hydrogen-peroxide_T0_1.rst7')
+        )
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)
@@ -74,7 +72,9 @@ class TestAmberParm(FileIOTestCase, TestCaseRelative, QuantityTestCase):
 
     def test_gas_energy_conf_2(self):
         """ Compare Amber and OpenMM gas phase energies and forces (topology 2) """
-        parm = AmberParm(get_fn('hydrogen-peroxide_T0_2.prmtop'), get_fn('hydrogen-peroxide_T0_2.rst7'))
+        parm = AmberParm(
+            get_fn('hydrogen-peroxide_T0_2.prmtop'), get_fn('hydrogen-peroxide_T0_2.rst7')
+        )
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem() # Default, no cutoff
         integrator = mm.VerletIntegrator(1.0*u.femtoseconds)

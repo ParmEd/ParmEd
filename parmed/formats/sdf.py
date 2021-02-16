@@ -2,15 +2,12 @@
 This module contains parsers for sdf file format 
 extension described at https://www.cas.org/content/chemical-suppliers/example-sdf
 """
-from __future__ import print_function, division, absolute_import
 import linecache
 
-from parmed.formats.registry import FileFormatType
-from parmed.utils.six import add_metaclass
-from parmed import rdkit
+from .registry import FileFormatType
+from .. import rdkit
 
-@add_metaclass(FileFormatType)
-class SDFFile(object):
+class SDFFile(metaclass=FileFormatType):
     """ Class to read SDF file """
 
     @staticmethod

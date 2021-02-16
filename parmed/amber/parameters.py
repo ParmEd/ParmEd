@@ -1,12 +1,6 @@
 """
 This module contains classes for parsing and processing Amber parameter files.
-
-Author: Jason M. Swails
-Contributors:
-Date: Aug. 11, 2015
 """
-from __future__ import division, print_function
-
 from collections import defaultdict
 from contextlib import closing
 import math
@@ -21,15 +15,9 @@ from ..formats.mol2 import Mol2File
 from ..formats.registry import FileFormatType
 from ..parameters import ParameterSet
 from ..periodic_table import Mass, element_by_mass, AtomicNum
-from ..topologyobjects import (AtomType, BondType, AngleType, DihedralType,
-                                    DihedralTypeList)
+from ..topologyobjects import AtomType, BondType, AngleType, DihedralType, DihedralTypeList
 from ..utils.io import genopen
-from ..utils.six import add_metaclass, string_types, iteritems, PY2
-from ..utils.six.moves import map
-if PY2:
-    from collections import Sequence
-else:
-    from collections.abc import Sequence
+from collections.abc import Sequence
 
 # parameter file regexes
 subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',
@@ -60,24 +48,20 @@ def _find_amber_file(fname, search_oldff):
     - $AMBERHOME/dat/leap/lib
     - $AMBERHOME/dat/leap/parm
     """
-    from parmed.amber import AMBERHOME
+    from . import AMBERHOME
     if len(fname) > 1 and {fname[0], fname[-1]} in ({'"'}, {"'"}):
         # Strip quotes
         fname = fname[1:-1]
-    if os.path.exists(fname):
-        return fname
     leapdir = os.path.join(AMBERHOME, 'dat', 'leap')
-    if os.path.exists(os.path.join(leapdir, 'lib', fname)):
-        return os.path.join(leapdir, 'lib', fname)
-    if os.path.exists(os.path.join(leapdir, 'parm', fname)):
-        return os.path.join(leapdir, 'parm', fname)
+    paths = [os.getcwd(), os.path.join(leapdir, 'lib'), os.path.join(leapdir, 'parm')]
     if search_oldff:
-        if os.path.exists(os.path.join(leapdir, 'lib', 'oldff', fname)):
-            return os.path.join(leapdir, 'lib', 'oldff', fname)
-    raise ValueError('Cannot find Amber file [%s]' % fname)
+        paths.append(os.path.join(leapdir, 'lib', 'oldff'))
+    for path in paths:
+        if os.path.exists(os.path.join(path, fname)):
+            return os.path.join(path, fname)
+    raise FileNotFoundError('Cannot find Amber file [%s] in paths %s' % (fname, paths))
 
-@add_metaclass(FileFormatType)
-class AmberParameterSet(ParameterSet):
+class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
     """ Class storing parameters from an Amber parameter set
 
     Parameters
@@ -216,7 +200,7 @@ class AmberParameterSet(ParameterSet):
         self.default_scnb = 2.0
         self.titles = []
         for filename in filenames:
-            if isinstance(filename, string_types):
+            if isinstance(filename, str):
                 if AmberOFFLibrary.id_format(filename):
                     self.residues.update(AmberOFFLibrary.parse(filename))
                 else:
@@ -260,7 +244,7 @@ class AmberParameterSet(ParameterSet):
         - loadMol3
         """
         params = cls()
-        if isinstance(fname, string_types):
+        if isinstance(fname, str):
             f = genopen(fname, 'r')
             own_handle = True
         else:
@@ -376,7 +360,7 @@ class AmberParameterSet(ParameterSet):
         fname : str or file-like
             Parameter file to parse
         """
-        if isinstance(fname, string_types):
+        if isinstance(fname, str):
             f = genopen(fname, 'r')
             own_handle = True
         else:
@@ -510,8 +494,8 @@ class AmberParameterSet(ParameterSet):
                 a1, a2, acoef, bcoef = line.split()[:4]
                 acoef = float(acoef)
                 bcoef = float(bcoef)
-            except ValueError:
-                raise ParameterError('Trouble parsing 10-12 terms')
+            except ValueError as err:
+                raise ParameterError('Trouble parsing 10-12 terms') from err
             if acoef != 0 or bcoef != 0:
                 raise ParameterError('10-12 potential not supported in AmberParameterSet currently')
             rawline = next(fiter)
@@ -530,8 +514,9 @@ class AmberParameterSet(ParameterSet):
             rawline = next(fiter)
         words = next(fiter).split()
         if len(words) < 2:
-            raise ParameterError('Could not parse the kind of nonbonded '
-                                 'parameters in Amber parameter file')
+            raise ParameterError(
+                'Could not parse the kind of nonbonded parameters in Amber parameter file'
+            )
         if words[1].upper() != 'RE':
             raise ParameterError('Only RE nonbonded parameters supported')
         rawline = next(fiter)
@@ -542,15 +527,16 @@ class AmberParameterSet(ParameterSet):
             self._process_nonbond_line(line)
             rawline = next(fiter)
         # Now assign all of the equivalenced atoms
-        for atyp, otyp in iteritems(equivalent_ljtypes):
+        for atyp, otyp in equivalent_ljtypes.items():
             otyp = self.atom_types[otyp]
             if atyp in self.atom_types:
                 if (self.atom_types[atyp].rmin is not None and
                         self.atom_types[atyp].epsilon is not None):
                     if (abs(otyp.epsilon-self.atom_types[atyp].epsilon) > TINY
                             or abs(otyp.rmin-self.atom_types[atyp].rmin) > TINY):
-                        warnings.warn('Equivalency defined between %s and %s but parameters are '
-                                      'not equal' % (otyp.name, atyp), AmberWarning)
+                        warnings.warn(
+                            f'{otyp.name} and {atyp} expected to be equal but are not', AmberWarning
+                        )
                         # Remove from equivalent types
                         equivalent_types[otyp.name].remove(atyp)
                         continue
@@ -573,7 +559,7 @@ class AmberParameterSet(ParameterSet):
         try:
             mass = float(words[1])
         except ValueError:
-            raise ParameterError('Could not convert mass to float [%s]' % words[1])
+            raise ParameterError(f'Could not convert mass to float [{words[1]}]')
         except IndexError:
             raise ParameterError('Error parsing MASS line. Not enough tokens')
         if words[0] in self.atom_types:
@@ -582,8 +568,7 @@ class AmberParameterSet(ParameterSet):
             atype = AtomType(words[0], len(self.atom_types)+1, mass, 0)
             self.atom_types[words[0]] = atype
         else:
-            atype = AtomType(words[0], len(self.atom_types)+1, mass,
-                             AtomicNum[element_by_mass(mass)])
+            atype = AtomType(words[0], len(self.atom_types)+1, mass, AtomicNum[element_by_mass(mass)])
             self.atom_types[words[0]] = atype
 
     #===================================================
@@ -591,7 +576,7 @@ class AmberParameterSet(ParameterSet):
     def _process_bond_line(self, line):
         rematch = _bondre.match(line)
         if not rematch:
-            raise ParameterError('Could not understand BOND line [%s]' % line)
+            raise ParameterError(f'Could not understand BOND line [{line}]')
         a1, a2, k, eq = rematch.groups()
         a1 = a1.strip(); a2 = a2.strip()
         typ = BondType(float(k), float(eq))
@@ -601,7 +586,7 @@ class AmberParameterSet(ParameterSet):
     def _process_angle_line(self, line):
         rematch = _anglere.match(line)
         if not rematch:
-            raise ParameterError('Could not understand ANGLE line [%s]' % line)
+            raise ParameterError(f'Could not understand ANGLE line [{line}]')
         a1, a2, a3, k, eq = rematch.groups()
         a1 = a1.strip(); a2 = a2.strip(); a3 = a3.strip()
         typ = AngleType(float(k), float(eq))
@@ -632,34 +617,31 @@ class AmberParameterSet(ParameterSet):
         """
         rematch = _dihedre.match(line)
         if not rematch and last_key is None:
-            raise ParameterError('Could not understand DIHEDRAL line '
-                                 '[%s]' % line)
+            raise ParameterError(f'Could not understand DIHEDRAL line [{line}]')
         elif not rematch:
             rematch = _dihed2re.match(line)
             if not rematch:
-                raise ParameterError('Could not understand DIHEDRAL line '
-                                     '[%s]' % line)
+                raise ParameterError(f'Could not understand DIHEDRAL line [{line}]')
             div, k, phi, per = rematch.groups()
             key = last_key
             rkey = tuple(reversed(key))
             assert key in finished_diheds
             if finished_diheds[key]:
-                raise AssertionError('Cannot have an implied torsion that '
-                                     'has already finished!')
+                raise AssertionError('Cannot have an implied torsion that has already finished!')
         else:
             a1, a2, a3, a4, div, k, phi, per = rematch.groups()
             a1, a2, a3, a4 =  a1.strip(), a2.strip(), a3.strip(), a4.strip()
             key = (a1, a2, a3, a4)
             rkey = (a4, a3, a2, a1)
             if last_key is not None and (last_key != key and last_key != rkey):
-                warnings.warn('Expecting next term in dihedral %r, got '
-                              'definition for dihedral %r' % (last_key, key),
-                              ParameterWarning)
+                warnings.warn(
+                    f'Expecting next term in dihedral {last_key}, got dihedral {key}',
+                    ParameterWarning,
+                )
         scee = [float(x) for x in _sceere.findall(line)] or [1.2]
         scnb = [float(x) for x in _scnbre.findall(line)] or [2.0]
         per = float(per)
-        typ = DihedralType(float(k)/float(div), abs(per), float(phi),
-                           scee[0], scnb[0])
+        typ = DihedralType(float(k)/float(div), abs(per), float(phi), scee[0], scnb[0])
         if finished_diheds[key]:
             # This dihedral is already finished its definition, which means
             # we go ahead and add a new one to override it
@@ -675,8 +657,7 @@ class AmberParameterSet(ParameterSet):
     def _process_improper_line(self, line):
         rematch = _impropre.match(line)
         if not rematch:
-            raise ParameterError('Could not understand IMPROPER line '
-                                    '[%s]' % line)
+            raise ParameterError(f'Could not understand IMPROPER line [{line}]')
         a1, a2, a3, a4, k, phi, per = rematch.groups()
         a1 = a1.strip(); a2 = a2.strip();
         a3 = a3.strip(); a4 = a4.strip()
@@ -684,53 +665,48 @@ class AmberParameterSet(ParameterSet):
         # it must be in Amber parameter files!!!!)
         a1, a2, a4 = sorted([a1, a2, a4])
         key = (a1, a2, a3, a4)
-        self.improper_periodic_types[key] = \
-                DihedralType(float(k), float(per), float(phi))
+        self.improper_periodic_types[key] = DihedralType(float(k), float(per), float(phi))
 
     def _process_nonbond_line(self, line):
         try:
             atyp, rmin, eps = line.split()[:3]
-        except ValueError:
-            raise ParameterError('Could not understand nonbond parameter line '
-                                 '[%s]' % line)
+        except ValueError as err:
+            raise ParameterError(f'Could not understand nonbond parameter line [{line}]') from err
         try:
             self.atom_types[atyp].set_lj_params(float(eps), float(rmin))
-        except KeyError:
-            raise ParameterError('Atom type %s not present in the database.' %
-                                 atyp)
-        except ValueError:
-            raise ParameterError('Could not convert nonbond parameters to '
-                                 'floats [%s, %s]' % (rmin, eps))
+        except KeyError as err:
+            raise ParameterError(f'Atom type {atyp} not present in the database.') from err
+        except ValueError as err:
+            raise ParameterError(
+                f'Could not convert nonbond parameters to floats [{rmin}, {eps}]'
+            ) from err
 
     def _process_nbfix_line(self, line, equivalents=None):
         try:
             a1, a2, rmin1, eps1, rmin2, eps2 = line.split()[:6]
-        except ValueError:
-            raise ParameterError('Could not understand LJEDIT line [%s]' % line)
+        except ValueError as err:
+            raise ParameterError(f'Could not understand LJEDIT line [{line}]') from err
         try:
             rmin1 = float(rmin1)
             eps1 = float(eps1)
             rmin2 = float(rmin2)
             eps2 = float(eps2)
-        except ValueError:
-            raise ParameterError('Could not convert LJEDIT parameters '
-                                 'to floats.')
-        self.nbfix_types[(min(a1, a2), max(a1, a2))] = \
-                (math.sqrt(eps1*eps2), rmin1+rmin2)
+        except ValueError as err:
+            raise ParameterError('Could not convert LJEDIT parameters to floats.') from err
+        self.nbfix_types[(min(a1, a2), max(a1, a2))] = (math.sqrt(eps1*eps2), rmin1+rmin2)
         if equivalents is not None:
             # We need to add the same nbfixes to all atom types that are
             # equivalent to the atom types defined in the LJEDIT line
             for oa1 in equivalents[a1]:
-                self.nbfix_types[(min(oa1, a2), max(oa1, a2))] = \
-                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+                self.nbfix_types[(min(oa1, a2), max(oa1, a2))] = (math.sqrt(eps1*eps2), rmin1+rmin2)
             for oa2 in equivalents[a2]:
-                self.nbfix_types[(min(a1, oa2), max(a1, oa2))] = \
-                        (math.sqrt(eps1*eps2), rmin1+rmin2)
+                self.nbfix_types[(min(a1, oa2), max(a1, oa2))] = (math.sqrt(eps1*eps2), rmin1+rmin2)
             # Now do the equivalenced of atom 1 with the equivalenced of atom 2
             for oa1 in equivalents[a1]:
                 for oa2 in equivalents[a2]:
-                    self.nbfix_types[(min(oa1, oa2), max(oa1, oa2))] = \
-                            (math.sqrt(eps1*eps2), rmin1+rmin2)
+                    self.nbfix_types[(min(oa1, oa2), max(oa1, oa2))] = (
+                        math.sqrt(eps1*eps2), rmin1+rmin2
+                    )
 
     #===================================================
 
@@ -747,7 +723,7 @@ class AmberParameterSet(ParameterSet):
             If 'frcmod', the parameters are written in frcmod-format. If 'parm',
             the parameters are written in parm.dat-format. Default is 'frcmod'
         """
-        if isinstance(dest, string_types):
+        if isinstance(dest, str):
             outfile = genopen(dest, 'w')
             own_handle = True
         else:
@@ -755,58 +731,55 @@ class AmberParameterSet(ParameterSet):
             own_handle = False
 
         if style not in ('frcmod', 'parm'):
-            raise ValueError('style must be either frcmod or parm, not %s' % style)
+            raise ValueError(f'style must be either frcmod or parm, not {style}')
 
         outfile.write(title.rstrip('\r\n'))
         outfile.write('\n')
         # Write the atom mass
         outfile.write('MASS\n')
-        for atom, typ in iteritems(self.atom_types):
-            outfile.write('%s%6.3f\n' % (atom.ljust(6), typ.mass))
+        for atom, typ in self.atom_types.items():
+            outfile.write(f'{atom:<6}{typ.mass:6.3f}\n')
         outfile.write('\n')
         # Write the bonds
         outfile.write('BOND\n')
         done = set()
-        for (a1, a2), typ in iteritems(self.bond_types):
+        for (a1, a2), typ in self.bond_types.items():
             if id(typ) in done: continue
             done.add(id(typ))
-            outfile.write('%s-%s   %8.3f  %6.3f\n' % (a1.ljust(2), a2.ljust(2), typ.k, typ.req))
+            outfile.write(f'{a1:<2}-{a2:<2}   {typ.k:8.3f}  {typ.req:6.3f}\n')
         outfile.write('\n')
         # Write the angles
         outfile.write('ANGLE\n')
         done = set()
-        for (a1, a2, a3), typ in iteritems(self.angle_types):
+        for (a1, a2, a3), typ in self.angle_types.items():
             if id(typ) in done: continue
             done.add(id(typ))
-            outfile.write('%s-%s-%s   %8.3f  %6.3f\n' % (a1.ljust(2), a2.ljust(2), a3.ljust(2),
-                                                         typ.k, typ.theteq))
+            outfile.write(f"{a1:<2}-{a2:<2}-{a3:<2}   {typ.k:8.3f}  {typ.theteq:6.3f}\n")
         outfile.write('\n')
         # Write the dihedrals
         outfile.write('DIHE\n')
         done = set()
-        for (a1, a2, a3, a4), typ in iteritems(self.dihedral_types):
+        def write_dtype(outfile, a1, a2, a3, a4, cont, typ):
+            outfile.write(
+                f'{a1:<2}-{a2:<2}-{a3:<2}-{a4:<2} {1:4d} {typ.phi_k:14.8f} {typ.phase:8.3f} '
+                f'{cont * typ.per:5.1f}    SCEE={typ.scee} SCNB={typ.scnb}\n'
+            )
+        for (a1, a2, a3, a4), typ in self.dihedral_types.items():
             if id(typ) in done: continue
             done.add(id(typ))
             if isinstance(typ, DihedralType) or len(typ) == 1:
                 if not isinstance(typ, DihedralType):
                     typ = typ[0]
-                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
-                              (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1, typ.phi_k,
-                               typ.phase, typ.per, typ.scee, typ.scnb))
+                write_dtype(outfile, a1, a2, a3, a4, 1, typ)
             else:
                 for dtyp in typ[:-1]:
-                    outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
-                                  (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1,
-                                   dtyp.phi_k, dtyp.phase, -dtyp.per, dtyp.scee, dtyp.scnb))
-                dtyp = typ[-1]
-                outfile.write('%s-%s-%s-%s %4i %14.8f %8.3f %5.1f    SCEE=%s SCNB=%s\n' %
-                              (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), 1, dtyp.phi_k,
-                               dtyp.phase, dtyp.per, dtyp.scee, dtyp.scnb))
+                    write_dtype(outfile, a1, a2, a3, a4, -1, dtyp)
+                write_dtype(outfile, a1, a2, a3, a4, 1, typ[-1])
         outfile.write('\n')
         # Write the impropers
         outfile.write('IMPROPER\n')
         written_impropers = dict()
-        for (a1, a2, a3, a4), typ in iteritems(self.improper_periodic_types):
+        for (a1, a2, a3, a4), typ in self.improper_periodic_types.items():
             # Make sure wild-cards come at the beginning
             if a2 == 'X':
                 assert a4 == 'X', 'Malformed generic improper!'
@@ -818,22 +791,23 @@ class AmberParameterSet(ParameterSet):
                 if written_impropers[(a1, a2, a3, a4)] != typ:
                     raise ValueError('Multiple impropers with the same atom set not allowed')
                 continue
-            outfile.write('%s-%s-%s-%s %14.8f %8.3f %5.1f\n' %
-                          (a1.ljust(2), a2.ljust(2), a3.ljust(2), a4.ljust(2), typ.phi_k,
-                           typ.phase, typ.per))
+            outfile.write(
+                f'{a1:<2}-{a2:<2}-{a3:<2}-{a4:<2} {typ.phi_k:14.8f} {typ.phase:8.3f} {typ.per:5.1f}\n'
+            )
             written_impropers[(a1, a2, a3, a4)] = typ
         outfile.write('\n')
         # Write the LJ terms
         outfile.write('NONB\n')
-        for atom, typ in iteritems(self.atom_types):
-            outfile.write('%s  %12.8f %12.8f\n' % (atom.ljust(2), typ.rmin, typ.epsilon))
+        for atom, typ in self.atom_types.items():
+            outfile.write(f'{atom:<2}  {typ.rmin:12.8f} {typ.epsilon:12.8f}\n')
         outfile.write('\n')
         # Write the NBFIX terms
         if self.nbfix_types:
             outfile.write('LJEDIT\n')
-            for (a1, a2), (eps, rmin) in iteritems(self.nbfix_types):
-                outfile.write('%s %s %12.8f %12.8f %12.8f %12.8f\n' %
-                              (a1.ljust(2), a2.ljust(2), eps, rmin/2, eps, rmin/2))
+            for (a1, a2), (eps, rmin) in self.nbfix_types.items():
+                outfile.write(
+                    f'{a1:<2} {a2:<2} {eps:12.8f} {rmin / 2:12.8f} {eps:12.8f} {rmin / 2:12.8f}\n'
+                )
 
         if own_handle:
             outfile.close()

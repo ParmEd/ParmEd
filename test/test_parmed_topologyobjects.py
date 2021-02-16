@@ -3,8 +3,6 @@ Unittests for the classes and interfaces defined in parmed.topologyobjects
 
 By Jason Swails
 """
-from __future__ import division
-
 import math
 import numpy as np
 from parmed.exceptions import MoleculeError, ParameterError
@@ -15,8 +13,6 @@ from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
 from parmed.topologyobjects import *
 from parmed.structure import Structure
 import parmed.unit as u
-from parmed.utils.six import PY3
-from parmed.utils.six.moves import range, zip
 from copy import copy
 import unittest
 from utils import get_fn, has_openmm

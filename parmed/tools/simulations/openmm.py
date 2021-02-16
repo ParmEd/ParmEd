@@ -2,18 +2,16 @@
 This module contains functionality for running simulations with OpenMM using
 parameters defined in an input file for sander and pmemd.
 """
-from __future__ import division
-
 import logging
+import os
+from math import sqrt
+
 from ...amber import AmberMdcrd, AmberMask, NetCDFTraj, Rst7
 from ...amber.mdin import Mdin
 from ...openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter, RestartReporter,
-                           ProgressReporter, EnergyMinimizerReporter)
+                       ProgressReporter, EnergyMinimizerReporter)
 from ...utils.timer import Timer
 from ... import unit as u
-from ...utils.six.moves import range
-from math import sqrt
-import os
 from ..exceptions import SimulationError, SimulationWarning, UnhandledArgumentWarning
 import sys
 import warnings
@@ -29,8 +27,7 @@ except ImportError:
 LOGGER = logging.getLogger(__name__)
 
 _SCRIPT_HEADER = """\
-#!/usr/bin/env python
-from __future__ import division, print_function
+#!/usr/bin/env python3
 
 import os, sys
 
@@ -43,7 +40,6 @@ from parmed.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
 from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
 from parmed import unit as u
-from parmed.utils.six.moves import range
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')
@@ -55,13 +51,16 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
     coordinates given in the refc restart file for the atoms specified in 'mask'
     """
     parm = mask.parm # store the parm object
-    if not refc.valid or refc.natom != parm.ptr('natom'):
-        raise SimulationError('Invalid (or incompatible) reference coordinate file')
+    try:
+        refc = refc.reshape((-1, len(parm.atoms), 3))
+    except ValueError:
+        raise SimulationError('Invalid shape of coordinate array')
 
     # Make the (very simple) force term
     if scriptfile is not None:
         wt = weights.value_in_unit(u.kilocalories_per_mole/u.angstrom**2)
         scriptfile.write("# Create the positional restraint force\n")
+        scriptfile.write("refc = refc.reshape((-1, len(parm.atoms), 3))\n")
         scriptfile.write("frc = CustomExternalForce('k*((x-x0)*(x-x0)+"
                          "(y-y0)*(y-y0)+(z-z0)*(z-z0))')\n")
         scriptfile.write("frc.addGlobalParameter('k', %s*u.kilocalorie_per_mole"
@@ -70,7 +69,7 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
         scriptfile.write("frc.addPerParticleParameter('y0')\n")
         scriptfile.write("frc.addPerParticleParameter('z0')\n")
         scriptfile.write("for idx in mask.Selected():\n")
-        scriptfile.write("    frc.addParticle(idx, refc.positions[idx])\n")
+        scriptfile.write("    frc.addParticle(idx, refc[0, idx, :] / 10)\n")
 
     frc = mm.CustomExternalForce('k*((x-x0)*(x-x0)+(y-y0)*(y-y0)+'
                                     '(z-z0)*(z-z0))')
@@ -79,7 +78,7 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
     frc.addPerParticleParameter('y0')
     frc.addPerParticleParameter('z0')
     for idx in mask.Selected():
-        frc.addParticle(idx, refc.positions[idx])
+        frc.addParticle(idx, refc[0, idx, :] / 10) # angstroms to nanometers
 
     return frc
 
@@ -273,7 +272,7 @@ def simulate(parm, args):
         rw = True
     else:
         raise SimulationError('ntc must be 1, 2, or 3')
-   
+
     # Determine if these constraints are flexible (their energies are computed)
     if mdin.cntrl_nml['ntf'] == 1:
         flexconst = True
@@ -756,7 +755,7 @@ def simulate(parm, args):
     LOGGER.info('Done')
     for t in timer.timer_names:
         timer.print_(t, sys.stdout)
-   
+
     if mdin.cntrl_nml['imin'] == 0 and runsim:
         LOGGER.info('MD timing: %.3f ns/day' % nsperday)
 
@@ -786,7 +785,7 @@ def energy(parm, args, output=sys.stdout):
     unmarked_cmds = args.unmarked()
     if len(unmarked_cmds) > 0:
         warnings.warn("Un-handled arguments: " + ' '.join(unmarked_cmds), UnhandledArgumentWarning)
-   
+
     gbmeth = None
     if parm.ptr('ifbox') == 0:
         if cutoff is None or cutoff >= 500:
@@ -900,7 +899,7 @@ def energy(parm, args, output=sys.stdout):
     nrg = u.kilocalories/u.mole
     if decomp:
         # Now we have to loop through every force group and compute them individually
-      
+
         # Bonds first
         state = context.getState(getEnergy=True, enforcePeriodicBox=has_pbc,
                                  groups=2**parm.BOND_FORCE_GROUP)
@@ -1018,10 +1017,9 @@ def minimize(parm, igb, saltcon, cutoff, restraintmask, weight,
 
     # See if we need to add restraints
     if restraintmask is not None:
-        mask = AmberMask(parm, restraintmask)
         system.addForce(
-            positional_restraints(mask, u.kilocalorie_per_mole/u.angstrom/u.angstrom,
-                                  parm.rst7, scriptfile=scriptfile,)
+            positional_restraints(restraintmask, u.kilocalorie_per_mole/u.angstrom/u.angstrom,
+                                  parm.coordinates, scriptfile=scriptfile,)
         )
 
     if script is not None:

@@ -3,9 +3,9 @@ Provides a class for reading CHARMM-style files. The key component to these
 files is that the ! character is a comment character and everything after ! is
 ignored.
 """
-from parmed.utils.io import genopen
+from ..utils.io import genopen
 
-class CharmmFile(object):
+class CharmmFile:
     """
     A CHARMM file that recognizes the "!" character as a 'comment' token. It
     can be iterated over and generally treated like a file object, but only
@@ -181,7 +181,6 @@ class CharmmStreamFile(object):
             self.line_number += 1
         # No sections left
         return None, None, None
-
 
     def __del__(self): 
         pass

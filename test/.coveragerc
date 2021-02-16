@@ -2,15 +2,15 @@
 source = parmed
 omit =
     */parmed/utils/fortranformat/*
-    */parmed/utils/six.py
     */parmed/formats/pdbx/*
     */parmed/vec3.py
     */parmed/utils/netcdf.py
     */parmed/tinker/*
     */parmed/rosetta/*
-    */parmed/unit/*
     */parmed/tools/gui/*
     */parmed/tools/coarsegrain.py
+    */parmed/unit/*
+    */parmed/_version.py
 [paths]
 source =
     /home/*/site-packages/ParmEd-*.egg/

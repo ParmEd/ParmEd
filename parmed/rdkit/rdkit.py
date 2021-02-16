@@ -1,13 +1,8 @@
-"""
-This package contains classes responsible for loading rdkit objects
-"""
+""" This package contains classes responsible for loading rdkit objects """
+from io import StringIO
+from ..formats import PDBFile
 
-from __future__ import print_function, absolute_import
-from parmed.formats import PDBFile
-from parmed.utils.six.moves import StringIO
-
-
-class RDKit(object):
+class RDKit:
 
     @staticmethod
     def load(rmol):
@@ -51,8 +46,7 @@ class RDKit(object):
         mol = Chem.MolFromSmiles(smiles)
 
         if coordinates:
-            AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True,
-                    useBasicKnowledge=True)
+            AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True, useBasicKnowledge=True)
 
         parm = RDKit.load(mol)
         if not coordinates:

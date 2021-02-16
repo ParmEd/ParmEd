@@ -1,14 +1,10 @@
 """ A collection of utilities for use with Pandas objects """
-from __future__ import absolute_import, division, print_function
-
 import numpy as np
 try:
     import pandas as pd
 except ImportError:
     pd = None
-from parmed.exceptions import ParameterWarning
-from parmed.utils.six.moves import zip
-from parmed.utils.six import iteritems
+from ..exceptions import ParameterWarning
 import warnings
 
 # Utility function for generating a DataFrame based on a collection of items.
@@ -85,8 +81,7 @@ def create_dataframe(obj):
         - U23 : float (U[2][3] of anisotropic b-factor tensor)
     """
     if pd is None:
-        raise ImportError('pandas is not available; cannot create a pandas '
-                          'DataFrame from this Structure')
+        raise ImportError('pandas is not available; cannot create a DataFrame')
     ret = pd.DataFrame()
 
     atoms = obj.atoms
@@ -150,11 +145,11 @@ def create_dataframe(obj):
     # AMOEBA multipoles
     try:
         multipoles = pd.DataFrame(
-                [atom.multipoles for atom in atoms],
-                columns=['multipole_111', 'multipole_211', 'multipole_212',
-                         'multipole_222', 'multipole_411', 'multipole_412',
-                         'multipole_422', 'multipole_413', 'multipole_423',
-                         'multipole_433']
+            [atom.multipoles for atom in atoms],
+            columns=['multipole_111', 'multipole_211', 'multipole_212',
+                     'multipole_222', 'multipole_411', 'multipole_412',
+                     'multipole_422', 'multipole_413', 'multipole_423',
+                     'multipole_433']
         )
     except AttributeError:
         pass
@@ -183,10 +178,7 @@ def create_dataframe(obj):
         elif all_nones:
             all_nones = False
     if not all_nones:
-        ret = ret.join(
-                pd.DataFrame(anisos,
-                    columns=['U11', 'U22', 'U33', 'U12', 'U13', 'U23'])
-        )
+        ret = ret.join(pd.DataFrame(anisos, columns=['U11', 'U22', 'U33', 'U12', 'U13', 'U23']))
     return ret
 
 def load_dataframe(obj, dataframe):
@@ -260,7 +252,7 @@ def load_dataframe(obj, dataframe):
 
     multipoles = [None for i in range(10)]
     anisous = [None for i in range(6)]
-    for key, data in iteritems(dataframe):
+    for key, data in dataframe.items():
         if key == 'number':
             set_attribute('number', data)
         elif key == 'name':
@@ -358,8 +350,7 @@ def load_dataframe(obj, dataframe):
             set_residue_attr(key, data)
             continue
         else:
-            warnings.warn('Atomic property %s not recognized' % key,
-                          ParameterWarning)
+            warnings.warn(f'Atomic property {key} not recognized', ParameterWarning)
 
     # Now combine the multipoles and anisous if they are all specified
     if not None in anisous:

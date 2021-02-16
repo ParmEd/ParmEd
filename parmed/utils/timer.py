@@ -2,17 +2,11 @@
 This is a module that contains basic timer facilities. It's useful for profiling
 the performance of a script in "chunks".
 """
-
 from time import time
 from os import linesep as ls
 
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
 class Timer(object):
-   """ Timer class. It adds new timers and keeps track of how much time has been
-       spent. """
-
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+   """ Timer class. It adds new timers and keeps track of how much time has been spent. """
 
    def __init__(self):
       """ Declares the global timer """
@@ -21,8 +15,6 @@ class Timer(object):
       self.active_timers = ['global']
       self.timer_names = ['global']
       self.units = 'sec.'
-
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
    def add_timer(self, timer_name, description):
       """ Add a new timer """
@@ -33,8 +25,6 @@ class Timer(object):
       self.timers[timer_name] = 0
       self.timer_names.append(timer_name)
       self.descriptions[timer_name] = description
-
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
    def start_timer(self, timer_name):
       """ Start the specified timer """
@@ -51,8 +41,6 @@ class Timer(object):
       # This timer is now on
       self.active_timers.append(timer_name)
 
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
    def stop_timer(self, timer_name):
       """ End the specified timer """
       # First make sure that it is a timer to begin with
@@ -67,14 +55,10 @@ class Timer(object):
       self.timers[timer_name] += time()
       self.active_timers.pop(self.active_timers.index(timer_name))
 
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
    def end_all(self):
       """ End all of the timers """
       while len(self.active_timers) > 0:
          self.stop_timer(self.active_timers[0])
-
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
    def done(self):
       """ Tell Timer we are done, and we can convert units to best 
@@ -100,13 +84,8 @@ class Timer(object):
       for timer in self.timer_names:
          self.timers[timer] /= tfactor
 
-   #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
    def print_(self, timer, outfile, newline=True):
       """ Prints the value of the timer """
-      outfile.write("%-40s %8.3f %s" % (self.descriptions[timer], 
-                                        self.timers[timer], self.units))
+      outfile.write(f"{self.descriptions[timer]:<40} {self.timers[timer]:8.3f} {self.units}")
       if newline:
          outfile.write(ls)
-
-#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

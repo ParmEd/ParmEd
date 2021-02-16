@@ -53,34 +53,13 @@ Things I would like to see, but are not as important:
 Target Python Version
 ---------------------
 
-ParmEd officially supports Python 2.7 and Python 3.3+ in the same code base
-through the use of the ``six`` module (although some earlier versions of Python
-*may* work, no effort is made to support Python 2.6 and lower or Python 3.2 and
-lower). The ``six`` module is included as a subpackage in the ``parmed.utils``
-package, and all components should be imported from there.
+ParmEd officially supports Python 3.7+ in the same code base
 
-In particular, the ``range`` and ``zip`` builtins should be imported from
-``parmed.utils.six.moves`` rather than relying on the standard versions. This is
-because in Python 3, ``range`` and ``zip`` return efficient iterators, while in
-Python 2 they return potentially inefficient lists. The Python 2-equivalent
-versions of the ``range`` and ``zip`` iterators are ``xrange`` and
-``itertools.izip``, respectively, which are the *actual* functions defined
-within ``parmed.utils.six.moves`` for Python 2.
-
-Supporting both Python 2 and Python 3 in the same code base means that you must
-never use the ``print`` statement, implicit integer division, or relative
-imports (as those will *not* work in Python 3). You are encouraged to put the
-following line at the top of each Python module in ParmEd::
-
-    from __future__ import division, absolute_imports, print_function
-
-In addition to supporting CPython 2.7 and 3.3+, ParmEd also strives to support
+In addition to supporting CPython 3.7+, ParmEd also strives to support
 the ``pypy`` interpreter.  Under the ``pypy`` interpreter, PDB file parsing
 is about 3-5x faster *using the same code*. Since ParmEd parses a substantial
 amount of metadata from RCSB/wwPDB files, the added efficiency can be useful for
-mining the PDB. As such, modules that require CPython (such as ``scipy``,
-``scikit-learn``, ``matplotlib``, ... etc.) must be made optional so that the
-functionality *not* relying on those modules can be used within ``pypy``.
+mining the PDB.
 
 Tests
 -----
@@ -93,31 +72,28 @@ managed.
 
 The ParmEd tests are run in the ``ParmEd/tests`` directory with the command::
 
-    nosetests -vs .
+    py.test --disable-warnings --cov=parmed --cov-branch .
 
 which will automatically find and run all ``test_*.py`` files. The tests are
 implemented using the ``unittest`` module in the Python standard library. Look
 at existing tests for examples.
 
-While developing new functionality, I find it helpful to run the tests directly
-from the ParmEd directory with the following command::
+While developing new functionality, I find it helpful to install an editable
+copy of ParmEd using `pip install -e`. This way, any changes you make are
+immediately available when running the tests. You can run a specific test using
+the following command::
 
-    nosetests -vs test/test_parmed_structure.py
+    py.test --disable-warnings test_parmed_structure.py
 
 Obviously in this case, ``test_parmed_structure.py`` is replaced with whichever
-test module you are working on. You can select *specific* tests using the ``-m``
+test module you are working on. You can select *specific* tests using the ``-k``
 flag specifying a regex that matches the test case method.  For example::
 
-    nosetests -vs test/test_parmed_structure.py -m add_atom
+    py.test --disable-warnings test/test_parmed_structure.py -k add_atom
 
 will test both the ``test_add_atom`` and ``test_add_atom_to_residue`` methods.
-This is an easy way to run tests quickly while working on new methods *without*
-having to run ``python setup.py install`` after every change. Note that when you
-run tests from the root ParmEd directory, however, the imported ParmEd
-repository will not have any Python extensions installed (meaning that the tests
-relying on them -- like the test for the Amber optimized reader -- will fail).
 
-ParmEd utilizes the Travis continuous integration server to perform automatic
+ParmEd utilizes the GitHub Actions integration service to perform automatic
 tests of all pull requests. Tests generally must pass these tests before being
 considered for merge into the master branch.
 

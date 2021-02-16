@@ -1,7 +1,6 @@
 """
 Tests the functionality in parmed.residue
 """
-
 import utils
 import parmed as pmd
 from parmed import residue
@@ -90,8 +89,8 @@ class TestChemistryResidue(unittest.TestCase):
         self.assertIs(residue.AminoAcidResidue.get('CASH'), residue.ASP)
         self.assertIs(residue.AminoAcidResidue.get('NHIS'), residue.HIS)
         self.assertIs(residue.AminoAcidResidue.get('NASH'), residue.ASP)
-        self.assertRaises(KeyError,
-                lambda: residue.AminoAcidResidue.get('XASH'))
+        with self.assertRaises(KeyError):
+            residue.AminoAcidResidue.get('XASH')
 
 class TestNucleicAcidResidues(unittest.TestCase):
 
@@ -129,19 +128,3 @@ class TestNucleicAcidResidues(unittest.TestCase):
         self.assertTrue(residue.DNAResidue.has('DG5'))
         self.assertTrue(residue.DNAResidue.has('DG3'))
         self.assertFalse(residue.RNAResidue.has('G4'))
-
-    @unittest.skipUnless(utils.is_jenkins(), 'PDB blocks Travis from downloading PDB files')
-    def test_modified_dna_rna(self):
-        """ Tests that modified DNA/RNA residue names are properly recognized"""
-        def count_nures(parm):
-            nnuc = 0
-            for res in parm.residues:
-                if RNAResidue.has(res.name) or DNAResidue.has(res.name):
-                    nnuc += 1
-            return nnuc
-
-        pdb_with_nnures = [('1EHZ', 76), ('3p4a', 48), ('3p4b', 48), ('3p4d', 16)]
-        for pdbid, correct_nres in pdb_with_nnures:
-            pdb = pmd.download_PDB(pdbid)
-            nres = count_nures(pdb)
-            self.assertEqual(correct_nres, nres)

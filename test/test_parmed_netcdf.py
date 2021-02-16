@@ -1,13 +1,11 @@
 """
 Tests the NetCDF file parsing capabilities with the different backends
 """
-
 from random import randint
 import numpy as np
 from parmed import __version__
 from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
 from parmed import unit as u
-from parmed.utils.six.moves import range, zip
 from parmed.utils import PYPY
 from parmed.utils.netcdf import NetCDFFile
 from unittest import skipIf
@@ -24,25 +22,24 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         rst = NetCDFRestart.open_old(get_fn('ncinpcrd.rst7'))
         self._check_rst(rst)
         # Now try writing files
-        ntraj = NetCDFTraj.open_new(get_fn('test.nc', written=True),
-                                    traj.atom, box=True)
+        ntraj = NetCDFTraj.open_new(self.get_fn('test.nc', written=True), traj.atom, box=True)
         for crd in traj.coordinates:
             ntraj.add_coordinates(crd)
         for box in traj.box:
             ntraj.add_box(box)
         ntraj.close()
-        traj = NetCDFTraj.open_old(get_fn('test.nc', written=True))
+        traj = NetCDFTraj.open_old(self.get_fn('test.nc', written=True))
         self._check_traj(traj, written=True)
 
-        nrst = NetCDFRestart.open_new(get_fn('test.ncrst', written=True),
-                                      rst.atom, rst.hasbox, rst.hasvels,
-                                      title=rst.title)
+        nrst = NetCDFRestart.open_new(
+            self.get_fn('test.ncrst', written=True), rst.atom, rst.hasbox, rst.hasvels, title=rst.title
+        )
         nrst.coordinates = rst.coordinates
         nrst.velocities = rst.velocities
         nrst.time = rst.time
         nrst.box = rst.box
         nrst.close()
-        rst = NetCDFRestart.open_old(get_fn('test.ncrst', written=True))
+        rst = NetCDFRestart.open_old(self.get_fn('test.ncrst', written=True))
         self._check_rst(rst, written=True)
         # Now write NetCDF trajectory without any optional attributes/variables
         # and check proper reading
@@ -50,7 +47,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         nframe = randint(5, 20)
         coords = np.random.rand(nframe, natom, 3) * 20 - 10
         coords = np.array(coords, dtype='f')
-        nctraj = NetCDFFile(get_fn('test2.nc', written=True), 'w', mmap=False)
+        nctraj = NetCDFFile(self.get_fn('test2.nc', written=True), 'w', mmap=False)
         nctraj.Conventions = 'AMBER'
         nctraj.ConventionVersion = '1.0'
         nctraj.program = 'ParmEd'
@@ -64,7 +61,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         v[:] = coords
         del v
         nctraj.close()
-        traj2 = NetCDFTraj.open_old(get_fn('test2.nc', written=True))
+        traj2 = NetCDFTraj.open_old(self.get_fn('test2.nc', written=True))
         np.testing.assert_allclose(traj2.coordinates, coords)
 
         # Now write NetCDF restart without any optional attributes/variables and
@@ -72,7 +69,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         natom = randint(100, 1000)
         nframe = randint(5, 20)
         coords = np.random.rand(natom, 3) * 20 - 10
-        nctraj = NetCDFFile(get_fn('test2.ncrst', written=True), 'w', mmap=False)
+        nctraj = NetCDFFile(self.get_fn('test2.ncrst', written=True), 'w', mmap=False)
         nctraj.Conventions = 'AMBERRESTART'
         nctraj.ConventionVersion = '1.0'
         nctraj.program = 'ParmEd'
@@ -86,17 +83,16 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         v[:] = coords
         del v
         nctraj.close()
-        traj2 = NetCDFRestart.open_old(get_fn('test2.ncrst', written=True))
+        traj2 = NetCDFRestart.open_old(self.get_fn('test2.ncrst', written=True))
         np.testing.assert_allclose(traj2.coordinates[0], coords)
 
     def testRemdFiles(self):
         """ Test proper reading and writing of NetCDF files with REMD info """
-        rstfn = get_fn('restart.ncrst', written=True)
-        trjfn = get_fn('traj.nc', written=True)
+        rstfn = self.get_fn('restart.ncrst', written=True)
+        trjfn = self.get_fn('traj.nc', written=True)
         # Do the restart with T-REMD first
         traj = NetCDFRestart.open_new(
-                rstfn, 100, True, True, 'Restart w/ REMD', remd='Temperature',
-                temp=300,
+            rstfn, 100, True, True, 'Restart w/ REMD', remd='Temperature', temp=300,
         )
         crd = np.random.rand(100, 3)
         vel = np.random.rand(100, 3)
@@ -110,8 +106,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
 
         traj = NetCDFRestart.open_new(
-                rstfn, 100, False, True, 'Restart w/ REMD', remd='Multi',
-                remd_dimtypes=[1, 3, 3, 3],
+            rstfn, 100, False, True, 'Restart w/ REMD', remd='Multi', remd_dimtypes=[1, 3, 3, 3],
         )
         crd = np.random.rand(100, 3)
         vel = np.random.rand(100, 3)
@@ -127,8 +122,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         np.testing.assert_equal([1, 3, 3, 3], traj.remd_dimtype)
         # Do the restart with T-REMD first
         traj = NetCDFTraj.open_new(
-                trjfn, 100, True, True, True, title='Traj w/ REMD',
-                remd='Temperature',
+            trjfn, 100, True, True, True, title='Traj w/ REMD', remd='Temperature',
         )
         crd = np.random.rand(100, 3)
         vel = np.random.rand(100, 3)
@@ -143,8 +137,7 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         np.testing.assert_allclose(vel, traj.velocities.squeeze(), atol=1e-5)
 
         traj = NetCDFTraj.open_new(
-                trjfn, 100, False, True, title='Traj w/ REMD', remd='Multi',
-                remd_dimension=4, vels=True, frcs=True,
+            trjfn, 100, False, True, title='Traj w/ REMD', remd='Multi', remd_dimension=4, vels=True, frcs=True,
         )
         crd = np.random.rand(100, 3)
         vel = np.random.rand(100, 3)
@@ -188,36 +181,25 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
 
     def testBadNetCDFFiles(self):
         """ Tests error checking for bad usage of NetCDF files """
-        self.assertRaises(ValueError, lambda:
-                NetCDFRestart.open_new(get_fn('test.ncrst', written=True),
-                                       natom=10, box=True, vels=True,
-                                       remd='Temperature')
-        )
-        self.assertRaises(ValueError, lambda:
-                NetCDFRestart.open_new(get_fn('test.ncrst', written=True),
-                                       natom=10, box=True, vels=True,
-                                       remd='Multi')
-        )
-        self.assertRaises(ValueError, lambda:
-                NetCDFRestart.open_new(get_fn('test.ncrst', written=True),
+        with self.assertRaises(ValueError):
+            NetCDFRestart.open_new(self.get_fn('test.ncrst', written=True),
+                                   natom=10, box=True, vels=True, remd='Temperature')
+        with self.assertRaises(ValueError):
+            NetCDFRestart.open_new(self.get_fn('test.ncrst', written=True),
+                                   natom=10, box=True, vels=True, remd='Multi')
+        with self.assertRaises(ValueError):
+                NetCDFRestart.open_new(self.get_fn('test.ncrst', written=True),
                                        natom=10, box=True, vels=True,
                                        remd='Multi', remd_dimtypes=[1, 3, 2])
-        )
-        self.assertRaises(ValueError, lambda:
-                NetCDFRestart.open_new(get_fn('test.ncrst', written=True),
-                                       natom=10, box=True, vels=True,
-                                       remd='Illegal')
-        )
-        self.assertRaises(ValueError, lambda:
-                NetCDFTraj.open_new(get_fn('test.nc', written=True),
-                                    natom=10, box=True, vels=False,
-                                    remd='Multidim')
-        )
-        self.assertRaises(ValueError, lambda:
-                NetCDFTraj.open_new(get_fn('test.nc', written=True),
-                                    natom=10, box=True, vels=False,
-                                    remd='Illegal')
-        )
+        with self.assertRaises(ValueError):
+            NetCDFRestart.open_new(self.get_fn('test.ncrst', written=True),
+                                   natom=10, box=True, vels=True, remd='Illegal')
+        with self.assertRaises(ValueError):
+            NetCDFTraj.open_new(self.get_fn('test.nc', written=True),
+                                natom=10, box=True, vels=False, remd='Multidim')
+        with self.assertRaises(ValueError):
+            NetCDFTraj.open_new(self.get_fn('test.nc', written=True),
+                                natom=10, box=True, vels=False, remd='Illegal')
 
     def _check_rst(self, rst, written=False):
         """ Checks various restart properties """
@@ -238,7 +220,5 @@ class TestNetCDF(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(rst.cell_angles[0], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[1], 109.471219)
         self.assertAlmostEqual(rst.cell_angles[2], 109.471219)
-        self.assertTrue(all([round(x-y, 7) == 0
-                             for x, y in zip(rst.cell_lengths, rst.box[:3])]))
-        self.assertTrue(all([round(x-y, 7) == 0
-                             for x, y in zip(rst.cell_angles, rst.box[3:])]))
+        self.assertTrue(all([round(x-y, 7) == 0 for x, y in zip(rst.cell_lengths, rst.box[:3])]))
+        self.assertTrue(all([round(x-y, 7) == 0 for x, y in zip(rst.cell_angles, rst.box[3:])]))

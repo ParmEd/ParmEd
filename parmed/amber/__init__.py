@@ -8,15 +8,14 @@ __all__ = ['AmberFormat', 'FortranFormat', 'AmberAsciiRestart', 'AmberMdcrd',
            'Rst7', 'BeemanRestart', 'ConvertFromPSF', 'LoadParm', 'AMBERHOME',
            'titratable_residues']
 
-from parmed.amber.amberformat import AmberFormat, FortranFormat
-from parmed.amber.asciicrd import AmberAsciiRestart, AmberMdcrd
-from parmed.amber.mask import AmberMask
-from parmed.amber.netcdffiles import NetCDFTraj, NetCDFRestart
-from parmed.amber.offlib import AmberOFFLibrary
-from parmed.amber.parameters import AmberParameterSet
-from parmed.amber.readparm import (AmberParm, ChamberParm, AmoebaParm,
-                Rst7, BeemanRestart, ConvertFromPSF, LoadParm)
-from parmed.amber import titratable_residues
+from .amberformat import AmberFormat, FortranFormat
+from .asciicrd import AmberAsciiRestart, AmberMdcrd
+from .mask import AmberMask
+from .netcdffiles import NetCDFTraj, NetCDFRestart
+from .offlib import AmberOFFLibrary
+from .parameters import AmberParameterSet
+from .readparm import AmberParm, ChamberParm, AmoebaParm, Rst7, BeemanRestart, ConvertFromPSF, LoadParm
+from . import titratable_residues
 
 # See if there is an AMBERHOME defined, which we will use by default. Otherwise,
 # set it to the empty string

@@ -1,22 +1,13 @@
 """
 Unittests for serializing various objects in ParmEd
 """
-from __future__ import division
-
 from io import BytesIO
 import numpy as np
 import os
 import parmed as pmd
-from parmed.utils.six.moves import range, zip
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 import random
-try:
-    from string import uppercase
-except ImportError:
-    from string import ascii_uppercase as uppercase
+from string import ascii_uppercase as uppercase
 import unittest
 import utils
 from utils import HAS_GROMACS
