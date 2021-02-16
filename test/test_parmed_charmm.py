@@ -256,6 +256,7 @@ class TestCharmmPsf(TestCharmmBase):
 
     def test_psf_atomic_number_assignment(self):
         """ Checks that atomic number is assigned if just PSF is read """
+        psf1 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         psf2 = psf.CharmmPsfFile(get_fn('ala_ala_ala.psf'))
         psf2.load_parameters(parmset=self.param22)
         for a1, a2 in zip(psf1.atoms, psf2.atoms):
