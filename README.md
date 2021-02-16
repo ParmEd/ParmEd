@@ -138,3 +138,10 @@ Boston, MA 02111-1307, USA.
 The `fortranformat` package is released under the MIT license, Copyright (C)
 Brendan Arnold. See `fortranformat/__init__.py` for more information.
 ```
+
+## Citation
+
+If you make use of ParmEd for research and would like to cite your use of it in
+a research paper, please use the following citation:
+
+https://dx.doi.org/10.1007/s10822-016-9977-1
