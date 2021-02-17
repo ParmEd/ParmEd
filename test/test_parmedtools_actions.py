@@ -2071,6 +2071,12 @@ Basic MD simulation
         str(act)
         act.execute()
 
+    def test_check_validity_solvated_parm(self):
+        """ Tests the checkValidity test for a solvated topology """
+        act = PT.checkValidity(solvparm)
+        str(act)
+        act.execute()
+
 class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
 
@@ -2210,8 +2216,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                 self.assertEqual(radii, 1.5)
 
         PT.changeRadii(parm, 'mbondi').execute()
-        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
-                         'modified Bondi radii (mbondi)')
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'modified Bondi radii (mbondi)')
         for atom in parm.atoms:
             radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
@@ -2237,8 +2242,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                 self.assertEqual(radii, 1.5)
 
         PT.changeRadii(parm, 'mbondi2').execute()
-        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
-                         'H(N)-modified Bondi radii (mbondi2)')
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'H(N)-modified Bondi radii (mbondi2)')
         for atom in parm.atoms:
             radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
@@ -2262,8 +2266,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
                 self.assertEqual(radii, 1.5)
 
         PT.changeRadii(parm, 'mbondi3').execute()
-        self.assertEqual(parm.parm_data['RADIUS_SET'][0],
-                         'ArgH and AspGluO modified Bondi2 radii (mbondi3)')
+        self.assertEqual(parm.parm_data['RADIUS_SET'][0], 'ArgH and AspGluO modified Bondi2 radii (mbondi3)')
         for i, atom in enumerate(parm.atoms):
             radii, atomic_number = atom.solvent_radius, atom.atomic_number
             if atomic_number == 6:
@@ -2271,12 +2274,9 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             elif atomic_number == 7:
                 self.assertEqual(radii, 1.55)
             elif atomic_number == 8:
-                if atom.residue.name in ('ASP,GLU') and (
-                            atom.name.startswith('OD') or
-                            atom.name.startswith('OE')):
+                if atom.residue.name in ('ASP,GLU') and (atom.name.startswith('OD') or atom.name.startswith('OE')):
                     self.assertEqual(radii, 1.4)
-                elif atom.name == 'OXT' or (i < parm.ptr('natom')-1 and
-                            parm.atoms[i+1].name == 'OXT'):
+                elif atom.name == 'OXT' or (i < parm.ptr('natom')-1 and parm.atoms[i+1].name == 'OXT'):
                     self.assertEqual(radii, 1.4)
                 else:
                     self.assertEqual(radii, 1.5)
@@ -2289,8 +2289,7 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             elif atomic_number == 16:
                 self.assertEqual(radii, 1.8)
             elif atomic_number == 1:
-                if atom.residue.name == 'ARG' and \
-                            atom.name[:2] in ('HH', 'HE'):
+                if atom.residue.name == 'ARG' and atom.name[:2] in ('HH', 'HE'):
                     self.assertEqual(radii, 1.17)
                 elif atom.bond_partners[0].atomic_number == 7:
                     self.assertEqual(radii, 1.3)
@@ -2299,8 +2298,8 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             else:
                 self.assertEqual(radii, 1.5)
         # Now test bad input
-        self.assertRaises(exc.ChangeRadiiError, lambda:
-                          PT.changeRadii(parm, 'mbondi6').execute())
+        with self.assertRaises(exc.ChangeRadiiError):
+            PT.changeRadii(parm, 'mbondi6').execute()
 
     def test_change_lj_pair(self):
         """ Test changeLJPair for ChamberParm """
@@ -2997,6 +2996,18 @@ class TestChamberParmActions(FileIOTestCase, TestCaseRelative):
             self.assertAlmostEqual(a1.xz, a2.xz, delta=2e-3)
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.idx, a2.residue.idx)
+
+    def test_check_validity(self):
+        """ Test the checkValidity action on ChamberParm """
+        act = PT.checkValidity(gascham)
+        str(act)
+        act.execute()
+
+    def test_check_validity_solv(self):
+        """ Test the checkValidity action on solvated ChamberParm """
+        act = PT.checkValidity(solvchamber)
+        str(act)
+        act.execute()
 
 class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
     """ Tests actions on Amber prmtop files """
