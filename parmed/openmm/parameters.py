@@ -940,11 +940,22 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
         # Get the 1-4 scaling factors from the torsion list
         scee, scnb = set(), set()
+        unscaled_atom_types = set()
         for key in self.dihedral_types:
             dt = self.dihedral_types[key]
             for t in dt:
-                if t.scee: scee.add(t.scee)
-                if t.scnb: scnb.add(t.scnb)
+                if t.scee == 1 and t.scnb == 1:
+                    unscaled_atom_types.add(key[0])
+                    unscaled_atom_types.add(key[3])
+                else:
+                    if t.scee: scee.add(t.scee)
+                    if t.scnb: scnb.add(t.scnb)
+        if len(unscaled_atom_types) > 0:
+            # If no 1-4 interactions are scaled, set the scale factors to 1.0.
+            if len(scee) == 0:
+                scee = {1.0}
+            if len(scnb) == 0:
+                scnb = {1.0}
         if len(scee) > 1 or len(scnb) > 1:
             scee_facs = ', '.join([str(x) for x in scee])
             scnb_facs = ', '.join([str(x) for x in scnb])
@@ -990,6 +1001,30 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
             attributes = { 'class' : name, 'sigma' : str(sigma), 'epsilon' : str(abs(epsilon)) }
             etree.SubElement(xml_force, 'Atom', **attributes)
+
+        if len(unscaled_atom_types) > 0 and (coulomb14scale != 1 or lj14scale != 1):
+            # Some 1-4 interactions should be unscaled.  Add a script to fix them.
+            import textwrap
+            types = ', '.join('"%s"' % s for s in unscaled_atom_types)
+            types = '\n    '.join(textwrap.wrap(types))
+            script = etree.SubElement(xml_root, 'Script')
+            script.text = """
+# Some 1-4 interactions should be unscaled.
+
+import simtk.openmm as mm
+unscaled_types = [%s]
+unscaled_atoms = set(atom.index for atom in data.atoms if data.atomType[atom] in unscaled_types)
+for force in sys.getForces():
+  if isinstance(force, mm.NonbondedForce):
+    atom_charges = {}
+    for atom in unscaled_atoms:
+      charge, sigma, epsilon = force.getParticleParameters(atom)
+      atom_charges[atom] = charge
+    for i in range(force.getNumExceptions()):
+      p1, p2, chargeProd, sigma, epsilon = force.getExceptionParameters(i)
+      if p1 in unscaled_atoms and p2 in unscaled_atoms and chargeProd._value != 0:
+        force.setExceptionParameters(i, p1, p2, atom_charges[p1]*atom_charges[p2], sigma, epsilon)
+""" % types
 
     def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
         if not self.nbfix_types and not separate_ljforce: return
