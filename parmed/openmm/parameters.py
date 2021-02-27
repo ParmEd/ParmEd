@@ -1005,7 +1005,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         if len(unscaled_atom_types) > 0 and (coulomb14scale != 1 or lj14scale != 1):
             # Some 1-4 interactions should be unscaled.  Add a script to fix them.
             import textwrap
-            types = ', '.join('"%s"' % s for s in unscaled_atom_types)
+            types = ', '.join('"%s"' % s for s in sorted(unscaled_atom_types))
             types = '\n    '.join(textwrap.wrap(types))
             script = etree.SubElement(xml_root, 'Script')
             script.text = """
