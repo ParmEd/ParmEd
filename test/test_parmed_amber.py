@@ -423,7 +423,7 @@ class TestReadParm(FileIOTestCase):
 
         parm.remake_parm()
 
-        myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
+        myre = re.compile(r'AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
         for flag, data in parm.parm_data.items():
             if 'TORSION_TORSION' not in flag: continue
             rematch = myre.match(flag)
@@ -811,22 +811,17 @@ class TestReadParm(FileIOTestCase):
         self.assertEqual(parm.ptr('ntheta'), len(list(parm.angles_without_h)))
         self.assertEqual(parm.ptr('nphih'), len(list(parm.dihedrals_inc_h)))
         self.assertEqual(parm.ptr('nphia'), len(list(parm.dihedrals_without_h)))
-        self.assertEqual([a.name for a in parm.atoms],
-                         parm.parm_data['ATOM_NAME'])
-        self.assertEqual([a.type for a in parm.atoms],
-                         parm.parm_data['AMBER_ATOM_TYPE'])
+        self.assertEqual([a.name for a in parm.atoms], parm.parm_data['ATOM_NAME'])
+        self.assertEqual([a.type for a in parm.atoms], parm.parm_data['AMBER_ATOM_TYPE'])
         if has1012:
             self.assertTrue(parm.has_1012())
         else:
             self.assertFalse(parm.has_1012())
 
     def _solv_pointer_tests(self, parm):
-        self.assertEqual(parm.ptr('nspm'),
-                         parm.parm_data['SOLVENT_POINTERS'][1])
-        self.assertEqual(parm.ptr('nspm'),
-                         len(parm.parm_data['ATOMS_PER_MOLECULE']))
-        self.assertEqual(parm.ptr('natom'),
-                         sum(parm.parm_data['ATOMS_PER_MOLECULE']))
+        self.assertEqual(parm.ptr('nspm'), parm.parm_data['SOLVENT_POINTERS'][1])
+        self.assertEqual(parm.ptr('nspm'), len(parm.parm_data['ATOMS_PER_MOLECULE']))
+        self.assertEqual(parm.ptr('natom'), sum(parm.parm_data['ATOMS_PER_MOLECULE']))
 
     def _extensive_checks(self, parm):
         # Check the __contains__ methods of the various topologyobjects
@@ -905,22 +900,16 @@ class TestParameterFiles(FileIOTestCase):
     def test_frcmod_parsing(self):
         """ Tests parsing an Amber frcmod file """
         self._check_ff99sb(
-                parameters.AmberParameterSet(
-                    os.path.join(get_fn('parm'), 'frcmod.ff99SB')
-                )
+            parameters.AmberParameterSet(os.path.join(get_fn('parm'), 'frcmod.ff99SB'))
         )
         self._check_ff99sb(
-                parameters.AmberParameterSet(
-                    os.path.join(get_fn('parm'), 'frcmod.1')
-                )
+            parameters.AmberParameterSet(os.path.join(get_fn('parm'), 'frcmod.1'))
         )
 
     def test_parm_dat_bad_equivalencing(self):
         """ Test handling of erroneous atom equivalencing in parm.dat files """
         with self.assertWarns(AmberWarning):
-            parameters.AmberParameterSet(
-                    os.path.join(get_fn('parm'), 'parmAM1.dat')
-            )
+            parameters.AmberParameterSet(os.path.join(get_fn('parm'), 'parmAM1.dat'))
         params = parameters.AmberParameterSet(os.path.join(get_fn('parm'), 'parmAM1.dat'))
         # Make sure CA and C have different types, even though they are
         # explicitly equivalenced
@@ -931,9 +920,7 @@ class TestParameterFiles(FileIOTestCase):
 
     def test_frcmod_with_tabstops(self):
         """ Test parsing an Amber frcmod file with tabs instead of spaces """
-        params = parameters.AmberParameterSet(
-                os.path.join(get_fn('parm'), 'all_modrna08.frcmod')
-        )
+        params = parameters.AmberParameterSet(os.path.join(get_fn('parm'), 'all_modrna08.frcmod'))
         self.assertEqual(len(params.atom_types), 38) # Ugh! Duplicates??  Really??
         self.assertEqual(params.bond_types[('C', 'CM')],
                          topologyobjects.BondType(449.9, 1.466)) # OVERWRITING IN THE SAME FILE??
@@ -1604,6 +1591,17 @@ class TestCoordinateFiles(FileIOTestCase):
         self.assertEqual(parm.get_coordinates().shape, (101, 223, 3))
         self.assertEqual(len(parm.atoms), 223)
         self.assertIs(parm.box, None)
+
+    def test_save_amberparm_with_cmaps(self):
+        """ Ensure the CMAPs do not force Structure.save to write a ChamberParm """
+        parm = pmd.load_file(get_fn("ff19sb-cmaps.parm7"))
+        self.assertNotIn("CTITLE", parm.flag_list)
+        self.assertIsInstance(parm, readparm.AmberParm)
+        written_fn = self.get_fn("ff19sb-cmaps.prmtop", written=True)
+        parm.save(written_fn)
+        parm2 = pmd.load_file(written_fn)
+        self.assertNotIn("CTITLE", parm2.flag_list)
+        self.assertIsInstance(parm2, readparm.AmberParm)
 
 
 class TestAmberMask(unittest.TestCase):
