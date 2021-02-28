@@ -180,7 +180,7 @@ def clapp():
                 if len(sys.argv) > 1:
                     logfile.write(f"# Command line arguments: {' '.join(sys.argv[1:])}\n")
                 if len(amber_prmtop) > 0:
-                    logfile.write(f"# Loaded topologies: {', '.join(name for name in amber_prmtop.parm_names)}")
+                    logfile.write(f"# Loaded topologies: {', '.join(parm.name for parm in amber_prmtop)}")
                 parmed_commands.setlog(logfile)
                 close_log_file = True
         # Loop through all of the commands
