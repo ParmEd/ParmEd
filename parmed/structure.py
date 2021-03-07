@@ -22,7 +22,7 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
                               TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
-                              UreyBradley, Link)
+                              UreyBradley, Link, LocalCoordinatesFrame)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .vec3 import Vec3
@@ -2195,6 +2195,16 @@ class Structure:
                 system.setVirtualSite(
                     atom.idx, mm.OutOfPlaneSite(a1.idx, a2.idx, a3.idx, w1, w2, w3)
                 )
+            elif isinstance(typ, LocalCoordinatesFrame):
+                a1, a2, a3 = refatoms
+                origin_weights, x_weights, y_weights, local_position = weights
+                # Convert positions to nanometers
+                position_nm = [0.1 * position for position in local_position]
+                system.setVirtualSite(
+                    atom.idx, mm.LocalCoordinatesSite(a1.idx, a2.idx, a3.idx, origin_weights, x_weights, y_weights, position_nm)
+                )
+            else:
+                raise RuntimeError(f"Did not recognize frame type {type(typ).__name__}")
 
     #===================================================
 

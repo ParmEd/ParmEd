@@ -6,6 +6,7 @@ by Jason Swails
 """
 import math
 import warnings
+from abc import ABC, abstractmethod
 from copy import copy
 from functools import wraps
 
@@ -1164,9 +1165,25 @@ class ExtraPoint(Atom):
 
         return self._frame_type
 
+    @frame_type.setter
+    def frame_type(self, value):
+        self._frame_type = value
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class TwoParticleExtraPointFrame:
+class ExtraPointFrame(ABC):
+
+    @abstractmethod
+    def get_weights(self):
+        pass
+
+    @abstractmethod
+    def get_atoms(self):
+        pass
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TwoParticleExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 2 particles
@@ -1244,7 +1261,7 @@ class TwoParticleExtraPointFrame:
         else:
             return ((r1 + r2) / r1), -(r2 / r1)
 
-class ThreeParticleExtraPointFrame:
+class ThreeParticleExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 3 particles
@@ -1468,7 +1485,7 @@ class ThreeParticleExtraPointFrame:
         else:
             return 1 + weight, -weight / 2, -weight / 2
 
-class OutOfPlaneExtraPointFrame:
+class OutOfPlaneExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 3 particles, but with the virtual site out of the
@@ -1545,8 +1562,7 @@ class OutOfPlaneExtraPointFrame:
         regbonds = []
         mybond = None
         for bond in ep.parent.bonds:
-            if (not isinstance(bond.atom1, ExtraPoint) and
-                    not isinstance(bond.atom2, ExtraPoint)):
+            if (not isinstance(bond.atom1, ExtraPoint) and not isinstance(bond.atom2, ExtraPoint)):
                 regbonds.append(bond)
             elif ep in bond:
                 if mybond is not None:
@@ -1639,6 +1655,59 @@ class OutOfPlaneExtraPointFrame:
             costheta = v1edotcross / (lenv1e*lencross)
             weightCross = -weightCross if costheta < 0 else weightCross
         return weight / 2, weight / 2, weightCross
+
+class LocalCoordinatesFrame(ExtraPointFrame):
+    """
+    Frame based on the local coordinates
+
+    Parameters
+    ----------
+    atom1: :class:`Atom`
+        The first atom defining the frame
+    atom2: :class:`Atom`
+        The second atom defining the frame
+    atom3: :class:`Atom`
+        The third atom defining the frame
+    origin_weights: list
+        weights (must sum to 1) for the three particles when computing the origin location
+    x_weights: list
+        the weight factors for the three particles when computing x-direction
+    y_weights: list
+        the weight factors for the three particles when computing y-direction
+    local_position: list
+        the position of the virtual site in the local coordinate system
+
+    Notes
+    -----
+    All of the lists must have 3 elements.
+
+    Raises
+    ------
+    ValueError if any of the weights or position are invalid
+    """
+    def __init__(self, atom1, atom2, atom3, origin_weights, x_weights, y_weights, local_position):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.origin_weights = self._validate_weights(origin_weights, lambda x: abs(sum(x) - 1) > 1e-5)
+        self.x_weights = self._validate_weights(x_weights)
+        self.y_weights = self._validate_weights(y_weights)
+        self.local_position = self._validate_weights(local_position)
+
+    @staticmethod
+    def _validate_weights(weights, does_violate=lambda x: False) -> list:
+        my_weights = list(weights)
+        if len(my_weights) != 3:
+            raise ValueError(f"Weights must have 3 elements, not {len(my_weights)}")
+        if does_violate(weights):
+            raise ValueError(f"Weights failed condition requirement")
+        return [float(wt) for wt in my_weights]
+
+    def get_weights(self):
+        return self.origin_weights, self.x_weights, self.y_weights, self.local_position
+
+    def get_atoms(self):
+        return self.atom1, self.atom2, self.atom3
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4130,7 +4199,7 @@ class DrudeAtom(Atom):
     """
 
     def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', **kwargs):
-        Atom.__init__(self, **kwargs)
+        super().__init__(**kwargs)
         self.alpha = alpha
         self.thole = thole
         self.drude_type = drude_type

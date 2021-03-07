@@ -2,14 +2,16 @@
 Provides a Python class for parsing a PSF file and setting up a system
 structure for it
 """
+import math
 import re
 import warnings
 from copy import copy as _copy
 from functools import wraps
+from ..constants import DEG_TO_RAD
 from ..periodic_table import AtomicNum, element_by_mass
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
-                               UnassignedAtomType)
+                               UnassignedAtomType, ExtraPoint, DrudeAtom, LocalCoordinatesFrame)
 from ..exceptions import CharmmError, CharmmWarning, ParameterError
 from ..structure import needs_openmm, Structure
 from ..utils.io import genopen
@@ -176,8 +178,7 @@ class CharmmPsfFile(Structure):
         instance from the data.
         """
         from ..utils import tag_molecules
-        global _resre
-        Structure.__init__(self)
+        super().__init__()
         # Bail out if we don't have a filename
         if psf_name is None:
             return
@@ -209,7 +210,11 @@ class CharmmPsfFile(Structure):
             self.title = psfsections['NTITLE'][1]
             # Next is the number of atoms
             natom = self._convert(psfsections['NATOM'][0], int, 'natom')
+            last_alpha = last_thole = None
             # Parse all of the atoms
+            drude_alpha_thole = []
+            drude_pair_list = []
+            is_drude = 'DRUDE' in psf_flags
             for i in range(natom):
                 words = psfsections['NATOM'][1][i].split()
                 atid = int(words[0])
@@ -232,8 +237,19 @@ class CharmmPsfFile(Structure):
                 charge = self._convert(words[6], float, 'partial charge')
                 mass = self._convert(words[7], float, 'atomic mass')
                 props = words[8:]
-                atom = Atom(name=name, type=attype, charge=charge, mass=mass,
-                            atomic_number=AtomicNum[element_by_mass(mass)])
+                if is_drude:
+                    alpha = self._convert(words[9], float, 'alpha')
+                    thole = self._convert(words[10], float, 'thole')
+                    drude_alpha_thole.append((alpha, thole))
+                if is_drude and i > 1 and drude_alpha_thole[-2] != (0, 0):
+                    my_alpha, my_thole = drude_alpha_thole[-2]
+                    atom = DrudeAtom(name=name, type=attype, charge=charge, mass=mass,
+                                     atomic_number=0, alpha=my_alpha, thole=my_thole, drude_type=atom_type)
+                elif name.startswith('LP') and mass == 0:
+                    atom = ExtraPoint(name=name, type=attype, charge=charge, mass=mass, atomic_number=0)
+                else:
+                    atom = Atom(name=name, type=attype, charge=charge, mass=mass,
+                                atomic_number=AtomicNum[element_by_mass(mass)])
                 atom.props = props
                 self.add_atom(atom, resname, resid, chain=segid, inscode=inscode, segid=segid)
             # Now get the number of bonds
@@ -301,14 +317,10 @@ class CharmmPsfFile(Structure):
             tmp = psfsections['MOLNT'][1]
             tag_molecules(self)
             molecule_list = [a.marked for a in self.atoms]
+            lp_distance_list = lp_angle_list = lp_dihedral_list = lp_hostnum_list = None
             if len(tmp) == len(self.atoms):
                 # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
-                numlp, numlph = psfsections['NUMLP NUMLPH'][0]
-                if numlp != 0 or numlph != 0:
-                    raise NotImplementedError(
-                        'Cannot currently handle PSFs with lone pairs defined in the NUMLP/'
-                        'NUMLPH section.'
-                    )
+                self._process_lonepair_section(psfsections["NUMLP NUMLPH"])
             # Now do the CMAPs
             ncrterm = self._convert(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
             if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
@@ -332,6 +344,105 @@ class CharmmPsfFile(Structure):
         finally:
             if own_handle:
                 fileobj.close()
+
+    #===================================================
+
+    def _process_lonepair_section(self, section):
+        lp_distance_list = []
+        lp_angle_list = []
+        lp_dihedral_list = []
+        lp_hostnum_list = []
+        numlp, numlph = section[0]
+        lp_lines = section[1]
+        if len(lp_lines) != numlp + (numlph + 7) // 8:
+            raise CharmmError("Unexpected number of lines in NUMLP/NUMLPH section")
+        for i in range(numlp):
+            lp_line = lp_lines[i].split()
+            if len(lp_line) != 6 or lp_line[2] != 'F':
+                raise CharmmError("lonepair format error")
+            lp_hostnum_list.append(int(lp_line[0]))
+            lp_distance_list.append(float(lp_line[3]))
+            lp_angle_list.append(float(lp_line[4]))
+            lp_dihedral_list.append(float(lp_line[5]))
+        lp_cnt = 0
+        for i in range(numlp):
+            idall = []
+            for j in range(lp_hostnum_list[i] + 1):
+                words = lp_lines[int((lp_cnt + j) // 8) + numlp].split()
+                icol = (lp_cnt + j) % 8
+                idall.append(int(words[icol]) - 1)
+            if len(idall) not in (3, 4):
+                raise CharmmError(f"Unsupported lone pair configuration (must have 2 or 3 atoms in frame, not {len(idall) - 1})")
+            if len(idall) == 4:
+                frame = self._get_frame3(idall[1], idall[3], idall[2], lp_distance_list[i], lp_angle_list[i], lp_dihedral_list[i])
+            else:
+                frame = self._get_frame2(idall[1], idall[2], lp_distance_list[i])
+            if not isinstance(self.atoms[idall[0]], ExtraPoint):
+                raise CharmmError(f"Expected atom {idall[0]} to be an ExtraPoint but it is not")
+            self.atoms[idall[0]].frame = frame
+            lp_cnt += lp_hostnum_list[i] + 1
+
+    #===================================================
+
+    def _get_frame3(
+        self,
+        a1idx: int,
+        a2idx: int,
+        a3idx: int,
+        dist: float,
+        ang: float,
+        dihed: float,
+    ) -> LocalCoordinatesFrame:
+
+        def small_to_zero(num: float) -> float:
+            if abs(num) < 1e-10:
+                return 0.0
+            return num
+
+        ang *= DEG_TO_RAD
+        dihed *= DEG_TO_RAD
+        if dist > 0:
+            x_weights = [-1.0, 0.0, 1.0]
+        elif dist < 0:
+            x_weights = [-1.0, 0.5, 0.5]
+        dist = abs(dist)
+        origin_weights = [1, 0, 0]
+        y_weights = [0, -1, 1]
+        local_position = [
+            small_to_zero(dist * math.cos(ang)),
+            small_to_zero(dist * math.sin(ang) * math.cos(dihed)),
+            small_to_zero(dist * math.sin(ang) * math.sin(dihed)),
+        ]
+        return LocalCoordinatesFrame(
+            self.atoms[a1idx], self.atoms[a2idx], self.atoms[a3idx], origin_weights, x_weights, y_weights, local_position
+        )
+
+    def _get_frame2(
+        self,
+        a1idx: int,
+        a2idx: int,
+        dist: float,
+    ) -> LocalCoordinatesFrame:
+
+        def small_to_zero(num: float) -> float:
+            if abs(num) < 1e-10:
+                return 0.0
+            return num
+
+        # TODO - figure out if this can be done with another virtual site type. This comes from the OpenMM implementation
+        # in the CHARMM parsers there
+        a1 = self.atoms[a1idx]
+        a2 = self.atoms[a2idx]
+        for a3 in a1.bond_partners + a2.bond_partners:
+            if a3 not in (a1, a2):
+                break
+        else:
+            raise CharmmError("Could not find a third atom to define in the LocalCoordinatesFrame")
+        origin_weights = [1, 0, 0]
+        x_weights = [1, -1, 0]
+        y_weights = [0, -1, 1]
+        local_position = [dist, 0, 0]
+        return LocalCoordinatesFrame(a1, a2, a3, origin_weights, x_weights, y_weights, local_position)
 
     #===================================================
 

@@ -277,7 +277,7 @@ A = RNAResidue('Adenine', 'A', ['ADE', 'AP', 'A5', 'A3', 'AN', 'RA', 'RA3', 'RA5
 U = RNAResidue('Uracil', 'U', ['URA', 'U3', 'U5', 'UN', 'RU', 'RU3', 'RU5', 'RUN'])
 T = RNAResidue('Thymine', 'T', ['THY', 'T3', 'T5', 'TN', 'RT', 'RT3', 'RT5', 'RTN'])
 
-WATER_NAMES = {'WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC'}
+WATER_NAMES = {'WAT', 'HOH', 'TIP3', 'TIP4', 'TIP5', 'SPCE', 'SPC', 'SWM4', 'SWM6'}
 SOLVENT_NAMES = WATER_NAMES | {'SOL'}
 EXTRA_POINT_NAMES = {'EP', 'LP'}
 CATION_NAMES = {'Na+', 'Li+', 'Mg+', 'Rb+', 'MG', 'Cs+', 'POT', 'SOD', 'MG2',

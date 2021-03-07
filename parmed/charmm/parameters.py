@@ -415,7 +415,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 section = None
                 continue
             if line.upper().startswith('THOLE'):
-                section = None
+                section = 'NBTHOLE'
                 continue
             # It seems like files? sections? can be terminated with 'END'
             if line[:3].upper() == 'END':
@@ -726,8 +726,21 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 except IndexError:
                     raise CharmmError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
-        # If we had any CMAP terms, then the last one will not have been added
-        # yet. Add it here
+                continue
+            if section.upper() == 'NBTHOLE':
+                words = line.split()
+                try:
+                    at1 = words[0]
+                    at2 = words[1]
+                    nbt = abs(conv(words[2], float, 'NBTHOLE a'))
+                    try:
+                        self.atom_types_str[at1].add_nbthole(at2, nbt)
+                        self.atom_types_str[at2].add_nbthole(at1, nbt)
+                    except KeyError:
+                        pass
+                except IndexError as err:
+                    raise CharmmError("Could not parse NBTHOLE terms.") from err
+        # If we had any CMAP terms, then the last one will not have been added yet. Add it here
         if current_cmap is not None:
             typ = CmapType(current_cmap_res, current_cmap_data)
             self.cmap_types[current_cmap] = typ

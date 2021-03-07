@@ -84,6 +84,7 @@ class ParameterSet:
         self.cmap_types = OrderedDict()
         self.nbfix_types = OrderedDict()
         self.pair_types = OrderedDict()
+        self.nbthole_types = OrderedDict()
         self.parametersets = []
         self._combining_rule = 'lorentz'
         self.residues = OrderedDict()
