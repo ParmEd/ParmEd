@@ -2086,10 +2086,10 @@ class Structure:
             constrains is None
         """
 
-        if constraints is None and not rigidWater: return
+        if constraints is None and not rigidWater:
+            return
         if constraints not in (None, app.HBonds, app.AllBonds, app.HAngles):
-            raise ValueError("Unrecognized constraints option (%s)" %
-                             constraints)
+            raise ValueError(f"Unrecognized constraints option ({constraints})")
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
 
@@ -2102,19 +2102,22 @@ class Structure:
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
         elif constraints is app.HBonds:
             for bond in self.bonds:
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 if bond.atom1.element == 1 or bond.atom2.element == 1:
-                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                    atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                    constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
         if rigidWater:
             for bond in self.bonds:
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 if is_water[bond.atom1.residue.idx]:
-                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                    atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                    constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
 
         # Add bond constraints
         for bond in self.bonds:
@@ -2129,19 +2132,19 @@ class Structure:
                 if angle.atom3.element == 1:
                     numH += 1
                 if numH == 2 or (numH == 1 and angle.atom2.element == 8):
-                    constraint_angle_set.add((angle.atom1.idx,
-                                              angle.atom2.idx,
-                                              angle.atom3.idx))
+                    atom1, atom2, atom3 = min(angle.atom1, angle.atom3), angle.atom2, max(angle.atom1, angle.atom3)
+                    constraint_angle_set.add((atom1.idx, atom2.idx, atom3.idx))
         if rigidWater:
             for angle in self.angles:
                 if is_water[angle.atom1.residue.idx]:
-                    constraint_angle_set.add((angle.atom1.idx,
-                                              angle.atom2.idx,
-                                              angle.atom3.idx))
+                    atom1, atom2, atom3 = min(angle.atom1, angle.atom3), angle.atom2, max(angle.atom1, angle.atom3)
+                    constraint_angle_set.add((angle.atom1.idx, angle.atom2.idx, angle.atom3.idx))
         # Add angle constraints
         for angle in self.angles:
             if (angle.atom1.idx, angle.atom2.idx, angle.atom3.idx) in constraint_angle_set:
                 if frozenset((angle.atom1.idx, angle.atom3.idx)) in constraint_bond_set:
+                    continue
+                if frozenset((angle.atom3.idx, angle.atom1.idx)) in constraint_bond_set:
                     continue
                 # Constrain this angle
                 l1 = l2 = None
