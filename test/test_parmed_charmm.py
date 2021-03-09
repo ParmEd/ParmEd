@@ -11,7 +11,7 @@ from parmed.utils.io import genopen
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
-from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTypeList
+from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint
 import parmed.unit as u
 import random
 import unittest
@@ -1181,3 +1181,49 @@ class TestFileWriting(TestCharmmBase):
         parm.save(fn, overwrite=True)
         cpsf = pmd.load_file(fn)
         self.assertIn('XPLOR', cpsf.flags)
+
+class TestCharmmDrudeSystems(unittest.TestCase):
+    """ Tests processing of DRUDE systems """
+
+    def test_drude_parsing_na(self):
+        """ Test parsing a trinucleotide with Drude particles and lone pairs """
+        system = psf.CharmmPsfFile(get_fn("cyt-gua-cyt.psf"))
+        self.assertEqual(len(system.atoms), 176)
+
+        # Check that we have the right number of DRUDE particles
+        self.assertEqual(sum(isinstance(atom, DrudeAtom) for atom in system.atoms), 59)
+        self.assertTrue(all(atom.type == "DRUD" for atom in system.atoms if isinstance(atom, DrudeAtom)))
+
+        # Check that we have the right number of lone pairs
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in system.atoms), 23)
+
+        # Check that the parameters match expectation from a known implementation
+        ep1 = system.atoms[7]
+        origin_weights, x_weights, y_weights, local_position = ep1.frame.get_weights()
+        self.assertAlmostEqual(local_position[0], -0.11970705016398403)
+        self.assertAlmostEqual(local_position[1], 0.005739964140425085)
+        self.assertAlmostEqual(local_position[2], 0.32884232536689074)
+        self.assertEqual(x_weights, [-1, 0, 1])
+        self.assertEqual(y_weights, [0, -1, 1])
+        self.assertEqual(origin_weights, [1, 0, 0])
+
+        # Now try a virtual site with a negative distance
+        ep2 = system.atoms[22]
+        origin_weights, x_weights, y_weights, local_position = ep2.frame.get_weights()
+        self.assertAlmostEqual(local_position[0], -0.34999999466919514)
+        self.assertAlmostEqual(local_position[1], 6.108652257915055e-05)
+        self.assertAlmostEqual(local_position[2], 1.0661609584247726e-08)
+        self.assertEqual(x_weights, [-1, 0.5, 0.5])
+        self.assertEqual(y_weights, [0, -1, 1])
+        self.assertEqual(origin_weights, [1, 0, 0])
+
+        # Check some Drude particle parameters
+        drude1 = system.atoms[2]
+        self.assertIsInstance(drude1, DrudeAtom)
+        self.assertEqual(drude1.alpha, -1.028)
+        self.assertEqual(drude1.thole, 1.3)
+
+        drude2 = system.atoms[-1]
+        self.assertIsInstance(drude2, DrudeAtom)
+        self.assertEqual(drude2.alpha, -0.157)
+        self.assertEqual(drude2.thole, 1.3)

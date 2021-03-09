@@ -156,9 +156,9 @@ class CharmmPsfFile(Structure):
                 title, pointers = cls._parse_psf_title_line(line)
                 line = psf.readline().strip()
         data = []
-        if title == 'NATOM' or title == 'NTITLE':
-            # Store these two sections as strings (ATOM section we will parse
-            # later). The rest of the sections are integer pointers
+        if title in {'NATOM', 'NTITLE', 'NUMLP NUMLPH', 'NUMANISO'}:
+            # Store these two sections as strings to be parsed later.
+            # The rest of the sections are integer pointers
             while line:
                 data.append(line)
                 line = psf.readline().strip()
@@ -202,7 +202,7 @@ class CharmmPsfFile(Structure):
             psfsections = _ZeroDict()
             while True:
                 try:
-                    sec, ptr, data = CharmmPsfFile._parse_psf_section(fileobj)
+                    sec, ptr, data = self._parse_psf_section(fileobj)
                 except _FileEOF:
                     break
                 psfsections[sec] = (ptr, data)
@@ -244,7 +244,7 @@ class CharmmPsfFile(Structure):
                 if is_drude and i > 1 and drude_alpha_thole[-2] != (0, 0):
                     my_alpha, my_thole = drude_alpha_thole[-2]
                     atom = DrudeAtom(name=name, type=attype, charge=charge, mass=mass,
-                                     atomic_number=0, alpha=my_alpha, thole=my_thole, drude_type=atom_type)
+                                     atomic_number=0, alpha=my_alpha, thole=my_thole, drude_type=attype)
                 elif name.startswith('LP') and mass == 0:
                     atom = ExtraPoint(name=name, type=attype, charge=charge, mass=mass, atomic_number=0)
                 else:
@@ -400,7 +400,7 @@ class CharmmPsfFile(Structure):
             return num
 
         ang *= DEG_TO_RAD
-        dihed *= DEG_TO_RAD
+        dihed = (180 - dihed) * DEG_TO_RAD
         if dist > 0:
             x_weights = [-1.0, 0.0, 1.0]
         elif dist < 0:
