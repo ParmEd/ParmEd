@@ -310,9 +310,9 @@ class Structure:
         # Just assume that if the first atom has a defined type, so does
         # everything else... we don't want __repr__ to be super expensive
         if self.atoms[0].type:
-            retstr.append('; parametrized>')
+            retstr.append('; parameterized>')
         else:
-            retstr.append('; NOT parametrized>')
+            retstr.append('; NOT parameterized>')
         return ''.join(retstr)
 
     #===================================================
