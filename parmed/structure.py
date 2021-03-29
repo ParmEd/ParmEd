@@ -1501,7 +1501,7 @@ class Structure:
                         self.multipole_frames):
                     s = amber.AmoebaParm.from_structure(self)
                     s.write_parm(fname, **kwargs)
-                elif self.urey_bradleys or self.impropers or self.cmaps:
+                elif self.urey_bradleys or self.impropers:
                     s = amber.ChamberParm.from_structure(self)
                     s.write_parm(fname, **kwargs)
                 else:
