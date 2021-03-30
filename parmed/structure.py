@@ -309,7 +309,7 @@ class Structure:
                 retstr.append(' (orthogonal)')
         # Just assume that if the first atom has a defined type, so does
         # everything else... we don't want __repr__ to be super expensive
-        if self.atoms[0].type:
+        if self.atoms[0].atom_type is not UnassignedAtomType and self.atoms[0]._epsilon is None:
             retstr.append('; parameterized>')
         else:
             retstr.append('; NOT parameterized>')
