@@ -306,7 +306,7 @@ class GromacsGroFile(metaclass=FileFormatType):
         elif not nobox and struct.atoms:
             # Find the extent of the molecule in all dimensions, and buffer it by 5 A
             crds = struct.coordinates
-            diff = (crds.max(axis=1) - crds.min(axis=1)) / 10 + 0.5
+            diff = (crds.max(axis=0) - crds.min(axis=0)) / 10 + 0.5
             dest.write(f'{diff[0]:10.5f}{diff[1]:10.5f}{diff[2]:10.5f}\n')
         if own_handle:
             dest.close()
