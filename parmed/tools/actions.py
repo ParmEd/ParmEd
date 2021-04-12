@@ -3325,30 +3325,37 @@ class deletePDB(Action):
 
 class add12_6_4(Action):
     """
-    Adds the LENNARD_JONES_CCOEF term for the new divalent metal ion 12-6-4
-    Lennard-Jones potential term. If provided, the mask will allow you to
-    specify which ions are divalent. The C4 parameter between the metal ion and
-    water can either be taken from Ref. [1] for the requested [watermodel]
-    (TIP3P, TIP4PEW, or SPCE) or provided in the file specified by the c4file
-    keyword.  The polarizabilities must be present in the the polfile file. The
-    chemical symbol of the element will be used to determine the atom type.
-    Parameters are expected in a file with 2 columns:
+    Adds the LENNARD_JONES_CCOEF term for the ion 12-6-4 Lennard-Jones potential
+    term. If provided, the mask will allow you to specify which ions. If not
+    provided, :ZN will be used for the mask by default. The C4 parameter between
+    the ion and water can either be taken from the references for the requested
+    [watermodel] (TIP3P, TIP4PEW, SPCE, OPC3, OPC, FB3, and FB4) or provided in
+    the file specified by the c4file keyword. The polarizabilities must be
+    present in the the polfile file. The chemical symbol of the element will be
+    used to determine the atom type. Parameters are expected in a file with 2
+    columns:
         <atom type>   <parameter>
 
-    All defaults come from Ref. [1], [2] and [3]
+    All defaults come from Ref. [1], [2], [3], [4], [5] and [6]
 
     [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
-        289-297
+        289-297.
     [2] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
-        119, 883-895
+        119, 883-895.
     [3] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
         2015, 11, 1645-1657.
+    [4] Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M. Merz Jr. J. Chem.
+        Theory Comput., 2020, 16, 4429-4442.
+    [5] Arkajyoti Sengupta, Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M.
+        Merz Jr., J. Chem. Inf. Model., 2021, 61, 869-880.
+    [6] Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M. Merz Jr. J. Chem.
+        Theory Comput., 2021, DOI: 10.1021/acs.jctc.0c01320
     """
-    usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
-            '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')
+    usage = ('[<ion mask>] [c4file <C4 Param. File> | watermodel <water model>] '
+            '[polfile <Pol. Param File> [tunfactor <tunfactor>]')
     strictly_supported = (AmberParm, ChamberParm)
 
-    _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
+    _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE', 'OPC3', 'OPC', 'FB3', 'FB4')
 
     def init(self, arg_list):
         self.mask = AmberMask(self.parm,
@@ -3392,7 +3399,7 @@ class add12_6_4(Action):
         self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
-                comments=['For 12-6-4 potential used for divalent metal ions'])
+                comments=['For 12-6-4 potential used for ions'])
         for i, param in enumerate(params(self.parm, self.mask, self.c4file,
                                          self.watermodel, self.polfile,
                                          self.tunfactor)):
