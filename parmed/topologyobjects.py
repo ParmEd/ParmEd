@@ -2138,11 +2138,12 @@ class Dihedral(_FourAtomTerm):
     @property
     def funct(self):
         if self._funct is None:
-            if self.type is not None and isinstance(self.type, (DihedralType, DihedralTypeList)):
+            if self.type is not None and isinstance(self.type, DihedralTypeList):
                 return 9
+            elif self.type is not None and isinstance(self.type, DihedralType):
+                return 1
             elif self.type is not None and isinstance(self.type, RBTorsionType):
                 return 3
-            return 1
         return self._funct
 
     @funct.setter
