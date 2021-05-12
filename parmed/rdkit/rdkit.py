@@ -36,7 +36,7 @@ class RDKit:
         smiles : str, smiles
         coordinates : bool, default True
             if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
-        hydrogens : bool, default False
+        hydrogens : bool, default True
             if True, use `rdkit.Chem.AddHs` to generate explicit hydrogens
 
         Returns
