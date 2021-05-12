@@ -35,3 +35,13 @@ class TestRDKit(unittest.TestCase):
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles)
         np.testing.assert_allclose(parm.coordinates[0], [-1.072,  0.829 ,  0.108])
+
+    def test_load_smiles_explicit_hydrogen(self):
+        """ test adding explict hydrogens from smiles string"""
+        smiles = "CC"
+
+        num_atoms = 8 # CH3-CH3
+        parm = pmd.rdkit.from_smiles(smiles=smiles, coordinates=False, hydrogens=True)
+        self.assertEqual(len(parm.atoms), num_atoms)
+        self.assertEqual([atom.name for atom in parm.atoms], ['C1', 'C2', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'])
+
