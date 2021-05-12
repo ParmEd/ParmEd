@@ -27,7 +27,7 @@ class RDKit:
         return PDBFile.parse(fh)
 
     @staticmethod
-    def from_smiles(smiles, coordinates=True, hydrogens=False):
+    def from_smiles(smiles, coordinates=True, hydrogens=True):
         """
         Load smiles string to :class:`Structure`
 
