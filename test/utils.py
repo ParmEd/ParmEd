@@ -15,8 +15,8 @@ import numpy as np
 from parmed import gromacs, openmm
 
 try:
-    from simtk import openmm as mm
-    from simtk.openmm import app
+    import openmm as mm
+    from openmm import app
     openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
     CPU = mm.Platform.getPlatformByName('CPU')
     Reference = mm.Platform.getPlatformByName('Reference')

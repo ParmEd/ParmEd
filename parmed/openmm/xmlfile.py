@@ -55,10 +55,10 @@ class XmlFile(metaclass=FileFormatType):
         Parses XML file and returns deserialized object. The return value
         depends on the serialized object, summarized below
 
-            - System : returns simtk.openmm.System
-            - State : returns simtk.openmm.State
-            - Integrator : returns simtk.openmm.Integrator subclass
-            - ForceField : returns simtk.openmm.app.ForceField
+            - System : returns openmm.System
+            - State : returns openmm.State
+            - Integrator : returns openmm.Integrator subclass
+            - ForceField : returns openmm.app.ForceField
 
         Parameters
         ----------
@@ -75,8 +75,8 @@ class XmlFile(metaclass=FileFormatType):
         OpenMM requires the entire contents of this file read into memory. As a
         result, this function may require a significant amount of memory.
         """
-        import simtk.openmm as mm
-        from simtk.openmm import app
+        import openmm as mm
+        from openmm import app
         if isinstance(filename, str):
             with closing(genopen(filename, 'r')) as f:
                 contents = f.read()
@@ -102,7 +102,7 @@ class _OpenMMStateContents:
 
     Parameters
     ----------
-    state : :class:`simtk.openmm.State`
+    state : :class:`openmm.State`
         OpenMM State containing relevant state information
 
     Attributes

@@ -20,7 +20,7 @@ __email__ = "cmbruns@stanford.edu"
 # `parmed.unit` package can be used interchangeably with OpenMM
 
 try:
-    from simtk.unit import *
+    from openmm.unit import *
 except ImportError:
     from .unit import Unit, is_unit
     from .quantity import Quantity, is_quantity

@@ -249,9 +249,9 @@ if "forcebalance" in __name__:
     #| OpenMM interface functions |#
     #==============================#
     try: 
-        from simtk.unit import *
-        from simtk.openmm import *
-        from simtk.openmm.app import *
+        from openmm.unit import *
+        from openmm import *
+        from openmm.app import *
     except: 
         warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     

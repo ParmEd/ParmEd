@@ -37,9 +37,9 @@ from chemistry import gromacs
 from chemistry import amber
 
 # OpenMM import
-import simtk.unit as u
-import simtk.openmm as mm
-import simtk.openmm.app as app
+import openmm.unit as u
+import openmm as mm
+import openmm.app as app
 
 
 def energy_components(Sim, verbose=False):

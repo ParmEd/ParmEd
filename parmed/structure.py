@@ -29,9 +29,9 @@ from .vec3 import Vec3
 
 # Try to import the OpenMM modules
 try:
-    from simtk.openmm import app
-    from simtk import openmm as mm
-    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    from openmm import app
+    import openmm as mm
+    from openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     mm = app = None
 
@@ -1931,7 +1931,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, LJPME, or Ewald objects
-            from the simtk.openmm.app namespace
+            from the openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2490,7 +2490,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2859,7 +2859,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace. Default is NoCutoff
+            openmm.app namespace. Default is NoCutoff
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating opint number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2879,7 +2879,7 @@ class Structure:
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
         """
-        from simtk.openmm.app.internal.customgbforces import (
+        from openmm.app.internal.customgbforces import (
             GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
         )
         if implicitSolvent is None: return None

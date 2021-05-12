@@ -31,9 +31,9 @@ from parmed import gromacs, amber
 from parmed.amber.mdin import Mdin
 
 # OpenMM import
-import simtk.unit as u
-import simtk.openmm as mm
-import simtk.openmm.app as app
+import openmm.unit as u
+import openmm as mm
+import openmm.app as app
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-a', '--amber', action='store_true', help='Pass this flag to run AMBER tests along with Gromacs / OpenMM.')

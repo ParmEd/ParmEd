@@ -141,8 +141,8 @@ energy components to be compared between programs more effectively. For
 example::
 
     >>> import parmed as pmd
-    >>> from simtk.openmm import app
-    >>> from simtk import openmm as mm
+    >>> from openmm import app
+    >>> from openmm as mm
     >>> # Instantiate the parm and create the system
     ... parm = pmd.load_file('tip4p.parm7', 'tip4p.rst7')
     >>> system = parm.createSystem(nonbondedMethod=app.PME,
@@ -217,8 +217,8 @@ file with the ff99SB force field::
     import parmed as chem
     import parmed.unit as u
 
-    from simtk.openmm import app
-    from simtk import openmm as mm
+    from openmm import app
+    from openmm as mm
 
     pdb = app.PDBFile('input.pdb')
     forcefield = app.ForceField('amber99sb.xml', 'tip3p.xml')
