@@ -26,14 +26,14 @@ class TestRDKit(unittest.TestCase):
         smiles = 'C1=CC=CN=C1'
 
         # coordinates = False
-        parm = pmd.rdkit.from_smiles(smiles, coordinates=False)
+        parm = pmd.rdkit.from_smiles(smiles, coordinates=False, hydrogens=False)
         self.assertEqual([atom.name for atom in parm.atoms], ['C1', 'C2', 'C3', 'C4', 'N1', 'C5']) 
         self.assertEqual(parm.residues[0].name, 'UNL')
         self.assertIs(parm.coordinates, None)
         self.assertIs(parm.get_coordinates(), None)
 
         # coordinates = True (default)
-        parm = pmd.rdkit.from_smiles(smiles)
+        parm = pmd.rdkit.from_smiles(smiles, coordinates=True, hydrogens=False)
         np.testing.assert_allclose(parm.coordinates[0], [-1.072,  0.829 ,  0.108])
 
     def test_load_smiles_explicit_hydrogen(self):
