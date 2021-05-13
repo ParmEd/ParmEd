@@ -2138,11 +2138,18 @@ class Dihedral(_FourAtomTerm):
     @property
     def funct(self):
         if self._funct is None:
+            # see https://manual.gromacs.org/documentation/current/reference-manual/topologies/topology-file-formats.html
+            # for more info on funct types and their meaning
             if self.type is not None and isinstance(self.type, DihedralTypeList):
-                return 9
+                return 9 # multiple proper dihedral
+            elif self.type is not None and isinstance(self.type, DihedralType):
+                return 1 # proper dihedral
             elif self.type is not None and isinstance(self.type, RBTorsionType):
-                return 3
-            return 1
+                return 3 # Ryckaert-Bellemans dihedral
+            elif self.type is not None:
+                raise NotImplementedError(
+                    f"Dihedral.type (self.type) must be: DihedralTypeList, DihedralType, or RBTorsionType."
+                )
         return self._funct
 
     @funct.setter
