@@ -31,7 +31,10 @@ from .vec3 import Vec3
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
-    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    try:
+        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    except ModuleNotFoundError:
+        from openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     mm = app = None
 
