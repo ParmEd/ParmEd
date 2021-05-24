@@ -12,6 +12,6 @@ __email__ = "jwest@rcsb.rutgers.edu <or> jason.swails@gmail.com"
 
 __all__ = ['PdbxReader', 'PdbxWriter', 'containers']
 
-from parmed.formats.pdbx.PdbxReader import PdbxReader
-from parmed.formats.pdbx.PdbxWriter import PdbxWriter
-from parmed.formats.pdbx import PdbxContainers as containers
+from .PdbxReader import PdbxReader
+from .PdbxWriter import PdbxWriter
+from . import PdbxContainers as containers

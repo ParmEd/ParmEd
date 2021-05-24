@@ -1,8 +1,6 @@
 """
 Contains all of the class objects for the Tinker topology
 """
-from __future__ import division
-from parmed.utils.six.moves import range, zip
 from collections import OrderedDict
 
 class Atom(object):
@@ -37,29 +35,23 @@ class Atom(object):
             self.reduction = float(reduction)
 
     def __repr__(self):
-        return '<Atom %s [#%d]; Mass=%.2f; "%s">' % (
-                        self.symbol, self.atomic_number, self.mass, self.desc)
+        return f'<Atom {self.symbol} [#{self.atomic_number}]; Mass={self.mass:.2f}; "{self.desc}">'
 
     def __str__(self):
-        retstr =  ('Atom %s [#%s] %s\n'
-                    '   Type:        %d\n'
-                    '   Class:       %d\n'
-                    '   Mass:        %.2f\n'
-                    '   Valence:     %d' % 
-                    (self.symbol, self.atomic_number, self.desc, self.type,
-                     self.class_, self.mass, self.valence)
-        )
+        retstr =  (f'Atom {self.symbol} [#{self.atomic_number}] {self.desc}\n'
+                   f'   Type:        {self.type}\n'
+                   f'   Class:       {self.class_}\n'
+                   f'   Mass:        {self.mass:.2f}\n'
+                   f'   Valence:     {self.valence}')
 
         if hasattr(self, 'radius'):
-            retstr += ('\n   vdW Rad:     %.2f\n'
-                        '   vdW Eps:     %.2f' % (self.radius, self.epsilon))
+            retstr += (f'\n   vdW Rad:     {self.radius:.2f}\n'
+                       f'   vdW Eps:     {self.epsilon:.2f}')
             if self.radius14 is not None or self.epsilon14 is not None:
-                retstr += ('\n   vdW 1-4 Rad: %.2f\n   vdW 1-4 Eps: %.2f' %
-                           (self.radius14, self.epsilon14)
-                )
+                retstr += f'\n   vdW 1-4 Rad: {self.radius14:.2f}\n   vdW 1-4 Eps: {self.epsilon14:.2f}'
 
         if self.reduction is not None:
-            retstr += '\n   vdW Reduct:  %.2f' % (self.reduction)
+            retstr += f'\n   vdW Reduct:  {self.reduction:.2f}'
 
         return retstr
 
@@ -73,16 +65,15 @@ class _ParamTypeList(list):
     typeclass = None
 
     def __init__(self):
-        super(_ParamTypeList, self).__init__()
+        super().__init__()
 
     def add(self, *args, **kwargs):
         self.append(self.typeclass(*args, **kwargs))
 
     def append(self, thing):
         if not isinstance(thing, self.typeclass):
-            raise TypeError('Can only append "%s" objects to %s' %
-                            (self.typeclass.__name__, type(self).__name__))
-        super(_ParamTypeList, self).append(thing)
+            raise TypeError(f'Can only append "{self.typeclass.__name__}" objects to {self.__class__.__name__}')
+        super().append(thing)
 
     def extend(self, things):
         for thing in things:
@@ -101,15 +92,12 @@ class BondStretch(object):
         self.req = float(req)
 
     def __repr__(self):
-        return '<%s [%s-%s]; k=%.2f; Req=%.2f>' % (type(self).__name__,
-                self.atom1.symbol, self.atom2.symbol, self.k, self.req)
+        return f'<{self.__class__.__name__} [{self.atom1.symbol}-{self.atom2.symbol}]; k={self.k:.2f}; Req={self.req:.2f}>'
 
     def __str__(self):
-        return ('%s %r --- %r\n'
-                '     K = %.4f\n'
-                '   Req = %.4f' % (type(self).__name__, self.atom1, self.atom2,
-                                   self.k, self.req)
-        )
+        return (f'{self.__class__.name__} {repr(self.atom1)} --- {repr(self.atom2)}\n'
+                f'     K = {self.k:.4f}\n'
+                f'   Req = {self.req:.4f}')
 
 class BondList(_ParamTypeList):
     typeclass = BondStretch
@@ -129,23 +117,21 @@ class AngleBend(object):
         self.type = type_.strip() or 'Harmonic'
 
     def __repr__(self):
-        retstr = '<AngleBend [%s-%s-%s]; k=%.2f; Theta_eq=%.2f' % (
-                self.atom1.symbol, self.atom2.symbol, self.atom3.symbol,
-                self.k, self.theteq
+        retstr = (
+            f'<AngleBend [{self.atom1.symbol}-{self.atom2.symbol}-{self.atom3.symbol}]; '
+            f'k={self.k:.2f}; Theta_eq={self.theteq:.2f}'
         )
         if self.fold is not None:
-            retstr += '; fold=%.1f' % self.fold
-        return retstr + '; %s>' % self.type
+            retstr += f'; fold={self.fold:.1f}'
+        return retstr + f'; {self.type}>'
 
     def __str__(self):
-        retstr = ('AngleBend %r --- %r --- %r\n'
-                  '     K = %.4f\n'
-                  ' Theta = %.4f\n' % (self.atom1, self.atom2, self.atom3,
-                                       self.k, self.theteq)
-        )
+        retstr = (f'AngleBend {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)}\n'
+                  f'     K = {self.k:.4f}\n'
+                  f' Theta = {self.theteq:.4f}\n')
         if self.fold is not None:
-            retstr += '  Fold = %.1f\n' % (self.fold)
-        return retstr + '  Type = %s' % (self.type)
+            retstr += f'  Fold = {self.fold:.1f}\n'
+        return retstr + f'  Type = {self.type}'
 
 class AngleList(_ParamTypeList):
     typeclass = AngleBend
@@ -162,19 +148,17 @@ class StretchBend(object):
         self.r2eq = float(r2eq)
 
     def __repr__(self):
-        return ('<StretchBend [%s-%s-%s]; k=%.2f; Theta_eq=%.2f; R1eq=%.2f; '
-                'R2eq=%.2f>' % (self.atom1.symbol, self.atom2.symbol,
-                                self.atom3.symbol, self.k, self.theteq,
-                                self.r1eq, self.r2eq)
+        return (
+            f'<StretchBend [{self.atom1.symbol}-{self.atom2.symbol}-{self.atom3.symbol}]; '
+            f'k={self.k:.2f}; Theta_eq={self.theteq:.2f}; R1eq={self.r1eq:.2f}; R2eq={self.r2eq:.2f}>'
         )
 
     def __str__(self):
-        return ('StretchBend %r --- %r --- %r\n'
-                '     K = %.4f\n'
-                ' Theta = %.4f\n'
-                '  R1eq = %.4f\n'
-                '  R2eq = %.4f' % (self.atom1, self.atom2, self.atom3, self.k,
-                                   self.theteq, self.r1eq, self.r2eq))
+        return (f'StretchBend {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)}\n'
+                f'     K = {self.k:.4f}\n'
+                f' Theta = {self.theteq:.4f}\n'
+                f'  R1eq = {self.r1eq:.4f}\n'
+                f'  R2eq = {self.r2eq:.4f}')
 
 class StretchBendList(_ParamTypeList):
     typeclass = StretchBend
@@ -185,7 +169,7 @@ class UreyBradley(BondStretch):
 class UreyBradleyList(_ParamTypeList):
     typeclass = UreyBradley
 
-class OutOfPlaneBend(object):
+class OutOfPlaneBend:
     """ An out-of-plane bending term """
     def __init__(self, atom1, atom2, atom3, atom4, k):
         self.atom1 = atom1
@@ -195,16 +179,11 @@ class OutOfPlaneBend(object):
         self.k = float(k)
 
     def __repr__(self):
-        return '<%s [%s-%s-%s-%s]; k=%.2f>' % (
-                type(self).__name__, self.atom1.symbol, self.atom2.symbol,
-                self.atom3.symbol, self.atom4.symbol, self.k
-        )
+        return f'<{self.__class__.__name__} [{self.atom1.symbol}-{self.atom2.symbol}-{self.atom3.symbol}-{self.atom4.symbol}]; k={self.k:.2f}>'
 
     def __str__(self):
-        return ('%s %r --- %r --- %r --- %r\n'
-                '   K = %.2f' % (type(self).__name__, self.atom1, self.atom2,
-                                 self.atom3, self.atom4, self.k)
-        )
+        return (f'{self.__class__.__name__} {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)} --- {repr(self.atom4)}\n'
+                f'   K = {self.k:.2f}')
 
 class OutOfPlaneBendList(_ParamTypeList):
     typeclass = OutOfPlaneBend
@@ -236,31 +215,21 @@ class TorsionAngle(object):
 
     def __repr__(self):
         if len(self.amplitude) == 0:
-            return '<TorsionAngle [%s-%s-%s-%s]; No Terms>' % (
-                        self.atom1.symbol, self.atom2.symbol,
-                        self.atom3.symbol, self.atom4.symbol,
-            )
-        return '<TorsionAngle [%s-%s-%s-%s]; Ampl=%s; Phase=%s; Per=%s>' % (
-                        self.atom1.symbol, self.atom2.symbol,
-                        self.atom3.symbol, self.atom4.symbol, self.amplitude,
-                        self.phase, self.periodicity
-        )
+            return f'<TorsionAngle [{self.atom1.symbol}-{self.atom1.symbol}-{self.atom1.symbol}-{self.atom1.symbol}]; No Terms>'
+        return (f'<TorsionAngle [{self.atom1.symbol}-{self.atom1.symbol}-{self.atom1.symbol}-{self.atom1.symbol}]; '
+                f'Ampl={self.amplitude}; Phase={self.phase}; Per={self.periodicity}>')
 
     def __str__(self):
         if len(self.amplitude) == 0:
-            return ('TorsionAngle %r --- %r --- %r --- %r\n'
-                    '   No Terms' % (self.atom1, self.atom2, self.atom3,
-                                     self.atom4)
-            )
-        retstr = 'TorsionAngle %r --- %r --- %r --- %r' % (self.atom1,
-                self.atom2, self.atom3, self.atom4)
+            return (f'TorsionAngle {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)} --- {repr(self.atom4)}\n'
+                    '   No Terms')
+        retstr = f'TorsionAngle {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)} --- {repr(self.atom4)}'
         seq = range(len(self.amplitude))
-        for i, amp, phase, per in enumerate(zip(seq, self.amplitude, self.phase,
-                                                self.periodicity)):
-            retstr += ('\n   Term %d\n'
-                       '   Amplitude = %.4f\n'
-                       '       Phase = %.4f\n'
-                       ' Periodicity = %.4f' % (i + 1, amp, phase, per))
+        for i, amp, phase, per in enumerate(zip(seq, self.amplitude, self.phase, self.periodicity)):
+            retstr += (f'\n   Term {i + 1}\n'
+                       f'   Amplitude = {amp:.4f}\n'
+                       f'       Phase = {phase:.4f}\n'
+                       f' Periodicity = {per:.4f}')
         return retstr
 
 class TorsionAngleList(_ParamTypeList):
@@ -273,12 +242,10 @@ class PiTorsion(object):
         self.amplitude = float(amplitude)
 
     def __repr__(self):
-        return '<PiTorsion [%s-%s]; Ampl=%.2f>' % (self.atom1.symbol,
-                self.atom2.symbol, self.amplitude)
+        return f'<PiTorsion [{self.atom1.symbol}-{self.atom2.symbol}]; Ampl={self.amplitude:.2f}>'
 
     def __str__(self):
-        return ('PiTorsion %r --- %r\n   Amplitude = %.4f' %
-                (self.atom1, self.atom2, self.amplitude))
+        return f'PiTorsion {repr(self.atom1)} --- {repr(self.atom1)}\n   Amplitude = {self.amplitude:.4f}'
 
 class PiTorsionList(_ParamTypeList):
     typeclass = PiTorsion
@@ -295,19 +262,15 @@ class TorsionTorsion(object):
         self.spline2 = int(spline2)
 
     def __repr__(self):
-        return '<TorsionTorsion [%s-%s-%s-%s-%s]; Spline=(%d,%d)>' % (
-                        self.atom1.symbol, self.atom2.symbol,
-                        self.atom3.symbol, self.atom4.symbol,
-                        self.atom5.symbol, self.spline1, self.spline2,
+        return (
+            f'<TorsionTorsion [{self.atom1.symbol}-{self.atom2.symbol}-{self.atom3.symbol}-{self.atom4.symbol}-{self.atom5.symbol}]; '
+            f'Spline=({self.spline1},{self.spline2})>'
         )
 
     def __str__(self):
-        return ('TorsionTorsion %r --- %r --- %r ---\n'
-                '                      %r --- %r\n'
-                '   Spline Grid = (%d x %d)' %
-                    (self.atom1, self.atom2, self.atom3, self.atom4,
-                     self.atom5, self.spline1, self.spline2)
-        )
+        return (f'TorsionTorsion {repr(self.atom1)} --- {repr(self.atom2)} --- {repr(self.atom3)} ---\n'
+                f'                      {repr(self.atom4)} --- {repr(self.atom5)}\n'
+                f'   Spline Grid = ({self.spline1} x {self.spline2})')
 
 class TorsionTorsionList(_ParamTypeList):
     typeclass = TorsionTorsion
@@ -345,8 +308,7 @@ class TorsionTorsionGrid(OrderedDict):
 
     # No comparisons are implemented
     def __gt__(self, other):
-        raise NotImplemented('TorsionTorsionGrid instances are not '
-                             'well-ordered')
+        raise NotImplemented('TorsionTorsionGrid instances are not well-ordered')
     __lt__ = __ge__ = __le__ = __gt__
 
 class AtomicMultipole(object):
@@ -358,25 +320,16 @@ class AtomicMultipole(object):
         self.moment = [float(x) for x in moments]
 
     def __repr__(self):
-        return '<AtomicMultipole [%s] %s; Frame=%s; Moments=%s>' % (
-                        self.atom.symbol, self.definition,
-                        self.frame, self.moment
-        )
+        return f'<AtomicMultipole [{self.atom.symbol}] {self.definition}; Frame={self.frame}; Moments={self.moment}>'
 
     def __str__(self):
-        return ('AtomicMultipole %r "%s"\n'
-                '     Frame = %s\n'
-                '   Moments = %8.5f\n'
-                '             %8.5f %8.5f %8.5f\n'
-                '             %8.5f\n'
-                '             %8.5f %8.5f\n'
-                '             %8.5f %8.5f %8.5f' % (
-                        self.atom, self.definition, self.frame,
-                        self.moment[0], self.moment[1], self.moment[2],
-                        self.moment[3], self.moment[4], self.moment[5],
-                        self.moment[6], self.moment[7], self.moment[8],
-                        self.moment[9])
-        )
+        return (f'AtomicMultipole {repr(self.atom)} "{self.definition}"\n'
+                f'     Frame = {self.frame}\n'
+                f'   Moments = {self.moment[0]:8.5f}\n'
+                f'             {self.moment[1]:8.5f} {self.moment[2]:8.5f} {self.moment[3]:8.5f}\n'
+                f'             {self.moment[4]:8.5f}\n'
+                f'             {self.moment[5]:8.5f} {self.moment[6]:8.5f}\n'
+                f'             {self.moment[7]:8.5f} {self.moment[8]:8.5f} {self.moment[9]:8.5f}')
 
 class AtomicMultipoleList(_ParamTypeList):
     typeclass = AtomicMultipole
@@ -389,14 +342,12 @@ class DipolePolarizability(object):
         self.group = [int(g) for g in group]
 
     def __repr__(self):
-        return '<DipolePolarizability [%s]; Alpha=%.2f; Group=%s>' % (
-                self.atom.symbol, self.alpha, self.group)
+        return f'<DipolePolarizability [{self.atom.symbol}]; Alpha={self.alpha:.2f}; Group={self.group}>'
 
     def __str__(self):
-        return ('DipolePolarizability %r\n'
-                '    Alpha = %.4f\n'
-                '    Group = %s' % (self.atom, self.alpha, self.group))
-
+        return (f'DipolePolarizability {repr(self.atom)}\n'
+                f'    Alpha = {self.alpha:.4f}\n'
+                f'    Group = {self.group}')
 
 class DipolePolarizabilityList(_ParamTypeList):
     typeclass = DipolePolarizability

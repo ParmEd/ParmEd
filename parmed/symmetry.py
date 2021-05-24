@@ -1,6 +1,6 @@
 import numpy as np
 
-class Symmetry(object):
+class Symmetry:
     """Symmetry operations
 
     Parameters

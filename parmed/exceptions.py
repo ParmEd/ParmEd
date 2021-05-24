@@ -36,11 +36,17 @@ class CharmmError(ParsingError):
 class ResidueError(ParmedError):
     """ For when there are problems defining a residue """
 
+class IncompatiblePatchError(ParmedError):
+    """ For when applying a PatchTemplate to a ResidueTemplate fails """
+
 class ParameterError(ParmedError):
     """ If a parameter is missing from a database """
 
 class GromacsError(ParmedError):
     """ If there is a problem parsing GROMACS topology files """
+
+class DlpolyError(ParmedError):
+    """ If there is a problem parsing DLPOLY topology files """
 
 class FormatNotFound(ParmedError):
     """ If the file format does not have a registered parser with it """
@@ -92,6 +98,9 @@ class CharmmWarning(ParmedWarning):
 
 class GromacsWarning(ParmedWarning):
     " If we are uncertain about something regarding the GROMACS topology file "
+
+class DlpolyWarning(ParmedWarning):
+    " If we are uncertain about something regarding the DLPOLY topology file "
 
 class ParameterWarning(ParmedWarning):
     """ If a type of parameter is missing, but you don't want it to be fatal """

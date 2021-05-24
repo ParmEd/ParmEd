@@ -31,10 +31,9 @@ force fields).
 
 The first step is to instantiate the action with the :class:`AmberParm
 <parmed.amber.AmberParm>` instance as the first argument. The arguments that
-each action requires in the ParmEd interpreter can then be given as separate
-arguments to the constructor or all as a single string in the second argument.
-Keyword arguments can optionally be given as keyword arguments to the action
-constructor.
+each action requires in the ParmEd interpreter must then be given as separate
+arguments to the constructor. Keyword arguments can optionally be given as
+keyword arguments to the action constructor.
 
 Examples of valid syntax for :doc:`addLJType` are shown below::
 
@@ -43,10 +42,7 @@ Examples of valid syntax for :doc:`addLJType` are shown below::
 
     parm = AmberParm('trx.prmtop')
 
-    # All arguments as one string, a la parmed
-    action = addLJType(parm, "@1 radius 1.5 epsilon 0.5")
-
-    # Equivalent; all arguments separate
+    # All arguments separate
     action = addLJType(parm, "@1", "radius", 1.5, "epsilon", 0.5)
 
     # Also equivalent; keyword arguments given as keywords
@@ -65,3 +61,9 @@ the action to a string::
 
     # Equivalent:
     print('%s' % action)
+
+*Note*: A backwards-incompatible change was introduced after version 2.7.3 in
+which including all arguments as a single string in the first argument was
+supported. However, it was impossible to maintain this behavior *and* support
+file name paths with whitespace in them. As a result, this
+backwards-incompatible change was made.

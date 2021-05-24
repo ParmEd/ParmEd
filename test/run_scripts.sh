@@ -5,7 +5,7 @@ if [ -z "`which coverage 2>/dev/null`" ]; then
     has_coverage="no"
     echo "No coverage module found..."
 else
-    run_cmd="coverage run --parallel-mode"
+    run_cmd="coverage run --branch -a"
     has_coverage="yes"
     echo "coverage found and will be used..."
 fi
@@ -21,6 +21,9 @@ evaluate_test() {
     if [ $1 -ne 0 ]; then
         echo "ERROR"
         errors=`python -c "print($errors + 1)"`
+    elif [ $# -eq 1 ]; then
+        # Just checking if the script completed successfully
+        echo "PASSED"
     elif [ $# -eq 2 ]; then
         diff $DIFFARGS files/saved_scripts/$2 files/writes/$2 >> files/writes/DIFFLOG 2>&1
         if [ $? -ne 0 ]; then
@@ -106,7 +109,7 @@ ls nofile
 ls */
 ls subdir/file?
 EOF
-$run_cmd `which parmed` -nr > files/writes/parmed3.out 2>&1 << EOF
+$run_cmd `which parmed` -nr 2>&1 << EOF
 source files/writes/parmed1.in
 EOF
 if [ $? -ne 0 ]; then
@@ -114,7 +117,12 @@ if [ $? -ne 0 ]; then
 else
     echo "PASSED"
 fi
-#evaluate_test $? parmed3.out
+
+printf "Running basic test of CL with parm..."
+$run_cmd `which parmed` files/ash.parm7 2>&1 > /dev/null << EOF
+printFlags
+EOF
+evaluate_test $?
 
 ###### END TESTS ######
 

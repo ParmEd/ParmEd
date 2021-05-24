@@ -1,18 +1,19 @@
 """
 Tools to aid in input/output within the parmed package
 """
-from __future__ import print_function, division, absolute_import
 
 __all__ = ['genopen']
 
-from io import TextIOWrapper, BytesIO
 import os
-from parmed.utils.six import PY2
-from parmed.utils.six.moves.urllib.request import urlopen
-from parmed.utils.six.moves.urllib.error import HTTPError, URLError
-from parmed.constants import DEFAULT_ENCODING
+from io import TextIOWrapper, BytesIO
+from pathlib import Path
+from typing import Union
+from urllib.error import HTTPError, URLError
+from urllib.request import urlopen
 
-def genopen(name, mode='r'):
+from ..constants import DEFAULT_ENCODING
+
+def genopen(name: Union[Path, str], mode: str = 'r'):
     """
     Opens a file, automatically detecting compression schemes by filename
     extension. Note, these files are opened in a way that *always* returns a
@@ -29,7 +30,7 @@ def genopen(name, mode='r'):
 
     Parameters
     ----------
-    name : str
+    name : str or Path
         Name of the file to open or URL to a remote file to access
     mode : str, optional
         Whether to open the file to 'r'ead, 'w'rite, or 'a'ppend. Default is 'r'
@@ -46,12 +47,6 @@ def genopen(name, mode='r'):
     written into a 'new' file with the same name as the original. As such, it is
     noticeably slower and more resource-intensive (particularly for large files)
     than using gzipped files.
-
-    In Python 2, opened URLs are not file-like *enough* for GzipFile or BZ2File
-    to read directly from them, so they must first be loaded entirely into
-    memory. With Python 3, this limitation is not present, so reading remote
-    Gzipped or Bzipped files is significantly cheaper with respect to memory
-    requirements.
     """
     if mode not in ['w', 'r', 'a']:
         raise ValueError('open mode must be "w", "r", or "a"')
@@ -60,28 +55,17 @@ def genopen(name, mode='r'):
     is_url = False
     if name.startswith('file:///'):
         name = name[7:]
-    elif name.startswith('http://') or name.startswith('https://')\
-            or name.startswith('ftp://'):
+    elif name.startswith('http://') or name.startswith('https://') or name.startswith('ftp://'):
         is_url = True
         if mode in ['w', 'a']:
             raise ValueError('Cannot write or append a webpage')
         try:
             open_url = urlopen(name)
-        except (HTTPError, URLError) as e:
-            raise IOError('Could not open %s: %s' % (name, e))
+        except (HTTPError, URLError) as err:
+            raise IOError(f"Could not open {name}") from err
 
     if name.endswith('.bz2'):
         import bz2
-        # BZ2File does not have a way of taking an arbitrary file-like object in
-        # Python 2, so we have to read everything into memory, decompress it,
-        # and then pass it back as a BytesIO object wrapped with TextIOWrapper
-        # if it is a URL in Python 2
-        if PY2 and is_url:
-            fileobj = BytesIO()
-            fileobj.write(bz2.decompress(open_url.read()))
-            open_url.close()
-            fileobj.seek(0)
-            return TextIOWrapper(fileobj)
         # BZ2File cannot open in append mode, so we have to fake it. Read the
         # entire existing contents into memory, open a new file, write the
         # contents back, and return the file that is now open for writing
@@ -93,47 +77,19 @@ def genopen(name, mode='r'):
                 tmp.seek(0)
             f = bz2.BZ2File(name, 'wb')
             f.write(tmp.read())
-            del tmp
-            if PY2:
-                return f
-            else:
-                return TextIOWrapper(f)
-        # Not a URL in Py2, so handle like a regular file
-        if PY2:
-            return bz2.BZ2File(name, mode+'b')
-        else:
-            # If it is a URL, just pass in the urlopen object as a filename
-            if is_url:
-                name = open_url
-            return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
+            return TextIOWrapper(f)
+        # If it is a URL, just pass in the urlopen object as a filename
+        if is_url:
+            name = open_url
+        return TextIOWrapper(bz2.BZ2File(name, mode+'b'))
     elif name.endswith('.gz'):
         import gzip
-        if PY2:
-            if is_url:
-                # addinfourl in Python 2 does not have a "tell" attribute, so we
-                # need to take the same approach for BZ2File above with the
-                # BytesIO object... sigh. Yet another reason to migrate to
-                # Python 3
-                fileobj = BytesIO()
-                fileobj.write(open_url.read())
-                fileobj.seek(0)
-                open_url.close()
-                return gzip.GzipFile(fileobj=fileobj, mode='r')
-            else:
-                return gzip.open(name, mode+'b')
+        if is_url:
+            return TextIOWrapper(gzip.GzipFile(fileobj=open_url, mode='r'))
         else:
-            if is_url:
-                return TextIOWrapper(gzip.GzipFile(fileobj=open_url, mode='r'))
-            else:
-                return TextIOWrapper(gzip.open(name, mode+'b'))
+            return TextIOWrapper(gzip.open(name, mode+'b'))
 
     if is_url:
-        if PY2:
-            return open_url
-        else:
-            return TextIOWrapper(open_url)
+        return TextIOWrapper(open_url)
     else:
-        if PY2:
-            return open(name, mode)
-        else:
-            return open(name, mode, encoding=DEFAULT_ENCODING)
+        return open(name, mode, encoding=DEFAULT_ENCODING)

@@ -4,14 +4,12 @@ List of all pointers and constants used in the Amber topology file.
 Can be used like:
    from parmed.constants import *
 """
-from __future__ import division
+from enum import IntEnum
+
 from math import pi as _pi, sqrt as _sqrt, log10 as _log10, acos as _acos
 
-__all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'NATOM', 'NTYPES', 'NBONH', 'MBONA', 'NTHETH',
-           'MTHETA', 'NPHIH', 'MPHIA', 'NHPARM', 'NPARM', 'NEXT', 'NRES', 'NBONA', 'NTHETA',
-           'NPHIA', 'NUMBND', 'NUMANG', 'NPTRA', 'NATYP', 'NPHB', 'IFPERT', 'NBPER', 'NGPER',
-           'NDPER', 'MBPER', 'MGPER', 'MDPER', 'IFBOX', 'NMXRS', 'IFCAP', 'NUMEXTRA', 'NCOPY',
-           'NNB', 'RAD_TO_DEG', 'DEG_TO_RAD', 'TRUNCATED_OCTAHEDRON_ANGLE']
+__all__ = ['AMBER_ELECTROSTATIC', 'AMBER_POINTERS', 'PrmtopPointers',
+           'RAD_TO_DEG', 'DEG_TO_RAD', 'TRUNCATED_OCTAHEDRON_ANGLE']
 
 AMBER_ELECTROSTATIC = 18.2223
 CHARMM_ELECTROSTATIC = _sqrt(332.0716)
@@ -53,16 +51,40 @@ NCOPY  : Number of copies for advanded simulations
 # These global variables provide a more natural way of accessing
 # the various pointers.  Most useful if they're loaded into the
 # top-level namespace.
-NATOM  = 0; NTYPES = 1; NBONH  = 2; MBONA  = 3; NTHETH = 4
-MTHETA = 5; NPHIH  = 6; MPHIA  = 7; NHPARM = 8; NPARM  = 9
-NEXT   = 10; NRES   = 11; NBONA  = 12; NTHETA = 13; NPHIA  = 14
-NUMBND = 15; NUMANG = 16; NPTRA  = 17; NATYP  = 18; NPHB   = 19
-IFPERT = 20; NBPER  = 21; NGPER  = 22; NDPER  = 23; MBPER  = 24
-MGPER  = 25; MDPER  = 26; IFBOX  = 27; NMXRS  = 28; IFCAP  = 29
-NUMEXTRA= 30; NCOPY  = 31
-
-# An alias
-NNB = NEXT
+class PrmtopPointers(IntEnum):
+    NATOM = 0
+    NTYPES = 1
+    NBONH = 2
+    MBONA = 3
+    NTHETH = 4
+    MTHETA = 5
+    NPHIH = 6
+    MPHIA = 7
+    NHPARM = 8
+    NPARM = 9
+    NEXT = 10
+    NRES = 11
+    NBONA = 12
+    NTHETA = 13
+    NPHIA = 14
+    NUMBND = 15
+    NUMANG = 16
+    NPTRA = 17
+    NATYP = 18
+    NPHB = 19
+    IFPERT = 20
+    NBPER = 21
+    NGPER = 22
+    NDPER = 23
+    MBPER = 24
+    MGPER = 25
+    MDPER = 26
+    IFBOX = 27
+    NMXRS = 28
+    IFCAP = 29
+    NUMEXTRA = 30
+    NCOPY = 31
+    NNB = NEXT
 
 RAD_TO_DEG = 180.0 / _pi
 DEG_TO_RAD = _pi / 180.0

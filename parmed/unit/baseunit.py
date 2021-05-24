@@ -2,7 +2,7 @@
 
 
 """
-Module simtk.unit.baseunit
+Module openmm.unit.baseunit
 
 Contains BaseUnit class, which is a component of the Unit class.
 

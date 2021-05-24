@@ -3,7 +3,7 @@
 __author__ = 'Jason Swails'
 __all__ = [] # This is populated with the ParmEd Actions below
 
-from parmed.tools.actions import *
-from parmed.tools.parmlist import ParmList
+from .actions import *
+from .parmlist import ParmList
 
 __all__ += ['ParmList']

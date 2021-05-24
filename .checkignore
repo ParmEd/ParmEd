@@ -1,5 +1,4 @@
 GmxTests/
-parmed/utils/six.py
 parmed/utils/fortranformat
 parmed/unit
 test/

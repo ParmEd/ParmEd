@@ -1,13 +1,8 @@
-"""
-This package contains classes responsible for loading rdkit objects
-"""
+""" This package contains classes responsible for loading rdkit objects """
+from io import StringIO
+from ..formats import PDBFile
 
-from __future__ import print_function, absolute_import
-from parmed.formats import PDBFile
-from parmed.utils.six.moves import StringIO
-
-
-class RDKit(object):
+class RDKit:
 
     @staticmethod
     def load(rmol):
@@ -32,7 +27,7 @@ class RDKit(object):
         return PDBFile.parse(fh)
 
     @staticmethod
-    def from_smiles(smiles, coordinates=True):
+    def from_smiles(smiles, coordinates=True, hydrogens=True):
         """
         Load smiles string to :class:`Structure`
 
@@ -41,6 +36,8 @@ class RDKit(object):
         smiles : str, smiles
         coordinates : bool, default True
             if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
+        hydrogens : bool, default True
+            if True, use `rdkit.Chem.AddHs` to generate explicit hydrogens
 
         Returns
         -------
@@ -50,9 +47,11 @@ class RDKit(object):
         from rdkit.Chem import AllChem
         mol = Chem.MolFromSmiles(smiles)
 
+        if hydrogens:
+            mol = Chem.AddHs(mol)
+
         if coordinates:
-            AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True,
-                    useBasicKnowledge=True)
+            AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True, useBasicKnowledge=True)
 
         parm = RDKit.load(mol)
         if not coordinates:

@@ -1,8 +1,11 @@
 """
 This stores a list of arguments, tokenizing a string into a list of arguments.
 """
+import logging
 import warnings
-from parmed.tools.exceptions import NoArgument, InputError
+from .exceptions import NoArgument, InputError
+
+LOGGER = logging.getLogger(__name__)
 
 class Argument(object):
     """ Is an argument """
@@ -12,9 +15,10 @@ class Argument(object):
         self.marked = False
         self.keep_quotes = False
         if len(string) == 0 or (len(string) == 1 and string in ("'", '"')):
-            warnings.warn("Unclosed quotation detected! Ignoring lone quote")
+            LOGGER.warning("Unclosed quotation detected! Ignoring lone quote")
 
     def lower(self):
+        """ Make the argument lower-case """
         return self.string.lower()
 
     def isfloat(self):
@@ -56,9 +60,9 @@ class Argument(object):
             return self.string
 
         # Strip leading and trailing quotes (only if they both exist)
-        if self.string[0] == "'" and self.string[len(self.string)-1] == "'":
-            return self.string[1:len(self.string)-1]
-        elif self.string[0] == '"' and self.string[len(self.string)-1] == '"':
+        if self.string[0] == "'" and self.string[-1] == "'":
+            return self.string[1:-1]
+        elif self.string[0] == '"' and self.string[-1] == '"':
             return self.string[1:len(self.string)-1]
 
         return self.string
@@ -105,7 +109,7 @@ class ArgumentList(object):
             self.original = ' '.join([str(a) for a in inp.tokenlist])
         else:
             # Treat as a string-like and pad with spaces
-            self.original = ' %s ' % inp
+            self.original = f' {inp} '
             self.tokenize(self.original)
 
     def tokenize(self, instring):
@@ -114,12 +118,12 @@ class ArgumentList(object):
         including whitespace
         """
         import re
-        tokenre = re.compile(r'''((?:\s+".*"\s+)|(?:\s+'.*'\s+)|(?:\S+))''')
+        tokenre = re.compile(r'''((?:\s+".*?"\s+?)|(?:\s+'.*?'\s+?)|(?:\S+))''')
         tokenlist = tokenre.findall(instring)
         # Make sure every non-whitespace character is consumed
         if len(tokenre.sub('', instring).strip()) > 0:
-            warnings.warn("Not all of argument string were handled: [%s]" % 
-                          tokenre.sub('', instring).strip())
+            unhandled_args = tokenre.sub('', instring).strip()
+            warnings.warn(f"Not all of argument string were handled: [{unhandled_args}]")
         # Strip out whitespace in all arguments
         self.tokenlist = [Argument(token.strip()) for token in tokenlist]
 
@@ -177,15 +181,12 @@ class ArgumentList(object):
             # arbitrary-length list of arguments
             if token.marked: continue
             if token == key:
-                if self.tokenlist[i+1].marked:
-                    raise RuntimeError("Expected token already marked! Should "
-                                       "not happen. This means a buggy "
-                                       "action...")
+                assert not self.tokenlist[i + 1].marked, "Marked token should not happen. BUG!"
                 token.marked = True
                 try:
                     return argtype(self.tokenlist[i+1])
                 except ValueError as err:
-                    raise InputError(str(err))
+                    raise InputError(str(err)) from err
 
         raise NoArgument('Catch me!')
 
@@ -208,9 +209,9 @@ class ArgumentList(object):
         for i, token in enumerate(self.tokenlist):
             if token == key:
                 if not self.tokenlist[i+1].ismask():
-                    raise InputError("Expected mask to follow %s. Got %s "
-                                     "instead" %
-                                     (key, self.tokenlist[i+1].string))
+                    raise InputError(
+                        f"Expected mask to follow {key}. Got {self.tokenlist[i+1].string} instead"
+                    )
         try:
             return self._get_key_arg(key, str)
         except NoArgument:

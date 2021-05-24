@@ -3,11 +3,9 @@ Provides a class for reading GROMACS-style files. The key component to these
 files is that the ; character is a comment character and everything after ; is
 ignored.
 """
-from __future__ import division, print_function, absolute_import
+from ._cpp import CPreProcessor
 
-from parmed.gromacs._cpp import CPreProcessor
-
-class GromacsFile(object):
+class GromacsFile:
     """
     A GROMACS file that recognizes the ";" character as a 'comment' token. It
     can be iterated over and generally treated like a file object, but only
@@ -85,7 +83,7 @@ class GromacsFile(object):
                 if line.rstrip('\r\n').endswith('\\'):
                     chars = list(reversed(line.rstrip('\r\n')))
                     del chars[chars.index('\\')]
-                    parts.append('%s ' % ''.join(reversed(chars)))
+                    parts.append(f"{''.join(reversed(chars))} ")
                 elif parts:
                     parts.append(line)
                     return ''.join(parts)

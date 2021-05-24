@@ -4,11 +4,8 @@ This module contains the following classes:
    TinkerAnalout - Reads the output from the "analyze" command
 
 """
-from __future__ import print_function, absolute_import, division
-
-from parmed.utils.six.moves import range
-from parmed.exceptions import TinkerError
-from parmed.tinker.topologyobjects import (AtomList, BondList, AngleList,
+from ..exceptions import TinkerError
+from .topologyobjects import (AtomList, BondList, AngleList,
       StretchBendList, UreyBradleyList, OutOfPlaneBendList, OutOfPlaneDistList,
       TorsionAngleList, PiTorsionList, TorsionTorsionList, AtomicMultipoleList,
       DipolePolarizabilityList, TorsionTorsionGrid)
@@ -59,8 +56,7 @@ class TinkerAnalout(object):
             # Look for the TINKER watermark
             while True:
                 if not line:
-                    raise TinkerError('Could not find the TINKER watermark '
-                                      'in %s' % fname)
+                    raise TinkerError(f'Could not find the TINKER watermark in {fname}')
                 if line.lstrip().startswith('###            TINKER'):
                     break
                 line = f.readline()
@@ -78,12 +74,11 @@ class TinkerAnalout(object):
                 try:
                     key = TinkerAnalout.atom_inter_flags[line[:27].strip()]
                 except KeyError:
-                    raise TinkerError('Unrecognized pointer keyword %s' % key)
+                    raise TinkerError(f'Unrecognized pointer keyword {key}')
                 try:
                     self.pointers[key] = int(line[27:].strip())
                 except ValueError:
-                    raise TinkerError('Could not convert pointer %s to int '
-                                      '[%s]' % (key, line.rstrip()))
+                    raise TinkerError(f'Could not convert pointer {key} to int [{line.rstrip()}]')
                 except KeyError:
                     raise Exception('Should not be here -- internal error')
                 line = f.readline()
@@ -96,8 +91,7 @@ class TinkerAnalout(object):
             # Get the atoms in the next section
             while line.strip() != 'Atom Type Definition Parameters :':
                 if not line:
-                    raise TinkerError('Unexpected EOF when looking for atom '
-                                      'definitions')
+                    raise TinkerError('Unexpected EOF when looking for atom definitions')
                 line = f.readline()
             TinkerAnalout._read_atom_definitions(self, f)
             # Get all of the sections defined in _functionmap -- see bottom of
@@ -110,8 +104,6 @@ class TinkerAnalout(object):
                     break
         finally:
             f.close()
-
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     # These are functions that take an open file and load a section of the file
     # into the data structures
@@ -130,18 +122,15 @@ class TinkerAnalout(object):
                     line[34:44], line[44:49], line[54:].strip()
                 )
             except ValueError:
-                raise TinkerError('Error parsing atomic properties\n\t'
-                                  '[%s]' % line.rstrip())
+                raise TinkerError(f'Error parsing atomic properties\n\t[{line.rstrip()}]')
             line = f.readline()
             if atnum != i + 1:
-                raise TinkerError('Atom number mismatch [%d vs %d]' %
-                                  (i + 1, atnum))
+                raise TinkerError(f'Atom number mismatch [{i + 1} vs {atnum}]')
 
     def _read_vdw(self, f):
         """ Reads the van der Waals parameters """
         if not hasattr(self, 'atom_list'):
-            raise AttributeError('Atom definitions must be loaded '
-                                 'prior to vdW!')
+            raise AttributeError('Atom definitions must be loaded prior to vdW!')
         # Eat the next 3 lines
         f.readline(); f.readline(); f.readline()
         line = f.readline()
@@ -150,15 +139,13 @@ class TinkerAnalout(object):
                 int(line[0:6])
                 atnum = int(line[9:15])
                 self.atom_list[i].add_vdw(
-                    line[22:32], line[32:42], line[43:53],
-                    line[53:63], line[64:74],
+                    line[22:32], line[32:42], line[43:53], line[53:63], line[64:74],
                 )
             except ValueError:
                 raise TinkerError('Error parsing van der Waals term')
             line = f.readline()
             if atnum != i + 1:
-                raise TinkerError('Atom number mismatch in vdW [%d vs %d]' %
-                                  (i + 1, atnum))
+                raise TinkerError(f'Atom number mismatch in vdW [{i + 1} vs {atnum}]')
 
     def _read_bonds(self, f):
         """ Reads the bond stretching terms """
@@ -171,8 +158,7 @@ class TinkerAnalout(object):
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
-                self.bond_list.add(self.atom_list[at1], self.atom_list[at2],
-                    line[40:50], line[50:60])
+                self.bond_list.add(self.atom_list[at1], self.atom_list[at2], line[40:50], line[50:60])
             except ValueError:
                 raise TinkerError('Error parsing bonded term')
             line = f.readline()
@@ -189,11 +175,12 @@ class TinkerAnalout(object):
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
-                self.angle_list.add(self.atom_list[at1], self.atom_list[at2],
-                    self.atom_list[at3], line[40:50], line[50:60], line[60:67],
-                    line[69:])
-            except ValueError:
-                raise TinkerError('Error parsing angle term')
+                self.angle_list.add(
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    line[40:50], line[50:60], line[60:67], line[69:]
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing angle term') from err
             line = f.readline()
 
     def _read_strbnd(self, f):
@@ -209,9 +196,8 @@ class TinkerAnalout(object):
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
                 self.stretchbend_list.add(
-                        self.atom_list[at1], self.atom_list[at2],
-                        self.atom_list[at3], line[27:40], line[40:50],
-                        line[50:60], line[60:70]
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    line[27:40], line[40:50], line[50:60], line[60:70]
                 )
             except ValueError:
                 raise TinkerError('Error parsing stretch-bend term')
@@ -236,10 +222,11 @@ class TinkerAnalout(object):
                     at3 = int(line[21:27]) - 1
                 except ValueError:
                     at3 = at2
-                self.ureybrad_list.add(self.atom_list[at1], self.atom_list[at3],
-                        line[34:50], line[50:60])
-            except ValueError:
-                raise TinkerError('Error parsing Urey-Bradley term')
+                self.ureybrad_list.add(
+                    self.atom_list[at1], self.atom_list[at3], line[34:50], line[50:60]
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing Urey-Bradley term') from err
             line = f.readline()
 
     def _read_opbend(self, f):
@@ -255,11 +242,12 @@ class TinkerAnalout(object):
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
                 at4 = int(line[27:33]) - 1
-                self.oopbend_list.add(self.atom_list[at1], self.atom_list[at2],
-                                      self.atom_list[at3], self.atom_list[at4],
-                                      line[42:52])
-            except ValueError:
-                raise TinkerError('Error parsing out-of-plane bending term')
+                self.oopbend_list.add(
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    self.atom_list[at4], line[42:52]
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing out-of-plane bending term') from err
             line = f.readline()
 
     def _read_opdist(self, f):
@@ -275,11 +263,12 @@ class TinkerAnalout(object):
                 at2 = int(line[15:21]) - 1
                 at3 = int(line[21:27]) - 1
                 at4 = int(line[27:33]) - 1
-                self.oopdist_list.add(self.atom_list[at1], self.atom_list[at2],
-                                      self.atom_list[at3], self.atom_list[at4],
-                                      line[42:52])
-            except ValueError:
-                raise TinkerError('Error parsing out-of-plane distance term')
+                self.oopdist_list.add(
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    self.atom_list[at4], line[42:52]
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing out-of-plane distance term') from err
             line = f.readline()
 
     def _read_torang(self, f):
@@ -298,11 +287,12 @@ class TinkerAnalout(object):
                 # Get the rest of the terms (replace / with ' ' so we can do a
                 # simple string split on whitespace)
                 terms = line[33:].replace('/', ' ').split()
-                self.torangle_list.add(self.atom_list[at1], self.atom_list[at2],
-                                       self.atom_list[at3], self.atom_list[at4],
-                                       terms)
-            except ValueError:
-                raise TinkerError('Error parsing torsion angle term')
+                self.torangle_list.add(
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    self.atom_list[at4], terms
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing torsion angle term') from err
             line = f.readline()
 
     def _read_pitors(self, f):
@@ -316,10 +306,9 @@ class TinkerAnalout(object):
                 int(line[0:6])
                 at1 = int(line[9:15]) - 1
                 at2 = int(line[15:21]) - 1
-                self.pitors_list.add(self.atom_list[at1], self.atom_list[at2],
-                                     line[40:50])
-            except ValueError:
-                raise TinkerError('Error parsing pi-torsion term')
+                self.pitors_list.add(self.atom_list[at1], self.atom_list[at2], line[40:50])
+            except ValueError as err:
+                raise TinkerError('Error parsing pi-torsion term') from err
             line = f.readline()
 
     def _read_tortors(self, f):
@@ -338,11 +327,12 @@ class TinkerAnalout(object):
                 at5 = int(line[33:39]) - 1
                 dim1 = int(line[49:55])
                 dim2 = int(line[55:61])
-                self.tortor_list.add(self.atom_list[at1], self.atom_list[at2],
-                                     self.atom_list[at3], self.atom_list[at4],
-                                     self.atom_list[at5], dim1, dim2)
-            except ValueError:
-                raise TinkerError('Error parsing torsion-torsion term')
+                self.tortor_list.add(
+                    self.atom_list[at1], self.atom_list[at2], self.atom_list[at3],
+                    self.atom_list[at4], self.atom_list[at5], dim1, dim2
+                )
+            except ValueError as err:
+                raise TinkerError('Error parsing torsion-torsion term') from err
             line = f.readline()
             # The CMAP section was adjusted to print out the entire torsion
             # grid under each tor-tor definition. If this line has 3 words, we
@@ -377,10 +367,9 @@ class TinkerAnalout(object):
                 moments.extend([line[50:59], line[59:68]])
                 line = f.readline()
                 moments.extend([line[50:59], line[59:68], line[68:77]])
-                self.multipole_list.add(self.atom_list[at], frame,
-                                        typestr, moments)
-            except ValueError:
-                raise TinkerError('Error parsing multipole term')
+                self.multipole_list.add(self.atom_list[at], frame, typestr, moments)
+            except ValueError as err:
+                raise TinkerError('Error parsing multipole term') from err
             line = f.readline()
 
     def _read_dipoles(self, f):
@@ -393,10 +382,9 @@ class TinkerAnalout(object):
             try:
                 int(line[0:6])
                 at = int(line[9:15]) - 1
-                self.dipole_list.add(self.atom_list[at], line[25:35],
-                    line[40:].split())
-            except ValueError:
-                raise TinkerError('Error parsing dipole polarizabilities')
+                self.dipole_list.add(self.atom_list[at], line[25:35], line[40:].split())
+            except ValueError as err:
+                raise TinkerError('Error parsing dipole polarizabilities') from err
             line = f.readline()
 
     def _read_interactions(self, f):
@@ -408,8 +396,7 @@ class TinkerAnalout(object):
             try:
                 key = TinkerAnalout.atom_inter_flags[line[1:20]]
             except KeyError:
-                raise TinkerError('Unrecognized token in interaction count '
-                                  '[%s]' % line[1:20].strip())
+                raise TinkerError(f'Unrecognized token in interaction count: [{line[1:20]}]')
             self.pointers[key] = int(line[21:])
             line = f.readline()
 
@@ -459,7 +446,7 @@ class TinkerAnalout(object):
         return self.fname
 
     def __repr__(self):
-        return '<TinkerAnalout; %d atoms>' % self.pointers['natom']
+        return f"<TinkerAnalout; {self.pointers['natom']} atoms>"
 
 
 # Add the functionmap onto TinkerAnalout after the class has been built. Only
@@ -486,6 +473,5 @@ TinkerAnalout._functionmap = {
     'List of 1-3 Connected Atomic Interactions :' : TinkerAnalout._read_13pairs,
     'List of 1-4 Connected Atomic Interactions :' : TinkerAnalout._read_14pairs,
     'List of 1-5 Connected Atomic Interactions :' : TinkerAnalout._read_15pairs,
-    'Total Number of Pairwise Atomic Interactions :' :
-            TinkerAnalout._read_interactions,
+    'Total Number of Pairwise Atomic Interactions :' : TinkerAnalout._read_interactions,
 }

@@ -2,45 +2,25 @@
 This module contains a chamber prmtop class that will read in all
 parameters and allow users to manipulate that data and write a new
 prmtop object.
-
-Copyright (C) 2010 - 2015  Jason Swails
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330,
-Boston, MA 02111-1307, USA.
 """
-from __future__ import division, print_function
-
-from parmed.amber._amberparm import AmberParm
-from parmed.constants import (NTYPES, NATYP, IFBOX, TINY, NATOM, SMALL,
-                              DEG_TO_RAD, RAD_TO_DEG)
-from parmed.exceptions import AmberError, AmberWarning
-from parmed.topologyobjects import (UreyBradley, Improper, Cmap, BondType,
-                                    ImproperType, CmapType, ExtraPoint)
-from parmed.utils.six.moves import zip, range
 import copy as _copy
-from math import sqrt, pi
 import warnings
+from math import pi, sqrt
+
+from ..constants import DEG_TO_RAD, PrmtopPointers, RAD_TO_DEG, SMALL, TINY
+from ..exceptions import AmberError, AmberWarning
+from ..topologyobjects import BondType, ExtraPoint, Improper, ImproperType, UreyBradley
+from ._amberparm import AmberParm
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class ChamberParm(AmberParm):
-    """
-    Chamber Topology (parm7 format) class. Gives low, and some high, level
-    access to topology data or interact with some of the high-level classes
-    comprising the system topology and parameters.  The ChamberParm class uses
-    the same attributes that the AmberParm class uses, and only the ones unique
+    """Chamber Topology (parm7 format) class.
+
+    Gives low, and some high, level access to topology data or
+    interact with some of the high-level classes comprising the system
+    topology and parameters.  The ChamberParm class uses the same
+    attributes that the AmberParm class uses, and only the ones unique
     to ChamberParm will be shown below.
 
     Parameters
@@ -87,9 +67,11 @@ class ChamberParm(AmberParm):
 
     See Also
     --------
-    See :class:`AmberParm` for list of other attributes present in ChamberParm
-    instances
+    :class:`AmberParm`
+
     """
+
+    _cmap_prefix = "CHARMM_"
 
     #===================================================
 
@@ -128,10 +110,6 @@ class ChamberParm(AmberParm):
         self.pointers['NUBTYPES'] = nubtypes
         self.pointers['NIMPHI'] = self.parm_data['CHARMM_NUM_IMPROPERS'][0]
         self.pointers['NIMPRTYPES'] = self.parm_data['CHARMM_NUM_IMPR_TYPES'][0]
-        # If CMAP is not present, don't load the pointers
-        if self.has_cmap:
-            self.pointers['CMAP'] = self.parm_data['CHARMM_CMAP_COUNT'][0]
-            self.pointers['CMAP_TYPES'] = self.parm_data['CHARMM_CMAP_COUNT'][1]
 
     #===================================================
 
@@ -144,7 +122,6 @@ class ChamberParm(AmberParm):
         super(ChamberParm, self).load_structure()
         self._load_urey_brad_info()
         self._load_improper_info()
-        self._load_cmap_info()
         # All of our angles are urey-bradley types
         for angle in self.angles: angle.funct = 5
         super(ChamberParm, self).unchange()
@@ -211,19 +188,18 @@ class ChamberParm(AmberParm):
             inst.LJ_14_depth[atom.nb_idx-1] = atom.epsilon_14
         inst._add_standard_flags()
         inst.pointers['NATOM'] = len(inst.atoms)
-        inst.parm_data['POINTERS'][NATOM] = len(inst.atoms)
+        inst.parm_data['POINTERS'][PrmtopPointers.NATOM] = len(inst.atoms)
         inst.box = _copy.copy(struct.box)
         if struct.box is None:
-            inst.parm_data['POINTERS'][IFBOX] = 0
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 0
             inst.pointers['IFBOX'] = 0
         elif (abs(struct.box[3] - 90) > TINY or abs(struct.box[4] - 90) > TINY
                 or abs(struct.box[5] - 90) > TINY):
-            inst.parm_data['POINTERS'][IFBOX] = 2
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 2
             inst.pointers['IFBOX'] = 2
-            inst.parm_data['BOX_DIMENSIONS'] = ([struct.box[3]] +
-                                               list(struct.box[:3]))
+            inst.parm_data['BOX_DIMENSIONS'] = [struct.box[3]] + list(struct.box[:3])
         else:
-            inst.parm_data['POINTERS'][IFBOX] = 1
+            inst.parm_data['POINTERS'][PrmtopPointers.IFBOX] = 1
             inst.pointers['IFBOX'] = 1
             inst.parm_data['BOX_DIMENSIONS'] = [90] + list(struct.box[:3])
         # pmemd likes to skip torsions with periodicities of 0, which may be
@@ -234,12 +210,10 @@ class ChamberParm(AmberParm):
             if dt.phi_k == 0 and dt.per == 0:
                 dt.per = 1.0
             elif dt.per == 0:
-                warnings.warn('Periodicity of 0 detected with non-zero force '
-                              'constant. Changing periodicity to 1 and force '
-                              'constant to 0 to ensure 1-4 nonbonded pairs are '
-                              'properly identified. This might cause a shift '
-                              'in the energy, but will leave forces unaffected',
-                              AmberWarning)
+                warnings.warn('Periodicity of 0 detected with non-zero force constant. Changing '
+                              'periodicity to 1 and force constant to 0 to ensure 1-4 nonbonded '
+                              'pairs are properly identified. This might cause a shift in the '
+                              'energy, but will leave forces unaffected', AmberWarning)
                 dt.phi_k = 0.0
                 dt.per = 1.0
         inst.remake_parm()
@@ -334,10 +308,6 @@ class ChamberParm(AmberParm):
     def amoeba(self):
         return False
 
-    @property
-    def has_cmap(self):
-        return len(self.cmaps) > 0 or 'CHARMM_CMAP_COUNT' in self.parm_data
-
     #===========  PRIVATE INSTANCE METHODS  ============
 
     def _load_urey_brad_info(self):
@@ -388,27 +358,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _load_cmap_info(self):
-        """ Loads the CHARMM CMAP types and array """
-        if not self.has_cmap: return
-        del self.cmaps[:]
-        del self.cmap_types[:]
-        for i in range(self.pointers['CMAP_TYPES']):
-            resolution = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-            grid = self.parm_data['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            cmts = self.parm_comments['CHARMM_CMAP_PARAMETER_%02d' % (i+1)]
-            self.cmap_types.append(
-                    CmapType(resolution, grid, cmts, list=self.cmap_types)
-            )
-        it = iter(self.parm_data['CHARMM_CMAP_INDEX'])
-        for i, j, k, l, m, n in zip(it, it, it, it, it, it):
-            self.cmaps.append(
-                    Cmap(self.atoms[i-1], self.atoms[j-1], self.atoms[k-1],
-                         self.atoms[l-1], self.atoms[m-1], self.cmap_types[n-1])
-            )
-
-    #===================================================
-
     def _check_section_lengths(self):
         """ Make sure each section has the necessary number of entries """
         super(ChamberParm, self)._check_section_lengths()
@@ -435,12 +384,6 @@ class ChamberParm(AmberParm):
         ntypes = self.pointers['NTYPES']
         check_length('LENNARD_JONES_14_ACOEF', ntypes*(ntypes+1)//2)
         check_length('LENNARD_JONES_14_BCOEF', ntypes*(ntypes+1)//2)
-        if self.has_cmap:
-            check_length('CHARMM_CMAP_COUNT', 2)
-            check_length('CHARMM_CMAP_RESOLUTION', self.pointers['CMAP_TYPES'])
-            for i in range(self.pointers['CMAP_TYPES']):
-                res = self.parm_data['CHARMM_CMAP_RESOLUTION'][i]
-                check_length('CHARMM_CMAP_PARAMETER_%02d' % (i+1), res*res)
 
     #===================================================
 
@@ -494,66 +437,6 @@ class ChamberParm(AmberParm):
 
     #===================================================
 
-    def _xfer_cmap_properties(self):
-        """ Sets the topology file section data from the cmap arrays """
-        if not self.has_cmap: return
-        data = self.parm_data
-        for ct in self.cmap_types:
-            ct.used = False
-        for cmap in self.cmaps:
-            cmap.type.used = True
-        self.cmap_types.prune_unused()
-        # If we have no cmaps, delete all remnants of the CMAP terms in the
-        # prmtop and bail out
-        if len(self.cmaps) == 0:
-            # We have deleted all cmaps. Get rid of them from the parm file and
-            # bail out. This is probably pretty unlikely, though...
-            self.delete_flag('CHARMM_CMAP_COUNT')
-            self.delete_flag('CHARMM_CMAP_RESOLUTION')
-            for flag in self.flag_list:
-                if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                    self.delete_flag(flag)
-            del self.pointers['CMAP']
-            del self.pointers['CMAP_TYPES']
-            return
-        # All of our CMAP types are in different topology file sections. We need
-        # to delete all of the CHARMM_CMAP_PARAMETER_XX sections and then
-        # recreate them with the correct size and comments.  The comments have
-        # been stored in the CMAP types themselves to prevent them from being
-        # lost. We will also assume that the Fortran format we're going to use
-        # is the same for all CMAP types, so just pull it from
-        # CHARMM_CMAP_PARAMETER_01 (or fall back to 8(F9.5))
-        try:
-            fmt = str(self.formats['CHARMM_CMAP_PARAMETER_01'])
-        except KeyError:
-            fmt = '8(F9.5)'
-        flags_to_delete = []
-        for flag in self.flag_list:
-            if flag.startswith('CHARMM_CMAP_PARAMETER'):
-                flags_to_delete.append(flag)
-        for flag in flags_to_delete:
-            self.delete_flag(flag)
-        # Now add them back
-        after = 'CHARMM_CMAP_RESOLUTION'
-        for i, ct in enumerate(self.cmap_types):
-            newflag = 'CHARMM_CMAP_PARAMETER_%02d' % (i+1)
-            self.add_flag(newflag, fmt, data=ct.grid, comments=ct.comments,
-                          after=after)
-            after = newflag
-        # Now do the CMAP_INDEX section
-        data['CHARMM_CMAP_INDEX'] = cmap_array = []
-        for cm in self.cmaps:
-            cmap_array.extend([cm.atom1.idx+1, cm.atom2.idx+1,
-                               cm.atom3.idx+1, cm.atom4.idx+1,
-                               cm.atom5.idx+1, cm.type.idx+1])
-        data['CHARMM_CMAP_COUNT'] = [len(self.cmaps), len(self.cmap_types)]
-        data['CHARMM_CMAP_RESOLUTION'] = \
-                    [ct.resolution for ct in self.cmap_types]
-        self.pointers['CMAP'] = len(self.cmaps)
-        self.pointers['CMAP_TYPES'] = len(self.cmap_types)
-
-    #===================================================
-
     def _add_standard_flags(self):
         """ Adds all of the standard flags to the parm_data array """
         self.set_version()
@@ -562,8 +445,7 @@ class ChamberParm(AmberParm):
         self.add_flag('FORCE_FIELD_TYPE', 'i2,a78', num_items=0)
         self.add_flag('ATOM_NAME', '20a4', num_items=0)
         self.add_flag('CHARGE', '3E24.16', num_items=0,
-                comments=['Atomic charge multiplied by sqrt(332.0716D0) '
-                         '(CCELEC)'])
+                      comments=['Atomic charge multiplied by sqrt(332.0716D0) (CCELEC)'])
         self.add_flag('ATOMIC_NUMBER', '10I8', num_items=0)
         self.add_flag('MASS', '5E16.8', num_items=0)
         self.add_flag('ATOM_TYPE_INDEX', '10I8', num_items=0)
@@ -576,38 +458,38 @@ class ChamberParm(AmberParm):
         self.add_flag('ANGLE_FORCE_CONSTANT', '5E16.8', num_items=0)
         self.add_flag('ANGLE_EQUIL_VALUE', '3E25.17', num_items=0)
         self.add_flag('CHARMM_UREY_BRADLEY_COUNT', '2I8', num_items=2,
-                comments=['V(ub) = K_ub(r_ik - R_ub)**2',
-                          'Number of Urey Bradley terms and types'])
+                      comments=['V(ub) = K_ub(r_ik - R_ub)**2',
+                                'Number of Urey Bradley terms and types'])
         self.add_flag('CHARMM_UREY_BRADLEY', '10I8', num_items=0,
-                comments=['List of the two atoms and its parameter index',
-                          'in each UB term: i,k,index'])
-        self.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8',
-                num_items=0, comments=['K_ub: kcal/mol/A**2'])
+                      comments=['List of the two atoms and its parameter index',
+                                'in each UB term: i,k,index'])
+        self.add_flag('CHARMM_UREY_BRADLEY_FORCE_CONSTANT', '5E16.8', num_items=0,
+                      comments=['K_ub: kcal/mol/A**2'])
         self.add_flag('CHARMM_UREY_BRADLEY_EQUIL_VALUE', '5E16.8', num_items=0,
-                comments=['r_ub: A'])
+                      comments=['r_ub: A'])
         self.add_flag('DIHEDRAL_FORCE_CONSTANT', '5E16.8', num_items=0)
         self.add_flag('DIHEDRAL_PERIODICITY', '5E16.8', num_items=0)
         self.add_flag('DIHEDRAL_PHASE', '5E16.8', num_items=0)
         self.add_flag('SCEE_SCALE_FACTOR', '5E16.8', num_items=0)
         self.add_flag('SCNB_SCALE_FACTOR', '5E16.8', num_items=0)
         self.add_flag('CHARMM_NUM_IMPROPERS', '10I8', num_items=0,
-                comments=['Number of terms contributing to the',
-                          'quadratic four atom improper energy term:',
-                          'V(improper) = K_psi(psi - psi_0)**2'])
+                      comments=['Number of terms contributing to the',
+                                'quadratic four atom improper energy term:',
+                                'V(improper) = K_psi(psi - psi_0)**2'])
         self.add_flag('CHARMM_IMPROPERS', '10I8', num_items=0,
-                comments=['List of the four atoms in each improper term',
-                          'i,j,k,l,index  i,j,k,l,index',
-                          'where index is into the following two lists:',
-                          'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}'])
+                      comments=['List of the four atoms in each improper term',
+                                'i,j,k,l,index  i,j,k,l,index',
+                                'where index is into the following two lists:',
+                                'CHARMM_IMPROPER_{FORCE_CONSTANT,IMPROPER_PHASE}'])
         self.add_flag('CHARMM_NUM_IMPR_TYPES', '1I8', num_items=1,
-                comments=['Number of unique parameters contributing to the',
-                          'quadratic four atom improper energy term'])
+                      comments=['Number of unique parameters contributing to the',
+                                'quadratic four atom improper energy term'])
         self.add_flag('CHARMM_IMPROPER_FORCE_CONSTANT', '5E16.8', num_items=0,
-                comments=['K_psi: kcal/mole/rad**2'])
-        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0,
-                comments=['psi: radians'])
-        natyp = self.pointers['NATYP'] = self.parm_data['POINTERS'][NATYP] = 1
-        self.add_flag('SOLTY', '5E16.8', num_items=natyp)
+                      comments=['K_psi: kcal/mole/rad**2'])
+        self.add_flag('CHARMM_IMPROPER_PHASE', '5E16.8', num_items=0, comments=['psi: radians'])
+        self.pointers['NATYP'] = 1
+        self.parm_data['POINTERS'][PrmtopPointers.NATYP] = 1
+        self.add_flag('SOLTY', '5E16.8', num_items=1)
         self.add_flag('LENNARD_JONES_ACOEF', '3E24.16', num_items=0)
         self.add_flag('LENNARD_JONES_BCOEF', '3E24.16', num_items=0)
         self.add_flag('LENNARD_JONES_14_ACOEF', '3E24.16', num_items=0)
@@ -627,15 +509,14 @@ class ChamberParm(AmberParm):
         self.add_flag('JOIN_ARRAY', '10I8', num_items=0)
         self.add_flag('IROTAT', '10I8', num_items=0)
         if self.has_cmap:
-            self.add_flag('CHARMM_CMAP_COUNT', '2I8', num_items=2,
-                    comments=['Number of CMAP terms, number of unique CMAP '
-                              'parameters'])
-            self.add_flag('CHARMM_CMAP_RESOLUTION', '20I4', num_items=0,
-                    comments=['Number of steps along each phi/psi CMAP axis',
-                              'for each CMAP_PARAMETER grid'])
-            self.add_flag('CHARMM_CMAP_INDEX', '6I8', num_items=0,
-                    comments=['Atom index i,j,k,l,m of the cross term',
-                              'and then pointer to CHARMM_CMAP_PARAMETER_n'])
+            self.add_flag(self._cmap_prefix + 'CMAP_COUNT', '2I8', num_items=2,
+                          comments=['Number of CMAP terms, number of unique CMAP parameters'])
+            self.add_flag(self._cmap_prefix + 'CMAP_RESOLUTION', '20I4', num_items=0,
+                          comments=['Number of steps along each phi/psi CMAP axis',
+                                    'for each CMAP_PARAMETER grid'])
+            self.add_flag(self._cmap_prefix + 'CMAP_INDEX', '6I8', num_items=0,
+                          comments=['Atom index i,j,k,l,m of the cross term',
+                                    'and then pointer to CMAP_PARAMETER_n'])
         if self.box is not None:
             self.add_flag('SOLVENT_POINTERS', '3I8', num_items=3)
             self.add_flag('ATOMS_PER_MOLECULE', '10I8', num_items=0)
@@ -648,12 +529,10 @@ class ChamberParm(AmberParm):
     #===================================================
 
     def _set_nonbonded_tables(self, nbfixes=None):
-        """
-        Sets the tables of Lennard-Jones nonbonded interaction pairs
-        """
-        from parmed.tools.actions import addLJType
+        """ Sets the tables of Lennard-Jones nonbonded interaction pairs """
+        from ..tools.actions import addLJType
         data = self.parm_data
-        ntypes = data['POINTERS'][NTYPES]
+        ntypes = data['POINTERS'][PrmtopPointers.NTYPES]
         ntypes2 = ntypes * ntypes
         # Set up the index lookup tables (not a unique solution)
         data['NONBONDED_PARM_INDEX'] = [0 for i in range(ntypes2)]
@@ -666,8 +545,7 @@ class ChamberParm(AmberParm):
         idx = 0
         for i in range(ntypes):
             for j in range(ntypes):
-                data['NONBONDED_PARM_INDEX'][idx] = \
-                            holder[ntypes*i+j]
+                data['NONBONDED_PARM_INDEX'][idx] = holder[ntypes*i+j]
                 idx += 1
         nttyp = ntypes * (ntypes + 1) // 2
         # Now build the Lennard-Jones arrays
@@ -725,8 +603,7 @@ class ChamberParm(AmberParm):
                     if abs(data['LENNARD_JONES_14_ACOEF'][idx] - acoef) > SMALL:
                         # Need to split out another type
                         needed_split = True
-                        assert (a1 not in replaced_atoms or
-                                a2 not in replaced_atoms)
+                        assert a1 not in replaced_atoms or a2 not in replaced_atoms
                         # Only add each atom as a new type ONCE
                         if a1 in replaced_atoms:
                             mask = '@%d' % (a2.idx+1)
@@ -734,15 +611,14 @@ class ChamberParm(AmberParm):
                         else:
                             mask = '@%d' % (a1.idx+1)
                             replaced_atoms.add(a1)
-                        addLJType(self, mask, radius_14=0,
-                                  epsilon_14=0).execute()
+                        addLJType(self, mask, radius_14=0, epsilon_14=0).execute()
                         ntypes += 1
                         # None-out all of the added terms
                         j = ntypes - 1
                         for i in range(j):
-                            _ = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
-                            data['LENNARD_JONES_14_ACOEF'][_] = None
-                            data['LENNARD_JONES_14_BCOEF'][_] = None
+                            idx2 = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                            data['LENNARD_JONES_14_ACOEF'][idx2] = None
+                            data['LENNARD_JONES_14_BCOEF'][idx2] = None
                         # We can stop here, since the next loop through the
                         # explicit exclusions will fill this in
                 else:
@@ -752,14 +628,13 @@ class ChamberParm(AmberParm):
             if not needed_split:
                 break
             # The following should never happen
-            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. ' \
-                    'Some unexpected problem with the algorithm'
+            assert ii <= len(self.atoms)+1, 'Could not resolve all exceptions. This is a bug'
         # Now go through and change all None's to 0s, as these terms won't be
         # used for any exceptions, anyway
         for i, item in enumerate(data['LENNARD_JONES_14_ACOEF']):
             if item is None:
                 assert data['LENNARD_JONES_14_BCOEF'][i] is None, \
-                        'A- and B- coefficients must be in lock-step!'
+                       'A- and B- coefficients must be in lock-step!'
                 data['LENNARD_JONES_14_ACOEF'][i] = 0.0
                 data['LENNARD_JONES_14_BCOEF'][i] = 0.0
 
