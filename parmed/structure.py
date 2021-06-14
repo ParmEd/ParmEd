@@ -31,7 +31,10 @@ from .vec3 import Vec3
 try:
     from simtk.openmm import app
     from simtk import openmm as mm
-    from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    try:
+        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    except ModuleNotFoundError:
+        from openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     mm = app = None
 
@@ -307,12 +310,12 @@ class Structure:
                 retstr.append(' (triclinic)')
             else:
                 retstr.append(' (orthogonal)')
-        # Just assume that if the first bond has a defined type, so does
+        # Just assume that if the first atom has a defined type, so does
         # everything else... we don't want __repr__ to be super expensive
-        if len(self.bonds) > 0 and self.bonds[0].type is not None:
-            retstr.append('; parametrized>')
+        if self.atoms[0].atom_type is UnassignedAtomType and self.atoms[0]._epsilon is None:
+            retstr.append('; NOT parameterized>')
         else:
-            retstr.append('; NOT parametrized>')
+            retstr.append('; parameterized>')
         return ''.join(retstr)
 
     #===================================================

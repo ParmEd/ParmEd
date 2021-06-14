@@ -27,7 +27,7 @@ class RDKit:
         return PDBFile.parse(fh)
 
     @staticmethod
-    def from_smiles(smiles, coordinates=True):
+    def from_smiles(smiles, coordinates=True, hydrogens=True):
         """
         Load smiles string to :class:`Structure`
 
@@ -36,6 +36,8 @@ class RDKit:
         smiles : str, smiles
         coordinates : bool, default True
             if True, use `rdkit.Chem.AllChem.EmbedMultipleConfs to assign coordinates
+        hydrogens : bool, default True
+            if True, use `rdkit.Chem.AddHs` to generate explicit hydrogens
 
         Returns
         -------
@@ -44,6 +46,9 @@ class RDKit:
         from rdkit import Chem
         from rdkit.Chem import AllChem
         mol = Chem.MolFromSmiles(smiles)
+
+        if hydrogens:
+            mol = Chem.AddHs(mol)
 
         if coordinates:
             AllChem.EmbedMultipleConfs(mol, useExpTorsionAnglePrefs=True, useBasicKnowledge=True)
