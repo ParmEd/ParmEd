@@ -22,7 +22,7 @@ def tag_molecules(struct) -> List[Set[int]]:
     """
     # Make sure our recursion limit is large enough, but never shrink it
     from sys import setrecursionlimit, getrecursionlimit
-    setrecursionlimit(max(len(struct.atoms), getrecursionlimit()))
+    setrecursionlimit(max(int(1.2 * len(struct.atoms)), getrecursionlimit()))
 
     if not struct.bonds:
         for i, atom in enumerate(struct.atoms):
