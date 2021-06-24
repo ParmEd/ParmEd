@@ -614,6 +614,40 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             wy1="0", wy2="-1", wy3="1",
             p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
 
+    def _get_atoms_with_external_bonds(self, residue_name):
+        # Determine the atoms with external bonds
+        d = {'C': 4, 'N': 3, 'O': 2, 'H': 1, 'S': 2} # Key: atom element name, Value: number of bonds it should have
+        external_bonds = []
+        for atom in self.residues[residue_name].atoms:
+            bonds = 0
+
+            # Add an extra bond if the atom is the O in a carbonyl
+            if atom.name in ['OD1', 'O', 'O2N', 'OXT']:
+                bonds += 1
+
+            for bond in self.residues[residue_name].bonds:
+                if bond.atom1 == atom or bond.atom2 == atom:
+                    bonds += 1
+
+                # Add extra bonds if the atom is the C in a carbonyl
+                if (bond.atom1.name == 'OD1' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'OD1'):
+                    bonds += 1
+                elif (bond.atom1.name == 'O' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'O'):
+                    bonds += 1
+                elif (bond.atom1.name == 'O2N' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'O2N'):
+                    bonds += 1
+                elif (bond.atom1.name == 'OXT' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'OXT'):
+                    bonds += 1
+            if atom.element_name == 'Og': # If the atom is in a glycan, the element names are not set properly
+                element_name = atom.name[0]
+            else:
+                element_name = atom.element_name
+            if d[element_name] != bonds:
+                external_bonds.append(atom)
+
+        return external_bonds
+
+
     def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None):
         if not self.residues: return
         if valid_patches_for_residue is None:
@@ -653,6 +687,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
+            external_bonds = self._get_atoms_with_external_bonds(name)
+            for atom in external_bonds:
+                if atom != residue.head and atom != residue.tail:
+                    etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.name in valid_patches_for_residue:
                 for patch_name in valid_patches_for_residue[residue.name]:
                     etree.SubElement(xml_residue, 'AllowPatch', name=patch_name)
