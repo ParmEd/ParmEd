@@ -1574,11 +1574,11 @@ class Structure:
         return self._combining_rule
 
     @combining_rule.setter
-    def combining_rule(self, thing):
+    def combining_rule(self, thing, recalculate_14=False):
         if thing not in ('lorentz', 'geometric'):
             raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
-        if self._combining_rule != thing
-            self._combining_rule = thing
+        self._combining_rule = thing
+        if recalculate_14:
             if thing == 'lorentz':
                 for adj in structure.adjusts:
                     sig1 = adj.atom1.sigma
