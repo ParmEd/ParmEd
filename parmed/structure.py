@@ -1577,7 +1577,18 @@ class Structure:
     def combining_rule(self, thing):
         if thing not in ('lorentz', 'geometric'):
             raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
-        self._combining_rule = thing
+        if self._combining_rule != thing
+            self._combining_rule = thing
+            if thing == 'lorentz':
+                for adj in structure.adjusts:
+                    sig1 = adj.atom1.sigma
+                    sig2 = adj.atom2.sigma
+                    adj.type.sigma = (sig1 + sig2)/2
+            elif thing == 'geometric':
+                for adj in structure.adjusts:
+                    sig1 = adj.atom1.sigma
+                    sig2 = adj.atom2.sigma
+                    adj.type.sigma = (sig1 * sig2) ** 0.5
 
     #===================================================
 
