@@ -1574,21 +1574,25 @@ class Structure:
         return self._combining_rule
 
     @combining_rule.setter
-    def combining_rule(self, thing, recalculate_14=False):
+    def combining_rule(self, thing):
         if thing not in ('lorentz', 'geometric'):
             raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
-        self._combining_rule = thing
-        if recalculate_14:
-            if thing == 'lorentz':
-                for adj in structure.adjusts:
-                    sig1 = adj.atom1.sigma
-                    sig2 = adj.atom2.sigma
-                    adj.type.sigma = (sig1 + sig2)/2
-            elif thing == 'geometric':
-                for adj in structure.adjusts:
-                    sig1 = adj.atom1.sigma
-                    sig2 = adj.atom2.sigma
-                    adj.type.sigma = (sig1 * sig2) ** 0.5
+        if self._combining_rule == thing:
+            return
+        elif self.has_NBFIX():
+            raise ValueError(
+                "Cannot change the combining rule with modified"
+                "off-diagonal Lennard-Jones parameters")
+        else:
+            self._combining_rule = thing
+            if thing == "lorentz":
+                combine = lambda sig1, sig2: (sig1 + sig2)/2
+            elif thing == "geometric":
+                combine = lambda sig1, sig2: (sig1 * sig2)**2
+
+            for adj in structure.adjusts:
+                adj.type.sigma = combine(adj.atom1.sigma_14, adj.atom2.sigma_14)
+
 
     #===================================================
 
