@@ -276,7 +276,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         return atom.type
 
     def write(self, dest, provenance=None, write_unused=True, separate_ljforce=False,
-              improper_dihedrals_ordering='default', charmm_imp=False, skip_duplicates=True):
+              improper_dihedrals_ordering='default', charmm_imp=False, skip_duplicates=True, is_glycam=False):
         """ Write the parameter set to an XML file for use with OpenMM
 
         Parameters
@@ -375,7 +375,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
         self._write_omm_provenance(root, provenance)
         self._write_omm_atom_types(root, skip_types, skip_residues)
         self._write_omm_residues(root, skip_residues, skip_duplicates,
-                                 valid_patches_for_residue=valid_patches_for_residue)
+                                 valid_patches_for_residue=valid_patches_for_residue, is_glycam=is_glycam)
         self._write_omm_patches(root, valid_residues_for_patch)
         self._write_omm_bonds(root, skip_types)
         self._write_omm_angles(root, skip_types)
@@ -615,16 +615,37 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             p1=str(p[0]), p2=str(p[1]), p3=str(p[2]))
 
     def _get_atoms_with_external_bonds(self, residue_name):
-        # Determine the atoms with external bonds
-        d = {'C': 4, 'N': 3, 'O': 2, 'H': 1, 'S': 2} # Key: atom element name, Value: number of bonds it should have
+        """
+        Given a (glycan) residue, generate a list of atoms in the residue with external bonds
+ 
+        Parameters
+        ----------
+        residue_name : str
+            name of the residue to get external bonds for
+
+        Returns
+        -------
+        external bonds : list of parmed.topologyobjects.Atom 
+            atoms in the residue with external bonds
+        """
+
+        # If its a sulfate (special case), the S is the atom with an external bond
+        if residue_name == 'SO3':
+            return [atom for atom in self.residues[residue_name] if atom.name == 'S1']
+
+        # Define dict of valences for each atom (in glycan residues)
+        d = {'C': 4, 'N': 3, 'O': 2, 'H': 1} # Key: atom element name, Value: number of bonds it should have
+
+        # Iterate over the atoms in the residue and determine whether it has an external bond
         external_bonds = []
         for atom in self.residues[residue_name].atoms:
             bonds = 0
 
-            # Add an extra bond if the atom is the O in a carbonyl
+            # Add an extra bond if the atom is the O in a carbonyl (double bond)
             if atom.name in ['OD1', 'O', 'O2N', 'OXT']:
                 bonds += 1
 
+            # Count the number of bonds this atom has within the residue
             for bond in self.residues[residue_name].bonds:
                 if bond.atom1 == atom or bond.atom2 == atom:
                     bonds += 1
@@ -638,17 +659,21 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                     bonds += 1
                 elif (bond.atom1.name == 'OXT' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'OXT'):
                     bonds += 1
+             
+            # Get the atom's element name
             if atom.element_name == 'Og': # If the atom is in a glycan, the element names are not set properly
                 element_name = atom.name[0]
             else:
                 element_name = atom.element_name
+
+            # If the number of bonds within the residue does not equal the number of bonds the atom should have, the atom  has an external bond 
             if d[element_name] != bonds:
                 external_bonds.append(atom)
 
         return external_bonds
 
 
-    def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None):
+    def _write_omm_residues(self, xml_root, skip_residues, skip_duplicates, valid_patches_for_residue=None, is_glycam=False):
         if not self.residues: return
         if valid_patches_for_residue is None:
             valid_patches_for_residue = OrderedDict()
@@ -687,10 +712,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
             if residue.tail is not None and residue.tail is not residue.head:
                 etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
-            external_bonds = self._get_atoms_with_external_bonds(name)
-            for atom in external_bonds:
-                if atom != residue.head and atom != residue.tail:
-                    etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
+            if is_glycam:
+                external_bonds = self._get_atoms_with_external_bonds(name)
+                for atom in external_bonds:
+                    if atom != residue.head and atom != residue.tail:
+                        etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.name in valid_patches_for_residue:
                 for patch_name in valid_patches_for_residue[residue.name]:
                     etree.SubElement(xml_residue, 'AllowPatch', name=patch_name)
