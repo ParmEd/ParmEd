@@ -1589,8 +1589,9 @@ class Structure:
                 combine = lambda sig1, sig2: (sig1 + sig2)/2
             elif thing == "geometric":
                 combine = lambda sig1, sig2: (sig1 * sig2)**2
-
-            for adj in structure.adjusts:
+            if any((not np.isclose(adj.type.sigma, combine(adj.atom1.sigma_14, adj.atom2.sigma_14))) for adj in self.adjusts):
+                raise ValueError("Cannot change the combining rule with modified off-diagonal 1-4 Lennard-Jones parameters")
+            for adj in self.adjusts:
                 adj.type.sigma = combine(adj.atom1.sigma_14, adj.atom2.sigma_14)
 
 
