@@ -945,7 +945,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             dt = self.dihedral_types[key]
             for t in dt:
                 if t.scee == 1 and t.scnb == 1:
-                    unscaled_atom_types.add(tuple(sorted((key[0], key[3]))))
+                    unscaled_atom_types.add(key)
                 else:
                     if t.scee: scee.add(t.scee)
                     if t.scnb: scnb.add(t.scnb)
@@ -1003,17 +1003,27 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
         if len(unscaled_atom_types) > 0 and (coulomb14scale != 1 or lj14scale != 1):
             # Some 1-4 interactions should be unscaled.  Add a script to fix them.
-            import textwrap
-            types = ', '.join('("%s","%s")' % s for s in sorted(unscaled_atom_types))
-            types = '\n    '.join(textwrap.wrap(types))
+            types = ',\n    '.join('("%s","%s","%s","%s")' % s for s in sorted(unscaled_atom_types))
             script = etree.SubElement(xml_root, 'Script')
             script.text = """
 # Some 1-4 interactions should be unscaled.
 
-import simtk.openmm as mm
+import openmm as mm
+import openmm.unit as unit
 import math
-unscaled_types = [%s]
+unscaled_types = set([%s])
+
+# Identify 1-4 pairs whose interactions should not be scaled.
+
 atom_types = [data.atomType[atom] for atom in data.atoms]
+unscaled_pairs = set()
+for p1, p2, p3, p4 in data.propers:
+  types = (atom_types[p1], atom_types[p2], atom_types[p3], atom_types[p4])
+  if types in unscaled_types or reversed(types) in unscaled_types:
+    unscaled_pairs.add((p1, p4))
+
+# Fix the exception parameters for those pairs.
+
 for force in sys.getForces():
   if isinstance(force, mm.NonbondedForce):
     atom_charges = {}
@@ -1027,9 +1037,9 @@ for force in sys.getForces():
       atom_epsilons[index] = epsilon
     for i in range(force.getNumExceptions()):
       p1, p2, chargeProd, sigma, epsilon = force.getExceptionParameters(i)
-      types = tuple(sorted((atom_types[p1], atom_types[p2])))
-      if types in unscaled_types and (chargeProd._value != 0 or epsilon._value != 0):
-        force.setExceptionParameters(i, p1, p2, atom_charges[p1]*atom_charges[p2], (atom_sigmas[p1]+atom_sigmas[p2])/2, math.sqrt(atom_epsilons[p1]*atom_epsilons[p2]))
+      if chargeProd._value != 0 or epsilon._value != 0:
+        if (p1, p2) in unscaled_pairs or (p2, p1) in unscaled_pairs:
+          force.setExceptionParameters(i, p1, p2, atom_charges[p1]*atom_charges[p2], (atom_sigmas[p1]+atom_sigmas[p2])/2, unit.sqrt(atom_epsilons[p1]*atom_epsilons[p2]))
 """ % types
 
     def _write_omm_LennardJonesForce(self, xml_root, skip_types, separate_ljforce):
