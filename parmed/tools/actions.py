@@ -2,6 +2,7 @@
 All of the prmtop actions used in PARMED. Each class is a separate action.
 """
 import copy
+import io
 import math
 import os
 import sys
@@ -10,6 +11,7 @@ from collections import Counter, OrderedDict
 from glob import glob
 
 import numpy as np
+import rdkit.Chem as Chem
 
 from .. import gromacs, unit as u, read_PDB
 from ..amber import (
@@ -23,6 +25,7 @@ from ..formats import CIFFile, Mol2File, PDBFile
 from ..formats.registry import load_file
 from ..modeller import AmberOFFLibrary, ResidueTemplateContainer
 from ..periodic_table import Element as _Element
+from ..periodic_table import element_by_name
 from ..residue import (
     ANION_NAMES, CATION_NAMES, SOLVENT_NAMES, AminoAcidResidue, DNAResidue, RNAResidue
 )
@@ -3243,12 +3246,61 @@ class HMassRepartition(Action):
     def init(self, arg_list):
         self.changewater = arg_list.has_key('dowater')
         self.new_h_mass = arg_list.get_next_float(optional=True, default=3.024)
+        self.alt_new_h_mass = arg_list.get_key_float('altmass', default=None)
 
     def __str__(self):
         retstr = f'Repartitioning hydrogen masses to {self.new_h_mass} daltons. '
         if self.changewater:
             return retstr + 'Also changing water hydrogen masses.'
         return retstr + 'Not changing water hydrogen masses.'
+
+    def _residue_to_rdkit(self, residue):
+        """Extract a residue as a standalone rdkit Mol object."""
+        # Hack to make sure that atom types are compliant with rdkit
+        # expectations. That is, rdkit must be able to infer the element based
+        # solely on the atom type, which is not always true for things like
+        # standard GAFF types.
+        #
+        mol = self.parm[':%d'%(residue.number + 1)]
+        for atom in mol.atoms:
+            atom.type = element_by_name(atom.name)
+
+        stdout_bak = sys.stdout
+        rslt = io.StringIO()
+        sys.stdout = rslt
+        Mol2File.write(mol, sys.stdout)
+        mol2str = rslt.getvalue()
+        rmol = Chem.MolFromMol2Block(mol2str, sanitize=False)
+        sys.stdout = stdout_bak
+        return rmol
+
+    def is_in_ring(self, atom):
+        # The heavy atom must have atleast two bonds with other heavy atoms and
+        # no more than two bonds with hydrogen atoms (assuming a max
+        # coordination of four). This quickly avoids silly cases like
+        # accidentally flagging a rigid water as a three-membered ring.
+        #
+        num_hyd_partners =\
+                sum((bp.atomic_number == 1) for bp in atom.bond_partners)
+        num_hvy_partners = len(atom.bond_partners) - num_hyd_partners
+        if not (num_hvy_partners >= 2 and num_hyd_partners in [1, 2]):
+            return False
+        # Use rdkit Atom.IsInRing() method.
+        # This is obviously really inefficient since each atom in a residue
+        # will cause the _same_ molecule object to be built. It doesn't seem to
+        # be a terrible speed issue for now and it can always be restructured
+        # later.
+        #
+        rmol = self._residue_to_rdkit(atom.residue)
+        for patom, ratom in zip(atom.residue.atoms, rmol.GetAtoms()):
+            if patom != atom:
+                continue
+            if ratom.IsInRing():
+                return True
+            else:
+                return False
+        # This should really never be reached...
+        return False
 
     def execute(self):
         # Back up the masses in case something goes wrong
@@ -3270,11 +3322,16 @@ class HMassRepartition(Action):
                 # Only bonded to other hydrogens. Weird, but do not repartition
                 warnings.warn('H atom detected not bound to heteroatom. Ignoring.', ParmWarning)
                 continue
-            transfermass = self.new_h_mass - atom.mass
-            atom.mass = self.new_h_mass
+            new_h_mass = self.new_h_mass
+            if (self.alt_new_h_mass is not None and
+                    self.is_in_ring(heteroatom)):
+                # Alternate target mass for hydrogens on rings.
+                new_h_mass = self.alt_new_h_mass
+            transfermass = new_h_mass - atom.mass
+            atom.mass = new_h_mass
             heteroatom.mass -= transfermass
             if isinstance(self.parm, AmberParm):
-                self.parm.parm_data['MASS'][i] = self.new_h_mass
+                self.parm.parm_data['MASS'][i] = new_h_mass
                 self.parm.parm_data['MASS'][heteroatom.idx] -= transfermass
 
         # Now make sure that all masses are positive, or revert masses and
