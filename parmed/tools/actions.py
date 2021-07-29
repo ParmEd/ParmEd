@@ -3265,13 +3265,13 @@ class HMassRepartition(Action):
         for atom in mol.atoms:
             atom.type = element_by_name(atom.name)
 
-        stdout_bak = sys.stdout
         rslt = io.StringIO()
-        sys.stdout = rslt
-        Mol2File.write(mol, sys.stdout)
+        Mol2File.write(mol, rslt)
         mol2str = rslt.getvalue()
+        # clean the rslt string
+        rslt.truncate(0)
+        rslt.seek(0)
         rmol = Chem.MolFromMol2Block(mol2str, sanitize=False)
-        sys.stdout = stdout_bak
         return rmol
 
     def is_in_ring(self, atom):
