@@ -11,7 +11,11 @@ from collections import Counter, OrderedDict
 from glob import glob
 
 import numpy as np
-import rdkit.Chem as Chem
+try:
+    import rdkit.Chem as Chem
+    HAS_RDKIT = True
+except ImportError:
+    HAS_RDKIT = False
 
 from .. import gromacs, unit as u, read_PDB
 from ..amber import (
@@ -25,7 +29,6 @@ from ..formats import CIFFile, Mol2File, PDBFile
 from ..formats.registry import load_file
 from ..modeller import AmberOFFLibrary, ResidueTemplateContainer
 from ..periodic_table import Element as _Element
-from ..periodic_table import element_by_name
 from ..residue import (
     ANION_NAMES, CATION_NAMES, SOLVENT_NAMES, AminoAcidResidue, DNAResidue, RNAResidue
 )
@@ -3246,24 +3249,31 @@ class HMassRepartition(Action):
     def init(self, arg_list):
         self.changewater = arg_list.has_key('dowater')
         self.new_h_mass = arg_list.get_next_float(optional=True, default=3.024)
-        self.alt_new_h_mass = arg_list.get_key_float('altmass', default=None)
+        self.new_ring_h_mass = arg_list.get_key_float('ring_hmass', default=None)
+        self._rmol_table = {} # See _residue_to_rdkit()
 
     def __str__(self):
         retstr = f'Repartitioning hydrogen masses to {self.new_h_mass} daltons. '
+        if self.new_ring_h_mass is not None:
+            retstr += 'Ring hydrogens will have mass {self.new_ring_h_mass} daltons. '
         if self.changewater:
             return retstr + 'Also changing water hydrogen masses.'
         return retstr + 'Not changing water hydrogen masses.'
 
     def _residue_to_rdkit(self, residue):
         """Extract a residue as a standalone rdkit Mol object."""
+        # Use dict look-up to avoid rebuilding the same residue multiple times.
+        #
+        if residue.idx in self._rmol_table:
+            return self._rmol_table[residue.idx]
         # Hack to make sure that atom types are compliant with rdkit
         # expectations. That is, rdkit must be able to infer the element based
         # solely on the atom type, which is not always true for things like
         # standard GAFF types.
         #
-        mol = self.parm[':%d'%(residue.number + 1)]
+        mol = self.parm[residue.idx,:]
         for atom in mol.atoms:
-            atom.type = element_by_name(atom.name)
+            atom.type = _Element[atom.atomic_number] 
 
         rslt = io.StringIO()
         Mol2File.write(mol, rslt)
@@ -3272,6 +3282,7 @@ class HMassRepartition(Action):
         rslt.truncate(0)
         rslt.seek(0)
         rmol = Chem.MolFromMol2Block(mol2str, sanitize=False)
+        self._rmol_table[residue.idx] = rmol
         return rmol
 
     def is_in_ring(self, atom):
@@ -3286,10 +3297,6 @@ class HMassRepartition(Action):
         if not (num_hvy_partners >= 2 and num_hyd_partners in [1, 2]):
             return False
         # Use rdkit Atom.IsInRing() method.
-        # This is obviously really inefficient since each atom in a residue
-        # will cause the _same_ molecule object to be built. It doesn't seem to
-        # be a terrible speed issue for now and it can always be restructured
-        # later.
         #
         rmol = self._residue_to_rdkit(atom.residue)
         for patom, ratom in zip(atom.residue.atoms, rmol.GetAtoms()):
@@ -3306,6 +3313,28 @@ class HMassRepartition(Action):
         # Back up the masses in case something goes wrong
         original_masses = [atom.mass for atom in self.parm.atoms]
         water = SOLVENT_NAMES
+
+        def get_new_mass(heteroatom):
+            return self.new_h_mass
+
+        if self.new_ring_h_mass is not None:
+            if HAS_RDKIT:
+                # Enable heterogeneous mass partitioning using ring perception
+                # from rdkit.
+                # TODO(BKR): Enable this generally?
+                #
+                def get_new_mass(heteroatom):
+                    if self.is_in_ring(heteroatom):
+                        return self.new_ring_h_mass
+                    else:
+                        return self.new_h_mass
+            else:
+                # Cannot enable heterogeneous partitioning. Issue a warning.
+                warnings.warn(
+                    'Cannot use heterogeneous mass repartitioning without '
+                    'rdkit installed.\nContinuing with standard scheme.'
+                )
+
         for i, atom in enumerate(self.parm.atoms):
             if atom.atomic_number != 1: continue
             if not self.changewater and atom.residue.name in water:
@@ -3322,11 +3351,7 @@ class HMassRepartition(Action):
                 # Only bonded to other hydrogens. Weird, but do not repartition
                 warnings.warn('H atom detected not bound to heteroatom. Ignoring.', ParmWarning)
                 continue
-            new_h_mass = self.new_h_mass
-            if (self.alt_new_h_mass is not None and
-                    self.is_in_ring(heteroatom)):
-                # Alternate target mass for hydrogens on rings.
-                new_h_mass = self.alt_new_h_mass
+            new_h_mass = get_new_mass(heteroatom)
             transfermass = new_h_mass - atom.mass
             atom.mass = new_h_mass
             heteroatom.mass -= transfermass
