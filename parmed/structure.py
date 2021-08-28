@@ -1914,8 +1914,9 @@ class Structure:
                      hydrogenMass=None,
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
-                     verbose=False,
-                     splitDihedrals=False):
+                     splitDihedrals=False,
+                     drudeMass=0.4*u.dalton,
+                     **kwargs):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -1975,12 +1976,12 @@ class Structure:
             If False, the energies and forces from the constrained degrees of
             freedom will NOT be computed. If True, they will (but those degrees
             of freedom will *still* be constrained).
-        verbose : bool=False
-            If True, the progress of this subroutine will be printed to stdout
         splitDihedrals : bool=False
             If True, the dihedrals will be split into two forces -- proper and
             impropers. This is primarily useful for debugging torsion parameter
             assignments.
+        drudeMass : float or mass quantity = 0.4 dalton
+            The mass to assign to the Drude particles. Default is 0.4 daltons
 
         Notes
         -----
@@ -2013,7 +2014,8 @@ class Structure:
                     if heavy_atom is not None:
                         masses[atom.idx] = hydrogenMass
                         masses[heavy_atom.idx] -= hydrogenMass - atom.mass
-        for mass in masses: system.addParticle(mass)
+        for mass in masses:
+            system.addParticle(mass)
         self.omm_add_constraints(system, constraints, rigidWater)
         # Prune empty terms if we have changed
         if self.is_changed():
@@ -2021,9 +2023,7 @@ class Structure:
             self.unchange()
         # Add the various types of forces
         LOGGER.info('Adding bonds...')
-        self._add_force_to_system(system,
-                self.omm_bond_force(constraints, rigidWater, flexibleConstraints)
-        )
+        self._add_force_to_system(system, self.omm_bond_force(constraints, rigidWater, flexibleConstraints))
         LOGGER.info('Adding angles...')
         self._add_force_to_system(system, self.omm_angle_force(constraints, flexibleConstraints))
         LOGGER.info('Adding dihedrals...')
@@ -2052,8 +2052,7 @@ class Structure:
         else:
             rf_dielc = 78.5
         self._add_force_to_system(system,
-            self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff, switchDistance,
-                                     ewaldErrorTolerance, rf_dielc)
+            self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff, switchDistance, ewaldErrorTolerance, rf_dielc)
         )
         if implicitSolvent is not None:
             LOGGER.info('Adding GB force...')
@@ -3584,7 +3583,8 @@ class Structure:
     @staticmethod
     def _add_force_to_system(system, force):
         """ Adds an OpenMM force to a system IFF the force is not None """
-        if force is None: return
+        if force is None:
+            return
         if isinstance(force, tuple) or isinstance(force, list):
             # It's possible we got multiple forces to add
             for f in force:

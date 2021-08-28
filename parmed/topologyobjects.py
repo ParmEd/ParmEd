@@ -5052,6 +5052,8 @@ class AtomType:
         # Store each NBFIX term as a dict with the atom type string matching to
         # a 2-element tuple that is rmin, epsilon
         self.nbfix = dict()
+        # Also store the NBTHOLE term similarly, except it is just a single number
+        self.nbthole = dict()
         self._idx = -1 # needed for some internal bookkeeping
         self._bond_type = bond_type
         self.charge = charge
@@ -5131,8 +5133,7 @@ class AtomType:
         """ The integer representation of an AtomType is its index """
         return self.number
 
-    def add_nbfix(self, typename, rmin, epsilon,
-                  rmin14=None, epsilon14=None):
+    def add_nbfix(self, typename, rmin, epsilon, rmin14=None, epsilon14=None):
         """ Adds a new NBFIX exclusion for this atom type
 
         Parameters
@@ -5155,6 +5156,10 @@ class AtomType:
         if rmin14 is None: rmin14 = rmin
         if epsilon14 is None: epsilon14 = epsilon
         self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)
+
+    def add_nbthole(self, typename, nbt):
+        """ Adds a new NBTHOLE screening factor for this atom type """
+        self.nbthole[typename] = nbt
 
     @property
     def sigma(self):

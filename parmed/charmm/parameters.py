@@ -740,6 +740,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                         pass
                 except IndexError as err:
                     raise CharmmError("Could not parse NBTHOLE terms.") from err
+                self.nbthole_types[(at1, at2)] = self.nbthole_types[(at2, at1)] = nbt
         # If we had any CMAP terms, then the last one will not have been added yet. Add it here
         if current_cmap is not None:
             typ = CmapType(current_cmap_res, current_cmap_data)
