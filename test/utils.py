@@ -19,7 +19,11 @@ from parmed.utils.six.moves import zip
 try:
     from simtk import openmm as mm
     from simtk.openmm import app
-    openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    try:
+        openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    except AttributeError:
+        import openmm as mm
+        openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
     CPU = mm.Platform.getPlatformByName('CPU')
     Reference = mm.Platform.getPlatformByName('Reference')
     has_openmm = True

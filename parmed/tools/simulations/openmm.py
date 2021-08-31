@@ -18,7 +18,10 @@ from ..exceptions import SimulationError, SimulationWarning, UnhandledArgumentWa
 import sys
 import warnings
 try:
-    from simtk.openmm.vec3 import Vec3
+    try:
+        from simtk.openmm.vec3 import Vec3
+    except ImportError:
+        from openmm.vec3 import Vec3
     from simtk.openmm.app import (forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2,
                                   Simulation, DCDReporter, amberprmtopfile)
     import simtk.openmm as mm
