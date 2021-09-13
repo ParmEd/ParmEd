@@ -3291,23 +3291,15 @@ class HMassRepartition(Action):
         # coordination of four). This quickly avoids silly cases like
         # accidentally flagging a rigid water as a three-membered ring.
         #
-        num_hyd_partners =\
-                sum((bp.atomic_number == 1) for bp in atom.bond_partners)
+        num_hyd_partners = sum((bp.atomic_number == 1) for bp in atom.bond_partners)
         num_hvy_partners = len(atom.bond_partners) - num_hyd_partners
         if not (num_hvy_partners >= 2 and num_hyd_partners in [1, 2]):
             return False
-        # Use rdkit Atom.IsInRing() method.
-        #
+
         rmol = self._residue_to_rdkit(atom.residue)
-        for patom, ratom in zip(atom.residue.atoms, rmol.GetAtoms()):
-            if patom != atom:
-                continue
-            if ratom.IsInRing():
-                return True
-            else:
-                return False
-        # This should really never be reached...
-        return False
+        for pa, ra in zip(atom.residue.atoms, rmol.GetAtoms()):
+            if pa == atom:
+                return ra.IsInRing()
 
     def execute(self):
         # Back up the masses in case something goes wrong
