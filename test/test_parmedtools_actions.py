@@ -35,11 +35,18 @@ try:
 except ImportError:
     sander = None
 
+try:
+    import rdkit.Chem as Chem
+    HAS_RDKIT = True
+except ImportError:
+    HAS_RDKIT = False
+
 gasparm = AmberParm(get_fn('trx.prmtop'))
 solvparm = AmberParm(get_fn('solv2.parm7'))
 gascham = ChamberParm(get_fn('ala_ala_ala.parm7'))
 solvchamber = ChamberParm(get_fn('ala3_solv.parm7'))
 amoebaparm = AmoebaParm(get_fn('nma.parm7'))
+phenolparm = AmberParm(get_fn('phenol.prmtop'))
 
 # Make sure default overwrite is False
 PT.Action.overwrite = False
@@ -1663,6 +1670,34 @@ class TestAmberParmActions(FileIOTestCase, TestCaseRelative):
         self.assertAlmostEqual(sum(solvparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
         with self.assertRaises(exc.HMassRepartitionError):
             PT.HMassRepartition(parm, 100.0).execute()
+
+    @unittest.skipUnless(HAS_RDKIT, 'Cannot test without RDKit')
+    def test_ring_h_mass_repartition(self):
+        """
+        Test HMassRepartition on AmberParm
+        Phenol is a system with all hydrogens on carbons in a ring
+        and one hydrogen on an oxygen not in the ring.
+        """
+        parm = copy(phenolparm)
+        PT.HMassRepartition(parm, 2.0, ring_hmass=1.5).execute()
+        for atom in parm.atoms:
+            if atom.atomic_number == 1:
+                assert len(atom.bond_partners) == 1
+                if atom.bond_partners[0].atomic_number == 8:
+                    self.assertEqual(atom.mass, 2.0)
+                else:
+                    self.assertEqual(atom.mass, 1.5)
+        self.assertEqual(parm.parm_data['MASS'], [a.mass for a in parm.atoms])
+        self.assertAlmostEqual(sum(phenolparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
+
+        PT.HMassRepartition(parm, 2.0).execute()
+        for atom in parm.atoms:
+            if atom.atomic_number == 1:
+                self.assertEqual(atom.mass, 2.0)
+        self.assertEqual(parm.parm_data['MASS'], [a.mass for a in parm.atoms])
+        self.assertAlmostEqual(sum(phenolparm.parm_data['MASS']), sum(parm.parm_data['MASS']))
+
+
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_openmm_action(self):
