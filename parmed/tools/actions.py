@@ -3322,10 +3322,7 @@ class HMassRepartition(Action):
                         return self.new_h_mass
             else:
                 # Cannot enable heterogeneous partitioning. Issue a warning.
-                warnings.warn(
-                    'Cannot use heterogeneous mass repartitioning without '
-                    'rdkit installed.\nContinuing with standard scheme.'
-                )
+                raise ImportError("Heterogeneous mass repartitioning requires rdkit.")
 
         for i, atom in enumerate(self.parm.atoms):
             if atom.atomic_number != 1: continue
