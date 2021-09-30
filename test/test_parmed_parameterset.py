@@ -1,7 +1,7 @@
 """ Tests the functionality in parmed/parameters.py """
 import parmed as pmd
 import unittest
-from utils import get_fn
+from utils import get_fn, HAS_GROMACS
 import warnings
 
 class TestParameterSet(unittest.TestCase):
@@ -79,6 +79,7 @@ class TestParameterSet(unittest.TestCase):
             self.assertEqual(ubt.req, 2.0)
             self.assertEqual(ubt.k, 150.0)
 
+    @unittest.skipUnless(HAS_GROMACS, "Cannot run NBFIX SYMMETRY tests without GROMACS")
     def test_nbfix_symmetry(self):
         """ Tests that nbfixes are being added to each atom type """
         struct = pmd.load_file(get_fn('2PPN_bulk.top'))
