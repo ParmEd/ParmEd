@@ -365,8 +365,7 @@ def _process_nonbonded(struct, force, condense_atom_types):
     for i in range(force.getNumParticles()):
         atom = struct.atoms[i]
         chg, sig, eps = force.getParticleParameters(i)
-        atype_name = (atom.type if atom.type != ''
-                      else Element[atom.atomic_number])
+        atype_name = atom.type if atom.type != '' else Element[atom.atomic_number]
         key = (atype_name, sig._value, eps._value)
         if key in typemap and condense_atom_types:
             atom_type = typemap[key]

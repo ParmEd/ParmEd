@@ -16,8 +16,11 @@ from parmed.utils import PYPY
 import random
 import string
 import unittest
+from unittest import mock
 from utils import create_random_structure, get_fn, FileIOTestCase, has_openmm, app, HAS_GROMACS
 import warnings
+import pickle
+import pytest
 
 class TestStructureAPI(unittest.TestCase):
     """ Tests the underlying Structure API """
@@ -200,8 +203,7 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.box[3], 90)
         self.assertEqual(s.box[4], 90)
         self.assertEqual(s.box[5], 90)
-        s.box = [10*u.angstroms, 10*u.angstroms, 10*u.angstroms,
-                 90*u.degrees, 90*u.degrees, 90*u.degrees]
+        s.box = [10*u.angstroms, 10*u.angstroms, 10*u.angstroms, 90*u.degrees, 90*u.degrees, 90*u.degrees]
         self.assertIsInstance(s.box, np.ndarray)
         self.assertEqual(s.box[0], 10)
         self.assertEqual(s.box[1], 10)
@@ -209,10 +211,8 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(s.box[3], 90)
         self.assertEqual(s.box[4], 90)
         self.assertEqual(s.box[5], 90)
-        s.box = [[10*u.angstroms, 1*u.nanometers, 10*u.angstroms,
-                  90*u.degrees, 90*u.degrees, 90*u.degrees],
-                 [11*u.angstroms, 1*u.nanometers, 11*u.angstroms,
-                  91*u.degrees, 91*u.degrees, 91*u.degrees]]
+        s.box = [[10*u.angstroms, 1*u.nanometers, 10*u.angstroms, 90*u.degrees, 90*u.degrees, 90*u.degrees],
+                 [11*u.angstroms, 1*u.nanometers, 11*u.angstroms, 91*u.degrees, 91*u.degrees, 91*u.degrees]]
         self.assertIsInstance(s.box, np.ndarray)
         self.assertEqual(s.box[0], 10)
         self.assertEqual(s.box[1], 10)
@@ -483,22 +483,10 @@ class TestStructureAPI(unittest.TestCase):
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_screen_assignment(self):
         """ Testing screen parameter assignment """
-        self.assertEqual(
-                structure._gb_rad_screen(Atom(atomic_number=9), app.GBn2)[1],
-                0.88
-        )
-        self.assertEqual(
-                structure._gb_rad_screen(Atom(atomic_number=15), app.GBn2)[1],
-                0.86
-        )
-        self.assertEqual(
-                structure._gb_rad_screen(Atom(atomic_number=16), app.GBn2)[1],
-                0.96
-        )
-        self.assertEqual(
-                structure._gb_rad_screen(Atom(atomic_number=2), app.GBn2)[1],
-                0.8
-        )
+        self.assertEqual(structure._gb_rad_screen(Atom(atomic_number=9), app.GBn2)[1], 0.88)
+        self.assertEqual(structure._gb_rad_screen(Atom(atomic_number=15), app.GBn2)[1], 0.86)
+        self.assertEqual(structure._gb_rad_screen(Atom(atomic_number=16), app.GBn2)[1], 0.96)
+        self.assertEqual(structure._gb_rad_screen(Atom(atomic_number=2), app.GBn2)[1], 0.8)
 
     @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
     def test_omm_topology(self):
@@ -604,7 +592,7 @@ class TestStructureAPI(unittest.TestCase):
         s.prune_empty_terms()
         self.assertEqual(len(s.adjusts), nterms-1)
 
-class TestStructureAdd(unittest.TestCase):
+class TestStructureAdd(FileIOTestCase):
     """ Tests the addition property of a System """
 
     def _check_mult(self, s, s1, multfac):
@@ -616,6 +604,8 @@ class TestStructureAdd(unittest.TestCase):
         def cmp_atoms(a1, a2):
             self.assertIsNot(a1, a2)
             self.assertEqual(a1.name, a2.name)
+            self.assertEqual(a1.type, a2.type)
+            self.assertEqual(a1.atom_type, a2.atom_type)
             self.assertEqual(a1.type, a2.type)
             self.assertEqual(a1.atom_type, a2.atom_type)
             self.assertEqual(a1.mass, a2.mass)
@@ -718,13 +708,18 @@ class TestStructureAdd(unittest.TestCase):
         def cmp_atoms(a1, a2):
             self.assertIsNot(a1, a2)
             self.assertEqual(a1.name, a2.name)
-            self.assertEqual(a1.type, a2.type)
-            self.assertEqual(a1.atom_type, a2.atom_type)
-            self.assertEqual(a1.mass, a2.mass)
-            self.assertEqual(a1.charge, a2.charge)
+            if isinstance(a2.type, str) and f"{a2.type}D" == a1.type:
+                a2type = copy(a2.atom_type)
+                a2type.name += "D"
+                self.assertEqual(a1.atom_type, a2type)
+            else:
+                self.assertEqual(a1.type, a2.type)
+                self.assertEqual(a1.atom_type, a2.atom_type)
+            self.assertAlmostEqual(a1.mass, a2.mass)
+            self.assertAlmostEqual(a1.charge, a2.charge)
             self.assertEqual(a1.atomic_number, a2.atomic_number)
-            self.assertEqual(a1.solvent_radius, a2.solvent_radius)
-            self.assertEqual(a1.screen, a2.screen)
+            self.assertAlmostEqual(a1.solvent_radius, a2.solvent_radius)
+            self.assertAlmostEqual(a1.screen, a2.screen)
             self.assertEqual(a1.residue.name, a2.residue.name)
             self.assertEqual(a1.residue.insertion_code, a2.residue.insertion_code)
             self.assertEqual(len(a1.bond_partners), len(a2.bond_partners))
@@ -761,33 +756,26 @@ class TestStructureAdd(unittest.TestCase):
         self.assertEqual(len(s.groups), len(s1.groups)+len(s2.groups))
         self.assertEqual(len(s.adjusts), len(s1.adjusts)+len(s2.adjusts))
         # Check types
-        self.assertEqual(len(s.bond_types), len(s1.bond_types) +
-                len(s2.bond_types))
-        self.assertEqual(len(s.angle_types),
-                         len(s1.angle_types)+len(s2.angle_types))
-        self.assertEqual(len(s.dihedral_types),
-                         len(s1.dihedral_types)+len(s2.dihedral_types))
-        self.assertEqual(len(s.urey_bradley_types),
-                         len(s1.urey_bradley_types)+len(s2.urey_bradley_types))
-        self.assertEqual(len(s.improper_types),
-                         len(s1.improper_types)+len(s2.improper_types))
-        self.assertEqual(len(s.rb_torsion_types),
-                         len(s1.rb_torsion_types)+len(s2.rb_torsion_types))
-        self.assertEqual(len(s.cmap_types),
-                         len(s1.cmap_types)+len(s2.cmap_types))
-        self.assertEqual(len(s.stretch_bend_types),
-                         len(s1.stretch_bend_types)+len(s2.stretch_bend_types))
-        self.assertEqual(len(s.trigonal_angle_types),
-                         len(s1.trigonal_angle_types)+len(s2.trigonal_angle_types))
-        self.assertEqual(len(s.out_of_plane_bend_types),
-                         len(s1.out_of_plane_bend_types)+len(s2.out_of_plane_bend_types))
-        self.assertEqual(len(s.torsion_torsion_types),
-                         len(s1.torsion_torsion_types)+len(s2.torsion_torsion_types))
-        self.assertEqual(len(s.pi_torsion_types),
-                         len(s1.pi_torsion_types)+len(s2.pi_torsion_types))
-        self.assertEqual(len(s.adjust_types), len(s1.adjust_types)+len(s2.adjust_types))
+        self.assertEqual(len(s.bond_types), len(s1.bond_types) + len(s2.bond_types))
+        self.assertEqual(len(s.angle_types), len(s1.angle_types)+len(s2.angle_types))
+        self.assertEqual(len(s.dihedral_types), len(s1.dihedral_types)+len(s2.dihedral_types))
+        self.assertEqual(len(s.urey_bradley_types), len(s1.urey_bradley_types)+len(s2.urey_bradley_types))
+        self.assertEqual(len(s.improper_types), len(s1.improper_types)+len(s2.improper_types))
+        self.assertEqual(len(s.rb_torsion_types), len(s1.rb_torsion_types)+len(s2.rb_torsion_types))
+        self.assertEqual(len(s.cmap_types), len(s1.cmap_types)+len(s2.cmap_types))
+        self.assertEqual(len(s.stretch_bend_types), len(s1.stretch_bend_types)+len(s2.stretch_bend_types))
+        self.assertEqual(len(s.trigonal_angle_types), len(s1.trigonal_angle_types)+len(s2.trigonal_angle_types))
+        self.assertEqual(len(s.out_of_plane_bend_types), len(s1.out_of_plane_bend_types)+len(s2.out_of_plane_bend_types))
+        self.assertEqual(len(s.torsion_torsion_types), len(s1.torsion_torsion_types)+len(s2.torsion_torsion_types))
+        self.assertEqual(len(s.pi_torsion_types), len(s1.pi_torsion_types)+len(s2.pi_torsion_types))
+        #self.assertEqual(len(s.adjust_types), len(s1.adjust_types)+len(s2.adjust_types))
+        self.assertEqual(len(set(s.adjust_types)), len(set(s1.adjust_types) | set(s2.adjust_types)))
         # Check all valence terms
         def chk_valence(val1, val2):
+            if not val1 or not val2:
+                self.assertFalse(val1)
+                self.assertFalse(val2)
+                return
             self.assertIs(type(val1[0]), type(val2[0]))
             self.assertEqual(len(val1), len(val2))
             attrs = [attr for attr in dir(val1[0]) if attr.startswith('atom')]
@@ -804,7 +792,7 @@ class TestStructureAdd(unittest.TestCase):
         chk_valence(s.bonds, s1.bonds+s2.bonds)
         chk_valence(s.angles, s1.angles+s2.angles)
         chk_valence(s.dihedrals, s1.dihedrals+s2.dihedrals)
-        chk_valence(s.rb_torsions, s1.rb_torsions+s2.rb_torsions)
+        chk_valence(s.rb_torsions, s1.rb_torsions + s2.rb_torsions)
         chk_valence(s.urey_bradleys, s1.urey_bradleys+s2.urey_bradleys)
         chk_valence(s.impropers, s1.impropers+s2.impropers)
         chk_valence(s.cmaps, s1.cmaps+s2.cmaps)
@@ -832,6 +820,31 @@ class TestStructureAdd(unittest.TestCase):
         s = s1 + s2
         self._check_sum(s, s1, s2)
         self.assertEqual(s.get_coordinates('all').shape, (2, len(s.atoms), 3))
+
+    def test_add_issue_1197(self):
+        """ Tests addition of two Structures with overlapping atom type names """
+        with open(self.get_fn("thf.pkl"), "rb") as f:
+            s1 = pickle.load(f)
+            s1.residues[0].name = "THF"
+        with open(self.get_fn("ace.pkl"), "rb") as f:
+            s2 = pickle.load(f)
+            s2.residues[0].name = "ACE"
+        combined_fn = self.get_fn("gmx-co1bined.top", written=True)
+        comb = s1 + s2
+        comb.save(combined_fn, format="GROMACS")
+        s = pmd.load_file(combined_fn)
+        s.residues[0].chain = s1.residues[0].chain
+        s.residues[1].chain = s2.residues[0].chain
+
+        # The 1-4 charge scaling is handled by the adjust arrays, so go ahead and copy those over to avoid false fails
+        for d1, d2 in zip(s.dihedrals, s1.dihedrals + s2.dihedrals):
+            d1.type.scee = d2.type.scee
+            d1.type.scnb = d2.type.scnb
+
+        # We have some precision loss with writing to GROMACS (but this is necessary to trigger the original bug).
+        # So tweak our comparison thresholds for *just* this comparison.
+        with mock.patch("parmed.topologyobjects.TINY", 10e-4), mock.patch("parmed.topologyobjects._TINY_DIGITS", 4):
+            self._check_sum(s, s1, s2)
 
     def test_add_to_empty_structure(self):
         """ Tests addition to empty Structure """

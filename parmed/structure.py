@@ -576,40 +576,34 @@ class Structure:
             )
         for t in self.torsion_torsions:
             c.torsion_torsions.append(
-                    TorsionTorsion(atoms[t.atom1.idx], atoms[t.atom2.idx],
-                                   atoms[t.atom3.idx], atoms[t.atom4.idx],
-                                   atoms[t.atom5.idx],
-                                   t.type and c.torsion_torsion_types[t.type.idx])
+                TorsionTorsion(atoms[t.atom1.idx], atoms[t.atom2.idx], atoms[t.atom3.idx], atoms[t.atom4.idx],
+                               atoms[t.atom5.idx], t.type and c.torsion_torsion_types[t.type.idx])
             )
         for ch in self.chiral_frames:
             c.chiral_frames.append(
-                    ChiralFrame(atoms[ch.atom1.idx], atoms[ch.atom2.idx],
-                                ch.chirality)
+                ChiralFrame(atoms[ch.atom1.idx], atoms[ch.atom2.idx], ch.chirality)
             )
         for m in self.multipole_frames:
             c.multipole_frames.append(
-                    MultipoleFrame(atoms[m.atom.idx], m.frame_pt_num, m.vectail,
-                                   m.vechead, m.nvec)
+                MultipoleFrame(atoms[m.atom.idx], m.frame_pt_num, m.vectail, m.vechead, m.nvec)
             )
         for a in self.adjusts:
             c.adjusts.append(
-                    NonbondedException(atoms[a.atom1.idx], atoms[a.atom2.idx],
-                                       a.type and c.adjust_types[a.type.idx])
+                NonbondedException(atoms[a.atom1.idx], atoms[a.atom2.idx], a.type and c.adjust_types[a.type.idx])
             )
         for a in self.acceptors:
             c.acceptors.append(
-                    AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
+                AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
             )
         for d in self.donors:
             c.donors.append(
-                    AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
+                AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
         for l in self.links:
             c.links.append(
-                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length,
-                     l.symmetry_op1, l.symmetry_op2)
+                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length, l.symmetry_op1, l.symmetry_op2)
             )
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
@@ -2882,9 +2876,14 @@ class Structure:
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
         """
-        from simtk.openmm.app.internal.customgbforces import (
-            GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
-        )
+        try:
+            from simtk.openmm.app.internal.customgbforces import (
+                GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
+            )
+        except ImportError:
+            from openmm.app.internal.customgbforces import (
+                GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
+            )
         if implicitSolvent is None: return None
         if useSASA:
             sasa = 'ACE'
@@ -3344,6 +3343,10 @@ class Structure:
         # Cache my coordinates, since changing the structure will destroy the
         # coordinate list
         mycrd = self.get_coordinates('all')
+        # Make a copy of the "other" structure so we can change the atom types if
+        # there are any clashes with those in `self`
+        other = copy(other)
+        other._deduplicate_atom_type_names(self)
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3360,8 +3363,7 @@ class Structure:
             roffset = 0
         for atom in other.atoms:
             res = atom.residue
-            self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                          res.insertion_code, res.segid)
+            self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain, res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3606,6 +3608,7 @@ class Structure:
         retdict['acceptors'] = [(a.atom1.idx, a.atom2.idx) for a in self.acceptors]
         retdict['donors'] = [(d.atom1.idx, d.atom2.idx) for d in self.donors]
         retdict['exclusions'] = [tuple(e.idx for e in a._exclusion_partners) for a in self.atoms]
+        retdict['links'] = [(link.atom1.idx, link.atom2.idx, link.length, link.symmetry_op1, link.symmetry_op2) for link in self.links]
 
         # Now the metadata stuff, if applicable
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
@@ -3723,10 +3726,32 @@ class Structure:
         self.donors = TrackedList(
             AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]]) for it in d['donors']
         )
+        self.links = TrackedList(
+            Link(self.atoms[it[0]], self.atoms[it[1]], it[2], it[3], it[4]) for it in d["links"]
+        )
         # Transfer the exclusions
         for atom, excl in zip(self.atoms, d['exclusions']):
             for idx in excl:
                 atom.exclude(self.atoms[idx])
+
+    def _deduplicate_atom_type_names(self, other):
+        """ De-duplicates atom type names from another structure. Useful if adding two Structures """
+        other_atom_types = {
+            atom.atom_type.name: atom.atom_type for atom in other.atoms if atom.atom_type is not UnassignedAtomType
+        }
+        copied_atom_type_map = dict()
+        for atom in self.atoms:
+            if atom.atom_type is UnassignedAtomType:
+                continue
+            if other_atom_types.get(atom.atom_type.name, atom.atom_type) != atom.atom_type:
+                if id(atom.atom_type) in copied_atom_type_map:
+                    new_atom_type = copied_atom_type_map[id(atom.atom_type)]
+                else:
+                    new_atom_type = copy(atom.atom_type)
+                    new_atom_type.name += "D"
+                    copied_atom_type_map[id(atom.atom_type)] = new_atom_type
+                atom.type += "D"
+                atom.atom_type = new_atom_type
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

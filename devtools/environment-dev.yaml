@@ -5,7 +5,7 @@ channels:
 dependencies:
   - pandas
   - nose
-  - openmm ==7.5.0
+  - openmm >=7.6.0,<7.7.0a
   - coverage
   - nose-timer
   - netCDF4
