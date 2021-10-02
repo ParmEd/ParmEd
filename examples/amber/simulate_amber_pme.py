@@ -4,8 +4,8 @@ from __future__ import division, print_function
 import sys
 
 # OpenMM Imports
-import simtk.openmm as mm
-import simtk.openmm.app as app
+import openmm as mm
+import openmm.app as app
 
 # ParmEd Imports
 from parmed import load_file, unit as u

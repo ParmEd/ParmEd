@@ -11,16 +11,16 @@ __license__ = "MIT"
 __maintainer__ = "Christopher M. Bruns"
 __email__ = "cmbruns@stanford.edu"
 
-# This code is copied from the `simtk.unit` package distributed as a standalone
+# This code is copied from the `openmm.unit` package distributed as a standalone
 # package (https://pypi.python.org/pypi/simtk.unit/) and as part of OpenMM
-# (https://simtk.org/home/openmm).
+# (https://openmm.org).
 
 # When OpenMM can be imported, the unit package will be taken from there.
 # Otherwise, the implementation here will be used. This way, the
 # `parmed.unit` package can be used interchangeably with OpenMM
 
 try:
-    from simtk.unit import *
+    from openmm.unit import *
 except ImportError:
     from .unit import Unit, is_unit
     from .quantity import Quantity, is_quantity

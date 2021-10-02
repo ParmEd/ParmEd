@@ -31,9 +31,9 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
 
     Parameters
     ----------
-    topology : :class:`simtk.openmm.app.Topology`
+    topology : :class:`openmm.app.Topology`
         The Topology instance with the list of atoms and bonds for this system
-    system : :class:`simtk.openmm.System` or str, optional
+    system : :class:`openmm.System` or str, optional
         If provided, parameters from this System will be applied to the
         Structure. If a string is given, it will be interpreted as the file name
         of an XML-serialized System, and it will be deserialized into a System
@@ -79,7 +79,7 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
     If an OpenMM Atom.id attribute is populated by a non-integer, it will be
     used to name the corresponding ParmEd AtomType object.
     """
-    import simtk.openmm as mm
+    import openmm as mm
     struct = Structure()
     atommap = dict()
     for c in topology.chains():

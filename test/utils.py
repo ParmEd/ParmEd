@@ -2,25 +2,19 @@
 Useful functions for the test cases
 """
 import os
-from os.path import join, split, abspath
+from os.path import join
 import random
 import tempfile
 import unittest
-import warnings
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 
 from parmed import gromacs, openmm
 
 try:
-    try:
-        import openmm as mm
-        from openmm import app
-    except ImportError:
-        from simtk import openmm as mm
-        from simtk.openmm import app
+    import openmm as mm
+    from openmm import app
     CPU = mm.Platform.getPlatformByName('CPU')
     Reference = mm.Platform.getPlatformByName('Reference')
     has_openmm = True

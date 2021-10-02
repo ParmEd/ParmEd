@@ -29,12 +29,9 @@ from .vec3 import Vec3
 
 # Try to import the OpenMM modules
 try:
-    from simtk.openmm import app
-    from simtk import openmm as mm
-    try:
-        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-    except ModuleNotFoundError:
-        from openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    from openmm import app
+    import openmm as mm
+    from openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     mm = app = None
 
@@ -1928,7 +1925,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, LJPME, or Ewald objects
-            from the simtk.openmm.app namespace
+            from the openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2485,9 +2482,8 @@ class Structure:
         Parameters
         ----------
         nonbondedMethod : cutoff method
-            This is the cutoff method. It can be either the NoCutoff,
-            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            This is the cutoff method. It can be either the NoCutoff, CutoffNonPeriodic,
+            CutoffPeriodic, PME, or Ewald objects from the openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2495,11 +2491,9 @@ class Structure:
         switchDistance : float or distance Quantity
             The distance at which the switching function is turned on for van
             der Waals interactions. This is ignored when no cutoff is used, and
-            no switch is used if switchDistance is 0, negative, or greater than
-            the cutoff
+            no switch is used if switchDistance is 0, negative, or greater than the cutoff
         ewaldErrorTolerance : float=0.0005
-            When using PME or Ewald, the Ewald parameters will be calculated
-            from this value
+            When using PME or Ewald, the Ewald parameters will be calculated from this value
         reactionFieldDielectric : float=78.5
             If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
             region beyond the cutoff is treated using a reaction field method
@@ -2856,7 +2850,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace. Default is NoCutoff
+            openmm.app namespace. Default is NoCutoff
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating opint number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2876,14 +2870,9 @@ class Structure:
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
         """
-        try:
-            from simtk.openmm.app.internal.customgbforces import (
-                GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
-            )
-        except ImportError:
-            from openmm.app.internal.customgbforces import (
-                GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
-            )
+        from openmm.app.internal.customgbforces import (
+            GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
+        )
         if implicitSolvent is None: return None
         if useSASA:
             sasa = 'ACE'

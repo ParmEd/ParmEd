@@ -70,9 +70,9 @@ following::
     Traceback (most recent call last):
       File "test.py", line 11, in <module>
         positiveIon='Na+', negativeIon='Cl-', ionicStrength=0.1*molar)
-      File ".../python2.7/site-packages/simtk/openmm/app/modeller.py", line 372, in addSolvent
+      File ".../python3.8/site-packages/openmm/app/modeller.py", line XXX, in addSolvent
         system = forcefield.createSystem(self.topology)
-      File ".../python2.7/site-packages/simtk/openmm/app/forcefield.py", line 785, in createSystem
+      File ".../python3.8/site-packages/openmm/app/forcefield.py", line XXX, in createSystem
         raise ValueError('No template found for residue %d (%s).  %s' % (res.index+1, res.name, _findMatchErrors(self, res)))
     ValueError: No template found for residue 2 (PRO).  This might mean your input topology is missing some atoms or bonds, or possibly that you are using the wrong force field.
 

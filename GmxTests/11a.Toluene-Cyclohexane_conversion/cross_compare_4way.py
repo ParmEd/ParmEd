@@ -33,13 +33,13 @@ from nifty import printcool, printcool_dictionary, _exec, which, wopen, isint, l
 # from molecule import Molecule
 
 # ParmEd import
-from chemistry import gromacs
-from chemistry import amber
+from parmed import gromacs
+from parmed import amber
 
 # OpenMM import
-import simtk.unit as u
-import simtk.openmm as mm
-import simtk.openmm.app as app
+import openmm.unit as u
+import openmm as mm
+import openmm.app as app
 
 
 def energy_components(Sim, verbose=False):

@@ -15,14 +15,12 @@ from ... import unit as u
 from ..exceptions import SimulationError, SimulationWarning, UnhandledArgumentWarning
 import sys
 import warnings
+from ...vec3 import Vec3
 try:
-    try:
-        from simtk.openmm.vec3 import Vec3
-    except ImportError:
-        from openmm.vec3 import Vec3
-    from simtk.openmm.app import (forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2,
-                                  Simulation, DCDReporter, amberprmtopfile)
-    import simtk.openmm as mm
+    from openmm.app import (
+        forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2, Simulation, DCDReporter, amberprmtopfile
+    )
+    import openmm as mm
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False
@@ -35,8 +33,8 @@ _SCRIPT_HEADER = """\
 import os, sys
 
 # Import the OpenMM modules that are necessary
-from simtk.openmm.app import *
-from simtk.openmm import *
+from openmm.app import *
+from openmm import *
 
 # Import the Amber/OpenMM modules
 from parmed.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj

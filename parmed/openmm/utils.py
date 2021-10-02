@@ -75,7 +75,7 @@ def energy_decomposition_system(structure, system, platform=None,
         Each entry is a tuple with the name of the force followed by its
         contribution
     """
-    import simtk.openmm as mm
+    import openmm as mm
     # First get all of the old force groups so we can restore them
     old_groups = [f.getForceGroup() for f in system.getForces()]
     old_recip_group = []
