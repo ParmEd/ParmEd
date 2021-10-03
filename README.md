@@ -28,7 +28,7 @@ your own Python scripts and programs, and a GUI/CLI pair of programs that
 provide a means to quickly perform various modifications to chemical systems for
 rapid prototyping.
 
-The API also provides bindings to the [OpenMM](https://simtk.org/home/openmm)
+The API also provides bindings to the [OpenMM](https://openmm.org)
 library, permitting you to carry out full molecular dynamics investigations
 using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
 

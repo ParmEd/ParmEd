@@ -39,7 +39,7 @@ from . import unit
 # available, we try to import it from there, first, and only define our own if
 # OpenMM is not available.
 try:
-    from simtk.openmm.vec3 import Vec3
+    from openmm.vec3 import Vec3
 except ImportError:
     class Vec3(namedtuple('Vec3', ['x', 'y', 'z'])):
         """Vec3 is a 3-element tuple that supports many math operations."""

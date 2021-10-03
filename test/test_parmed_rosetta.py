@@ -3,7 +3,7 @@ from itertools import chain
 from utils import get_fn
 import unittest
 try:
-    from simtk.openmm.app import PDBFile
+    from openmm.app import PDBFile
 except:
     PDBFile = None
 try:

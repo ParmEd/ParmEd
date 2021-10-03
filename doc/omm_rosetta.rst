@@ -49,9 +49,9 @@ Start an OpenMM simulation
 Finally, we can use the following code to solvate and
 start simulating our ParmEd :class:`Structure`::
 
-    from simtk.openmm import *
-    from simtk.openmm.app import *
-    from simtk.unit import *
+    from openmm import *
+    from openmm.app import *
+    from unit import *
 
     ff = ForceField('amber99sbildn.xml', 'tip3p.xml')
 

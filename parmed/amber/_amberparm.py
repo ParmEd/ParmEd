@@ -26,8 +26,8 @@ from .asciicrd import AmberAsciiRestart
 from .netcdffiles import NetCDFRestart
 
 try:
-    from simtk import openmm as mm
-    from simtk.openmm import app
+    import openmm as mm
+    from openmm import app
 except ImportError:
     mm = app = None
 
@@ -948,7 +948,7 @@ class AmberParm(AmberFormat, Structure):
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This

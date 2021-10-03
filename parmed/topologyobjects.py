@@ -4961,6 +4961,7 @@ class AtomType:
     >>> print("%s: %d" % (str(at), int(at)))
     HA: 1
     """
+    _digits_tol = 6
 
     def __init__(self, name, number, mass, atomic_number=-1, bond_type=None, charge=0.0):
         if number is None and name is not None:
@@ -4985,6 +4986,10 @@ class AtomType:
         self._idx = -1 # needed for some internal bookkeeping
         self._bond_type = bond_type
         self.charge = charge
+
+    def __repr__(self):
+        return (f"<{self.__class__.__name__} {self.name} [# {self.number}]; q={self.charge:.4f} rmin={self.rmin:.4f} "
+                f"epsilon={self.epsilon:.4f} rmin_14={self.rmin_14:.4f} epsilon_14={self.epsilon_14:.4f}>")
 
     @_exception_to_notimplemented
     def __eq__(self, other):
@@ -5138,9 +5143,14 @@ class AtomType:
         return cp
 
     def __hash__(self):
-        return hash((self.name, self.mass, self.atomic_number, self.bond_type,
-                     self.charge, self.epsilon, self.rmin, self.epsilon_14,
-                     self.rmin_14, tuple(self.nbfix.items())))
+        return hash((self.name, self._round_trunc(self.mass), self.atomic_number, self.bond_type,
+                     self._round_trunc(self.charge), self._round_trunc(self.epsilon),
+                     self._round_trunc(self.rmin), self._round_trunc(self.epsilon_14),
+                     self._round_trunc(self.rmin_14), tuple(self.nbfix.items())))
+
+    @classmethod
+    def _round_trunc(cls, value):
+        return round(value, _TINY_DIGITS) if value is not None else None
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

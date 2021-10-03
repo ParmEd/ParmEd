@@ -81,7 +81,7 @@ def to_entos_qmmm_system(
     multiscale_input: QMMMInput
         The QM/MM input
     """
-    from simtk.openmm.app import LJPME, NoCutoff
+    from openmm.app import LJPME, NoCutoff
     if not HAS_MISTRAL:
         raise ImportError("You must install Entos mistral to create a QMMMInput object")
     if struct.coordinates is None:

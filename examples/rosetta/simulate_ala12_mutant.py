@@ -3,9 +3,9 @@
 from __future__ import print_function
 
 # OpenMM imports
-from simtk.openmm import *
-from simtk.openmm.app import *
-from simtk.unit import *
+from openmm import *
+from openmm.app import *
+from openmm.unit import *
 
 # ParmEd imports
 from parmed import load_rosetta

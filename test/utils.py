@@ -2,28 +2,25 @@
 Useful functions for the test cases
 """
 import os
-from os.path import join, split, abspath
+from os.path import join
 import random
 import tempfile
 import unittest
-import warnings
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 
 from parmed import gromacs, openmm
 
 try:
-    from simtk import openmm as mm
-    from simtk.openmm import app
-    openmm_version = tuple([int(x) for x in mm.__version__.split('.')])
+    import openmm as mm
+    from openmm import app
     CPU = mm.Platform.getPlatformByName('CPU')
     Reference = mm.Platform.getPlatformByName('Reference')
     has_openmm = True
 except ImportError:
     has_openmm = False
-    app = openmm_version = CPU = Reference = mm = None
+    app = CPU = Reference = mm = None
 
 try:
     import networkx as nx
@@ -127,9 +124,6 @@ def get_fn(filename):
     ----------
     filename : str
         Name of the file to get
-    written : bool=False
-        Was this file written by a test? (If so, it is put in a different
-        location)
 
     Returns
     -------

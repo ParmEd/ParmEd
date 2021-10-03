@@ -15,6 +15,7 @@ import sys
 import unittest
 from utils import (get_fn, CPU, mm, app, has_openmm, FileIOTestCase,
         TestCaseRelative, get_saved_fn, run_all_tests, QuantityTestCase)
+import pytest
 
 # OpenMM NonbondedForce methods are enumerated values. From NonbondedForce.h,
 # they are:
@@ -1705,6 +1706,7 @@ class TestChamberParm(TestCaseRelative):
                 parm.createSystem(nonbondedMethod=nbmethod)
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
+@pytest.mark.xfail
 class TestAmoebaParm(TestCaseRelative):
     """ Tests some of the OMM integration with the AmoebaParm classes """
 

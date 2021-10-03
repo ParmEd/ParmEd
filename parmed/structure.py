@@ -29,12 +29,9 @@ from .vec3 import Vec3
 
 # Try to import the OpenMM modules
 try:
-    from simtk.openmm import app
-    from simtk import openmm as mm
-    try:
-        from simtk.openmm.app.internal.unitcell import reducePeriodicBoxVectors
-    except ModuleNotFoundError:
-        from openmm.app.internal.unitcell import reducePeriodicBoxVectors
+    from openmm import app
+    import openmm as mm
+    from openmm.app.internal.unitcell import reducePeriodicBoxVectors
 except ImportError:
     mm = app = None
 
@@ -576,40 +573,34 @@ class Structure:
             )
         for t in self.torsion_torsions:
             c.torsion_torsions.append(
-                    TorsionTorsion(atoms[t.atom1.idx], atoms[t.atom2.idx],
-                                   atoms[t.atom3.idx], atoms[t.atom4.idx],
-                                   atoms[t.atom5.idx],
-                                   t.type and c.torsion_torsion_types[t.type.idx])
+                TorsionTorsion(atoms[t.atom1.idx], atoms[t.atom2.idx], atoms[t.atom3.idx], atoms[t.atom4.idx],
+                               atoms[t.atom5.idx], t.type and c.torsion_torsion_types[t.type.idx])
             )
         for ch in self.chiral_frames:
             c.chiral_frames.append(
-                    ChiralFrame(atoms[ch.atom1.idx], atoms[ch.atom2.idx],
-                                ch.chirality)
+                ChiralFrame(atoms[ch.atom1.idx], atoms[ch.atom2.idx], ch.chirality)
             )
         for m in self.multipole_frames:
             c.multipole_frames.append(
-                    MultipoleFrame(atoms[m.atom.idx], m.frame_pt_num, m.vectail,
-                                   m.vechead, m.nvec)
+                MultipoleFrame(atoms[m.atom.idx], m.frame_pt_num, m.vectail, m.vechead, m.nvec)
             )
         for a in self.adjusts:
             c.adjusts.append(
-                    NonbondedException(atoms[a.atom1.idx], atoms[a.atom2.idx],
-                                       a.type and c.adjust_types[a.type.idx])
+                NonbondedException(atoms[a.atom1.idx], atoms[a.atom2.idx], a.type and c.adjust_types[a.type.idx])
             )
         for a in self.acceptors:
             c.acceptors.append(
-                    AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
+                AcceptorDonor(atoms[a.atom1.idx], atoms[a.atom2.idx])
             )
         for d in self.donors:
             c.donors.append(
-                    AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
+                AcceptorDonor(atoms[d.atom1.idx], atoms[d.atom2.idx])
             )
         for g in self.groups:
             c.groups.append(Group(atoms[g.atom.idx], g.type, g.move))
         for l in self.links:
             c.links.append(
-                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length,
-                     l.symmetry_op1, l.symmetry_op2)
+                Link(atoms[l.atom1.idx], atoms[l.atom2.idx], l.length, l.symmetry_op1, l.symmetry_op2)
             )
         c._box = copy(self._box)
         c._coordinates = copy(self._coordinates)
@@ -1934,7 +1925,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, LJPME, or Ewald objects
-            from the simtk.openmm.app namespace
+            from the openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2491,9 +2482,8 @@ class Structure:
         Parameters
         ----------
         nonbondedMethod : cutoff method
-            This is the cutoff method. It can be either the NoCutoff,
-            CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace
+            This is the cutoff method. It can be either the NoCutoff, CutoffNonPeriodic,
+            CutoffPeriodic, PME, or Ewald objects from the openmm.app namespace
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating point number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2501,11 +2491,9 @@ class Structure:
         switchDistance : float or distance Quantity
             The distance at which the switching function is turned on for van
             der Waals interactions. This is ignored when no cutoff is used, and
-            no switch is used if switchDistance is 0, negative, or greater than
-            the cutoff
+            no switch is used if switchDistance is 0, negative, or greater than the cutoff
         ewaldErrorTolerance : float=0.0005
-            When using PME or Ewald, the Ewald parameters will be calculated
-            from this value
+            When using PME or Ewald, the Ewald parameters will be calculated from this value
         reactionFieldDielectric : float=78.5
             If the nonbondedMethod is CutoffPeriodic or CutoffNonPeriodic, the
             region beyond the cutoff is treated using a reaction field method
@@ -2862,7 +2850,7 @@ class Structure:
         nonbondedMethod : cutoff method
             This is the cutoff method. It can be either the NoCutoff,
             CutoffNonPeriodic, CutoffPeriodic, PME, or Ewald objects from the
-            simtk.openmm.app namespace. Default is NoCutoff
+            openmm.app namespace. Default is NoCutoff
         nonbondedCutoff : float or distance Quantity
             The nonbonded cutoff must be either a floating opint number
             (interpreted as nanometers) or a Quantity with attached units. This
@@ -2882,7 +2870,7 @@ class Structure:
         solventDielectric : float=78.5
             The dielectric constant of the water used in GB
         """
-        from simtk.openmm.app.internal.customgbforces import (
+        from openmm.app.internal.customgbforces import (
             GBSAHCTForce, GBSAOBC1Force, GBSAOBC2Force, GBSAGBnForce, GBSAGBn2Force
         )
         if implicitSolvent is None: return None
@@ -3344,6 +3332,10 @@ class Structure:
         # Cache my coordinates, since changing the structure will destroy the
         # coordinate list
         mycrd = self.get_coordinates('all')
+        # Make a copy of the "other" structure so we can change the atom types if
+        # there are any clashes with those in `self`
+        other = copy(other)
+        other._deduplicate_atom_type_names(self)
         # The basic approach taken here is to extend the atom list, then scan
         # through all of the valence terms in `other`, adding them to the
         # corresponding arrays of `self`, using an offset to look into the atom
@@ -3360,8 +3352,7 @@ class Structure:
             roffset = 0
         for atom in other.atoms:
             res = atom.residue
-            self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
-                          res.insertion_code, res.segid)
+            self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain, res.insertion_code, res.segid)
         def copy_valence_terms(oval, otyp, sval, styp, attrlist):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
@@ -3606,6 +3597,7 @@ class Structure:
         retdict['acceptors'] = [(a.atom1.idx, a.atom2.idx) for a in self.acceptors]
         retdict['donors'] = [(d.atom1.idx, d.atom2.idx) for d in self.donors]
         retdict['exclusions'] = [tuple(e.idx for e in a._exclusion_partners) for a in self.atoms]
+        retdict['links'] = [(link.atom1.idx, link.atom2.idx, link.length, link.symmetry_op1, link.symmetry_op2) for link in self.links]
 
         # Now the metadata stuff, if applicable
         for key in ('experimental', 'journal', 'authors', 'keywords', 'doi',
@@ -3723,10 +3715,32 @@ class Structure:
         self.donors = TrackedList(
             AcceptorDonor(self.atoms[it[0]], self.atoms[it[1]]) for it in d['donors']
         )
+        self.links = TrackedList(
+            Link(self.atoms[it[0]], self.atoms[it[1]], it[2], it[3], it[4]) for it in d["links"]
+        )
         # Transfer the exclusions
         for atom, excl in zip(self.atoms, d['exclusions']):
             for idx in excl:
                 atom.exclude(self.atoms[idx])
+
+    def _deduplicate_atom_type_names(self, other):
+        """ De-duplicates atom type names from another structure. Useful if adding two Structures """
+        other_atom_types = {
+            atom.atom_type.name: atom.atom_type for atom in other.atoms if atom.atom_type is not UnassignedAtomType
+        }
+        copied_atom_type_map = dict()
+        for atom in self.atoms:
+            if atom.atom_type is UnassignedAtomType:
+                continue
+            if other_atom_types.get(atom.atom_type.name, atom.atom_type) != atom.atom_type:
+                if id(atom.atom_type) in copied_atom_type_map:
+                    new_atom_type = copied_atom_type_map[id(atom.atom_type)]
+                else:
+                    new_atom_type = copy(atom.atom_type)
+                    new_atom_type.name += "D"
+                    copied_atom_type_map[id(atom.atom_type)] = new_atom_type
+                atom.type += "D"
+                atom.atom_type = new_atom_type
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -3,7 +3,7 @@ from functools import wraps
 import warnings
 
 try:
-    import simtk.openmm as mm
+    import openmm as mm
     HAS_OPENMM = True
 except ImportError:
     HAS_OPENMM = False

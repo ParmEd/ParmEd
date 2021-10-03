@@ -203,7 +203,7 @@ class StateDataReporter:
         simulation : Simulation
             The simulation to generate a report for
         """
-        import simtk.openmm as mm
+        import openmm as mm
         system = simulation.system
         frclist = system.getForces()
         if self._temperature:

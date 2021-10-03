@@ -245,8 +245,8 @@ Furthermore, you may check the correctness of topology loading by using the
 :class:`GromacsTopologyFile` object to calculate an OpenMM potential energy and
 force, then comparing that result with your own output from Gromacs::
 
-    >>> import simtk.openmm as mm
-    >>> import simtk.openmm.app as app
+    >>> import openmm as mm
+    >>> import openmm.app as app
     >>> system = gmx_top.createSystem() # OpenMM System creation
     >>> integ = mm.VerletIntegrator(1.0*u.femtosecond)
     >>> plat = mm.Platform.getPlatformByName('Reference')

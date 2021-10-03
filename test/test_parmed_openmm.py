@@ -24,13 +24,12 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
     def setUp(self):
         super(TestOpenMM, self).setUp()
         # Take one of the distributed OpenMM FF XML files as a test
-        self.ffxml = os.path.join(os.path.split(app.__file__)[0], 'data',
-                                  'amber99sbildn.xml')
+        self.ffxml = os.path.join(os.path.split(app.__file__)[0], 'data', 'amber99sbildn.xml')
         super(TestOpenMM, self).setUp()
 
     def test_format_id(self):
         """ Tests automatic format determination of OpenMM XML files """
-        self.assertTrue(openmm.XmlFile.id_format(get_fn('system_974wat.xml')))
+        self.assertTrue(openmm.XmlFile.id_format(get_fn('omm_system.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('state_974wat.xml')))
         self.assertTrue(openmm.XmlFile.id_format(get_fn('integrator.xml')))
         self.assertTrue(openmm.XmlFile.id_format(self.ffxml))
@@ -42,9 +41,9 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
 
     def test_deserialize_system(self):
         """ Tests automatic deserialization of a System XML file """
-        system = openmm.XmlFile.parse(get_fn('system_974wat.xml'))
+        system = openmm.XmlFile.parse(get_fn('omm_system.xml'))
         self.assertIsInstance(system, mm.System)
-        self.assertEqual(system.getNumParticles(), 6638)
+        self.assertEqual(system.getNumParticles(), 4217)
 
     def test_deserialize_state(self):
         """ Tests automatic deserialization of a State XML file """

@@ -2,9 +2,9 @@ Dimensional Analysis (working with :mod:`parmed.unit`)
 =========================================================
 
 The :mod:`unit` package was originally developed by Christopher M. Bruns at
-SimTK (Stanford University) for the ``simtk`` Python package in OpenMM_.
+SimTK (Stanford University) for the ``openmm`` Python package in OpenMM_.
 
-.. _OpenMM: http://simtk.org/home/openmm
+.. _OpenMM: https://openmm.org
 
 Different programs use different systems of units internally while performing
 calculations on quantities with specific dimensions. For instance, the *Amber*

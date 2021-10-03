@@ -4,12 +4,12 @@ OpenMM Functionality
 Since ParmEd is a library for reading, converting, and modifying full molecular
 mechanical descriptions of chemical systems in a wide variety of different
 families of force fields, supporting molecular simulation directly using the
-fantastic `OpenMM Python API <http://simtk.org/home/openmm>`_ was a natural
+fantastic `OpenMM Python API <http://docs.openmm.org/latest/api-python/>`_ was a natural
 extension.
 
 This page is not meant as an exhaustive description of the OpenMM library and
 its usage. Instead, you should visit the `OpenMM website
-<http://simtk.org/home/openmm>`_ for that. However, this page *will* provide a
+<https://openmm.org/>`_ for that. However, this page *will* provide a
 brief description of OpenMM, what I consider to be its strengths that can make
 it an invaluable tool in the field of molecular mechanics. It will also present
 an introduction to using OpenMM with the tools provided by ParmEd through a
@@ -141,8 +141,8 @@ energy components to be compared between programs more effectively. For
 example::
 
     >>> import parmed as pmd
-    >>> from simtk.openmm import app
-    >>> from simtk import openmm as mm
+    >>> from openmm import app
+    >>> import openmm as mm
     >>> # Instantiate the parm and create the system
     ... parm = pmd.load_file('tip4p.parm7', 'tip4p.rst7')
     >>> system = parm.createSystem(nonbondedMethod=app.PME,
@@ -214,18 +214,18 @@ Amber or Gromacs.
 An example is shown below, using the OpenMM functionality to parametrize a PDB
 file with the ff99SB force field::
 
-    import parmed as chem
+    import parmed as pmd
     import parmed.unit as u
 
-    from simtk.openmm import app
-    from simtk import openmm as mm
+    from openmm import app
+    import openmm as mm
 
     pdb = app.PDBFile('input.pdb')
     forcefield = app.ForceField('amber99sb.xml', 'tip3p.xml')
     system = forcefield.createSystem(pdb.topology, nonbondedMethod=app.PME,
                                      nonbondedCutoff=1*u.nanometer)
 
-    struct = chem.openmm.load_topology(pdb.topology, system)
+    struct = pmd.openmm.load_topology(pdb.topology, system)
 
 There are some limitations to this functionality, itemized below:
 

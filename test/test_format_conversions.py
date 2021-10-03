@@ -438,7 +438,7 @@ class TestOpenMMToGromacs(FileIOTestCase, EnergyTestCase):
         self.assertEqual(parm.combining_rule, 'lorentz')
         system = parm.createSystem()
         gromacs.GromacsTopologyFile.from_structure(
-                openmm.load_topology(parm.topology, system)
+            openmm.load_topology(parm.topology, system)
         ).write(self.get_fn('ash_from_omm.top', written=True))
         parm2 = gromacs.GromacsTopologyFile(self.get_fn('ash_from_omm.top', written=True))
         system2 = parm2.createSystem()

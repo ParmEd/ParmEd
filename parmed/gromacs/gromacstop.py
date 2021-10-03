@@ -246,8 +246,7 @@ class TopFromStructureMixin:
                         if dihedral.type.scnb:
                             scnb_values.add(dihedral.type.scnb)
             if len(set('%.5f' % x for x in scee_values)) > 1:
-                raise GromacsError('Structure has mixed 1-4 scaling which is '
-                                   'not supported by Gromacs')
+                raise GromacsError('Structure has mixed 1-4 scaling which is not supported by Gromacs')
             scee_values = list(scee_values)
             scnb_values = list(scnb_values)
             if len(set('%.5f' % x for x in scee_values)) == 1:
@@ -331,11 +330,9 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                 if not rematch:
                     return False
                 sec, = rematch.groups()
-                return sec in ('atoms', 'atomtypes', 'defaults', 'moleculetype',
-                               'system', 'bondtypes', 'angletypes', 'cmaptypes',
-                               'dihedraltypes', 'bonds', 'angles', 'dihedrals',
-                               'cmaps', 'molecules', 'exclusions',
-                               'nonbond_params', 'position_restraints')
+                return sec in {'atoms', 'atomtypes', 'defaults', 'moleculetype', 'system', 'bondtypes', 'angletypes',
+                               'cmaptypes', 'dihedraltypes', 'bonds', 'angles', 'dihedrals', 'cmaps', 'molecules',
+                               'exclusions', 'nonbond_params', 'position_restraints'}
             return False
 
     #===================================================
@@ -1383,21 +1380,18 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             # in as a file name. I'm not sure if all `write`-able objects have a
             # `name` property, though.
         else:
-            raise ValueError('molfile must be "top", a file name, or '
-                             'a file-like object')
+            raise ValueError('molfile must be "top", a file name, or a file-like object')
 
         # Error-checking for combine
         if combine is not None:
             if isinstance(combine, str):
                 if combine.lower() != 'all':
-                    raise ValueError('combine must be None, list of indices, '
-                                     'or "all"')
+                    raise ValueError('combine must be None, list of indices, or "all"')
             else:
                 combine_lists = []
                 for indices in combine:
                     indices = sorted(set(indices))
-                    if any((indices[i+1] - indices[i]) != 1
-                                for i in range(len(indices)-1)):
+                    if any((indices[i+1] - indices[i]) != 1 for i in range(len(indices)-1)):
                         raise ValueError('Can only combine adjacent molecules')
                     combine_lists.append(indices)
         try:
@@ -1422,8 +1416,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
 ''')
             if not itp :
                 dest.write('\n[ defaults ]\n')
-                dest.write('; nbfunc        comb-rule       gen-pairs       '
-                            'fudgeLJ fudgeQQ\n')
+                dest.write('; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ\n')
                 dest.write(
                     f'{self.defaults.nbfunc:<15d} {self.defaults.comb_rule:<15d} {self.defaults.gen_pairs:<15s} '
                     f'{self.defaults.fudgeLJ:<12.8g} {self.defaults.fudgeQQ:<12.8g}\n\n'
@@ -1527,8 +1520,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     parfile.write('\n')
                 if params.dihedral_types:
                     parfile.write('[ dihedraltypes ]\n')
-                    parfile.write(';i  j   k  l  func      phase      kd      '
-                                  'pn\n')
+                    parfile.write(';i  j   k  l  func      phase      kd      pn\n')
                     used_keys = set()
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)
                     fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
@@ -1558,8 +1550,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     # simpler for me to work with back when I wrote the CHARMM
                     # parsers. This needs to be fixed now and handled correctly.
                     parfile.write('[ dihedraltypes ]\n')
-                    parfile.write('; i  j       k       l       func     q0    '
-                                  'cq\n')
+                    parfile.write('; i  j       k       l       func     q0    cq\n')
                     fmt = '%-6s %-6s %-6s %-6s    %d   %.6f   %.6f\n'
                     conv = u.kilocalories.conversion_factor_to(u.kilojoules)*2
                     for key, param in params.improper_types.items():
@@ -1595,7 +1586,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                 nameset = set()
                 for molecule, num in molecules:
                     if len(molecule.residues) == 1:
-                        title = molecule.residues[0].name
+                        title = molecule.residues[0].name if molecule.residues[0].name.strip() else "UNK"
                         if title in nameset:
                             orig = title
                             sfx = 2
@@ -1607,8 +1598,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params,
-                                                        parameters == 'inline')
+                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params, parameters == 'inline')
                 if not itp :
                     # System
                     dest.write('[ system ]\n; Name\n')
@@ -1633,8 +1623,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                         dest.write(f'{names[j]:<15s} {ii - i:6d}\n')
                         i = ii
             elif isinstance(combine, str) and combine.lower() == 'all':
-                GromacsTopologyFile._write_molecule(self, _molfile, 'system', params,
-                                                    parameters == 'inline')
+                GromacsTopologyFile._write_molecule(self, _molfile, 'system', params, parameters == 'inline')
                 if not itp :
                     dest.write('[ system ]\n; Name\n')
                     if self.title:
@@ -1705,7 +1694,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                 nameset = set()
                 for molecule, num in new_molecules:
                     if len(molecule.residues) == 1:
-                        title = molecule.residues[0].name
+                        title = molecule.residues[0].name if molecule.residues[0].name.strip() else "UNK"
                         if title in nameset:
                             orig = title
                             sfx = 2
@@ -1717,8 +1706,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                         sysnum += 1
                     names.append(title)
                     nameset.add(title)
-                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params,
-                                                        parameters == 'inline')
+                    GromacsTopologyFile._write_molecule(molecule, _molfile, title, params, parameters == 'inline')
                 if not itp :
                     # System
                     dest.write('[ system ]\n; Name\n')
@@ -1754,6 +1742,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
 
     @staticmethod
     def _write_molecule(struct, dest, title, params, writeparams):
+        assert title.strip(), "title must not be whitespace only!"
         dest.write('\n[ moleculetype ]\n; Name            nrexcl\n')
         dest.write(f'{title}          {struct.nrexcl}\n\n')
         dest.write('[ atoms ]\n')
