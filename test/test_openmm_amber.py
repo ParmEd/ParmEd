@@ -1713,12 +1713,12 @@ class TestAmoebaParm(TestCaseRelative):
     def test_amoeba_forces(self):
         """ Test creation of some AMOEBA forces """
         parm = load_file(get_fn('amoeba.parm7'))
-        self.assertIsInstance(parm.omm_bond_force(rigidWater=False), mm.AmoebaBondForce)
-        self.assertIsInstance(parm.omm_angle_force(), mm.AmoebaAngleForce)
-        self.assertIsInstance(parm.omm_trigonal_angle_force(), mm.AmoebaInPlaneAngleForce)
-        self.assertIsInstance(parm.omm_out_of_plane_bend_force(), mm.AmoebaOutOfPlaneBendForce)
-        self.assertIsInstance(parm.omm_pi_torsion_force(), mm.AmoebaPiTorsionForce)
-        self.assertIsInstance(parm.omm_stretch_bend_force(), mm.AmoebaStretchBendForce)
+        self.assertIsInstance(parm.omm_bond_force(rigidWater=False), mm.CustomBondForce)
+        self.assertIsInstance(parm.omm_angle_force(), mm.CustomAngleForce)
+        self.assertIsInstance(parm.omm_trigonal_angle_force(), mm.CustomCompoundBondForce)
+        self.assertIsInstance(parm.omm_out_of_plane_bend_force(), mm.CustomCompoundBondForce)
+        self.assertIsInstance(parm.omm_pi_torsion_force(), mm.CustomCompoundBondForce)
+        self.assertIsInstance(parm.omm_stretch_bend_force(), mm.CustomCompoundBondForce)
 
         # Now some error handling
         # Trigonal angles
