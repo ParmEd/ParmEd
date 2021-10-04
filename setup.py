@@ -3,6 +3,7 @@ import shutil
 import sys
 import versioneer
 import struct
+import warnings
 
 if sys.version_info < (3, 6):
     sys.exit('You must have at least Python 3.6 for ParmEd to work correctly.')
@@ -24,12 +25,18 @@ def prepare_env_for_osx():
         '17': '10.13',
         '18': '10.14',
         '19': '10.15',
+        '20': '11.5',
     }
     os.environ['CXX'] = 'clang++'
     os.environ['CC'] = 'clang'
     darwin_major = os.uname()[2].split('.')[0]
     if darwin_major in darwin_major_to_osx_map:
         os.environ['MACOSX_DEPLOYMENT_TARGET'] = darwin_major_to_osx_map[darwin_major]
+    else:
+        import subprocess
+        warnings.warn("darwin_major_to_osx_map needs to be updated! Report this issue if build fails.")
+        swvers = subprocess.run("sw_vers -productVersion".split(), capture_output=True)
+        os.environ["MACOSX_DEPLOYMENT_TARGET"] = ".".join(swvers.stdout.decode("utf-8").strip().split(".")[:2])
 
 class CleanCommand(Clean):
     """python setup.py clean """
