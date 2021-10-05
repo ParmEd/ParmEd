@@ -1706,7 +1706,6 @@ class TestChamberParm(TestCaseRelative):
                 parm.createSystem(nonbondedMethod=nbmethod)
 
 @unittest.skipUnless(has_openmm, 'Cannot test without OpenMM')
-@pytest.mark.xfail
 class TestAmoebaParm(TestCaseRelative):
     """ Tests some of the OMM integration with the AmoebaParm classes """
 
