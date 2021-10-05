@@ -2231,9 +2231,11 @@ class Structure:
         frc_conv = _ambfrc.conversion_factor_to(_ommfrc)
         # See if we need to add Amoeba bonds or regular bonds
         if hasattr(self.bond_types, 'degree') and hasattr(self.bond_types, 'coeffs'):
-            force = mm.AmoebaBondForce()
-            force.setAmoebaGlobalBondCubic(self.bond_types.coeffs[3]/length_conv)
-            force.setAmoebaGlobalBondQuartic(self.bond_types.coeffs[4]/length_conv**2)
+            energy = "k*(d^2 + %s*d^3 + %s*d^4); d=r-r0" % (self.bond_types.coeffs[3]/length_conv, self.bond_types.coeffs[4]/length_conv**2)
+            force = mm.CustomBondForce(energy)
+            force.addPerBondParameter('r0')
+            force.addPerBondParameter('k')
+            force.setName('AmoebaBond')
         else:
             force = mm.HarmonicBondForce()
         force.setForceGroup(self.BOND_FORCE_GROUP)
@@ -2253,8 +2255,12 @@ class Structure:
                 continue
             if bond.type is None:
                 raise ParameterError('Cannot find necessary parameters')
-            force.addBond(bond.atom1.idx, bond.atom2.idx, bond.type.req*length_conv,
-                          2*bond.type.k*frc_conv)
+            if isinstance(force, mm.HarmonicBondForce):
+                force.addBond(bond.atom1.idx, bond.atom2.idx, bond.type.req*length_conv,
+                              2*bond.type.k*frc_conv)
+            else:
+                force.addBond(bond.atom1.idx, bond.atom2.idx, (bond.type.req*length_conv,
+                              2*bond.type.k*frc_conv))
         # Done adding the force
         if force.getNumBonds() == 0:
             return None
@@ -2289,11 +2295,11 @@ class Structure:
         if (hasattr(self.angle_types, 'degree') and
                 hasattr(self.angle_types, 'coeffs')):
             c = self.angle_types.coeffs
-            force = mm.AmoebaAngleForce()
-            force.setAmoebaGlobalAngleCubic(c[3])
-            force.setAmoebaGlobalAngleQuartic(c[4])
-            force.setAmoebaGlobalAnglePentic(c[5])
-            force.setAmoebaGlobalAngleSextic(c[6])
+            energy = "k*(d^2 + %s*d^3 + %s*d^4 + %s*d^5 + %s*d^6); d=%.15g*theta-theta0" % (c[3], c[4], c[5], c[6], 180/math.pi)
+            force = mm.CustomAngleForce(energy)
+            force.addPerAngleParameter('theta0')
+            force.addPerAngleParameter('k')
+            force.setName('AmoebaAngle')
         else:
             force = mm.HarmonicAngleForce()
         force.setForceGroup(self.ANGLE_FORCE_GROUP)
@@ -2304,8 +2310,12 @@ class Structure:
                 continue # pragma: no cover
             if angle.type is None:
                 raise ParameterError('Cannot find angle parameters')
-            force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
-                           angle.type.theteq*DEG_TO_RAD, 2*angle.type.k*frc_conv)
+            if isinstance(force, mm.HarmonicAngleForce):
+                force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
+                               angle.type.theteq*DEG_TO_RAD, 2*angle.type.k*frc_conv)
+            else:
+                force.addAngle(angle.atom1.idx, angle.atom2.idx, angle.atom3.idx,
+                               (angle.type.theteq*DEG_TO_RAD, 2*angle.type.k*frc_conv))
         if force.getNumAngles() == 0:
             return None
         return force
@@ -2956,18 +2966,26 @@ class Structure:
         if (not hasattr(self.trigonal_angle_types, 'degree') or
             not hasattr(self.trigonal_angle_types, 'coeffs')):
             raise ParameterError('Do not have the trigonal angle force table parameters')
-        force = mm.AmoebaInPlaneAngleForce()
         c = self.trigonal_angle_types.coeffs
-        force.setAmoebaGlobalInPlaneAngleCubic(c[3])
-        force.setAmoebaGlobalInPlaneAngleQuartic(c[4])
-        force.setAmoebaGlobalInPlaneAnglePentic(c[5])
-        force.setAmoebaGlobalInPlaneAngleSextic(c[6])
+        energy = """k*(d^2 + %s*d^3 + %s*d^4 + %s*d^5 + %s*d^6); d=theta-theta0;
+                    theta = %.15g*pointangle(x1, y1, z1, projx, projy, projz, x3, y3, z3);
+                    projx = x2-nx*dot; projy = y2-ny*dot; projz = z2-nz*dot;
+                    dot = nx*(x2-x3) + ny*(y2-y3) + nz*(z2-z3);
+                    nx = px/norm; ny = py/norm; nz = pz/norm;
+                    norm = sqrt(px*px + py*py + pz*pz);
+                    px = (d1y*d2z-d1z*d2y); py = (d1z*d2x-d1x*d2z); pz = (d1x*d2y-d1y*d2x);
+                    d1x = x1-x4; d1y = y1-y4; d1z = z1-z4;
+                    d2x = x3-x4; d2y = y3-y4; d2z = z3-z4""" % (c[3], c[4], c[5], c[6], 180/math.pi)
+        force = mm.CustomCompoundBondForce(4, energy)
+        force.addPerBondParameter("theta0")
+        force.addPerBondParameter("k")
+        force.setName('AmoebaInPlaneAngle')
         force.setForceGroup(self.TRIGONAL_ANGLE_FORCE_GROUP)
         for ang in self.trigonal_angles:
             if ang.type is None:
                 raise ParameterError('Missing trigonal angle parameters')
-            force.addAngle(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx,
-                           ang.type.theteq, ang.type.k*frc_conv)
+            force.addBond((ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx),
+                           (ang.type.theteq, ang.type.k*frc_conv))
         return force
 
     #===================================================
@@ -2986,18 +3004,25 @@ class Structure:
         if (not hasattr(self.out_of_plane_bend_types, 'degree') or
             not hasattr(self.out_of_plane_bend_types, 'coeffs')):
             raise ParameterError('Do not have the trigonal angle force table parameters')
-        force = mm.AmoebaOutOfPlaneBendForce()
         c = self.out_of_plane_bend_types.coeffs
-        force.setAmoebaGlobalOutOfPlaneBendCubic(c[3])
-        force.setAmoebaGlobalOutOfPlaneBendQuartic(c[4])
-        force.setAmoebaGlobalOutOfPlaneBendPentic(c[5])
-        force.setAmoebaGlobalOutOfPlaneBendSextic(c[6])
+        energy = """k*(theta^2 + %s*theta^3 + %s*theta^4 + %s*theta^5 + %s*theta^6);
+                    theta = %.15g*pointangle(x2, y2, z2, x4, y4, z4, projx, projy, projz);
+                    projx = x2-nx*dot; projy = y2-ny*dot; projz = z2-nz*dot;
+                    dot = nx*(x2-x3) + ny*(y2-y3) + nz*(z2-z3);
+                    nx = px/norm; ny = py/norm; nz = pz/norm;
+                    norm = sqrt(px*px + py*py + pz*pz);
+                    px = (d1y*d2z-d1z*d2y); py = (d1z*d2x-d1x*d2z); pz = (d1x*d2y-d1y*d2x);
+                    d1x = x1-x4; d1y = y1-y4; d1z = z1-z4;
+                    d2x = x3-x4; d2y = y3-y4; d2z = z3-z4""" % (c[3], c[4], c[5], c[6], 180/math.pi)
+        force = mm.CustomCompoundBondForce(4, energy)
+        force.addPerBondParameter("k")
+        force.setName('AmoebaOutOfPlaneBend')
         force.setForceGroup(self.OUT_OF_PLANE_BEND_FORCE_GROUP)
         for ang in self.out_of_plane_bends:
             if ang.type is None:
                 raise ParameterError('Missing out-of-plane bend parameters')
-            force.addOutOfPlaneBend(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx,
-                                    2*ang.type.k*frc_conv)
+            force.addBond((ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx),
+                                    (2*ang.type.k*frc_conv,))
         return force
 
     #===================================================
@@ -3013,13 +3038,23 @@ class Structure:
         """
         if not self.pi_torsions: return None
         frc_conv = u.kilocalories.conversion_factor_to(u.kilojoules)
-        force = mm.AmoebaPiTorsionForce()
+        energy = """2*k*sin(phi)^2;
+                    phi = pointdihedral(x3+c1x, y3+c1y, z3+c1z, x3, y3, z3, x4, y4, z4, x4+c2x, y4+c2y, z4+c2z);
+                    c1x = (d14y*d24z-d14z*d24y); c1y = (d14z*d24x-d14x*d24z); c1z = (d14x*d24y-d14y*d24x);
+                    c2x = (d53y*d63z-d53z*d63y); c2y = (d53z*d63x-d53x*d63z); c2z = (d53x*d63y-d53y*d63x);
+                    d14x = x1-x4; d14y = y1-y4; d14z = z1-z4;
+                    d24x = x2-x4; d24y = y2-y4; d24z = z2-z4;
+                    d53x = x5-x3; d53y = y5-y3; d53z = z5-z3;
+                    d63x = x6-x3; d63y = y6-y3; d63z = z6-z3"""
+        force = mm.CustomCompoundBondForce(6, energy)
+        force.addPerBondParameter('k')
+        force.setName('AmoebaPiTorsion')
         force.setForceGroup(self.PI_TORSION_FORCE_GROUP)
         for ang in self.pi_torsions:
             if ang.type is None:
                 raise ParameterError('Missing pi-torsion parameters')
-            force.addPiTorsion(ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx,
-                               ang.atom5.idx, ang.atom6.idx, ang.type.phi_k*frc_conv)
+            force.addBond((ang.atom1.idx, ang.atom2.idx, ang.atom3.idx, ang.atom4.idx,
+                               ang.atom5.idx, ang.atom6.idx), (ang.type.phi_k*frc_conv,))
         return force
 
     #===================================================
@@ -3037,15 +3072,22 @@ class Structure:
         # Conversion factor taken from pyopenmm/processTinkerForceField.py
         frc_conv = math.pi / 180 * 41.84 # 4.184 * 10
         length_conv = u.angstroms.conversion_factor_to(u.nanometers)
-        force = mm.AmoebaStretchBendForce()
+        energy = "(k1*(distance(p1,p2)-r12) + k2*(distance(p2,p3)-r23))*(%.15g*(angle(p1,p2,p3)-theta0))" % (180/math.pi)
+        force = mm.CustomCompoundBondForce(3, energy)
+        force.addPerBondParameter("r12")
+        force.addPerBondParameter("r23")
+        force.addPerBondParameter("theta0")
+        force.addPerBondParameter("k1")
+        force.addPerBondParameter("k2")
+        force.setName('AmoebaStretchBend')
         force.setForceGroup(self.STRETCH_BEND_FORCE_GROUP)
         for strbnd in self.stretch_bends:
             if strbnd.type is None:
                 raise ParameterError("Missing stretch-bend parameters")
-            force.addStretchBend(strbnd.atom1.idx, strbnd.atom2.idx, strbnd.atom3.idx,
-                                 strbnd.type.req1*length_conv, strbnd.type.req2*length_conv,
-                                 strbnd.type.theteq*math.pi/180, strbnd.type.k1*frc_conv,
-                                 strbnd.type.k2*frc_conv)
+            force.addBond((strbnd.atom1.idx, strbnd.atom2.idx, strbnd.atom3.idx),
+                          (strbnd.type.req1*length_conv, strbnd.type.req2*length_conv,
+                          strbnd.type.theteq*math.pi/180, strbnd.type.k1*frc_conv,
+                          strbnd.type.k2*frc_conv))
         return force
 
     #===================================================
