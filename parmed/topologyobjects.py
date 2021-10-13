@@ -946,7 +946,7 @@ class Atom(_ListItem):
         return not self > other
 
     def __repr__(self):
-        start = f'<Atom {self.name} [{self.idx}]'
+        start = f'<{self.__class__.__name__} {self.name} [{self.idx}]'
         if self.residue is not None and hasattr(self.residue, 'idx'):
             return start + f'; In {self.residue.name} {self.residue.idx}>'
         elif self.residue is not None:
@@ -4198,12 +4198,13 @@ class DrudeAtom(Atom):
         atoms, this is None.
     """
 
-    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', **kwargs):
+    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', parent=None, **kwargs):
         super().__init__(**kwargs)
         self.alpha = alpha
         self.thole = thole
         self.drude_type = drude_type
         self.anisotropy = None
+        self.parent = parent
 
     @property
     def drude_charge(self):
@@ -4231,11 +4232,9 @@ class DrudeAnisotropy(_FourAtomTerm):
     atom4 : :class:`Atom`
         the fourth atom defining the coordinate frame
     a11 : ``float``
-        the scale factor for the polarizability along the direction defined by
-        atom1 and atom2
+        the scale factor for the polarizability along the direction defined by atom1 and atom2
     a22 : ``float``
-        the scale factor for the polarizability along the direction defined by
-        atom3 and atom4
+        the scale factor for the polarizability along the direction defined by atom3 and atom4
     """
 
     def __init__(self, atom1, atom2, atom3, atom4, a11, a22):

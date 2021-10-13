@@ -17,7 +17,7 @@ from .exceptions import ParameterError
 from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
                        box_vectors_to_lengths_and_angles, distance2)
 from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
-                              Dihedral, DihedralType, DihedralTypeList, ExtraPoint, Group, Improper,
+                              Dihedral, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint, Group, Improper,
                               MultipoleFrame, NonbondedException, NoUreyBradley, OutOfPlaneBend,
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
@@ -234,6 +234,7 @@ class Structure:
     TORSION_TORSION_FORCE_GROUP = 10
     NONBONDED_FORCE_GROUP = 11
     RB_TORSION_FORCE_GROUP = 12
+    DRUDE_FORCE_GROUP = 13
 
     #===================================================
 
@@ -2066,6 +2067,8 @@ class Structure:
         if self.box is not None:
             system.setDefaultPeriodicBoxVectors(*reducePeriodicBoxVectors(self.box_vectors))
         self.omm_set_virtual_sites(system)
+        if any(isinstance(atom, DrudeAtom) for atom in self.atoms):
+            self._add_force_to_system(system, self.omm_drude_force(system))
         return system
 
     #===================================================
@@ -2681,6 +2684,13 @@ class Structure:
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
 
+        return force
+
+    #===================================================
+
+    def omm_drude_force(self, system):
+        force = mm.DrudeForce()
+        force.setForceGroup(self.DRUDE_FORCE_GROUP)
         return force
 
     #===================================================

@@ -241,11 +241,14 @@ class CharmmPsfFile(Structure):
                     alpha = self._convert(words[9], float, 'alpha')
                     thole = self._convert(words[10], float, 'thole')
                     drude_alpha_thole.append((alpha, thole))
-                if is_drude and i > 1 and drude_alpha_thole[-2] != (0, 0):
+                if is_drude and i >= 1 and drude_alpha_thole[-2] != (0, 0):
+                    # This assumes that the Drude atom is defined immediately after its parent atom.
+                    # This always appears to be the case, but if it proves untrue at some point then
+                    # this will need to be refactored to identify Drude atoms after identifying bonds.
                     my_alpha, my_thole = drude_alpha_thole[-2]
-                    atom = DrudeAtom(name=name, type=attype, charge=charge, mass=mass,
+                    atom = DrudeAtom(name=name, type=attype, charge=charge, mass=mass, parent=self.atoms[-1],
                                      atomic_number=0, alpha=my_alpha, thole=my_thole, drude_type=attype)
-                elif name.startswith('LP') and mass == 0:
+                elif (name.startswith('LP') or (isinstance(attype, str) and attype.startswith("LP"))) and mass == 0:
                     atom = ExtraPoint(name=name, type=attype, charge=charge, mass=mass, atomic_number=0)
                 else:
                     atom = Atom(name=name, type=attype, charge=charge, mass=mass,
@@ -637,10 +640,16 @@ class CharmmPsfFile(Structure):
             atom.atomic_number = atype.atomic_number
 
         # Next load all of the bonds
+        skipped_bonds = set()
         for bond in self.bonds:
+            # Skip any bonds with drude atoms or virtual sites. They are not stored.
+            # Depending on how Drude support is implemented in Amber (if that ever happens), we
+            # may have to add dummy values here.
+            if isinstance(bond.atom1, (DrudeAtom, ExtraPoint)) or isinstance(bond.atom2, (DrudeAtom, ExtraPoint)):
+                skipped_bonds.add(bond)
+                continue
             # Construct the key
-            key = (min(bond.atom1.type, bond.atom2.type),
-                   max(bond.atom1.type, bond.atom2.type))
+            key = (min(bond.atom1.type, bond.atom2.type), max(bond.atom1.type, bond.atom2.type))
             try:
                 bond.type = parmset.bond_types[key]
             except KeyError:
@@ -649,6 +658,8 @@ class CharmmPsfFile(Structure):
         # Build the bond_types list
         del self.bond_types[:]
         for bond in self.bonds:
+            if bond in skipped_bonds:
+                continue
             if bond.type.used:
                 continue
             bond.type.used = True

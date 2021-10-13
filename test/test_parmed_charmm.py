@@ -11,7 +11,8 @@ from parmed.utils.io import genopen
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
-from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint
+from parmed.topologyobjects import Atom, BondType, AngleType, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint
+from parmed.periodic_table import Element, Mass
 import parmed.unit as u
 import random
 import unittest
@@ -1030,12 +1031,10 @@ class TestFileWriting(TestCharmmBase):
 
     def test_charmm_file(self):
         """ Test the CharmmFile API and error handling """
-        self.assertRaises(ValueError, lambda:
-                CharmmFile(get_fn('trx.prmtop'), 'x')
-        )
-        self.assertRaises(IOError, lambda:
-                CharmmFile(get_fn('file_does_not_exist'), 'r')
-        )
+        with self.assertRaises(ValueError):
+            CharmmFile(get_fn('trx.prmtop'), 'x')
+        with self.assertRaises(IOError):
+            CharmmFile(get_fn('file_does_not_exist'), 'r')
         with CharmmFile(self.get_fn('newfile.chm', written=True), 'w') as f:
             f.write('abc123\ndef456\nghi789!comment...\n')
         with CharmmFile(self.get_fn('newfile.chm', written=True), 'r') as f:
@@ -1066,10 +1065,8 @@ class TestFileWriting(TestCharmmBase):
                 lines.append(line)
                 comments.append(f.comment)
                 line = f.readline()
-            self.assertEqual(lines, ['First line \n', 'Second line \n',
-                                     'Third line \n', 'Fourth line \n'])
-            self.assertEqual(comments, ['! first comment', '! second comment',
-                                        '! third comment', '! fourth comment'])
+            self.assertEqual(lines, ['First line \n', 'Second line \n', 'Third line \n', 'Fourth line \n'])
+            self.assertEqual(comments, ['! first comment', '! second comment', '! third comment', '! fourth comment'])
 
     def test_charmm_stream_file(self):
         """ Test the CharmmStreamFile API """
@@ -1184,6 +1181,20 @@ class TestFileWriting(TestCharmmBase):
 
 class TestCharmmDrudeSystems(unittest.TestCase):
     """ Tests processing of DRUDE systems """
+
+    def test_drude_mass(self):
+        drude_psf = psf.CharmmPsfFile(get_fn("ala3_solv_drude.psf"))
+        params = parameters.CharmmParameterSet(get_fn("toppar_drude_master_protein_2013e.str"))
+        drude_psf.load_parameters(params)
+        # Check this against a known-correct implementation in OpenM
+        self.assertEqual(sum([isinstance(a, DrudeAtom) for a in drude_psf.atoms]), 957)
+        for atom in drude_psf.atoms:
+            if isinstance(atom, DrudeAtom):
+                self.assertIsInstance(atom.parent, Atom)
+        for atom in drude_psf.atoms:
+            if isinstance(atom, DrudeAtom):
+                self.assertAlmostEqual(atom.mass + atom.parent.mass, Mass[atom.parent.element_name], delta=0.01)
+
 
     def test_drude_parsing_na(self):
         """ Test parsing a trinucleotide with Drude particles and lone pairs """
