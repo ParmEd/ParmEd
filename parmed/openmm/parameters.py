@@ -678,8 +678,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 element_name = atom.element_name
 
             # If the number of bonds within the residue does not equal the number of bonds the atom should have, the atom  has an external bond 
-            if residue_name == 'OLP':
-                print(f"{atom.name} {d[element_name]} {bonds}")
             if d[element_name] > bonds:
                 external_bonds.append(atom)
 
