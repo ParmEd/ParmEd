@@ -643,7 +643,12 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
             # Add an extra bond if the atom is the O in a carbonyl (double bond)
             if atom.name in ['OD1', 'O', 'O2N', 'OXT']:
-                bonds += 1
+                if atom.name == 'OD1' and residue_name in ['OLP', 'NOLP', 'COLP']: # OLP residue has OD1 atom that is not part of a carbonyl, it is instead used for O-linked glycosylation
+                    pass
+                elif atom.name == 'O' and residue_name == 'OME': # OME residue has O atom that is not part of a carbonyl
+                    pass
+                else:
+                    bonds += 1
 
             # Count the number of bonds this atom has within the residue
             for bond in self.residues[residue_name].bonds:
@@ -654,7 +659,10 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 if (bond.atom1.name == 'OD1' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'OD1'):
                     bonds += 1
                 elif (bond.atom1.name == 'O' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'O'):
-                    bonds += 1
+                    if residue_name == 'OME': # The O in OME is not a carbonyl
+                        pass
+                    else:
+                        bonds += 1
                 elif (bond.atom1.name == 'O2N' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'O2N'):
                     bonds += 1
                 elif (bond.atom1.name == 'OXT' and bond.atom2 == atom) or (bond.atom1 == atom and bond.atom2.name == 'OXT'):
@@ -667,7 +675,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 element_name = atom.element_name
 
             # If the number of bonds within the residue does not equal the number of bonds the atom should have, the atom  has an external bond 
-            if d[element_name] != bonds:
+            if d[element_name] > bonds:
                 external_bonds.append(atom)
 
         return external_bonds
@@ -706,17 +714,17 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                 etree.SubElement(xml_residue, 'Bond', atomName1=bond.atom1.name, atomName2=bond.atom2.name)
             for lonepair in residue.lonepairs:
                 etree.SubElement(xml_residue, 'VirtualSite', self._get_lonepair_parameters(lonepair))
-            for atom in residue.connections:
-                etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
-            if residue.head is not None:
-                etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
-            if residue.tail is not None and residue.tail is not residue.head:
-                etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
-            if is_glycam:
+            if not is_glycam:
+                for atom in residue.connections:
+                    etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
+                if residue.head is not None:
+                    etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.head.name)
+                if residue.tail is not None and residue.tail is not residue.head:
+                    etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
+            else:
                 external_bonds = self._get_atoms_with_external_bonds(name)
                 for atom in external_bonds:
-                    if atom != residue.head and atom != residue.tail:
-                        etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
+                    etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.name in valid_patches_for_residue:
                 for patch_name in valid_patches_for_residue[residue.name]:
                     etree.SubElement(xml_residue, 'AllowPatch', name=patch_name)
