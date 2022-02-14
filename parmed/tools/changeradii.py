@@ -137,6 +137,150 @@ def mbondi(parm):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+def mbondi_pb2(parm):
+    """
+    Sets the mbondi_pb2 radii
+
+    Use ropt values for halogens in Table 3 (https://pubs.acs.org/doi/full/10.1021/acs.jctc.9b00106)
+
+                     pb2
+    halogen	 rstd	 MAEstd	 MAEopt (ropt)
+    Cl	     1.70    1.544	 1.529  (1.76)
+    Br	     1.85    0.792	 0.743  (1.97)
+    I	     1.98    0.905	 0.858  (2.09)
+
+    These ropt values have been obtained using the "pb2" routine described
+    in https://pubs.acs.org/doi/full/10.1021/acs.jctc.9b00106
+
+    setup	radii set(s)	ΔGnonpolar	      γ	        β        inp value in gmx_MMPBSA
+    pb2	    mbondi	        γ * SASA + β	  0.00720	0.0000   1
+
+    """
+    for i, atom in enumerate(parm.atoms):
+        # Radius of H atom depends on element it is bonded to
+        if atom.atomic_number == 1:
+            bondeds = list(atom.bond_partners)
+            if bondeds[0].atomic_number in (6, 7): # C or N
+                atom.solvent_radius = 1.3
+            elif bondeds[0].atomic_number in (8, 16): # O or S
+                atom.solvent_radius = 0.8
+            else:
+                atom.solvent_radius = 1.2
+        # Radius of C atom depends on what type it is
+        elif atom.atomic_number == 6:
+            if atom.type.startswith('C1') and atom.mass > 13.0:
+                atom.solvent_radius = 2.2
+            if atom.type.startswith('C2') and atom.mass > 14.0:
+                atom.solvent_radius = 2.2
+            if atom.type.startswith('C3') and atom.mass > 15.0:
+                atom.solvent_radius = 2.2
+            else:
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        # Cl
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 1.76
+        # Br
+        elif atom.atomic_number == 35:
+            atom.solvent_radius = 1.97
+        # I
+        elif atom.atomic_number == 53:
+            atom.solvent_radius = 2.09
+        else:
+            atom.solvent_radius = 1.5
+    try:
+        parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii with ropt for halogens (mbondi_pb2)'
+    except AttributeError:
+        pass
+    _screen1(parm)
+
+
+def mbondi_pb3(parm):
+    """
+    Sets the mbondi_pb3 radii
+
+    Use ropt values for halogens in Table 3 (https://pubs.acs.org/doi/full/10.1021/acs.jctc.9b00106)
+
+                     pb3
+    halogen	 rstd	 MAEstd	 MAEopt (ropt)
+    Cl	     1.70    1.358	 1.236 (2.20)
+    Br	     1.85    0.770	 0.681 (2.04)
+    I	     1.98    0.769	 0.697 (2.19)
+
+    These ropt values have been obtained using the "pb3" routine described
+    in https://pubs.acs.org/doi/full/10.1021/acs.jctc.9b00106
+
+    setup	radii set(s)	ΔGnonpolar	                γ	     β        inp value in gmx_MMPBSA
+    pb3	    mbondi + Rmin	γ * SAV + β + ΔGdispersion	0.03780	 –0.5692  2
+
+    The mbondi radii set is used in the ΔGpolar calculation, while the value corresponding to Rmin in GAFF is
+    used for the calculation of ΔGnonpolar
+
+    """
+    for i, atom in enumerate(parm.atoms):
+        # Radius of H atom depends on element it is bonded to
+        if atom.atomic_number == 1:
+            bondeds = list(atom.bond_partners)
+            if bondeds[0].atomic_number in (6, 7): # C or N
+                atom.solvent_radius = 1.3
+            elif bondeds[0].atomic_number in (8, 16): # O or S
+                atom.solvent_radius = 0.8
+            else:
+                atom.solvent_radius = 1.2
+        # Radius of C atom depends on what type it is
+        elif atom.atomic_number == 6:
+            if atom.type.startswith('C1') and atom.mass > 13.0:
+                atom.solvent_radius = 2.2
+            if atom.type.startswith('C2') and atom.mass > 14.0:
+                atom.solvent_radius = 2.2
+            if atom.type.startswith('C3') and atom.mass > 15.0:
+                atom.solvent_radius = 2.2
+            else:
+                atom.solvent_radius = 1.7
+        # All other elements have fixed solvent_radius for all types/partners
+        elif atom.atomic_number == 7:
+            atom.solvent_radius = 1.55
+        elif atom.atomic_number == 8:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 9:
+            atom.solvent_radius = 1.5
+        elif atom.atomic_number == 14:
+            atom.solvent_radius = 2.1
+        elif atom.atomic_number == 15:
+            atom.solvent_radius = 1.85
+        elif atom.atomic_number == 16:
+            atom.solvent_radius = 1.8
+        # Cl
+        elif atom.atomic_number == 17:
+            atom.solvent_radius = 2.20
+        # Br
+        elif atom.atomic_number == 35:
+            atom.solvent_radius = 2.04
+        # I
+        elif atom.atomic_number == 53:
+            atom.solvent_radius = 2.19
+        else:
+            atom.solvent_radius = 1.5
+    try:
+        parm.parm_data['RADIUS_SET'][0] = 'modified Bondi radii with ropt for halogens (mbondi_pb3)'
+    except AttributeError:
+        pass
+    _screen1(parm)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 def mbondi2(parm):
     """ Sets the mbondi2 radii """
     for i, atom in enumerate(parm.atoms):
@@ -284,8 +428,8 @@ def _screen3(parm):
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-_call_method = dict(bondi=bondi, mbondi=mbondi, mbondi2=mbondi2,
-                    mbondi3=mbondi3, amber6=amber6)
+_call_method = dict(bondi=bondi, mbondi=mbondi, mbondi_pb2=mbondi_pb2, mbondi_pb3=mbondi_pb3, mbondi2=mbondi2,
+                    mbondi3=mbondi3, amber6=amber6, charmm_radii=charmm_radii)
 
 def ChRad(parm, radii_set):
     global _call_method
