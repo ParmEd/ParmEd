@@ -443,7 +443,7 @@ class TestReadParm(FileIOTestCase):
 
         parm.remake_parm()
 
-        myre = re.compile('AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
+        myre = re.compile(r'AMOEBA_TORSION_TORSION_TORTOR_TABLE_(\d\d)')
         for flag, data in iteritems(parm.parm_data):
             if 'TORSION_TORSION' not in flag: continue
             rematch = myre.match(flag)
@@ -1624,6 +1624,17 @@ class TestCoordinateFiles(FileIOTestCase):
         self.assertEqual(parm.get_coordinates().shape, (101, 223, 3))
         self.assertEqual(len(parm.atoms), 223)
         self.assertIs(parm.box, None)
+
+    def test_save_amberparm_with_cmaps(self):
+        """ Ensure the CMAPs do not force Structure.save to write a ChamberParm """
+        parm = pmd.load_file(get_fn("ff19sb-cmaps.parm7"))
+        self.assertNotIn("CTITLE", parm.flag_list)
+        self.assertIsInstance(parm, readparm.AmberParm)
+        written_fn = self.get_fn("ff19sb-cmaps.prmtop", written=True)
+        parm.save(written_fn)
+        parm2 = pmd.load_file(written_fn)
+        self.assertNotIn("CTITLE", parm2.flag_list)
+        self.assertIsInstance(parm2, readparm.AmberParm)
 
 
 class TestAmberMask(unittest.TestCase):
