@@ -490,11 +490,11 @@ class GromacsTopologyFile(Structure):
         else:
             atom = Atom(atomic_number=atomic_number, name=words[4],
                         type=words[1], charge=charge, mass=mass)
-        # check for insertion code
-        try:
+        # check for insertion code and negative res number
+        if words[2].isnumeric() or (words[2].startswith('-') and words[2][1:].isnumeric()):
             icode = ''
             resnum = int(words[2])
-        except:
+        else:
             icode = words[2][-1]
             resnum = int(words[2][:-1])
         return atom, words[3], resnum, icode
