@@ -21,6 +21,9 @@ evaluate_test() {
     if [ $1 -ne 0 ]; then
         echo "ERROR"
         errors=`python -c "print($errors + 1)"`
+    elif [ $# -eq 1 ]; then
+        # Just checking if the script completed successfully
+        echo "PASSED"
     elif [ $# -eq 2 ]; then
         diff $DIFFARGS files/saved_scripts/$2 files/writes/$2 >> files/writes/DIFFLOG 2>&1
         if [ $? -ne 0 ]; then
@@ -114,6 +117,12 @@ if [ $? -ne 0 ]; then
 else
     echo "PASSED"
 fi
+
+printf "Running basic test of CL with parm..."
+$run_cmd `which parmed` files/ash.parm7 2>&1 > /dev/null << EOF
+printFlags
+EOF
+evaluate_test $?
 
 ###### END TESTS ######
 
