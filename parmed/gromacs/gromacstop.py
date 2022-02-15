@@ -583,6 +583,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         else:
             atom = Atom(atomic_number=atomic_number, name=words[4],
                         type=words[1], charge=charge, mass=mass)
+
         # check for insertion code and negative res number
         if words[2].isnumeric() or (words[2].startswith('-') and words[2][1:].isnumeric()):
             icode = ''
