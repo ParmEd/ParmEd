@@ -94,10 +94,10 @@ def energy(parm, args, output=sys.stdout):
         ).format(e.vdw_14, e.elec_14, e.vdw, e.elec, e.tot))
     else:
         output.write((
-            'Bond     = %20.7f     Angle    = %20.7f\n'
-            'Dihedral = %20.7f     1-4 vdW  = %20.7f\n'
-            '1-4 Elec = %20.7f     vdWaals  = %20.7f\n'
-            'Elec.    = %20.7f'
+            'Bond     = {:20.7f}     Angle    = {:20.7f}\n'
+            'Dihedral = {:20.7f}     1-4 vdW  = {:20.7f}\n'
+            '1-4 Elec = {:20.7f}     vdWaals  = {:20.7f}\n'
+            'Elec.    = {:20.7f}'
         ).format(e.bond, e.angle, e.dihedral, e.vdw_14, e.elec_14, e.vdw, e.elec))
         if igb != 0 and inp.ntb == 0:
             output.write(f'     Egb      = {e.gb:20.7f}')
