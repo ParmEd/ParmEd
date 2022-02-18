@@ -7,7 +7,6 @@ import math
 import numpy as np
 import os
 import re
-import sys
 from io import StringIO
 import parmed as pmd
 from parmed.amber import (
@@ -21,6 +20,7 @@ from parmed import topologyobjects, load_file, Structure
 from parmed.tools import change
 import parmed.unit as u
 from parmed.utils import PYPY
+from parmed.gromacs import GromacsTopologyFile
 import pickle
 import random
 import saved_outputs as saved
@@ -30,7 +30,6 @@ from utils import (
     get_fn, FileIOTestCase, equal_atoms, create_random_structure, HAS_GROMACS,
     diff_files, has_openmm
 )
-import warnings
 from string import ascii_letters as letters
 
 def _picklecycle(obj):
@@ -360,6 +359,10 @@ class TestReadParm(FileIOTestCase):
         parm2.write_parm(f)
         f.seek(0)
         check_parm_for_cmap(readparm.AmberParm(f))
+        # Check that from_structure works correctly when reading from GROMACS with just cmap
+        from_struct_parm = readparm.AmberParm.from_structure(GromacsTopologyFile.from_structure(parm))
+        self.assertIs(type(from_struct_parm), type(parm))
+        check_parm_for_cmap(from_struct_parm)
 
     def test_chamber_gas_parm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
