@@ -304,7 +304,7 @@ class AmberParm(AmberFormat, Structure):
             return struct
         if struct.unknown_functional:
             raise TypeError('Cannot instantiate an AmberParm from unknown functional')
-        if (struct.urey_bradleys or struct.impropers or struct.cmaps or
+        if (struct.urey_bradleys or struct.impropers or
                 struct.trigonal_angles or struct.pi_torsions or
                 struct.out_of_plane_bends or struct.stretch_bends or
                 struct.torsion_torsions or struct.multipole_frames):

@@ -9,7 +9,6 @@ import math
 import numpy as np
 import os
 import re
-import sys
 import parmed as pmd
 from parmed.amber import (
     readparm, asciicrd, mask, parameters, mdin, FortranFormat, titratable_residues, AmberOFFLibrary
@@ -24,6 +23,7 @@ import parmed.unit as u
 from parmed.utils import PYPY
 from parmed.utils.six import string_types, iteritems
 from parmed.utils.six.moves import range, zip, StringIO
+from parmed.gromacs import GromacsTopologyFile
 import pickle
 import random
 import saved_outputs as saved
@@ -33,7 +33,6 @@ from utils import (
     get_fn, FileIOTestCase, equal_atoms, create_random_structure, HAS_GROMACS,
     diff_files, has_openmm
 )
-import warnings
 try:
     from string import letters
 except ImportError:
@@ -380,6 +379,10 @@ class TestReadParm(FileIOTestCase):
         parm2.write_parm(f)
         f.seek(0)
         check_parm_for_cmap(readparm.AmberParm(f))
+        # Check that from_structure works correctly when reading from GROMACS with just cmap
+        from_struct_parm = readparm.AmberParm.from_structure(GromacsTopologyFile.from_structure(parm))
+        self.assertIs(type(from_struct_parm), type(parm))
+        check_parm_for_cmap(from_struct_parm)
 
     def test_chamber_gas_parm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
