@@ -814,7 +814,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 elif line[:4].upper() == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
-                        warnings.warn('DEFA line has %d tokens; expected 5' % len(words))
+                        warnings.warn('DEFA line has %d tokens; expected 5' % len(words), ParameterWarning)
                     else:
                         it = iter(words[1:5])
                         for tok, val in zip(it, it):
@@ -825,7 +825,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             elif tok.upper() == 'LAST':
                                 tpatch = val
                             else:
-                                warnings.warn(f'DEFA patch {val} unknown')
+                                warnings.warn(f'DEFA patch {val} unknown', ParameterWarning)
                 elif line[:4].upper() in ('RESI', 'PRES'):
                     restype = line[:4].upper()
                     # Get the residue definition
@@ -839,7 +839,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     try:
                         charge = float(words[2])
                     except (IndexError, ValueError):
-                        warnings.warn(f'No charge for {resname}')
+                        warnings.warn(f'No charge for {resname}', ParameterWarning)
                     if restype == 'RESI':
                         res = ResidueTemplate(resname)
                     elif restype == 'PRES':
@@ -893,7 +893,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             else:
                                 warnings.warn(
                                     f'WARNING: Ignoring "{line.strip()}" because entity type '
-                                    f'{entity_type} not used.'
+                                    f'{entity_type} not used.', ParameterWarning
                                 )
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
@@ -933,7 +933,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             if not skip_adding_residue and lptype_keyword not in ['BISE', 'RELA']:
                                 warnings.warn(
                                     f'LONEPAIR type {words[1]} not supported; only BISEctor and '
-                                     'RELAtive supported'
+                                     'RELAtive supported', ParameterWarning
                                 )
                                 skip_adding_residue = True
                                 break
@@ -1007,14 +1007,14 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 try:
                     res.first_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn(f'Patch {patch_name} not found')
+                    warnings.warn(f'Patch {patch_name} not found', ParameterWarning)
 
             patch_name = tpatches[resname]
             if patch_name is not None:
                 try:
                     res.last_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn(f'Patch {patch_name} not found')
+                    warnings.warn(f'Patch {patch_name} not found', ParameterWarning)
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
 

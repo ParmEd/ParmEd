@@ -16,6 +16,7 @@ in the Amber restart file. The energies are very close, but have been
 recalculated using ParmEd for comparison here to improve the precision. The
 implementation these energies were computed by has already been validated.
 """
+import pytest
 from parmed.amber.readparm import Rst7
 from parmed.charmm import CharmmPsfFile, CharmmCrdFile, CharmmRstFile, CharmmParameterSet
 from parmed.exceptions import CharmmWarning, ParameterError
@@ -293,3 +294,15 @@ class TestCharmmFiles(TestCaseRelative):
             except TypeError:
                 d.scee = 0
         self.assertRaises(ValueError, parm.createSystem)
+
+@unittest.skipUnless(has_openmm, "Cannot test without OpenMM")
+class TestCharmmDrudeFiles(TestCaseRelative):
+
+    @pytest.mark.xfail
+    def test_create_simple_system(self):
+        psf = CharmmPsfFile(get_fn("ala3_solv_drude.psf"))
+        crd = CharmmCrdFile(get_fn("ala3_solv_drude.crd"))
+
+        params = CharmmParameterSet(get_fn("toppar_drude_master_protein_2013e.str"))
+
+        system = psf.createSystem(params)

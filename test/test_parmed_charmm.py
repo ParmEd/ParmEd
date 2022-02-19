@@ -1,7 +1,7 @@
 """
 Tests for the parmed/charmm subpackage
 """
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from io import StringIO
 import copy
 import numpy as np
@@ -12,7 +12,7 @@ from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
 from parmed.topologyobjects import Atom, BondType, AngleType, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint
-from parmed.periodic_table import Element, Mass
+from parmed.periodic_table import Mass
 import parmed.unit as u
 import random
 import unittest
@@ -23,9 +23,18 @@ class TestCharmmBase(FileIOTestCase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        warnings.simplefilter("ignore", category=exceptions.ParameterWarning)
         self.param22 = parameters.CharmmParameterSet(
             get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp')
         )
+
+    def setUp(self):
+        warnings.simplefilter("ignore", category=exceptions.ParameterWarning)
+        super().setUp()
+
+    def tearDown(self):
+        warnings.simplefilter("always", category=exceptions.ParameterWarning)
+        return super().tearDown()
 
 class TestCharmmCoords(TestCharmmBase):
     """ Test CHARMM coordinate file parsers """
@@ -1179,7 +1188,7 @@ class TestFileWriting(TestCharmmBase):
         cpsf = pmd.load_file(fn)
         self.assertIn('XPLOR', cpsf.flags)
 
-class TestCharmmDrudeSystems(unittest.TestCase):
+class TestCharmmDrudeSystems(TestCharmmBase):
     """ Tests processing of DRUDE systems """
 
     def test_drude_mass(self):
@@ -1194,6 +1203,9 @@ class TestCharmmDrudeSystems(unittest.TestCase):
         for atom in drude_psf.atoms:
             if isinstance(atom, DrudeAtom):
                 self.assertAlmostEqual(atom.mass + atom.parent.mass, Mass[atom.parent.element_name], delta=0.01)
+
+        self.assertEqual(sum(atom.anisotropy is not None for atom in drude_psf.atoms if isinstance(atom, DrudeAtom)), 4)
+        self.assertTrue(any(atom.anisotropy is None for atom in drude_psf.atoms if isinstance(atom, DrudeAtom)))
 
 
     def test_drude_parsing_na(self):

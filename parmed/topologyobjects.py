@@ -5,6 +5,7 @@ as atoms, residues, bonds, angles, etc.
 by Jason Swails
 """
 import math
+from typing import Optional
 import warnings
 from abc import ABC, abstractmethod
 from copy import copy
@@ -4203,7 +4204,7 @@ class DrudeAtom(Atom):
         self.alpha = alpha
         self.thole = thole
         self.drude_type = drude_type
-        self.anisotropy = None
+        self.anisotropy: Optional["DrudeAnisotropy"] = None
         self.parent = parent
 
     @property
@@ -4214,7 +4215,7 @@ class DrudeAtom(Atom):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class DrudeAnisotropy(_FourAtomTerm):
+class DrudeAnisotropy:
     """
     A description of an anisotropically polarizable atom.
 
@@ -4223,8 +4224,8 @@ class DrudeAnisotropy(_FourAtomTerm):
 
     Parameters
     ----------
-    atom1 : :class:`DrudeAtom`
-        the polarizable atom
+    atom1 : :class:`Atom`
+        the parent atom to the Drude atom
     atom2 : :class:`Atom`
         the second atom defining the coordinate frame
     atom3 : :class:`Atom`
@@ -4238,7 +4239,10 @@ class DrudeAnisotropy(_FourAtomTerm):
     """
 
     def __init__(self, atom1, atom2, atom3, atom4, a11, a22):
-        super().__init__(atom1, atom2, atom3, atom4)
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.atom4 = atom4
         self.a11 = a11
         self.a22 = a22
 

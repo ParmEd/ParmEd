@@ -4,15 +4,15 @@ structure for it
 """
 import math
 import re
-import warnings
 from copy import copy as _copy
 from functools import wraps
 from ..constants import DEG_TO_RAD
 from ..periodic_table import AtomicNum, element_by_mass
 from ..topologyobjects import (Bond, Angle, Dihedral, Improper, AcceptorDonor, Group, Cmap,
                                UreyBradley, NoUreyBradley, Atom, DihedralType, ImproperType,
-                               UnassignedAtomType, ExtraPoint, DrudeAtom, LocalCoordinatesFrame)
-from ..exceptions import CharmmError, CharmmWarning, ParameterError
+                               UnassignedAtomType, ExtraPoint, DrudeAtom, LocalCoordinatesFrame,
+                               DrudeAnisotropy)
+from ..exceptions import CharmmError, ParameterError
 from ..structure import needs_openmm, Structure
 from ..utils.io import genopen
 
@@ -210,10 +210,8 @@ class CharmmPsfFile(Structure):
             self.title = psfsections['NTITLE'][1]
             # Next is the number of atoms
             natom = self._convert(psfsections['NATOM'][0], int, 'natom')
-            last_alpha = last_thole = None
             # Parse all of the atoms
             drude_alpha_thole = []
-            drude_pair_list = []
             is_drude = 'DRUDE' in psf_flags
             for i in range(natom):
                 words = psfsections['NATOM'][1][i].split()
@@ -319,11 +317,12 @@ class CharmmPsfFile(Structure):
             # Assign all of the atoms to molecules recursively
             tmp = psfsections['MOLNT'][1]
             tag_molecules(self)
-            molecule_list = [a.marked for a in self.atoms]
-            lp_distance_list = lp_angle_list = lp_dihedral_list = lp_hostnum_list = None
             if len(tmp) == len(self.atoms):
                 # We have a CHARMM PSF file; now do NUMLP/NUMLPH sections
                 self._process_lonepair_section(psfsections["NUMLP NUMLPH"])
+            # Now process the NUMANISO records if this is a drude PSF
+            if is_drude:
+                self._process_aniso_section(psfsections["NUMANISO"])
             # Now do the CMAPs
             ncrterm = self._convert(psfsections['NCRTERM'][0], int, 'Number of cross-terms')
             if len(psfsections['NCRTERM'][1]) != ncrterm * 8:
@@ -384,6 +383,38 @@ class CharmmPsfFile(Structure):
                 raise CharmmError(f"Expected atom {idall[0]} to be an ExtraPoint but it is not")
             self.atoms[idall[0]].frame = frame
             lp_cnt += lp_hostnum_list[i] + 1
+
+    #===================================================
+
+    def _process_aniso_section(self, section):
+        num_aniso, data = section
+        if num_aniso == 0:
+            return
+        k_list = []
+        pointers = []
+
+        for i in range(num_aniso):
+            k_list.append([float(x) for x in data[i].split()])
+        for i in range((num_aniso + 1) // 2):
+            pointers.extend([int(x) for x in data[i + num_aniso].split()])
+        if len(pointers) != 4 * len(k_list):
+            raise CharmmError(
+                f"Bad NUMANISO section - mismatching numbers of atom indices and k ({len(pointers)} vs {len(k_list)})"
+            )
+        it = iter(pointers)
+        parent_to_drude = {atom.parent: atom for atom in self.atoms if isinstance(atom, DrudeAtom)}
+        for id1, id2, id3, id4, (k11, k22, k33) in zip(it, it, it, it, k_list):
+            parent_atom: Atom = self.atoms[id1 - 1]
+            drude_atom = parent_to_drude[parent_atom]
+            # Calculate a11 and a12, per the code originally found in OpenMM
+            a = k11 + k22 + (3 * k33)
+            b = (2 * k11 * k22) + (4 * k11 * k33) + (6 * k33 * k33)
+            c = 3 * k33 * (k11 + k33) * (k22 + k33)
+            drude_k = (math.sqrt(b * b - 4 * a * c)) / (2 * a)
+            a11 = round(drude_k / (k11 + k33 + drude_k), 5)
+            a22 = round(drude_k / (k22 + k33 + drude_k), 5)
+            at2, at3, at4 = self.atoms[id2 - 1], self.atoms[id3 - 1], self.atoms[id4 - 1]
+            drude_atom.anisotropy = DrudeAnisotropy(parent_atom, at2, at3, at4, a11, a22)
 
     #===================================================
 

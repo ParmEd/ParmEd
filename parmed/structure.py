@@ -2068,7 +2068,7 @@ class Structure:
             system.setDefaultPeriodicBoxVectors(*reducePeriodicBoxVectors(self.box_vectors))
         self.omm_set_virtual_sites(system)
         if any(isinstance(atom, DrudeAtom) for atom in self.atoms):
-            self._add_force_to_system(system, self.omm_drude_force(system))
+            self._add_force_to_system(system, self.omm_drude_force(drudeMass))
         return system
 
     #===================================================
@@ -2688,7 +2688,7 @@ class Structure:
 
     #===================================================
 
-    def omm_drude_force(self, system):
+    def omm_drude_force(self, drude_mass):
         force = mm.DrudeForce()
         force.setForceGroup(self.DRUDE_FORCE_GROUP)
         return force
