@@ -782,9 +782,8 @@ class PDBFile(metaclass=FileFormatType):
     @staticmethod
     def write(struct, dest, renumber=True, coordinates=None, altlocs='all',
               write_anisou=False, charmm=False, use_hetatoms=True,
-              standard_resnames=False, increase_tercount=True, write_links=False):
+              standard_resnames=False, increase_tercount=True, write_links=False, conect=True):
         """ Write a PDB file from a Structure instance
-
         Parameters
         ----------
         struct : :class:`Structure`
@@ -807,13 +806,11 @@ class PDBFile(metaclass=FileFormatType):
         altlocs : str, optional, default 'all'
             Keyword controlling which alternate locations are printed to the
             resulting PDB file. Allowable options are:
-
                 - 'all' : print all alternate locations
                 - 'first' : print only the first alternate locations
                 - 'occupancy' : print the one with the largest occupancy. If two
                   conformers have the same occupancy, the first one to occur is
                   printed
-
             Input is case-insensitive, and partial strings are permitted as long
             as it is a substring of one of the above options that uniquely
             identifies the choice.
@@ -826,7 +823,7 @@ class PDBFile(metaclass=FileFormatType):
             atom that does not contain a SEGID identifier.
         use_hetatoms: bool, optional, default True
             If True, certain atoms will have the HETATM tag instead of ATOM
-            as per the PDB-standard. 
+            as per the PDB-standard.
         standard_resnames : bool, optional, default False
             If True, common aliases for various amino and nucleic acid residues
             will be converted into the PDB-standard values.
@@ -837,7 +834,8 @@ class PDBFile(metaclass=FileFormatType):
             If True, any LINK records stored in the Structure will be written to
             the LINK records near the top of the PDB file. If this is True, then
             renumber *must* be False or a ValueError will be thrown
-
+        conect: bool, default True
+            Write CONECT records for S-S bridges and HETATM
         Notes
         -----
         If multiple coordinate frames are present, these will be written as
@@ -948,6 +946,8 @@ class PDBFile(metaclass=FileFormatType):
                     link.length,
                 )
                 dest.write(linkrec % rec)
+        conect_record = {}
+        atom_number_map = {}  # store atoms number according if was renumbered or not
         for model, coord in enumerate(coords):
             if coords.shape[0] > 1:
                 dest.write('MODEL      %5d\n' % (model+1))
@@ -969,6 +969,7 @@ class PDBFile(metaclass=FileFormatType):
                     else:
                         anum = _number_truncated_to_n_digits(pa.number, 5)
                         rnum = _number_truncated_to_n_digits(res.number, 4)
+                    atom_number_map[atom.idx] = anum
                     last_number = anum
                     # Do any necessary name munging to respect the PDB spec
                     aname = _format_atom_name_for_pdb(pa)
@@ -977,6 +978,16 @@ class PDBFile(metaclass=FileFormatType):
                         rec = hetatomrec
                     else:
                         rec = atomrec
+                    # get the connectivity only for the first model since they all must have the same records
+                    if not model:
+                        if atom.name == 'SG':
+                            for bondedatm in atom.bond_partners:
+                                if bondedatm.name == 'SG':
+                                    conect_record[atom.idx] = [bondedatm.idx]
+                                    break
+                        if hetatom and atom.bond_partners and atom.residue.name not in ['WAT', 'SOL', 'HOH']:
+                            conect_record[atom.idx] = [atm.idx for atm in atom.bond_partners]
+
                     dest.write(rec % (anum, aname, pa.altloc, resname,
                                res.chain[:1], rnum, res.insertion_code[:1],
                                x, y, z, pa.occupancy, pa.bfactor, segid,
@@ -1023,6 +1034,16 @@ class PDBFile(metaclass=FileFormatType):
             if coords.shape[0] > 1:
                 dest.write('ENDMDL\n')
 
+        if conect and conect_record:
+            for atidx, bonded_atoms in conect_record.items():
+                if len(bonded_atoms) > 5:
+                    dest.write('CONECT' + f"{atom_number_map[atidx]:>5d}" +
+                               ''.join([f"{atom_number_map[idx]:>5d}" for idx in bonded_atoms[:5]]) + '\n')
+                    dest.write('CONECT' + f"{atom_number_map[atidx]:>5d}" +
+                               ''.join([f"{atom_number_map[idx]:>5d}" for idx in bonded_atoms[5:]]) + '\n')
+                else:
+                    dest.write('CONECT' + f"{atom_number_map[atidx]:>5d}" +
+                               ''.join([f"{atom_number_map[idx]:>5d}" for idx in bonded_atoms]) + '\n')
         dest.write("%-80s\n" % "END")
         if own_handle:
             dest.close()
