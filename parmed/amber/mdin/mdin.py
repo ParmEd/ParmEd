@@ -477,6 +477,10 @@ class Mdin(object):
         self.change('cntrl','ncyc', ncyc)
         self.change('cntrl','ntmin', ntmin)
 
+    def rism(self, imin=5, irism=1):
+        self.change('cntrl', 'imin', imin)
+        self.change('cntrl', 'irism', irism)
+
     #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
     def AddCard(self, title='Residues in card', cardString='RES 1'):
