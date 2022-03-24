@@ -2442,7 +2442,7 @@ class TestAmberMdin(FileIOTestCase):
         """ Tests the Mdin object basic features """
         fn = self.get_fn('test.mdin', written=True)
         mdin1 = mdin.Mdin('sander')
-        self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb'})
+        self.assertEqual(set(mdin1.valid_namelists), {'cntrl', 'ewald', 'qmmm', 'pb', 'rism'})
         self.assertEqual(mdin1.title, 'mdin prepared by mdin.py')
         self.assertEqual(mdin1.verbosity, 0)
         # What the heck was this for?
@@ -2522,6 +2522,11 @@ class TestAmberMdin(FileIOTestCase):
         self.assertEqual(mdin1.cntrl_nml['maxcyc'], 1)
         self.assertEqual(mdin1.cntrl_nml['ncyc'], 10)
         self.assertEqual(mdin1.cntrl_nml['ntmin'], 1)
+        mdin1.rism()
+        self.assertEqual(mdin1.cntrl_nml['imin'], 5)
+        self.assertEqual(mdin1.cntrl_nml['irism'], 1)
+        self.assertEqual(mdin1.rism_nml['closure'], ['kh'])
+
         mdin1.change('cntrl', 'ifqnt', 1)
         mdin1.change('pb', 'istrng', 1.0)
         mdin1.change('qmmm', 'qmcharge', -1)
@@ -2538,6 +2543,8 @@ class TestAmberMdin(FileIOTestCase):
             self.assertEqual(mdin1.cntrl_nml[var], mdin2.cntrl_nml[var])
         for var in mdin1.qmmm_nml.keys():
             self.assertEqual(mdin1.qmmm_nml[var], mdin2.qmmm_nml[var])
+        for var in mdin1.rism_nml.keys():
+            self.assertEqual(mdin1.rism_nml[var], mdin2.rism_nml[var])
         mdin3 = mdin.Mdin(program='pmemd')
         self.assertRaises(InputError, lambda: mdin3.change('cntrl', 'ievb', 1))
         self.assertRaises(InputError, lambda: mdin.Mdin(program='charmm'))
