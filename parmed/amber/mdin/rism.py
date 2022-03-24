@@ -27,7 +27,7 @@ Boston, MA 02111-1307, USA.
 class rism:
 
     def __init__(self):
-        self.sander = {'closure': "kh", 'noasympcorr': 1, 'buffer': 14.0, 'solvcut': -1.0,
+        self.sander = {'closure': ["kh"], 'noasympcorr': 1, 'buffer': 14.0, 'solvcut': -1.0,
                        'grdspc': [0.5, 0.5, 0.5], 'ng3': [-1, -1, -1], 'solvbox': [-1, -1, -1], 'tolerance': [1e-05],
                        'ljtolerance': -1.0, 'asympkspacetolerance': -1.0, 'treedcf': 1, 'treetcf': 1,
                        'treecoulomb': 0, 'treedcfmac': 0.1, 'treetcfmac': 0.1, 'treecoulombmac': 0.1,

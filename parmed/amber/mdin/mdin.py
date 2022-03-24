@@ -202,14 +202,13 @@ class Mdin(object):
             file.write('&rism\n')
             for var in self.rism_nml.keys():
                 if self.rism_nml[var] == self.rism_nml_defaults[var]: continue
-                if var == 'closure':
-                    line = addOn(line, "%s=%s, " % (var, [str(x) for x in self.rism_nml[var]]), file)
-                elif var == 'tolerance' and ',' not in var:
-                    line = addOn(line, "%s=%s, " % (var, ','.join(map(str, [self.rism_nml[var]]))), file)
-                elif isinstance(self.rism_nml_defaults[var], string_types):
-                    line = addOn(line, "%s='%s', " % (var, self.rism_nml[var]), file)
-                elif isinstance(self.rism_nml_defaults[var], (list, tuple)):
-                    line = addOn(line, "%s=%s, " % (var, ','.join(map(str, self.rism_nml[var]))), file)
+                if isinstance(self.rism_nml_defaults[var], (list, tuple)):
+                    int_type = type(self.rism_nml_defaults[var][0])
+                    if int_type is str:
+                        temp_out = ','.join(map(lambda x: f"'{x}'", self.rism_nml[var]))
+                        line = addOn(line, "%s=%s, " % (var, temp_out), file)
+                    else:
+                        line = addOn(line, "%s=%s, " % (var, ', '.join(map(str, self.rism_nml[var]))), file)
                 else:
                     line = addOn(line, "%s=%s, " % (var, self.rism_nml[var]), file)
 
@@ -346,10 +345,8 @@ class Mdin(object):
             if variable in self.rism_nml.keys():
                 mytype = type(self.rism_nml_defaults[variable])
                 if isinstance(value, list):
-                    if all(isinstance(x, str) for x in value):
-                        self.rism_nml[variable] = str(', '.join(map(lambda x: f"'{x}'", value)))[1:-1]
-                    else:
-                        self.rism_nml[variable] = value[0] if len(value) == 1 else value
+                    int_type = type(self.rism_nml_defaults[variable][0])
+                    self.rism_nml[variable] = list(map(int_type, value))
                 else:
                     self.rism_nml[variable] = mytype(value)
             else:
