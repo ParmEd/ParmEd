@@ -726,7 +726,6 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                     etree.SubElement(xml_residue, 'ExternalBond', atomName=residue.tail.name)
             else:
                 external_bonds = self._get_atoms_with_external_bonds(name)
-                external_bonds = [external_bonds[0], external_bonds[-1]] + external_bonds[1:-1] if len(external_bonds) > 2 and len(external_bonds[-1].name) <= 2 else external_bonds # Hack to get rid of atom ordering diffs
                 for atom in external_bonds:
                     etree.SubElement(xml_residue, 'ExternalBond', atomName=atom.name)
             if residue.name in valid_patches_for_residue:
