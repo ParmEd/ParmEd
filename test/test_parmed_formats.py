@@ -300,6 +300,7 @@ class TestPDBStructure(FileIOTestCase):
         self.overflow = get_fn('4lyt_vmd.pdb')
         self.simple = get_fn('ala_ala_ala.pdb')
         self.format_test = get_fn('SCM_A.pdb')
+        self.pdb_conect = get_fn('3m7q_test.pdb')
         self.overflow2 = get_fn('overflow.pdb')
         self.ATOMLINE = "ATOM  %5s %4s%1s%3s %1s%4s%-2s  %8s%8s%8s%6s%6s          %-2s%2s\n"
         self.ANISOULINE = "ANISOU%5s %-4s%1s%-4s%1s%4s%-2s%7s%7s%7s%7s%7s%7s      %2s%-2s\n"
@@ -1080,6 +1081,12 @@ ATOM      5  SG  CYX H   2      36.833  15.443  15.640  1.00 15.60           S
                 self.assertEqual(oa1.anisou.shape, oa2.anisou.shape)
                 for x, y in zip(oa1.anisou, oa2.anisou):
                     self.assertAlmostEqual(x, y, delta=1e-4)
+
+    def test_conect_write(self):
+        pdbfile = read_PDB(self.pdb_conect)
+        f = self.get_fn('3m7q_parmed.pdb', written=True)
+        pdbfile.write_pdb(f, renumber=False, conect=True)
+        self.assertTrue(diff_files(self.get_fn('3m7q_conect.pdb', saved=True), f))
 
     def test_pdb_write_format(self):
         """ Test PDB atom names are properly justified per PDB standard """
