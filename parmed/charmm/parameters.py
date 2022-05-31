@@ -415,7 +415,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 section = None
                 continue
             if line.upper().startswith('THOLE'):
-                section = None
+                section = 'NBTHOLE'
                 continue
             # It seems like files? sections? can be terminated with 'END'
             if line[:3].upper() == 'END':
@@ -726,8 +726,22 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 except IndexError:
                     raise CharmmError('Could not parse NBFIX terms.')
                 self.nbfix_types[(min(at1, at2), max(at1, at2))] = (emin, rmin)
-        # If we had any CMAP terms, then the last one will not have been added
-        # yet. Add it here
+                continue
+            if section.upper() == 'NBTHOLE':
+                words = line.split()
+                try:
+                    at1 = words[0]
+                    at2 = words[1]
+                    nbt = abs(conv(words[2], float, 'NBTHOLE a'))
+                    try:
+                        self.atom_types_str[at1].add_nbthole(at2, nbt)
+                        self.atom_types_str[at2].add_nbthole(at1, nbt)
+                    except KeyError:
+                        pass
+                except IndexError as err:
+                    raise CharmmError("Could not parse NBTHOLE terms.") from err
+                self.nbthole_types[(at1, at2)] = self.nbthole_types[(at2, at1)] = nbt
+        # If we had any CMAP terms, then the last one will not have been added yet. Add it here
         if current_cmap is not None:
             typ = CmapType(current_cmap_res, current_cmap_data)
             self.cmap_types[current_cmap] = typ
@@ -800,7 +814,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 elif line[:4].upper() == 'DEFA':
                     words = line.split()
                     if len(words) < 5:
-                        warnings.warn('DEFA line has %d tokens; expected 5' % len(words))
+                        warnings.warn('DEFA line has %d tokens; expected 5' % len(words), ParameterWarning)
                     else:
                         it = iter(words[1:5])
                         for tok, val in zip(it, it):
@@ -811,7 +825,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             elif tok.upper() == 'LAST':
                                 tpatch = val
                             else:
-                                warnings.warn(f'DEFA patch {val} unknown')
+                                warnings.warn(f'DEFA patch {val} unknown', ParameterWarning)
                 elif line[:4].upper() in ('RESI', 'PRES'):
                     restype = line[:4].upper()
                     # Get the residue definition
@@ -825,7 +839,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                     try:
                         charge = float(words[2])
                     except (IndexError, ValueError):
-                        warnings.warn(f'No charge for {resname}')
+                        warnings.warn(f'No charge for {resname}', ParameterWarning)
                     if restype == 'RESI':
                         res = ResidueTemplate(resname)
                     elif restype == 'PRES':
@@ -879,7 +893,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             else:
                                 warnings.warn(
                                     f'WARNING: Ignoring "{line.strip()}" because entity type '
-                                    f'{entity_type} not used.'
+                                    f'{entity_type} not used.', ParameterWarning
                                 )
                         elif line.strip().upper() and line.split()[0].upper() in ('BOND', 'DOUBLE'):
                             it = iter([w.upper() for w in line.split()[1:]])
@@ -919,7 +933,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                             if not skip_adding_residue and lptype_keyword not in ['BISE', 'RELA']:
                                 warnings.warn(
                                     f'LONEPAIR type {words[1]} not supported; only BISEctor and '
-                                     'RELAtive supported'
+                                     'RELAtive supported', ParameterWarning
                                 )
                                 skip_adding_residue = True
                                 break
@@ -993,14 +1007,14 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 try:
                     res.first_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn(f'Patch {patch_name} not found')
+                    warnings.warn(f'Patch {patch_name} not found', ParameterWarning)
 
             patch_name = tpatches[resname]
             if patch_name is not None:
                 try:
                     res.last_patch = self.patches[patch_name]
                 except KeyError:
-                    warnings.warn(f'Patch {patch_name} not found')
+                    warnings.warn(f'Patch {patch_name} not found', ParameterWarning)
         # Now update the residues and patches with the ones we parsed here
         self.residues.update(residues)
 
@@ -1032,7 +1046,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
 
-    def write(self, top=None, par=None, stream=None, **kwargs):
+    def write(self, top=None, par=None, stream=None):
         """ Write a CHARMM parameter set to a file
 
         Parameters
@@ -1043,7 +1057,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         par : str or file-like object, optional
             If provided, the parameters will be written to this file in PAR
             format. Either this or the ``str`` argument *must* be provided
-        str : str or file-like object, optional
+        stream : str or file-like object, optional
             If provided, the atom types and parameters will be written to this
             file as separate RTF and PAR cards that can be read as a CHARMM
             stream file. Either this or the ``par`` argument *must* be provided
@@ -1052,17 +1066,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         ------
         ValueError if both par and str are None
         """
-        if stream is None and kwargs.get("str") is not None:
-            warnings.warn(
-                "Use 'stream' instead of 'str' to write CHARMM parameters", DeprecationWarning
-            )
-            stream = kwargs["str"]
-        if stream is not None and kwargs.get("str") != stream:
-            warnings.warn(
-                f"Ignoring 'str' ({kwargs.get('str')}), using 'stream' ({stream}) instead",
-                DeprecationWarning,
-            )
-
         if par is None and stream is None:
             raise ValueError('Must specify either par *or* str')
 

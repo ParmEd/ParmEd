@@ -5,7 +5,10 @@ as atoms, residues, bonds, angles, etc.
 by Jason Swails
 """
 import math
+from functools import cached_property
+from typing import Optional
 import warnings
+from abc import ABC, abstractmethod
 from copy import copy
 from functools import wraps
 
@@ -945,7 +948,7 @@ class Atom(_ListItem):
         return not self > other
 
     def __repr__(self):
-        start = f'<Atom {self.name} [{self.idx}]'
+        start = f'<{self.__class__.__name__} {self.name} [{self.idx}]'
         if self.residue is not None and hasattr(self.residue, 'idx'):
             return start + f'; In {self.residue.name} {self.residue.idx}>'
         elif self.residue is not None:
@@ -1164,9 +1167,25 @@ class ExtraPoint(Atom):
 
         return self._frame_type
 
+    @frame_type.setter
+    def frame_type(self, value):
+        self._frame_type = value
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class TwoParticleExtraPointFrame:
+class ExtraPointFrame(ABC):
+
+    @abstractmethod
+    def get_weights(self):
+        pass
+
+    @abstractmethod
+    def get_atoms(self):
+        pass
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+class TwoParticleExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 2 particles
@@ -1244,7 +1263,7 @@ class TwoParticleExtraPointFrame:
         else:
             return ((r1 + r2) / r1), -(r2 / r1)
 
-class ThreeParticleExtraPointFrame:
+class ThreeParticleExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 3 particles
@@ -1468,7 +1487,7 @@ class ThreeParticleExtraPointFrame:
         else:
             return 1 + weight, -weight / 2, -weight / 2
 
-class OutOfPlaneExtraPointFrame:
+class OutOfPlaneExtraPointFrame(ExtraPointFrame):
     r"""
     This class defines a frame of reference for a given extra point with a frame
     of reference defined by 3 particles, but with the virtual site out of the
@@ -1545,8 +1564,7 @@ class OutOfPlaneExtraPointFrame:
         regbonds = []
         mybond = None
         for bond in ep.parent.bonds:
-            if (not isinstance(bond.atom1, ExtraPoint) and
-                    not isinstance(bond.atom2, ExtraPoint)):
+            if (not isinstance(bond.atom1, ExtraPoint) and not isinstance(bond.atom2, ExtraPoint)):
                 regbonds.append(bond)
             elif ep in bond:
                 if mybond is not None:
@@ -1639,6 +1657,84 @@ class OutOfPlaneExtraPointFrame:
             costheta = v1edotcross / (lenv1e*lencross)
             weightCross = -weightCross if costheta < 0 else weightCross
         return weight / 2, weight / 2, weightCross
+
+class LocalCoordinatesFrame(ExtraPointFrame):
+    """
+    Frame based on the local coordinates
+
+    Parameters
+    ----------
+    atom1: :class:`Atom`
+        The first atom defining the frame
+    atom2: :class:`Atom`
+        The second atom defining the frame
+    atom3: :class:`Atom`
+        The third atom defining the frame
+    origin_weights: list
+        weights (must sum to 1) for the three particles when computing the origin location
+    x_weights: list
+        the weight factors for the three particles when computing x-direction
+    y_weights: list
+        the weight factors for the three particles when computing y-direction
+    distance: float
+        the distance in the local coordinate frame
+    angle: float
+        the angle in the local coordinate frame
+    dihedral: float
+        the dihedral angle in the local coordinate frame
+    frame_size: int
+        The number of immediately bonded atoms defining the frame
+
+    Notes
+    -----
+    All of the lists must have 3 elements.
+
+    Raises
+    ------
+    ValueError if any of the weights or position are invalid
+    """
+    def __init__(self, atom1, atom2, atom3, origin_weights, x_weights, y_weights, distance, angle, dihedral, frame_size):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.origin_weights = self._validate_weights(origin_weights, lambda x: abs(sum(x) - 1) > 1e-5)
+        self.x_weights = self._validate_weights(x_weights)
+        self.y_weights = self._validate_weights(y_weights)
+        self.distance = _strip_units(distance, u.angstrom)
+        self.angle = _strip_units(angle, u.degrees)
+        self.dihedral = _strip_units(dihedral, u.degrees)
+        self.frame_size = frame_size
+
+    @staticmethod
+    def _validate_weights(weights, does_violate=None) -> list:
+        my_weights = list(weights)
+        if len(my_weights) != 3:
+            raise ValueError(f"Weights must have 3 elements, not {len(my_weights)}")
+        if does_violate is not None and does_violate(weights):
+            raise ValueError("Weights failed condition requirement")
+        return [float(wt) for wt in my_weights]
+
+    def get_weights(self):
+        return self.origin_weights, self.x_weights, self.y_weights, self.local_position
+
+    def get_atoms(self):
+        return self.atom1, self.atom2, self.atom3
+
+    @cached_property
+    def local_position(self):
+        def small_to_zero(num: float) -> float:
+            if abs(num) < 1e-10:
+                return 0.0
+            return num
+        angle = self.angle * DEG_TO_RAD
+        dihedral = (180 - self.dihedral) * DEG_TO_RAD
+        distance = abs(self.distance)
+        part = distance * math.sin(angle)
+        return [
+            small_to_zero(distance * math.cos(angle)),
+            small_to_zero(part * math.cos(dihedral)),
+            small_to_zero(part * math.sin(dihedral)),
+        ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4129,12 +4225,13 @@ class DrudeAtom(Atom):
         atoms, this is None.
     """
 
-    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', **kwargs):
-        Atom.__init__(self, **kwargs)
+    def __init__(self, alpha=0.0, thole=1.3, drude_type='DRUD', parent=None, **kwargs):
+        super().__init__(**kwargs)
         self.alpha = alpha
         self.thole = thole
         self.drude_type = drude_type
-        self.anisotropy = None
+        self.anisotropy: Optional["DrudeAnisotropy"] = None
+        self.parent = parent
 
     @property
     def drude_charge(self):
@@ -4144,7 +4241,7 @@ class DrudeAtom(Atom):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-class DrudeAnisotropy(_FourAtomTerm):
+class DrudeAnisotropy:
     """
     A description of an anisotropically polarizable atom.
 
@@ -4153,8 +4250,8 @@ class DrudeAnisotropy(_FourAtomTerm):
 
     Parameters
     ----------
-    atom1 : :class:`DrudeAtom`
-        the polarizable atom
+    atom1 : :class:`Atom`
+        the parent atom to the Drude atom
     atom2 : :class:`Atom`
         the second atom defining the coordinate frame
     atom3 : :class:`Atom`
@@ -4162,17 +4259,22 @@ class DrudeAnisotropy(_FourAtomTerm):
     atom4 : :class:`Atom`
         the fourth atom defining the coordinate frame
     a11 : ``float``
-        the scale factor for the polarizability along the direction defined by
-        atom1 and atom2
+        the scale factor for the polarizability along the direction defined by atom1 and atom2
     a22 : ``float``
-        the scale factor for the polarizability along the direction defined by
-        atom3 and atom4
+        the scale factor for the polarizability along the direction defined by atom3 and atom4
+    **params : Any
+        arbitrary parameter list that can be used to store additional information about this
+        Drude anisotropy (useful for supporting PSF writes)
     """
 
-    def __init__(self, atom1, atom2, atom3, atom4, a11, a22):
-        super().__init__(atom1, atom2, atom3, atom4)
+    def __init__(self, atom1, atom2, atom3, atom4, a11, a22, **params):
+        self.atom1 = atom1
+        self.atom2 = atom2
+        self.atom3 = atom3
+        self.atom4 = atom4
         self.a11 = a11
         self.a22 = a22
+        self.params = params
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4983,6 +5085,8 @@ class AtomType:
         # Store each NBFIX term as a dict with the atom type string matching to
         # a 2-element tuple that is rmin, epsilon
         self.nbfix = dict()
+        # Also store the NBTHOLE term similarly, except it is just a single number
+        self.nbthole = dict()
         self._idx = -1 # needed for some internal bookkeeping
         self._bond_type = bond_type
         self.charge = charge
@@ -5062,8 +5166,7 @@ class AtomType:
         """ The integer representation of an AtomType is its index """
         return self.number
 
-    def add_nbfix(self, typename, rmin, epsilon,
-                  rmin14=None, epsilon14=None):
+    def add_nbfix(self, typename, rmin, epsilon, rmin14=None, epsilon14=None):
         """ Adds a new NBFIX exclusion for this atom type
 
         Parameters
@@ -5086,6 +5189,10 @@ class AtomType:
         if rmin14 is None: rmin14 = rmin
         if epsilon14 is None: epsilon14 = epsilon
         self.nbfix[typename] = (rmin, epsilon, rmin14, epsilon14)
+
+    def add_nbthole(self, typename, nbt):
+        """ Adds a new NBTHOLE screening factor for this atom type """
+        self.nbthole[typename] = nbt
 
     @property
     def sigma(self):

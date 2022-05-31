@@ -3,7 +3,10 @@ This module contains classes for reading and writing CHARMM- and XPLOR-style PSF
 files
 """
 # TODO -- move this functionality to a more centralized location
+import math
 from contextlib import closing
+
+from parmed.topologyobjects import DrudeAtom, ExtraPoint, LocalCoordinatesFrame
 from ..charmm.psf import CharmmPsfFile
 from ..formats.registry import FileFormatType
 from ..utils import tag_molecules
@@ -267,8 +270,83 @@ class PSFFile(metaclass=FileFormatType):
             if len(struct.atoms) % 8 != 0: dest.write('\n')
             dest.write('\n')
             # NUMLP/NUMLPH section
-            dest.write((intfmt*2) % (0, 0) + ' !NUMLP NUMLPH\n')
+            lone_pairs = [atom for atom in struct.atoms if isinstance(atom, ExtraPoint)]
+            def get_host_atoms(frame_type):
+                if isinstance(frame_type, LocalCoordinatesFrame):
+                    return frame_type.get_atoms()[:frame_type.frame_size]
+                return frame_type.get_atoms()
+            frame_hosts = [
+                [fatom for fatom in get_host_atoms(atom.frame_type)] for atom in lone_pairs
+            ]
+            dest.write(
+                (intfmt*2) % (len(lone_pairs), sum(len(x) + 1 for x in frame_hosts))
+                + ' !NUMLP NUMLPH\n'
+            )
+            i = 1
+            if lone_pairs:
+                lph_section = []
+                for lone_pair, frame_host in zip(lone_pairs, frame_hosts):
+                    if not isinstance(lone_pair.frame_type, LocalCoordinatesFrame):
+                        raise TypeError("CHARMM PSF files only support LocalCoordinatesFrame LPs")
+                    dest.write((intfmt * 2) % (len(frame_host), i))
+                    dest.write(
+                        "%4s%10.5f%14.5f%14.5f\n" % (
+                            "F",
+                            lone_pair.frame_type.distance,
+                            lone_pair.frame_type.angle,
+                            lone_pair.frame_type.dihedral,
+                        )
+                    )
+                    frame = [lone_pair] + frame_host[:lone_pair.frame_type.frame_size]
+                    if len(frame) == 4:
+                        frame = [frame[0], frame[1], frame[3], frame[2]]
+                    for atom in frame:
+                        lph_section.append(intfmt % (atom.idx + 1))
+                        if i % 8 == 0:
+                            lph_section.append("\n")
+                        i += 1
+                if lph_section[-1] == "\n":
+                    lph_section.pop()
+                lph_section.append("\n")
+                dest.write("".join(lph_section))
             dest.write('\n')
+            drudes = [atom for atom in struct.atoms if isinstance(atom, DrudeAtom)]
+            if drudes:
+                n_aniso = sum(drude.anisotropy is not None for drude in drudes)
+                dest.write((intfmt % n_aniso) + " !NUMANISO\n")
+                idx_section = []
+                i = 1
+                for drude in drudes:
+                    if drude.anisotropy is None:
+                        continue
+                    if any(key not in drude.anisotropy.params for key in ["k11", "k22", "k33"]):
+                        raise ValueError(
+                            "CHARMM Drude anisotropy parameters cannot be determined from just "
+                            "two polarizability scale factors."
+                        )
+                    dest.write(" " * 8)
+                    dest.write(
+                        "%14.5f%14.5f%14.5f\n" % (
+                            drude.anisotropy.params["k11"],
+                            drude.anisotropy.params["k22"],
+                            drude.anisotropy.params["k33"],
+                        )
+                    )
+                    for atom in [
+                        drude.anisotropy.atom1,
+                        drude.anisotropy.atom2,
+                        drude.anisotropy.atom3,
+                        drude.anisotropy.atom4,
+                    ]:
+                        idx_section.append(intfmt % (atom.idx + 1))
+                        if i % 8 == 0:
+                            idx_section.append("\n")
+                        i += 1
+                if idx_section[-1] == "\n":
+                    idx_section.pop()
+                idx_section.append("\n")
+                dest.write("".join(idx_section))
+                dest.write("\n")
         # CMAP section
         dest.write(intfmt % len(struct.cmaps) + ' !NCRTERM: cross-terms\n')
         for i, cmap in enumerate(struct.cmaps):

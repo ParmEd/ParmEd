@@ -1,4 +1,5 @@
-from .exceptions import ChangeRadiiError
+from .exceptions import ChangeRadiiError, ParmWarning
+import warnings
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -51,7 +52,10 @@ def amber6(parm):
         # Radius of H atom depends on element it is bonded to
         bondeds = list(atom.bond_partners)
         if atom.atomic_number == 1:
-            if bondeds[0].atomic_number == 6: # carbon
+            if not bondeds:
+                warnings.warn(f"hydrogen atom {i} has no bonds; this is unusual", ParmWarning)
+                atom.solvent_radius = 1.2
+            elif bondeds[0].atomic_number == 6: # carbon
                 atom.solvent_radius = 1.3
             elif bondeds[0].atomic_number in (8, 16): # oxygen or sulfur
                 atom.solvent_radius = 0.8
@@ -100,7 +104,10 @@ def mbondi(parm):
         # Radius of H atom depends on element it is bonded to
         if atom.atomic_number == 1:
             bondeds = list(atom.bond_partners)
-            if bondeds[0].atomic_number in (6, 7): # C or N
+            if not bondeds:
+                warnings.warn(f"hydrogen atom {i} has no bonds; this is unusual", ParmWarning)
+                atom.solvent_radius = 0.8
+            elif bondeds[0].atomic_number in (6, 7): # C or N
                 atom.solvent_radius = 1.3
             elif bondeds[0].atomic_number in (8, 16): # O or S
                 atom.solvent_radius = 0.8
@@ -292,6 +299,9 @@ def mbondi2(parm):
     for i, atom in enumerate(parm.atoms):
         # Radius of H atom depends on element it is bonded to
         if atom.atomic_number == 1:
+            if not atom.bond_partners:
+                warnings.warn(f"hydrogen atom {i} has no bonds; this is unusual", ParmWarning)
+                atom.solvent_radius = 1.2
             if atom.bond_partners[0].atomic_number == 7:
                 atom.solvent_radius = 1.3
             else:

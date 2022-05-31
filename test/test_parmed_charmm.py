@@ -1,17 +1,19 @@
 """
 Tests for the parmed/charmm subpackage
 """
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from io import StringIO
 import copy
 import numpy as np
+import pytest
 import os
 import parmed as pmd
 from parmed.utils.io import genopen
 from parmed.charmm import charmmcrds, parameters, psf
 from parmed.charmm._charmmfile import CharmmFile, CharmmStreamFile
 from parmed import exceptions, topologyobjects as to, load_file, ParameterSet
-from parmed.topologyobjects import BondType, AngleType, DihedralType, DihedralTypeList
+from parmed.topologyobjects import Atom, BondType, AngleType, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint
+from parmed.periodic_table import Mass
 import parmed.unit as u
 import random
 import unittest
@@ -22,9 +24,18 @@ class TestCharmmBase(FileIOTestCase):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        warnings.simplefilter("ignore", category=exceptions.ParameterWarning)
         self.param22 = parameters.CharmmParameterSet(
             get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp')
         )
+
+    def setUp(self):
+        warnings.simplefilter("ignore", category=exceptions.ParameterWarning)
+        super().setUp()
+
+    def tearDown(self):
+        warnings.simplefilter("always", category=exceptions.ParameterWarning)
+        return super().tearDown()
 
 class TestCharmmCoords(TestCharmmBase):
     """ Test CHARMM coordinate file parsers """
@@ -752,8 +763,7 @@ class TestCharmmParameters(TestCharmmBase):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
         params = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp'))
         params.write(top=self.get_fn('test.rtf', written=True), par=self.get_fn('test.par', written=True))
-        with self.assertWarns(DeprecationWarning):
-            params.write(str=self.get_fn('test.str', written=True))
+        params.write(stream=self.get_fn('test.str', written=True))
         # Check bad options
         self.assertRaises(ValueError, params.write)
 
@@ -1030,12 +1040,10 @@ class TestFileWriting(TestCharmmBase):
 
     def test_charmm_file(self):
         """ Test the CharmmFile API and error handling """
-        self.assertRaises(ValueError, lambda:
-                CharmmFile(get_fn('trx.prmtop'), 'x')
-        )
-        self.assertRaises(IOError, lambda:
-                CharmmFile(get_fn('file_does_not_exist'), 'r')
-        )
+        with self.assertRaises(ValueError):
+            CharmmFile(get_fn('trx.prmtop'), 'x')
+        with self.assertRaises(IOError):
+            CharmmFile(get_fn('file_does_not_exist'), 'r')
         with CharmmFile(self.get_fn('newfile.chm', written=True), 'w') as f:
             f.write('abc123\ndef456\nghi789!comment...\n')
         with CharmmFile(self.get_fn('newfile.chm', written=True), 'r') as f:
@@ -1066,10 +1074,8 @@ class TestFileWriting(TestCharmmBase):
                 lines.append(line)
                 comments.append(f.comment)
                 line = f.readline()
-            self.assertEqual(lines, ['First line \n', 'Second line \n',
-                                     'Third line \n', 'Fourth line \n'])
-            self.assertEqual(comments, ['! first comment', '! second comment',
-                                        '! third comment', '! fourth comment'])
+            self.assertEqual(lines, ['First line \n', 'Second line \n', 'Third line \n', 'Fourth line \n'])
+            self.assertEqual(comments, ['! first comment', '! second comment', '! third comment', '! fourth comment'])
 
     def test_charmm_stream_file(self):
         """ Test the CharmmStreamFile API """
@@ -1095,6 +1101,33 @@ class TestFileWriting(TestCharmmBase):
         fn = self.get_fn('test.psf', written=True)
         cpsf.write_psf(fn)
         cpsf2 = psf.CharmmPsfFile(fn)
+
+    def _run_lp_test(self, filename: str, n_lps: int):
+        """ Test writing PSF files with 4-particle lone pairs """
+        cpsf = psf.CharmmPsfFile(get_fn(filename))
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in cpsf.atoms), n_lps)
+
+        fn = self.get_fn("test.psf", written=True)
+        cpsf.write_psf(fn)
+        cpsf2 = psf.CharmmPsfFile(fn)
+
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in cpsf2.atoms), n_lps)
+        for atom1, atom2 in zip(cpsf.atoms, cpsf2.atoms):
+            if isinstance(atom1, DrudeAtom):
+                self.assertIsInstance(atom2, DrudeAtom)
+                if atom1.anisotropy is None:
+                    self.assertIsNone(atom2.anisotropy)
+                else:
+                    self.assertGreater(len(atom1.anisotropy.params), 0)
+                    self.assertEqual(atom1.anisotropy.params.keys(), atom2.anisotropy.params.keys())
+                    for key in atom1.anisotropy.params:
+                        self.assertAlmostEqual(atom1.anisotropy.params[key], atom2.anisotropy.params[key], delta=1e-4)
+
+    def test_write_psf_with_lp_1(self):
+        self._run_lp_test("cyt-gua-cyt.psf", 23)
+
+    def test_write_psf_with_lp_2(self):
+        self._run_lp_test("ala3_solv_drude.psf", 909)
 
     def test_eliminate_duplicate_dihedrals(self):
         """ Test that duplicate torsions are eliminated in PSF writes """
@@ -1126,13 +1159,11 @@ class TestFileWriting(TestCharmmBase):
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             # Skip descriptors
-            if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name', 'view'):
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
-                self.assertEqual(len(getattr(cpsf, attr)),
-                                 len(getattr(cpsf2, attr)))
+                self.assertEqual(len(getattr(cpsf, attr)), len(getattr(cpsf2, attr)))
             else:
                 self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
         f = open(self.get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
@@ -1181,3 +1212,66 @@ class TestFileWriting(TestCharmmBase):
         parm.save(fn, overwrite=True)
         cpsf = pmd.load_file(fn)
         self.assertIn('XPLOR', cpsf.flags)
+
+class TestCharmmDrudeSystems(TestCharmmBase):
+    """ Tests processing of DRUDE systems """
+
+    def test_drude_mass(self):
+        drude_psf = psf.CharmmPsfFile(get_fn("ala3_solv_drude.psf"))
+        params = parameters.CharmmParameterSet(get_fn("toppar_drude_master_protein_2013e.str"))
+        drude_psf.load_parameters(params)
+        # Check this against a known-correct implementation in OpenM
+        self.assertEqual(sum([isinstance(a, DrudeAtom) for a in drude_psf.atoms]), 957)
+        for atom in drude_psf.atoms:
+            if isinstance(atom, DrudeAtom):
+                self.assertIsInstance(atom.parent, Atom)
+        for atom in drude_psf.atoms:
+            if isinstance(atom, DrudeAtom):
+                self.assertAlmostEqual(atom.mass + atom.parent.mass, Mass[atom.parent.element_name], delta=0.01)
+
+        self.assertEqual(sum(atom.anisotropy is not None for atom in drude_psf.atoms if isinstance(atom, DrudeAtom)), 4)
+        self.assertTrue(any(atom.anisotropy is None for atom in drude_psf.atoms if isinstance(atom, DrudeAtom)))
+
+
+    def test_drude_parsing_na(self):
+        """ Test parsing a trinucleotide with Drude particles and lone pairs """
+        system = psf.CharmmPsfFile(get_fn("cyt-gua-cyt.psf"))
+        self.assertEqual(len(system.atoms), 176)
+
+        # Check that we have the right number of DRUDE particles
+        self.assertEqual(sum(isinstance(atom, DrudeAtom) for atom in system.atoms), 59)
+        self.assertTrue(all(atom.type == "DRUD" for atom in system.atoms if isinstance(atom, DrudeAtom)))
+
+        # Check that we have the right number of lone pairs
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in system.atoms), 23)
+
+        # Check that the parameters match expectation from a known implementation
+        ep1 = system.atoms[7]
+        origin_weights, x_weights, y_weights, local_position = ep1.frame_type.get_weights()
+        self.assertAlmostEqual(local_position[0], -0.11970705016398403)
+        self.assertAlmostEqual(local_position[1], 0.005739964140425085)
+        self.assertAlmostEqual(local_position[2], 0.32884232536689074)
+        self.assertEqual(x_weights, [-1, 0, 1])
+        self.assertEqual(y_weights, [0, -1, 1])
+        self.assertEqual(origin_weights, [1, 0, 0])
+
+        # Now try a virtual site with a negative distance
+        ep2 = system.atoms[22]
+        origin_weights, x_weights, y_weights, local_position = ep2.frame_type.get_weights()
+        self.assertAlmostEqual(local_position[0], -0.34999999466919514)
+        self.assertAlmostEqual(local_position[1], 6.108652257915055e-05)
+        self.assertAlmostEqual(local_position[2], 1.0661609584247726e-08)
+        self.assertEqual(x_weights, [-1, 0.5, 0.5])
+        self.assertEqual(y_weights, [0, -1, 1])
+        self.assertEqual(origin_weights, [1, 0, 0])
+
+        # Check some Drude particle parameters
+        drude1 = system.atoms[2]
+        self.assertIsInstance(drude1, DrudeAtom)
+        self.assertEqual(drude1.alpha, -1.028)
+        self.assertEqual(drude1.thole, 1.3)
+
+        drude2 = system.atoms[-1]
+        self.assertIsInstance(drude2, DrudeAtom)
+        self.assertEqual(drude2.alpha, -0.157)
+        self.assertEqual(drude2.thole, 1.3)

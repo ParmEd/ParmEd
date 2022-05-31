@@ -17,12 +17,12 @@ from .exceptions import ParameterError
 from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
                        box_vectors_to_lengths_and_angles, distance2)
 from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
-                              Dihedral, DihedralType, DihedralTypeList, ExtraPoint, Group, Improper,
+                              Dihedral, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint, Group, Improper,
                               MultipoleFrame, NonbondedException, NoUreyBradley, OutOfPlaneBend,
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
                               TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
-                              UreyBradley, Link)
+                              UreyBradley, Link, LocalCoordinatesFrame)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .vec3 import Vec3
@@ -234,6 +234,7 @@ class Structure:
     TORSION_TORSION_FORCE_GROUP = 10
     NONBONDED_FORCE_GROUP = 11
     RB_TORSION_FORCE_GROUP = 12
+    DRUDE_FORCE_GROUP = 13
 
     #===================================================
 
@@ -1914,8 +1915,9 @@ class Structure:
                      hydrogenMass=None,
                      ewaldErrorTolerance=0.0005,
                      flexibleConstraints=True,
-                     verbose=False,
-                     splitDihedrals=False):
+                     splitDihedrals=False,
+                     drudeMass=0.4*u.dalton,
+                     **kwargs):
         """
         Construct an OpenMM System representing the topology described by the
         prmtop file.
@@ -1975,12 +1977,12 @@ class Structure:
             If False, the energies and forces from the constrained degrees of
             freedom will NOT be computed. If True, they will (but those degrees
             of freedom will *still* be constrained).
-        verbose : bool=False
-            If True, the progress of this subroutine will be printed to stdout
         splitDihedrals : bool=False
             If True, the dihedrals will be split into two forces -- proper and
             impropers. This is primarily useful for debugging torsion parameter
             assignments.
+        drudeMass : float or mass quantity = 0.4 dalton
+            The mass to assign to the Drude particles. Default is 0.4 daltons
 
         Notes
         -----
@@ -2013,7 +2015,8 @@ class Structure:
                     if heavy_atom is not None:
                         masses[atom.idx] = hydrogenMass
                         masses[heavy_atom.idx] -= hydrogenMass - atom.mass
-        for mass in masses: system.addParticle(mass)
+        for mass in masses:
+            system.addParticle(mass)
         self.omm_add_constraints(system, constraints, rigidWater)
         # Prune empty terms if we have changed
         if self.is_changed():
@@ -2021,9 +2024,7 @@ class Structure:
             self.unchange()
         # Add the various types of forces
         LOGGER.info('Adding bonds...')
-        self._add_force_to_system(system,
-                self.omm_bond_force(constraints, rigidWater, flexibleConstraints)
-        )
+        self._add_force_to_system(system, self.omm_bond_force(constraints, rigidWater, flexibleConstraints))
         LOGGER.info('Adding angles...')
         self._add_force_to_system(system, self.omm_angle_force(constraints, flexibleConstraints))
         LOGGER.info('Adding dihedrals...')
@@ -2052,8 +2053,7 @@ class Structure:
         else:
             rf_dielc = 78.5
         self._add_force_to_system(system,
-            self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff, switchDistance,
-                                     ewaldErrorTolerance, rf_dielc)
+            self.omm_nonbonded_force(nonbondedMethod, nonbondedCutoff, switchDistance, ewaldErrorTolerance, rf_dielc)
         )
         if implicitSolvent is not None:
             LOGGER.info('Adding GB force...')
@@ -2067,6 +2067,8 @@ class Structure:
         if self.box is not None:
             system.setDefaultPeriodicBoxVectors(*reducePeriodicBoxVectors(self.box_vectors))
         self.omm_set_virtual_sites(system)
+        if any(isinstance(atom, DrudeAtom) for atom in self.atoms):
+            self._add_force_to_system(system, self.omm_drude_force(drudeMass))
         return system
 
     #===================================================
@@ -2086,10 +2088,10 @@ class Structure:
             constrains is None
         """
 
-        if constraints is None and not rigidWater: return
+        if constraints is None and not rigidWater:
+            return
         if constraints not in (None, app.HBonds, app.AllBonds, app.HAngles):
-            raise ValueError("Unrecognized constraints option (%s)" %
-                             constraints)
+            raise ValueError(f"Unrecognized constraints option ({constraints})")
 
         length_conv = u.angstrom.conversion_factor_to(u.nanometer)
 
@@ -2102,19 +2104,22 @@ class Structure:
                 # Skip all extra points... don't constrain those
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
-                constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
         elif constraints is app.HBonds:
             for bond in self.bonds:
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 if bond.atom1.element == 1 or bond.atom2.element == 1:
-                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                    atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                    constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
         if rigidWater:
             for bond in self.bonds:
                 if isinstance(bond.atom1, ExtraPoint): continue
                 if isinstance(bond.atom2, ExtraPoint): continue
                 if is_water[bond.atom1.residue.idx]:
-                    constraint_bond_set.add(frozenset((bond.atom1.idx, bond.atom2.idx)))
+                    atom1, atom2 = min(bond.atom1, bond.atom2), max(bond.atom1, bond.atom2)
+                    constraint_bond_set.add(frozenset((atom1.idx, atom2.idx)))
 
         # Add bond constraints
         for bond in self.bonds:
@@ -2129,19 +2134,19 @@ class Structure:
                 if angle.atom3.element == 1:
                     numH += 1
                 if numH == 2 or (numH == 1 and angle.atom2.element == 8):
-                    constraint_angle_set.add((angle.atom1.idx,
-                                              angle.atom2.idx,
-                                              angle.atom3.idx))
+                    atom1, atom2, atom3 = min(angle.atom1, angle.atom3), angle.atom2, max(angle.atom1, angle.atom3)
+                    constraint_angle_set.add((atom1.idx, atom2.idx, atom3.idx))
         if rigidWater:
             for angle in self.angles:
                 if is_water[angle.atom1.residue.idx]:
-                    constraint_angle_set.add((angle.atom1.idx,
-                                              angle.atom2.idx,
-                                              angle.atom3.idx))
+                    atom1, atom2, atom3 = min(angle.atom1, angle.atom3), angle.atom2, max(angle.atom1, angle.atom3)
+                    constraint_angle_set.add((angle.atom1.idx, angle.atom2.idx, angle.atom3.idx))
         # Add angle constraints
         for angle in self.angles:
             if (angle.atom1.idx, angle.atom2.idx, angle.atom3.idx) in constraint_angle_set:
                 if frozenset((angle.atom1.idx, angle.atom3.idx)) in constraint_bond_set:
+                    continue
+                if frozenset((angle.atom3.idx, angle.atom1.idx)) in constraint_bond_set:
                     continue
                 # Constrain this angle
                 l1 = l2 = None
@@ -2195,6 +2200,16 @@ class Structure:
                 system.setVirtualSite(
                     atom.idx, mm.OutOfPlaneSite(a1.idx, a2.idx, a3.idx, w1, w2, w3)
                 )
+            elif isinstance(typ, LocalCoordinatesFrame):
+                a1, a2, a3 = refatoms
+                origin_weights, x_weights, y_weights, local_position = weights
+                # Convert positions to nanometers
+                position_nm = [0.1 * position for position in local_position]
+                system.setVirtualSite(
+                    atom.idx, mm.LocalCoordinatesSite(a1.idx, a2.idx, a3.idx, origin_weights, x_weights, y_weights, position_nm)
+                )
+            else:
+                raise RuntimeError(f"Did not recognize frame type {type(typ).__name__}")
 
     #===================================================
 
@@ -2669,6 +2684,13 @@ class Structure:
         if self.has_NBFIX():
             return force, self._omm_nbfixed_force(force, nonbondedMethod)
 
+        return force
+
+    #===================================================
+
+    def omm_drude_force(self, drude_mass):
+        force = mm.DrudeForce()
+        force.setForceGroup(self.DRUDE_FORCE_GROUP)
         return force
 
     #===================================================
@@ -3571,7 +3593,8 @@ class Structure:
     @staticmethod
     def _add_force_to_system(system, force):
         """ Adds an OpenMM force to a system IFF the force is not None """
-        if force is None: return
+        if force is None:
+            return
         if isinstance(force, tuple) or isinstance(force, list):
             # It's possible we got multiple forces to add
             for f in force:

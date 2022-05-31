@@ -62,6 +62,7 @@ class ParameterSet:
     pair_types : dict((str,str):NonbondedExceptionType)
         Dictionary mapping the 2-element tuple of atom type names for which explicit exclusion rules
         should be applied
+    nbthole_types : dict(())
     parametersets : list(str)
         List of parameter set names processed in the current ParameterSet
     residues : dict(str:ResidueTemplate|ResidueTemplateContainer)
@@ -84,6 +85,7 @@ class ParameterSet:
         self.cmap_types = OrderedDict()
         self.nbfix_types = OrderedDict()
         self.pair_types = OrderedDict()
+        self.nbthole_types = OrderedDict()
         self.parametersets = []
         self._combining_rule = 'lorentz'
         self.residues = OrderedDict()
