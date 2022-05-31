@@ -3260,46 +3260,18 @@ class HMassRepartition(Action):
             return retstr + 'Also changing water hydrogen masses.'
         return retstr + 'Not changing water hydrogen masses.'
 
-    def _residue_to_rdkit(self, residue):
-        """Extract a residue as a standalone rdkit Mol object."""
-        # Use dict look-up to avoid rebuilding the same residue multiple times.
-        #
-        if residue.idx in self._rmol_table:
-            return self._rmol_table[residue.idx]
-        # Hack to make sure that atom types are compliant with rdkit
-        # expectations. That is, rdkit must be able to infer the element based
-        # solely on the atom type, which is not always true for things like
-        # standard GAFF types.
-        #
-        mol = self.parm[residue.idx,:]
-        for atom in mol.atoms:
-            atom.type = _Element[atom.atomic_number] 
-
-        rslt = io.StringIO()
-        Mol2File.write(mol, rslt)
-        mol2str = rslt.getvalue()
-        # clean the rslt string
-        rslt.truncate(0)
-        rslt.seek(0)
-        rmol = Chem.MolFromMol2Block(mol2str, sanitize=False)
-        self._rmol_table[residue.idx] = rmol
-        return rmol
-
-    def is_in_ring(self, atom):
+    def is_in_ring(self, atom, rdkit_mol):
         # The heavy atom must have atleast two bonds with other heavy atoms and
         # no more than two bonds with hydrogen atoms (assuming a max
         # coordination of four). This quickly avoids silly cases like
         # accidentally flagging a rigid water as a three-membered ring.
-        #
+
         num_hyd_partners = sum((bp.atomic_number == 1) for bp in atom.bond_partners)
         num_hvy_partners = len(atom.bond_partners) - num_hyd_partners
         if not (num_hvy_partners >= 2 and num_hyd_partners in [1, 2]):
             return False
 
-        rmol = self._residue_to_rdkit(atom.residue)
-        for pa, ra in zip(atom.residue.atoms, rmol.GetAtoms()):
-            if pa == atom:
-                return ra.IsInRing()
+        return rdkit_mol.GetAtomWithIdx(atom.idx).IsInRing()
 
     def execute(self):
         # Back up the masses in case something goes wrong
@@ -3314,9 +3286,9 @@ class HMassRepartition(Action):
                 # Enable heterogeneous mass partitioning using ring perception
                 # from rdkit.
                 # TODO(BKR): Enable this generally?
-                #
+                rdkit_mol = self.parm.rdkit_mol
                 def get_new_mass(heteroatom):
-                    if self.is_in_ring(heteroatom):
+                    if self.is_in_ring(heteroatom, rdkit_mol):
                         return self.new_ring_h_mass
                     else:
                         return self.new_h_mass

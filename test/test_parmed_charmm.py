@@ -1159,7 +1159,7 @@ class TestFileWriting(TestCharmmBase):
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             # Skip descriptors
-            if attr in ('topology', 'positions', 'box_vectors', 'velocities', 'name', 'view'):
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities', 'name', 'view', 'rdkit_mol'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
@@ -1185,8 +1185,7 @@ class TestFileWriting(TestCharmmBase):
         cpsf2 = psf.CharmmPsfFile(self.get_fn('dhfr_cmap_pbc.psf', written=True))
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
-            if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name', 'view'):
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities', 'name', 'view', 'rdkit_mol'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):

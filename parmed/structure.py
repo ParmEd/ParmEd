@@ -26,6 +26,7 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .vec3 import Vec3
+from .rdkit import RDKit
 
 # Try to import the OpenMM modules
 try:
@@ -204,6 +205,8 @@ class Structure:
         if no symmetry is set, this is set to None.
     links : :class:`TrackedList` (:class:`Link`)
         The list of Link definitions for this Structure
+    rdkit_mol : :class:`rdkit.Chem.Mol`
+        An RDKit Mol object from the current structure.
 
     Notes
     -----
@@ -1570,6 +1573,22 @@ class Structure:
         if thing not in ('lorentz', 'geometric'):
             raise ValueError("combining_rule must be 'lorentz' or 'geometric'")
         self._combining_rule = thing
+
+
+    #===================================================
+
+    @property
+    def rdkit_mol(self):
+        if not self.is_changed:
+            try:
+                return self._rdkit_mol
+            except AttributeError:
+                pass
+        else:
+            self.prune_empty_terms()
+            self.unchange()
+        self._rdkit_mol = RDKit.to_mol(self)
+        return self._rdkit_mol
 
     #===================================================
 
