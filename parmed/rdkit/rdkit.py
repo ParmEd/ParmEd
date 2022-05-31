@@ -1,6 +1,8 @@
 """ This package contains classes responsible for loading rdkit objects """
 from io import StringIO
-from ..formats import PDBFile
+from typing import TYPE_CHECKING
+
+from ..periodic_table import Element
 
 class RDKit:
 
@@ -22,6 +24,9 @@ class RDKit:
         >>> mol = Chem.MolFromSmiles('Cc1ccccc1')
         >>> struct = pmd.load_rdkit(mol)
         """
+        # TODO - We can convert to a Structure programmatically without having to go through
+        # a PDB file first
+        from ..formats.pdb import PDBFile
         from rdkit import Chem
         fh = StringIO(Chem.MolToPDBBlock(rmol))
         return PDBFile.parse(fh)
@@ -78,3 +83,57 @@ class RDKit:
             return RDKit.load(mol)
         else:
             return [RDKit.load(mol) for mol in sdf_collection]
+
+    @classmethod
+    def to_mol(cls, structure: "Structure"):
+        """ Instantiates an RDKit Mol object from a ParmEd Structure """
+        from rdkit.Chem import Atom, RWMol, Bond
+        from rdkit.Chem.rdchem import BondType
+
+        mol = RWMol()
+        for atom in structure.atoms:
+            rdatom = Atom(atom.atomic_number)
+            pdb_info = cls._get_pdb_info(atom)
+            rdatom.SetMonomerInfo(pdb_info)
+            mol.AddAtom(rdatom)
+
+        added_bonds = set()
+        for bond in structure.bonds:
+            key = frozenset({bond.atom1.idx, bond.atom2.idx})
+            if key in added_bonds:
+                continue
+            added_bonds.add(key)
+            mol.AddBond(bond.atom1.idx, bond.atom2.idx, BondType.UNSPECIFIED)
+
+        return mol.GetMol()
+
+    @classmethod
+    def _get_pdb_info(cls, atom: "Atom"):
+        from rdkit.Chem.rdchem import AtomPDBResidueInfo
+        return AtomPDBResidueInfo(
+            cls._to_pdb_atom_name(atom_name=atom.name, symbol=Element[atom.atomic_number]),
+            atom.number if atom.number != -1 else atom.idx + 1,
+            atom.altloc,
+            atom.residue.name,
+            atom.residue.number if atom.residue.number != -1 else atom.residue.idx + 1,
+            atom.residue.chain,
+            atom.residue.insertion_code,
+            atom.occupancy if atom.occupancy != 0.0 else 1.0,
+            atom.bfactor,
+        )
+
+    @staticmethod
+    def _to_pdb_atom_name(*, atom_name: str, symbol: str) -> str:
+        """Pad atom_name according to PDB specification.
+
+        For the 13-16 columns relating to the atom name:
+        'Alignment of one-letter atom name such as C starts at column 14, while two-letter atom name such as FE starts at column 13.'
+        See, http://www.wwpdb.org/documentation/file-format-content/format33/sect9.html#ATOM
+        """
+        pad_left = " " * (2 - len(symbol)) * int(len(atom_name) != 4)
+        return (pad_left + atom_name).ljust(4)
+
+
+if TYPE_CHECKING:
+    from ..structure import Structure
+    from ..topologyobjects import Atom
