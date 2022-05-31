@@ -1727,7 +1727,7 @@ class LocalCoordinatesFrame(ExtraPointFrame):
                 return 0.0
             return num
         angle = self.angle * DEG_TO_RAD
-        dihedral = self.dihedral * DEG_TO_RAD
+        dihedral = (180 - self.dihedral) * DEG_TO_RAD
         distance = abs(self.distance)
         part = distance * math.sin(angle)
         return [
