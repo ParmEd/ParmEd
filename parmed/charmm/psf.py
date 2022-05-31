@@ -381,7 +381,7 @@ class CharmmPsfFile(Structure):
                 frame = self._get_frame2(idall[1], idall[2], lp_distance_list[i])
             if not isinstance(self.atoms[idall[0]], ExtraPoint):
                 raise CharmmError(f"Expected atom {idall[0]} to be an ExtraPoint but it is not")
-            self.atoms[idall[0]].frame = frame
+            self.atoms[idall[0]].frame_type = frame
             lp_cnt += lp_hostnum_list[i] + 1
 
     #===================================================
@@ -414,7 +414,9 @@ class CharmmPsfFile(Structure):
             a11 = round(drude_k / (k11 + k33 + drude_k), 5)
             a22 = round(drude_k / (k22 + k33 + drude_k), 5)
             at2, at3, at4 = self.atoms[id2 - 1], self.atoms[id3 - 1], self.atoms[id4 - 1]
-            drude_atom.anisotropy = DrudeAnisotropy(parent_atom, at2, at3, at4, a11, a22)
+            drude_atom.anisotropy = DrudeAnisotropy(
+                parent_atom, at2, at3, at4, a11, a22, k11=k11, k22=k22, k33=k33
+            )
 
     #===================================================
 
@@ -428,27 +430,15 @@ class CharmmPsfFile(Structure):
         dihed: float,
     ) -> LocalCoordinatesFrame:
 
-        def small_to_zero(num: float) -> float:
-            if abs(num) < 1e-10:
-                return 0.0
-            return num
-
-        ang *= DEG_TO_RAD
-        dihed = (180 - dihed) * DEG_TO_RAD
         if dist > 0:
             x_weights = [-1.0, 0.0, 1.0]
         elif dist < 0:
             x_weights = [-1.0, 0.5, 0.5]
-        dist = abs(dist)
         origin_weights = [1, 0, 0]
         y_weights = [0, -1, 1]
-        local_position = [
-            small_to_zero(dist * math.cos(ang)),
-            small_to_zero(dist * math.sin(ang) * math.cos(dihed)),
-            small_to_zero(dist * math.sin(ang) * math.sin(dihed)),
-        ]
         return LocalCoordinatesFrame(
-            self.atoms[a1idx], self.atoms[a2idx], self.atoms[a3idx], origin_weights, x_weights, y_weights, local_position
+            self.atoms[a1idx], self.atoms[a2idx], self.atoms[a3idx],
+            origin_weights, x_weights, y_weights, dist, ang, dihed, 3
         )
 
     def _get_frame2(
@@ -457,11 +447,6 @@ class CharmmPsfFile(Structure):
         a2idx: int,
         dist: float,
     ) -> LocalCoordinatesFrame:
-
-        def small_to_zero(num: float) -> float:
-            if abs(num) < 1e-10:
-                return 0.0
-            return num
 
         # TODO - figure out if this can be done with another virtual site type. This comes from the OpenMM implementation
         # in the CHARMM parsers there
@@ -475,8 +460,7 @@ class CharmmPsfFile(Structure):
         origin_weights = [1, 0, 0]
         x_weights = [1, -1, 0]
         y_weights = [0, -1, 1]
-        local_position = [dist, 0, 0]
-        return LocalCoordinatesFrame(a1, a2, a3, origin_weights, x_weights, y_weights, local_position)
+        return LocalCoordinatesFrame(a1, a2, a3, origin_weights, x_weights, y_weights, dist, 0, 0, 2)
 
     #===================================================
 

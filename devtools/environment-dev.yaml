@@ -1,7 +1,7 @@
 name: parmed-dev
 channels:
-  - conda-forge
-  - bioconda
+  - https://conda.anaconda.org/conda-forge
+  - https://conda.anaconda.org/bioconda
 dependencies:
   - pandas
   - nose

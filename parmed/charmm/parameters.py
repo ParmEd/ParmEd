@@ -1046,7 +1046,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
                 self.read_parameter_file(section, comments)
             title, section, comments = f.next_section()
 
-    def write(self, top=None, par=None, stream=None, **kwargs):
+    def write(self, top=None, par=None, stream=None):
         """ Write a CHARMM parameter set to a file
 
         Parameters
@@ -1057,7 +1057,7 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         par : str or file-like object, optional
             If provided, the parameters will be written to this file in PAR
             format. Either this or the ``str`` argument *must* be provided
-        str : str or file-like object, optional
+        stream : str or file-like object, optional
             If provided, the atom types and parameters will be written to this
             file as separate RTF and PAR cards that can be read as a CHARMM
             stream file. Either this or the ``par`` argument *must* be provided
@@ -1066,17 +1066,6 @@ class CharmmParameterSet(ParameterSet, CharmmImproperMatchingMixin):
         ------
         ValueError if both par and str are None
         """
-        if stream is None and kwargs.get("str") is not None:
-            warnings.warn(
-                "Use 'stream' instead of 'str' to write CHARMM parameters", DeprecationWarning
-            )
-            stream = kwargs["str"]
-        if stream is not None and kwargs.get("str") != stream:
-            warnings.warn(
-                f"Ignoring 'str' ({kwargs.get('str')}), using 'stream' ({stream}) instead",
-                DeprecationWarning,
-            )
-
         if par is None and stream is None:
             raise ValueError('Must specify either par *or* str')
 

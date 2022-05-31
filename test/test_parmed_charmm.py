@@ -5,6 +5,7 @@ from collections import defaultdict
 from io import StringIO
 import copy
 import numpy as np
+import pytest
 import os
 import parmed as pmd
 from parmed.utils.io import genopen
@@ -762,8 +763,7 @@ class TestCharmmParameters(TestCharmmBase):
         """ Tests writing CHARMM RTF/PAR/STR files from parameter sets """
         params = parameters.CharmmParameterSet(get_fn('top_all22_prot.inp'), get_fn('par_all22_prot.inp'))
         params.write(top=self.get_fn('test.rtf', written=True), par=self.get_fn('test.par', written=True))
-        with self.assertWarns(DeprecationWarning):
-            params.write(str=self.get_fn('test.str', written=True))
+        params.write(stream=self.get_fn('test.str', written=True))
         # Check bad options
         self.assertRaises(ValueError, params.write)
 
@@ -1102,6 +1102,33 @@ class TestFileWriting(TestCharmmBase):
         cpsf.write_psf(fn)
         cpsf2 = psf.CharmmPsfFile(fn)
 
+    def _run_lp_test(self, filename: str, n_lps: int):
+        """ Test writing PSF files with 4-particle lone pairs """
+        cpsf = psf.CharmmPsfFile(get_fn(filename))
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in cpsf.atoms), n_lps)
+
+        fn = self.get_fn("test.psf", written=True)
+        cpsf.write_psf(fn)
+        cpsf2 = psf.CharmmPsfFile(fn)
+
+        self.assertEqual(sum(isinstance(atom, ExtraPoint) for atom in cpsf2.atoms), n_lps)
+        for atom1, atom2 in zip(cpsf.atoms, cpsf2.atoms):
+            if isinstance(atom1, DrudeAtom):
+                self.assertIsInstance(atom2, DrudeAtom)
+                if atom1.anisotropy is None:
+                    self.assertIsNone(atom2.anisotropy)
+                else:
+                    self.assertGreater(len(atom1.anisotropy.params), 0)
+                    self.assertEqual(atom1.anisotropy.params.keys(), atom2.anisotropy.params.keys())
+                    for key in atom1.anisotropy.params:
+                        self.assertAlmostEqual(atom1.anisotropy.params[key], atom2.anisotropy.params[key], delta=1e-4)
+
+    def test_write_psf_with_lp_1(self):
+        self._run_lp_test("cyt-gua-cyt.psf", 23)
+
+    def test_write_psf_with_lp_2(self):
+        self._run_lp_test("ala3_solv_drude.psf", 909)
+
     def test_eliminate_duplicate_dihedrals(self):
         """ Test that duplicate torsions are eliminated in PSF writes """
         def count_torsions(parm):
@@ -1132,13 +1159,11 @@ class TestFileWriting(TestCharmmBase):
         for attr in dir(cpsf):
             if attr.startswith('_'): continue
             # Skip descriptors
-            if attr in ('topology', 'positions', 'box_vectors',
-                        'velocities', 'name', 'view'):
+            if attr in ('topology', 'positions', 'box_vectors', 'velocities', 'name', 'view'):
                 continue
             if callable(getattr(cpsf, attr)): continue
             if hasattr(getattr(cpsf, attr), '__len__'):
-                self.assertEqual(len(getattr(cpsf, attr)),
-                                 len(getattr(cpsf2, attr)))
+                self.assertEqual(len(getattr(cpsf, attr)), len(getattr(cpsf2, attr)))
             else:
                 self.assertEqual(getattr(cpsf, attr), getattr(cpsf2, attr))
         f = open(self.get_fn('dhfr_cmap_pbc.psf', written=True), 'r')
@@ -1222,7 +1247,7 @@ class TestCharmmDrudeSystems(TestCharmmBase):
 
         # Check that the parameters match expectation from a known implementation
         ep1 = system.atoms[7]
-        origin_weights, x_weights, y_weights, local_position = ep1.frame.get_weights()
+        origin_weights, x_weights, y_weights, local_position = ep1.frame_type.get_weights()
         self.assertAlmostEqual(local_position[0], -0.11970705016398403)
         self.assertAlmostEqual(local_position[1], 0.005739964140425085)
         self.assertAlmostEqual(local_position[2], 0.32884232536689074)
@@ -1232,7 +1257,7 @@ class TestCharmmDrudeSystems(TestCharmmBase):
 
         # Now try a virtual site with a negative distance
         ep2 = system.atoms[22]
-        origin_weights, x_weights, y_weights, local_position = ep2.frame.get_weights()
+        origin_weights, x_weights, y_weights, local_position = ep2.frame_type.get_weights()
         self.assertAlmostEqual(local_position[0], -0.34999999466919514)
         self.assertAlmostEqual(local_position[1], 6.108652257915055e-05)
         self.assertAlmostEqual(local_position[2], 1.0661609584247726e-08)

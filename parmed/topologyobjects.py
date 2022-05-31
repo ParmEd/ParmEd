@@ -5,6 +5,7 @@ as atoms, residues, bonds, angles, etc.
 by Jason Swails
 """
 import math
+from functools import cached_property
 from typing import Optional
 import warnings
 from abc import ABC, abstractmethod
@@ -1675,8 +1676,14 @@ class LocalCoordinatesFrame(ExtraPointFrame):
         the weight factors for the three particles when computing x-direction
     y_weights: list
         the weight factors for the three particles when computing y-direction
-    local_position: list
-        the position of the virtual site in the local coordinate system
+    distance: float
+        the distance in the local coordinate frame
+    angle: float
+        the angle in the local coordinate frame
+    dihedral: float
+        the dihedral angle in the local coordinate frame
+    frame_size: int
+        The number of immediately bonded atoms defining the frame
 
     Notes
     -----
@@ -1686,22 +1693,25 @@ class LocalCoordinatesFrame(ExtraPointFrame):
     ------
     ValueError if any of the weights or position are invalid
     """
-    def __init__(self, atom1, atom2, atom3, origin_weights, x_weights, y_weights, local_position):
+    def __init__(self, atom1, atom2, atom3, origin_weights, x_weights, y_weights, distance, angle, dihedral, frame_size):
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
         self.origin_weights = self._validate_weights(origin_weights, lambda x: abs(sum(x) - 1) > 1e-5)
         self.x_weights = self._validate_weights(x_weights)
         self.y_weights = self._validate_weights(y_weights)
-        self.local_position = self._validate_weights(local_position)
+        self.distance = _strip_units(distance, u.angstrom)
+        self.angle = _strip_units(angle, u.degrees)
+        self.dihedral = _strip_units(dihedral, u.degrees)
+        self.frame_size = frame_size
 
     @staticmethod
-    def _validate_weights(weights, does_violate=lambda x: False) -> list:
+    def _validate_weights(weights, does_violate=None) -> list:
         my_weights = list(weights)
         if len(my_weights) != 3:
             raise ValueError(f"Weights must have 3 elements, not {len(my_weights)}")
-        if does_violate(weights):
-            raise ValueError(f"Weights failed condition requirement")
+        if does_violate is not None and does_violate(weights):
+            raise ValueError("Weights failed condition requirement")
         return [float(wt) for wt in my_weights]
 
     def get_weights(self):
@@ -1709,6 +1719,22 @@ class LocalCoordinatesFrame(ExtraPointFrame):
 
     def get_atoms(self):
         return self.atom1, self.atom2, self.atom3
+
+    @cached_property
+    def local_position(self):
+        def small_to_zero(num: float) -> float:
+            if abs(num) < 1e-10:
+                return 0.0
+            return num
+        angle = self.angle * DEG_TO_RAD
+        dihedral = self.dihedral * DEG_TO_RAD
+        distance = abs(self.distance)
+        part = distance * math.sin(angle)
+        return [
+            small_to_zero(distance * math.cos(angle)),
+            small_to_zero(part * math.cos(dihedral)),
+            small_to_zero(part * math.sin(dihedral)),
+        ]
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -4236,15 +4262,19 @@ class DrudeAnisotropy:
         the scale factor for the polarizability along the direction defined by atom1 and atom2
     a22 : ``float``
         the scale factor for the polarizability along the direction defined by atom3 and atom4
+    **params : Any
+        arbitrary parameter list that can be used to store additional information about this
+        Drude anisotropy (useful for supporting PSF writes)
     """
 
-    def __init__(self, atom1, atom2, atom3, atom4, a11, a22):
+    def __init__(self, atom1, atom2, atom3, atom4, a11, a22, **params):
         self.atom1 = atom1
         self.atom2 = atom2
         self.atom3 = atom3
         self.atom4 = atom4
         self.a11 = a11
         self.a22 = a22
+        self.params = params
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
