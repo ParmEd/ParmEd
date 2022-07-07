@@ -861,6 +861,22 @@ class TestStructureAdd(FileIOTestCase):
         s1 += s2
         self._check_sum(s1, s1cp, s2)
 
+    def test_copy_bond_order(self):
+        """ Tests that copying a structure also copies bond order """
+        s1 = create_random_structure(parametrized=True)
+        s1.bonds[0].order = 1.25
+
+        s1cp = copy(s1)
+        self.assertEqual(s1cp.bonds[0].order, 1.25)
+
+    def test_slice_bond_order(self):
+        """ Tests that copying via slice also copies bond order """
+        s1 = create_random_structure(parametrized=True)
+        s1.bonds[0].order = 1.25
+
+        s1cp = s1[:]
+        self.assertEqual(s1cp.bonds[0].order, 1.25)
+
     def test_add_not_parametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = create_random_structure(parametrized=False)

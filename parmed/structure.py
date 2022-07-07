@@ -474,7 +474,7 @@ class Structure:
         for b in self.bonds:
             c.bonds.append(
                     Bond(atoms[b.atom1.idx], atoms[b.atom2.idx],
-                         b.type and c.bond_types[b.type.idx])
+                         b.type and c.bond_types[b.type.idx], order=b.order)
             )
             c.bonds[-1].funct = b.funct
         for a in self.angles:
@@ -1088,7 +1088,7 @@ class Structure:
             else:
                 num = res.number
             struct.add_atom(copy(atom), res.name, num, res.chain, res.insertion_code, res.segid)
-        def copy_valence_terms(oval, otyp, sval, styp, attrlist):
+        def copy_valence_terms(oval, otyp, sval, styp, atom_attrs, extra_attrs=None):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
             styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
@@ -1096,7 +1096,7 @@ class Structure:
             otypcp = [copy(typ) for typ in styp]
             used_types = [False for typ in otypcp]
             for val in sval:
-                ats = [getattr(val, attr) for attr in attrlist]
+                ats = [getattr(val, attr) for attr in atom_attrs]
                 # Make sure all of our atoms in this valence term is "selected"
                 indices = [scan[at.idx] for at in ats if isinstance(at, Atom)]
                 if not all(indices):
@@ -1111,6 +1111,8 @@ class Structure:
                 for i, at in enumerate(ats):
                     if isinstance(at, Atom):
                         ats[i] = struct.atoms[scan[at.idx]-1]
+                if extra_attrs:
+                    kws.update({attr: getattr(val, attr) for attr in extra_attrs})
                 oval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     oval[-1].funct = val.funct
@@ -1121,7 +1123,7 @@ class Structure:
             if hasattr(otyp, 'claim'):
                 otyp.claim()
         copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
-                           self.bond_types, ['atom1', 'atom2'])
+                           self.bond_types, ['atom1', 'atom2'], ["order"])
         copy_valence_terms(struct.angles, struct.angle_types, self.angles,
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.dihedrals, struct.dihedral_types,
