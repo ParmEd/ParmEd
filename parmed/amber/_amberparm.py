@@ -5,7 +5,7 @@ prmtop object.
 """
 import copy as _copy
 from collections import defaultdict
-from math import sqrt
+from math import sqrt, cos, sin, pi, isclose
 from warnings import warn
 
 import numpy as np
@@ -2287,6 +2287,37 @@ class Rst7(object):
             self._box = np.array(value).reshape((-1, 6))[0]
 
     @property
+    def _ucell(self):
+        """Return the unit cell vectors as a packed 3x3 matrix.
+        
+        If no box is set, return None.
+        """
+        if not self.hasbox:
+            return None
+        ucell = np.zeros(9, dtype=self.box.dtype)
+        # Because we're not vectorizing anything we'll do math with Python
+        # builtin types and then return as a NumPy array.
+        #
+        # Math is taken from cpptraj/src/Box.cpp Box::CalcUcellFromXyzAbg
+        #
+        deg2rad = math.pi / 180.0
+        x, y, z, alp, bet, gam = map(float, self.box)
+        ucell[0] = x
+        if isclose(gam, 90.0):
+            ucell[4] = y
+        else:
+            ucell[3] = y * cos(gam * deg2rad)
+            ucell[4] = y * sin(gam * deg2rad)
+        if not isclose(bet, 90.0):
+            ucell[6] = z * cos(alp * deg2rad)
+        yz_cos_alp = 0.0
+        if not isclose(alp, 90.0):
+            yz_cos_alp = x * y * cos(alp * deg2rad)
+        ucell[7] = (yz_cos_alp - ucell[6] * ucell[3]) / ucell[4]
+        ucell[8] = sqrt(z**2 + ucell[6]**2 + ucell[7]**2)
+        return ucell
+
+    @property
     def volume(self):
         """Return the volume of the periodic box (in A^3).
 
@@ -2302,11 +2333,14 @@ class Rst7(object):
             # Conversion factor from Ambertools/src/leap/src/leap/tools.c
             return volume * 0.7698004
         else: # box_type  == 3:
-            _warn = 'VOLUME: ParmEd triclinic box detected.'\
-                   + 'TLeap can not produce these.'\
-                   + 'So it is most likely an octahedron.'
-            warn(_warn, category=RuntimeWarning)
-            return volume * 0.7698004
+            # Math is taken from cpptraj/src/Box.cpp Box::CalcFracFromUcell
+            #
+            ucell = self._ucell
+            u23x = ucell[4] * ucell[8] - ucell[5] * ucell[7]
+            u23y = ucell[5] * ucell[6] - ucell[3] * ucell[8]
+            u23z = ucell[3] * ucell[7] - ucell[4] * ucell[6]
+            volume = ucell[0] * u23x + ucell[1] * u23y + ucell[2] * u23z
+            return float(volume)
 
     @classmethod
     def open(cls, filename):
