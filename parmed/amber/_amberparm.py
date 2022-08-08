@@ -2286,28 +2286,6 @@ class Rst7(object):
         else:
             self._box = np.array(value).reshape((-1, 6))[0]
 
-    @property
-    def volume(self):
-        """Return the volume of the periodic box (in A^3).
-
-        If no box is present, return None.
-        """
-        if not self.hasbox:
-            return None
-        volume = float(self.box[:3].prod())
-        box_type = self.pointers['IFBOX']
-        if box_type == 1:
-            return volume
-        elif box_type == 2:
-            # Conversion factor from Ambertools/src/leap/src/leap/tools.c
-            return volume * 0.7698004
-        else: # box_type  == 3:
-            # volume formula from cpptraj/src/Box.cpp Box::CalcFracFromUcell
-            #
-            av, bv, cv = self.box_vectors
-            volume = _cross(bv, cv).dot(av) 
-            return float(volume.value_in_unit(u.angstrom**3))
-
     @classmethod
     def open(cls, filename):
         """ Constructor that opens and parses an input coordinate file

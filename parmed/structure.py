@@ -15,7 +15,7 @@ from . import residue
 from .constants import DEG_TO_RAD, SMALL
 from .exceptions import ParameterError
 from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
-                       box_vectors_to_lengths_and_angles, distance2)
+                       box_vectors_to_lengths_and_angles, distance2, _cross)
 from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
                               Dihedral, DihedralType, DihedralTypeList, DrudeAtom, ExtraPoint, Group, Improper,
                               MultipoleFrame, NonbondedException, NoUreyBradley, OutOfPlaneBend,
@@ -1916,6 +1916,26 @@ class Structure:
         B = B.value_in_unit(u.degrees)
         G = G.value_in_unit(u.degrees)
         self._box = np.array([[a, b, c, A, B, G]], dtype=np.float64)
+
+    @property
+    def uvolume(self):
+        """Return the volume of the periodic box (in A^3).
+
+        If no box is present, return None.
+        """
+        if self._box is None:
+            return None
+        av, bv, cv = self.box_vectors
+        uvolume = _cross(bv, cv).dot(av)
+        return uvolume
+
+    @property
+    def volume(self):
+        """Return the volume of the periodic box (in A^3).
+
+        If no box is present, return None.
+        """
+        return float(self.uvolume.value_in_unit(u.angstrom**3))
 
     #===================================================
 
