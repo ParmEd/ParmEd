@@ -314,38 +314,39 @@ class PSFFile(metaclass=FileFormatType):
             if drudes:
                 n_aniso = sum(drude.anisotropy is not None for drude in drudes)
                 dest.write((intfmt % n_aniso) + " !NUMANISO\n")
-                idx_section = []
-                i = 1
-                for drude in drudes:
-                    if drude.anisotropy is None:
-                        continue
-                    if any(key not in drude.anisotropy.params for key in ["k11", "k22", "k33"]):
-                        raise ValueError(
-                            "CHARMM Drude anisotropy parameters cannot be determined from just "
-                            "two polarizability scale factors."
+                if n_aniso:
+                    idx_section = []
+                    i = 1
+                    for drude in drudes:
+                        if drude.anisotropy is None:
+                            continue
+                        if any(key not in drude.anisotropy.params for key in ["k11", "k22", "k33"]):
+                            raise ValueError(
+                                "CHARMM Drude anisotropy parameters cannot be determined from just "
+                                "two polarizability scale factors."
+                            )
+                        dest.write(" " * 8)
+                        dest.write(
+                            "%14.5f%14.5f%14.5f\n" % (
+                                drude.anisotropy.params["k11"],
+                                drude.anisotropy.params["k22"],
+                                drude.anisotropy.params["k33"],
+                            )
                         )
-                    dest.write(" " * 8)
-                    dest.write(
-                        "%14.5f%14.5f%14.5f\n" % (
-                            drude.anisotropy.params["k11"],
-                            drude.anisotropy.params["k22"],
-                            drude.anisotropy.params["k33"],
-                        )
-                    )
-                    for atom in [
-                        drude.anisotropy.atom1,
-                        drude.anisotropy.atom2,
-                        drude.anisotropy.atom3,
-                        drude.anisotropy.atom4,
-                    ]:
-                        idx_section.append(intfmt % (atom.idx + 1))
-                        if i % 8 == 0:
-                            idx_section.append("\n")
-                        i += 1
-                if idx_section[-1] == "\n":
-                    idx_section.pop()
-                idx_section.append("\n")
-                dest.write("".join(idx_section))
+                        for atom in [
+                            drude.anisotropy.atom1,
+                            drude.anisotropy.atom2,
+                            drude.anisotropy.atom3,
+                            drude.anisotropy.atom4,
+                        ]:
+                            idx_section.append(intfmt % (atom.idx + 1))
+                            if i % 8 == 0:
+                                idx_section.append("\n")
+                            i += 1
+                    if idx_section[-1] == "\n":
+                        idx_section.pop()
+                    idx_section.append("\n")
+                    dest.write("".join(idx_section))
                 dest.write("\n")
         # CMAP section
         dest.write(intfmt % len(struct.cmaps) + ' !NCRTERM: cross-terms\n')
