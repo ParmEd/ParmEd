@@ -574,21 +574,28 @@ class changeRadii(Action):
 class changeLJPair(Action):
     """
     Changes a particular Lennard Jones pair based on a given (pre-combined)
-    epsilon/Rmin
+    epsilon/Rmin/[C4_coef]
     """
-    usage = '<mask1> <mask2> <Rmin> <epsilon>'
+    usage = '<mask1> <mask2> <Rmin> <epsilon> [<C4_coef>]'
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
         self.rmin = arg_list.get_next_float()
         self.eps = arg_list.get_next_float()
+        self.c4 = arg_list.get_next_float(optional=True, default=None)
 
     def __str__(self):
-        return (
-            f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
-            f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
-        )
+        if self.c4 == None:
+            return (
+                f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+                f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
+            )
+        else:
+            return (
+                f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+                f'{self.rmin:16.5f}, Epsilon = {self.eps:16.5f} and C4_coef = {self.c:16.5f}'
+            )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -612,7 +619,9 @@ class changeLJPair(Action):
                 else:
                     if attype2 != atom.nb_idx:
                         raise ChangeLJPairError('Second mask matches multiple atom types!')
-        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps)
+        if self.c4 != None and 'LENNARD_JONES_CCOEF' not in self.parm.flag_list:
+            raise ChangeLJPairError('No C4 information in parm. Please use the "add12_6_4" command first.')
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, c4=self.c4)   
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -662,7 +671,7 @@ class changeLJ14Pair(Action):
                         raise ChangeLJPairError('Second mask matches multiple atom types!')
 
         # Adjust 1-4 non-bonded terms as well if we're using a chamber-prmtop
-        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, True)
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, one_4=True)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -4242,7 +4251,7 @@ class gromber(Action):
 
 # Private helper methods
 
-def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
+def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
 
     if one_4:
         key = 'LENNARD_JONES_14'
@@ -4259,3 +4268,7 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data[f'{key}_ACOEF'][term_idx] = eps * rmin**12
     parm.parm_data[f'{key}_BCOEF'][term_idx] = 2 * eps * rmin**6
+    
+    # Change the CCOEF arrays if provided
+    if c4 != None and one_4 == False:
+        parm.parm_data[f'{key}_CCOEF'][term_idx] = c4
