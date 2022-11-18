@@ -4270,5 +4270,5 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
     parm.parm_data[f'{key}_BCOEF'][term_idx] = 2 * eps * rmin**6
     
     # Change the CCOEF arrays if provided
-    if c4 != None and one_4 == False:
+    if c4 is not None and not one_4:
         parm.parm_data[f'{key}_CCOEF'][term_idx] = c4
