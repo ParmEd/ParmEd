@@ -28,6 +28,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
         environment-file: devtools/environment-dev.yaml
         activate-environment: parmed-dev
+        channels: conda-forge,bioconda
+        # mamba-version: "*"
 
     - name: Environment Information
       shell: bash -l {0}
