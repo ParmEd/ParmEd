@@ -139,6 +139,17 @@ The `fortranformat` package is released under the MIT license, Copyright (C)
 Brendan Arnold. See `fortranformat/__init__.py` for more information.
 ```
 
+## For Developers
+
+The standard residue template library is generated from the chemical component database by running the `ccd.js` script
+supplied by @dsehnal. Run it using the comments at the top of the file. The chemical component dictionary can be
+downloaded from https://www.wwpdb.org/data/ccd.
+
+The version used in the current release was downloaded on Jan 23, 2023.
+
+The final file is generated using `get_hybridization_from_rdkit.py` to add the hybridization information as determined
+by RDKit.
+
 ## Citation
 
 If you make use of ParmEd for research and would like to cite your use of it in

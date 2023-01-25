@@ -33,7 +33,7 @@ NUCLEIC = _ResidueType('NUCLEIC')
 SOLVENT = _ResidueType('SOLVENT')
 UNKNOWN = _ResidueType('UNKNOWN')
 
-class ResidueTemplate(object):
+class ResidueTemplate:
     """
     This is a residue template, which contains a listing of the atoms in the
     residue template as well as a mapping of which atoms are bonded to other
@@ -169,7 +169,7 @@ class ResidueTemplate(object):
         del self._map[atom_name]
         self.atoms.remove(atom)
 
-    def add_bond(self, atom1, atom2, order=1.0):
+    def add_bond(self, atom1, atom2, order=1.0, qualitative_type=None):
         """ Adds a bond between the two provided atoms in the residue
 
         Parameters
@@ -190,6 +190,8 @@ class ResidueTemplate(object):
                 1.5 -- aromatic bond
                 1.25 -- amide bond
             Default is 1.0
+        qualitative_type : :class:`QualitativeBondType`
+            The qualitative bond type for this bond. Default is None
 
         Raises
         ------
@@ -213,7 +215,7 @@ class ResidueTemplate(object):
             raise RuntimeError('Both atoms must belong to template.atoms')
         # Do not add the same bond twice
         if atom1 not in atom2.bond_partners:
-            self.bonds.append(Bond(atom1, atom2, order=order))
+            self.bonds.append(Bond(atom1, atom2, order=order, qualitative_type=qualitative_type))
 
     def delete_bond(self, bond):
         """ Delete a bond from this residue template.
