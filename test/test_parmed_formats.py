@@ -16,7 +16,7 @@ import random
 import os
 import sys
 import unittest
-from utils import get_fn, diff_files, run_all_tests, is_jenkins, HAS_GROMACS, FileIOTestCase
+from utils import get_fn, diff_files, run_all_tests, is_local, HAS_GROMACS, FileIOTestCase
 import warnings
 
 def reset_stringio(io):
@@ -360,7 +360,7 @@ class TestPDBStructure(FileIOTestCase):
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
@@ -368,7 +368,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
         self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
         fname = self.get_fn('downloaded.pdb', written=True)
@@ -1631,7 +1631,7 @@ class TestCIFStructure(FileIOTestCase):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
         self._check4lzt(read_CIF(self.lzt))
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download(self):
         """ Test CIF downloading on 4LZT """
         fn = self.get_fn('4lzt.cif', written=True)
