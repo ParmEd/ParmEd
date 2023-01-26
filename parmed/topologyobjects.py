@@ -557,7 +557,7 @@ class Atom(_ListItem):
                   solvent_radius=item.solvent_radius, screen=item.screen, tree=item.tree,
                   join=item.join, irotat=item.irotat, occupancy=item.occupancy,
                   bfactor=item.bfactor, altloc=item.altloc, formal_charge=item.formal_charge,
-                  hybridization=item.hybridization)
+                  hybridization=item.hybridization, aromatic=item.aromatic)
         new.atom_type = item.atom_type
         new.anisou = copy(item.anisou)
         for key in item.other_locations:
@@ -1023,7 +1023,7 @@ class Atom(_ListItem):
                       anisou=self.anisou, _rmin=self._rmin, _epsilon=self._epsilon,
                       _rmin14=self._rmin14, _epsilon14=self._epsilon14, children=self.children,
                       atomic_number=self.atomic_number, formal_charge=self.formal_charge,
-                      hybridization=self.hybridization)
+                      hybridization=self.hybridization, aromatic=self.aromatic)
         for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles', 'type_idx', 'class_idx',
                     'polarizability', 'vdw_weight', 'weights', '_frame_type'):
             try:
