@@ -4,6 +4,7 @@ PDBx/mmCIF files.
 """
 from collections import OrderedDict, namedtuple
 from contextlib import closing
+from functools import lru_cache
 from string import ascii_letters
 import io
 import ftplib
@@ -14,9 +15,9 @@ from ..formats.pdbx import PdbxReader, PdbxWriter, containers
 from ..formats.registry import FileFormatType
 from ..periodic_table import AtomicNum, Mass, Element, element_by_name
 from ..residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
-from ..modeller import StandardBiomolecularResidues
+from ..modeller import StandardBiomolecularResidues, get_standard_residue_template_library
 from ..structure import Structure
-from ..topologyobjects import Atom, ExtraPoint, Bond, Link
+from ..topologyobjects import Atom, ExtraPoint, Bond, Link, QualitativeBondType
 from ..symmetry import Symmetry
 from ..utils.io import genopen
 import re
@@ -92,6 +93,54 @@ def _number_truncated_to_n_digits(num, digits):
     if num < 0:
         return int(-(-num % eval(f'1e{digits - 1:d}')))
     return int(num % eval(f'1e{digits:d}'))
+
+@lru_cache(maxsize=4096)
+def _atom_name_to_atom_map(residue_name):
+    templates = get_standard_residue_template_library()
+    if residue_name not in templates:
+        return {}
+    return {atom.name: atom for atom in templates[residue_name].atoms}
+
+@lru_cache(maxsize=4096)
+def _atom_name_to_bond_map(residue_name):
+    templates = get_standard_residue_template_library()
+    if residue_name not in templates:
+        return {}
+    bond_type_map = {}
+    for bond in templates[residue_name].bonds:
+        bond_type_map[(bond.atom1.name, bond.atom2.name)] = bond.qualitative_type
+        bond_type_map[(bond.atom2.name, bond.atom1.name)] = bond.qualitative_type
+    return bond_type_map
+
+def _map_atomic_properties_from_templates(structure: Structure):
+    """Modifies atoms in a structure in-place with attributes from the template"""
+    for residue in structure.residues:
+        template_atom_map = _atom_name_to_atom_map(residue.name)
+        for atom in residue.atoms:
+            if atom.name not in template_atom_map:
+                continue
+            template_atom = template_atom_map[atom.name]
+            atom.formal_charge = template_atom.formal_charge
+            atom.aromatic = template_atom.aromatic
+            atom.hybridization = template_atom.hybridization
+
+def _map_bond_types_from_templates(structure: Structure):
+    templates = get_standard_residue_template_library()
+    for bond in structure.bonds:
+        # Only assign bond types of bonds we recognize
+        if bond.atom1.residue.name not in templates or bond.atom2.residue.name not in templates:
+            continue
+        # Don't overwrite something already there
+        if bond.qualitative_type is not None:
+            continue
+        # For RNA, DNA, and peptides all inter-residue bonds are single bonds.
+        if bond.atom1.residue is not bond.atom2.residue:
+            bond.qualitative_type = QualitativeBondType.SINGLE
+            continue
+        # Otherwise they're both in the same residue, and should be in the template
+        bond_type_map = _atom_name_to_bond_map(bond.atom1.residue.name)
+        qualitative_type = bond_type_map.get((bond.atom1.name, bond.atom2.name), None)
+        bond.qualitative_type = qualitative_type
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -292,7 +341,7 @@ class PDBFile(metaclass=FileFormatType):
         self.struct.related_entries = []
 
     @classmethod
-    def parse(cls, filename, skip_bonds=False):
+    def parse(cls, filename, skip_bonds=False, expanded_residue_template_match=False):
         """ Read a PDB file and return a populated `Structure` class
 
         Parameters
@@ -309,6 +358,9 @@ class PDBFile(metaclass=FileFormatType):
             being parsed simply for its coordinates. This may also reduce
             element assignment if element information is not present in the PDB
             file already. Default is False.
+        expanded_residue_template_match : bool, optional
+            If True, an expanded set of residue templates taken from the chemical component database is used
+            to assign bonds and atomic properties.
 
         Metadata
         --------
@@ -349,6 +401,8 @@ class PDBFile(metaclass=FileFormatType):
             the PDB file.  No bonds or other topological features are added by
             default.
         """
+        if expanded_residue_template_match and skip_bonds:
+            raise ValueError("extended_residue_template_match cannot be True if skip_bonds is also True")
         if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
@@ -368,7 +422,12 @@ class PDBFile(metaclass=FileFormatType):
 
         # Assign bonds based on standard templates and simple distances
         if not skip_bonds:
-            inst.struct.assign_bonds()
+            if expanded_residue_template_match:
+                inst.struct.assign_bonds(get_standard_residue_template_library())
+                _map_atomic_properties_from_templates(inst.struct)
+                _map_bond_types_from_templates(inst.struct)
+            else:
+                inst.struct.assign_bonds()
 
         inst._postprocess_metadata()
         inst.struct.unchange()
@@ -1123,7 +1182,7 @@ class CIFFile(metaclass=FileFormatType):
     #===================================================
 
     @staticmethod
-    def parse(filename, skip_bonds=False):
+    def parse(filename, skip_bonds=False, expanded_residue_template_match=False):
         """
         Read a PDBx or mmCIF file and return a populated `Structure` class
 
@@ -1139,6 +1198,9 @@ class CIFFile(metaclass=FileFormatType):
             when parsing large files with non-standard residue names. However,
             no bonds are assigned. This is OK if, for instance, the CIF file is
             being parsed simply for its coordinates. Default is False.
+        expanded_residue_template_match : bool, optional
+            If True, an expanded set of residue templates taken from the chemical component database is used
+            to assign bonds and atomic properties.
 
         Metadata
         --------
@@ -1188,6 +1250,8 @@ class CIFFile(metaclass=FileFormatType):
         If this occurs, check the formatting on each line and make sure it
         matches the others.
         """
+        if expanded_residue_template_match and skip_bonds:
+            raise ValueError("extended_residue_template_match cannot be True if skip_bonds is also True")
         if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
@@ -1464,7 +1528,12 @@ class CIFFile(metaclass=FileFormatType):
         # Make sure we assign bonds for all of the structures we parsed
         if not skip_bonds:
             for struct in structures:
-                struct.assign_bonds()
+                if expanded_residue_template_match:
+                    struct.assign_bonds(get_standard_residue_template_library())
+                    _map_atomic_properties_from_templates(struct)
+                    _map_bond_types_from_templates(struct)
+                else:
+                    struct.assign_bonds()
         # Build the return value
         if len(structures) == 1:
             return structures[0]
