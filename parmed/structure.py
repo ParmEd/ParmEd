@@ -882,6 +882,15 @@ class Structure:
             # TER cards and changing chains prevents bonding to the next residue
             if res.ter or (res.chain and (res.chain != self.residues[i+1].chain)):
                 continue
+            # We should also skip bonding to the next residue if there are detected gaps in the
+            # residue sequence numbering
+            if res.number != -1 and self.residues[i + 1].number != -1:
+                try:
+                    if self.residues[i + 1].number != res.number + 1:
+                        continue
+                except TypeError:
+                    # The residue numbers are not numeric... weird, but move on as though no residue numbers were set
+                    pass
             ntempl = _res_in_templlib(self.residues[i+1], all_residues)
             if templ is None and ntempl is None:
                 # Any cross-link here picked up later
