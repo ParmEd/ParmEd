@@ -117,7 +117,7 @@ def _atom_name_to_bond_map(residue_name):
 
 def _replace_if_none(obj, template_obj, attribute):
     if getattr(obj, attribute) is None:
-        setattr(obj, getattr(template_obj, attribute))
+        setattr(obj, attribute, getattr(template_obj, attribute))
 
 def _map_atomic_properties_from_templates(structure: Structure):
     """Modifies atoms in a structure in-place with attributes from the template"""
