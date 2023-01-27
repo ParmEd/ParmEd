@@ -4,6 +4,7 @@ as atoms, residues, bonds, angles, etc.
 
 by Jason Swails
 """
+import enum
 import math
 from functools import cached_property
 from typing import Optional
@@ -26,7 +27,7 @@ __all__ = ['Angle', 'AngleType', 'Atom', 'AtomList', 'Bond', 'BondType', 'Chiral
            'NonbondedExceptionType', 'AmoebaNonbondedExceptionType', 'AcceptorDonor', 'Group',
            'AtomType', 'NoUreyBradley', 'ExtraPoint', 'TwoParticleExtraPointFrame',
            'ThreeParticleExtraPointFrame', 'OutOfPlaneExtraPointFrame', 'RBTorsionType',
-           'UnassignedAtomType', 'Link', 'DrudeAtom', 'DrudeAnisotropy']
+           'UnassignedAtomType', 'Link', 'DrudeAtom', 'DrudeAnisotropy', 'Hybridization', 'QualitativeBondType']
 
 def _strip_units(value, unit=None):
     """
@@ -223,6 +224,50 @@ def _safe_assigns(dest, source, attrs):
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+class Hybridization(enum.IntEnum):
+    """This represents atom hybridization, and mirrors the values in RDKit
+    See https://www.rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.HybridizationType
+    """
+    UNSPECIFIED = 0
+    S = 1
+    SP = 2
+    SP2 = 3
+    SP3 = 4
+    SP2D = 5
+    SP3D = 6
+    SP3D2 = 7
+    OTHER = 8
+
+
+class QualitativeBondType(enum.IntEnum):
+    """These are bond types as understood in the cheminformatics sense (e.g., single, double, etc.).
+    The definitions here adopt the RDKit values seen at https://www.rdkit.org/docs/source/rdkit.Chem.rdchem.html#rdkit.Chem.rdchem.BondType
+    """
+    UNSPECIFIED = 0
+    SINGLE = 1
+    DOUBLE = 2
+    TRIPLE = 3
+    QUADRUPLE = 4
+    QUINTUPLE = 5
+    HEXTUPLE = 6
+    ONEANDAHALF = 7
+    TWOANDAHALF = 8
+    THREEANDAHALF = 9
+    FOURANDAHALF = 10
+    FIVEANDAHALF = 11
+    AROMATIC = 12
+    IONIC = 13
+    HYDROGEN = 14
+    THREECENTER = 15
+    DATIVEONE = 16
+    DATIVE = 17
+    DATIVEL = 18
+    DATIVER = 19
+    OTHER = 20
+    ZERO = 21
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 class Atom(_ListItem):
     """
     An atom. Only use these as elements in AtomList instances, since AtomList
@@ -284,6 +329,12 @@ class Atom(_ListItem):
     epsilon14 : ``float``
         The epsilon (well depth) Lennard-Jones parameter for this atom in 1-4
         interactions. Default evaluates to 0
+    formal_charge : ``int``
+        The formal charge of this atom. The default value is `None`
+    hybridization : ``HybridizationType``
+        The hybridization type of this atom. Default is ``None``.
+    aromatic : ``bool``
+        If set, indicates whether or not the atom is aromatic
 
     Other Attributes
     ----------------
@@ -454,7 +505,7 @@ class Atom(_ListItem):
                  charge=None, mass=0.0, nb_idx=0, solvent_radius=0.0,
                  screen=0.0, tree='BLA', join=0.0, irotat=0.0, occupancy=0.0,
                  bfactor=0.0, altloc='', number=-1, rmin=None, epsilon=None,
-                 rmin14=None, epsilon14=None):
+                 rmin14=None, epsilon14=None, formal_charge=None, hybridization=None, aromatic=None):
         self.list = list
         self._idx = -1
         self.atomic_number = atomic_number
@@ -493,6 +544,9 @@ class Atom(_ListItem):
         self._rmin14 = _strip_units(rmin14, u.angstroms)
         self._epsilon14 = _strip_units(epsilon14, u.kilocalories_per_mole)
         self.children = []
+        self.aromatic = aromatic
+        self.formal_charge = formal_charge
+        self.hybridization = hybridization
 
     #===================================================
 
@@ -502,7 +556,8 @@ class Atom(_ListItem):
                   charge=item.charge, mass=item.mass, nb_idx=item.nb_idx,
                   solvent_radius=item.solvent_radius, screen=item.screen, tree=item.tree,
                   join=item.join, irotat=item.irotat, occupancy=item.occupancy,
-                  bfactor=item.bfactor, altloc=item.altloc)
+                  bfactor=item.bfactor, altloc=item.altloc, formal_charge=item.formal_charge,
+                  hybridization=item.hybridization, aromatic=item.aromatic)
         new.atom_type = item.atom_type
         new.anisou = copy(item.anisou)
         for key in item.other_locations:
@@ -967,7 +1022,8 @@ class Atom(_ListItem):
                       altloc=self.altloc, occupancy=self.occupancy, number=self.number,
                       anisou=self.anisou, _rmin=self._rmin, _epsilon=self._epsilon,
                       _rmin14=self._rmin14, _epsilon14=self._epsilon14, children=self.children,
-                      atomic_number=self.atomic_number)
+                      atomic_number=self.atomic_number, formal_charge=self.formal_charge,
+                      hybridization=self.hybridization, aromatic=self.aromatic)
         for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles', 'type_idx', 'class_idx',
                     'polarizability', 'vdw_weight', 'weights', '_frame_type'):
             try:
@@ -1758,6 +1814,8 @@ class Bond:
             1.5 -- aromatic bond
             1.25 -- amide bond
         Default is 1.0
+    qualitative_type : :class:`QualitativeBondType`
+        An optional qualitative bond type
 
     Notes
     -----
@@ -1775,7 +1833,7 @@ class Bond:
     True
     """
 
-    def __init__(self, atom1, atom2, type=None, order=1.0):
+    def __init__(self, atom1, atom2, type=None, order=1.0, qualitative_type=None):
         """ Bond constructor """
         # Make sure we're not bonding me to myself
         if atom1 is atom2:
@@ -1793,6 +1851,7 @@ class Bond:
         self.funct = 1
         self._order = None
         self.order = order
+        self.qualitative_type = qualitative_type
 
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom is in this Bond """

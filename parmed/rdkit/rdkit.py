@@ -3,6 +3,7 @@ from io import StringIO
 from typing import TYPE_CHECKING
 
 from ..periodic_table import Element
+from ..topologyobjects import QualitativeBondType, Hybridization
 
 class RDKit:
 
@@ -87,12 +88,18 @@ class RDKit:
     @classmethod
     def to_mol(cls, structure: "Structure"):
         """ Instantiates an RDKit Mol object from a ParmEd Structure """
-        from rdkit.Chem import Atom, RWMol, Bond
+        from rdkit.Chem import Atom, RWMol
         from rdkit.Chem.rdchem import BondType
 
         mol = RWMol()
         for atom in structure.atoms:
             rdatom = Atom(atom.atomic_number)
+            if atom.aromatic is not None:
+                rdatom.SetIsAromatic(atom.aromatic)
+            if atom.formal_charge is not None:
+                rdatom.SetFormalCharge(atom.formal_charge)
+            if atom.hybridization is not None:
+                rdatom.SetHybridization(getattr(Hybridization, atom.hybridization.name))
             pdb_info = cls._get_pdb_info(atom)
             rdatom.SetMonomerInfo(pdb_info)
             mol.AddAtom(rdatom)
@@ -103,21 +110,34 @@ class RDKit:
             if key in added_bonds:
                 continue
             added_bonds.add(key)
-            mol.AddBond(bond.atom1.idx, bond.atom2.idx, BondType.UNSPECIFIED)
+            bond_type = (
+                getattr(BondType, bond.qualitative_type.name)
+                if isinstance(bond.qualitative_type, QualitativeBondType)
+                else BondType.UNSPECIFIED
+            )
+            mol.AddBond(bond.atom1.idx, bond.atom2.idx, bond_type)
 
         return mol.GetMol()
 
     @classmethod
     def _get_pdb_info(cls, atom: "Atom"):
         from rdkit.Chem.rdchem import AtomPDBResidueInfo
+        try:
+            residue_number = atom.residue.number if atom.residue.number != -1 else atom.residue.idx + 1
+            chain = atom.residue.chain
+            insertion_code = atom.residue.insertion_code
+        except AttributeError:
+            residue_number = 1
+            chain = ""
+            insertion_code = ""
         return AtomPDBResidueInfo(
             cls._to_pdb_atom_name(atom_name=atom.name, symbol=Element[atom.atomic_number]),
             atom.number if atom.number != -1 else atom.idx + 1,
             atom.altloc,
             atom.residue.name,
-            atom.residue.number if atom.residue.number != -1 else atom.residue.idx + 1,
-            atom.residue.chain,
-            atom.residue.insertion_code,
+            residue_number,
+            chain,
+            insertion_code,
             atom.occupancy if atom.occupancy != 0.0 else 1.0,
             atom.bfactor,
         )
