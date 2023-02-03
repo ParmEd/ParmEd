@@ -31,7 +31,7 @@ class RDKit:
         from rdkit import Chem
         fh = StringIO(Chem.MolToPDBBlock(rmol))
         struct = PDBFile.parse(fh)
-        struct.coordinates = rmol.GetConformer().GetPositions()
+        struct.coordinates = rmol.GetConformer(0).GetPositions()
         return struct
 
     @staticmethod
