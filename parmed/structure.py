@@ -488,7 +488,7 @@ class Structure:
             c.torsion_torsion_types.append(deepcopy(tt))
         c.torsion_torsion_types.claim()
         for at in self.adjust_types:
-            c.adjust_types.append(cdeepcopyopy(at))
+            c.adjust_types.append(deepcopy(at))
         c.adjust_types.claim()
         # Now create the topological objects
         atoms = c.atoms
