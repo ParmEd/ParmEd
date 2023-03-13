@@ -546,8 +546,8 @@ def equal_atoms(tester, a1, a2):
         else:
             tester.assertFalse(hasattr(a1, key))
 
-def is_jenkins():
-    return 'JENKINS_URL' in os.environ
+def is_local():
+    return 'CI' not in os.environ
 
 def has_old_vec3():
     from parmed.vec3 import Vec3
