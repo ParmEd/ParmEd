@@ -193,7 +193,7 @@ class Mdin:
         )
 
         variable = variable.lower()
-        if isinstance(value, str):
+        if isinstance(value, str) and len(value) > 0:
             if (value[0] == value[-1] == "'") or (value[0] == value[-1] == '"'):
                 value = value[1:-1]
 
