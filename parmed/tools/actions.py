@@ -586,7 +586,7 @@ class changeLJPair(Action):
         self.c4 = arg_list.get_next_float(optional=True, default=None)
 
     def __str__(self):
-        if self.c4 == None:
+        if self.c4 is None:
             return (
                 f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
                 f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
@@ -619,7 +619,7 @@ class changeLJPair(Action):
                 else:
                     if attype2 != atom.nb_idx:
                         raise ChangeLJPairError('Second mask matches multiple atom types!')
-        if self.c4 != None and 'LENNARD_JONES_CCOEF' not in self.parm.flag_list:
+        if self.c4 is not None and 'LENNARD_JONES_CCOEF' not in self.parm.flag_list:
             raise ChangeLJPairError('No C4 information in parm. Please use the "add12_6_4" command first.')
         _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, c4=self.c4)   
 
