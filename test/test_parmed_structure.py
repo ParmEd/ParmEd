@@ -826,9 +826,18 @@ class TestStructureAdd(FileIOTestCase):
         with open(self.get_fn("thf.pkl"), "rb") as f:
             s1 = pickle.load(f)
             s1.residues[0].name = "THF"
+            # Add new attributes since this is a saved pickle file that predates adding these new attributes
+            for atom in s1.atoms:
+                atom.formal_charge = atom.hybridization = atom.aromatic = None
+            for bond in s1.bonds:
+                bond.qualitative_type = None
         with open(self.get_fn("ace.pkl"), "rb") as f:
             s2 = pickle.load(f)
             s2.residues[0].name = "ACE"
+            for atom in s2.atoms:
+                atom.formal_charge = atom.hybridization = atom.aromatic = None
+            for bond in s2.bonds:
+                bond.qualitative_type = None
         combined_fn = self.get_fn("gmx-co1bined.top", written=True)
         comb = s1 + s2
         comb.save(combined_fn, format="GROMACS")

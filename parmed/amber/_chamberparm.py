@@ -559,10 +559,10 @@ class ChamberParm(AmberParm):
             for i, fix in enumerate(nbfixes):
                 for terms in fix:
                     j, rmin, eps, rmin14, eps14 = terms
-                    i, j = min(i, j-1), max(i, j-1)
+                    k, l = min(i, j-1), max(i, j-1)
                     eps = abs(eps)
                     eps14 = abs(eps14)
-                    idx = data['NONBONDED_PARM_INDEX'][ntypes*i+j] - 1
+                    idx = data['NONBONDED_PARM_INDEX'][ntypes*k+l] - 1
                     data['LENNARD_JONES_ACOEF'][idx] = eps * rmin**12
                     data['LENNARD_JONES_BCOEF'][idx] = 2 * eps * rmin**6
                     data['LENNARD_JONES_14_ACOEF'][idx] = eps14 * rmin14**12
