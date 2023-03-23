@@ -476,7 +476,7 @@ class ResidueTemplate:
                 residue[atom.name].type = atom.type
                 residue[atom.name].charge = atom.charge
             else:
-                residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge))
+                residue.add_atom(Atom(name=atom.name, type=atom.type, charge=atom.charge, atomic_number=atom.atomic_number))
             modifications_made = True
         # Add bonds
         for (atom1_name, atom2_name, order) in patch.add_bonds:
