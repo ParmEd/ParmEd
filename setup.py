@@ -125,6 +125,7 @@ if __name__ == '__main__':
           packages=packages,
           ext_modules=extensions,
           cmdclass=cmdclass,
-          package_data={'parmed.modeller': ['data/*.lib']},
+          package_data={'parmed.modeller': ['data/*.lib', 'data/*.json']},
+          python_requires='>=3.8',
           **kws
     )

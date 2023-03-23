@@ -2,25 +2,29 @@
 This package contains classes responsible for reading and writing both PDB and
 PDBx/mmCIF files.
 """
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, namedtuple, Counter
 from contextlib import closing
+from functools import lru_cache
 from string import ascii_letters
 import io
 import ftplib
 import gzip
+import logging
 import numpy as np
 from ..exceptions import PDBError, PDBWarning
 from ..formats.pdbx import PdbxReader, PdbxWriter, containers
 from ..formats.registry import FileFormatType
 from ..periodic_table import AtomicNum, Mass, Element, element_by_name
 from ..residue import AminoAcidResidue, RNAResidue, DNAResidue, WATER_NAMES
-from ..modeller import StandardBiomolecularResidues
+from ..modeller import StandardBiomolecularResidues, get_standard_residue_template_library
 from ..structure import Structure
-from ..topologyobjects import Atom, ExtraPoint, Bond, Link
+from ..topologyobjects import Atom, ExtraPoint, Bond, Link, QualitativeBondType
 from ..symmetry import Symmetry
 from ..utils.io import genopen
 import re
 import warnings
+
+LOGGER = logging.getLogger(__name__)
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -93,6 +97,58 @@ def _number_truncated_to_n_digits(num, digits):
         return int(-(-num % eval(f'1e{digits - 1:d}')))
     return int(num % eval(f'1e{digits:d}'))
 
+@lru_cache(maxsize=4096)
+def _atom_name_to_atom_map(residue_name):
+    templates = get_standard_residue_template_library()
+    if residue_name not in templates:
+        return {}
+    return {atom.name: atom for atom in templates[residue_name].atoms}
+
+@lru_cache(maxsize=4096)
+def _atom_name_to_bond_map(residue_name):
+    templates = get_standard_residue_template_library()
+    if residue_name not in templates:
+        return {}
+    bond_type_map = {}
+    for bond in templates[residue_name].bonds:
+        bond_type_map[(bond.atom1.name, bond.atom2.name)] = bond.qualitative_type
+        bond_type_map[(bond.atom2.name, bond.atom1.name)] = bond.qualitative_type
+    return bond_type_map
+
+def _replace_if_none(obj, template_obj, attribute):
+    if getattr(obj, attribute) is None:
+        setattr(obj, attribute, getattr(template_obj, attribute))
+
+def _map_atomic_properties_from_templates(structure: Structure):
+    """Modifies atoms in a structure in-place with attributes from the template"""
+    for residue in structure.residues:
+        template_atom_map = _atom_name_to_atom_map(residue.name)
+        for atom in residue.atoms:
+            if atom.name not in template_atom_map:
+                continue
+            template_atom = template_atom_map[atom.name]
+            _replace_if_none(atom, template_atom, "formal_charge")
+            _replace_if_none(atom, template_atom, "aromatic")
+            _replace_if_none(atom, template_atom, "hybridization")
+
+def _map_bond_types_from_templates(structure: Structure):
+    templates = get_standard_residue_template_library()
+    for bond in structure.bonds:
+        # Only assign bond types of bonds we recognize
+        if bond.atom1.residue.name not in templates or bond.atom2.residue.name not in templates:
+            continue
+        # Don't overwrite something already there
+        if bond.qualitative_type is not None:
+            continue
+        # For RNA, DNA, and peptides all inter-residue bonds are single bonds.
+        if bond.atom1.residue is not bond.atom2.residue:
+            bond.qualitative_type = QualitativeBondType.SINGLE
+            continue
+        # Otherwise they're both in the same residue, and should be in the template
+        bond_type_map = _atom_name_to_bond_map(bond.atom1.residue.name)
+        qualitative_type = bond_type_map.get((bond.atom1.name, bond.atom2.name), None)
+        bond.qualitative_type = qualitative_type
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 class PDBFile(metaclass=FileFormatType):
@@ -127,15 +183,12 @@ class PDBFile(metaclass=FileFormatType):
 
         try:
             for line in fileobject:
-                if line[:6] in {'CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL',
-                        'MASTER', 'AUTHOR', 'CAVEAT', 'COMPND', 'EXPDTA',
-                        'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ',
-                        'SPRSDE', 'TITLE ', 'ANISOU', 'CISPEP', 'CONECT',
-                        'DBREF ', 'HELIX ', 'HET   ', 'LINK  ', 'MODRES',
-                        'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL',
-                        'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ', 'ENDMDL',
-                        'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER', 'DBREF ',
-                        'DBREF2', 'DBREF1', 'DBREF', 'HET', 'LINKR '}:
+                if line[:6] in {'CRYST1', 'END   ', 'END', 'HEADER', 'NUMMDL', 'MASTER', 'AUTHOR', 'CAVEAT',
+                        'COMPND', 'EXPDTA', 'MDLTYP', 'KEYWDS', 'OBSLTE', 'SOURCE', 'SPLIT ', 'SPRSDE', 'TITLE ',
+                        'ANISOU', 'CISPEP', 'CONECT', 'DBREF ', 'HELIX ', 'HET   ', 'LINK  ', 'MODRES',
+                        'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL', 'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ',
+                        'ENDMDL', 'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER', 'DBREF ', 'DBREF2', 'DBREF1',
+                        'DBREF', 'HET', 'LINKR '}:
                     continue
                 # Hack to support reduce-added flags
                 elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
@@ -292,7 +345,7 @@ class PDBFile(metaclass=FileFormatType):
         self.struct.related_entries = []
 
     @classmethod
-    def parse(cls, filename, skip_bonds=False):
+    def parse(cls, filename, skip_bonds=False, expanded_residue_template_match=False):
         """ Read a PDB file and return a populated `Structure` class
 
         Parameters
@@ -309,6 +362,9 @@ class PDBFile(metaclass=FileFormatType):
             being parsed simply for its coordinates. This may also reduce
             element assignment if element information is not present in the PDB
             file already. Default is False.
+        expanded_residue_template_match : bool, optional
+            If True, an expanded set of residue templates taken from the chemical component database is used
+            to assign bonds and atomic properties.
 
         Metadata
         --------
@@ -349,6 +405,8 @@ class PDBFile(metaclass=FileFormatType):
             the PDB file.  No bonds or other topological features are added by
             default.
         """
+        if expanded_residue_template_match and skip_bonds:
+            raise ValueError("extended_residue_template_match cannot be True if skip_bonds is also True")
         if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
@@ -368,7 +426,12 @@ class PDBFile(metaclass=FileFormatType):
 
         # Assign bonds based on standard templates and simple distances
         if not skip_bonds:
-            inst.struct.assign_bonds()
+            if expanded_residue_template_match:
+                inst.struct.assign_bonds(get_standard_residue_template_library())
+                _map_atomic_properties_from_templates(inst.struct)
+                _map_bond_types_from_templates(inst.struct)
+            else:
+                inst.struct.assign_bonds()
 
         inst._postprocess_metadata()
         inst.struct.unchange()
@@ -1122,8 +1185,8 @@ class CIFFile(metaclass=FileFormatType):
 
     #===================================================
 
-    @staticmethod
-    def parse(filename, skip_bonds=False):
+    @classmethod
+    def parse(cls, filename, skip_bonds=False, expanded_residue_template_match=False):
         """
         Read a PDBx or mmCIF file and return a populated `Structure` class
 
@@ -1139,6 +1202,9 @@ class CIFFile(metaclass=FileFormatType):
             when parsing large files with non-standard residue names. However,
             no bonds are assigned. This is OK if, for instance, the CIF file is
             being parsed simply for its coordinates. Default is False.
+        expanded_residue_template_match : bool, optional
+            If True, an expanded set of residue templates taken from the chemical component database is used
+            to assign bonds and atomic properties.
 
         Metadata
         --------
@@ -1188,6 +1254,8 @@ class CIFFile(metaclass=FileFormatType):
         If this occurs, check the formatting on each line and make sure it
         matches the others.
         """
+        if expanded_residue_template_match and skip_bonds:
+            raise ValueError("extended_residue_template_match cannot be True if skip_bonds is also True")
         if isinstance(filename, str):
             own_handle = True
             fileobj = genopen(filename, 'r')
@@ -1296,6 +1364,7 @@ class CIFFile(metaclass=FileFormatType):
             chainid = atoms.getAttributeIndex('auth_asym_id')
             resnumid = atoms.getAttributeIndex('auth_seq_id')
             inscodeid = atoms.getAttributeIndex('pdbx_PDB_ins_code')
+            formal_charge_id = atoms.getAttributeIndex("pdbx_formal_charge")
             xid = atoms.getAttributeIndex('Cartn_x')
             yid = atoms.getAttributeIndex('Cartn_y')
             zid = atoms.getAttributeIndex('Cartn_z')
@@ -1326,11 +1395,12 @@ class CIFFile(metaclass=FileFormatType):
                 x, y, z = float(row[xid]), float(row[yid]), float(row[zid])
                 occup = float(row[occupid])
                 bfactor = float(row[bfactorid])
-                # Try to figure out the element
-                elem = '%-2s' % elem # Make sure we have at least 2 characters
-                if elem[0] == ' ': elem = elem[1] + ' '
                 try:
-                    atsym = (elem[0] + elem[1].lower()).strip()
+                    formal_charge = int(row[formal_charge_id]) if formal_charge_id != -1 else None
+                except ValueError:
+                    formal_charge = None
+                try:
+                    atsym = elem.strip().title()
                     atomic_number = AtomicNum[atsym]
                     mass = Mass[atsym]
                 except KeyError:
@@ -1355,11 +1425,9 @@ class CIFFile(metaclass=FileFormatType):
                 else:
                     atom = Atom(atomic_number=atomic_number, name=atname,
                                 mass=mass, occupancy=occup, bfactor=bfactor,
-                                altloc=altloc, number=atnum)
+                                altloc=altloc, number=atnum, formal_charge=formal_charge)
                 atom.xx, atom.xy, atom.xz = x, y, z
-                if (_compare_atoms(last_atom, atom, resname, resnum,
-                                   chain, '', inscode)
-                        and altloc):
+                if (_compare_atoms(last_atom, atom, resname, resnum, chain, '', inscode) and altloc):
                     atom.residue = last_atom.residue
                     last_atom.other_locations[altloc] = atom
                 else:
@@ -1371,8 +1439,7 @@ class CIFFile(metaclass=FileFormatType):
                         xyz.extend([x, y, z])
                     else:
                         if all_coords and len(xyz) != len(all_coords[-1]):
-                            raise ValueError('All frames must have same number '
-                                             'of atoms')
+                            raise ValueError('All frames must have same number of atoms')
                         all_coords.append(xyz)
                         xyz = [x, y, z]
                         lastmodel = model
@@ -1420,8 +1487,7 @@ class CIFFile(metaclass=FileFormatType):
                 u23id = anisou.getAttributeIndex('U[2][3]')
                 if -1 in (atnumid, atnameid, altlocid, resnameid, chainid,
                           resnumid, u11id, u22id, u33id, u12id, u13id, u23id):
-                    warnings.warn('Incomplete anisotropic B-factor CIF '
-                                  'section. Skipping', PDBWarning)
+                    warnings.warn('Incomplete anisotropic B-factor CIF section. Skipping', PDBWarning)
                 else:
                     try:
                         for i in range(anisou.getRowCount()):
@@ -1441,30 +1507,35 @@ class CIFFile(metaclass=FileFormatType):
                             u23 = float(row[u23id])
                             if altloc == '.': altloc = ''
                             if inscode in '?.': inscode = ''
-                            key = (resnum, resname, inscode, chain, atnum,
-                                   altloc, atname)
-                            atommap[key].anisou = np.array(
-                                    [u11, u22, u33, u12, u13, u23]
-                            )
+                            key = (resnum, resname, inscode, chain, atnum, altloc, atname)
+                            atommap[key].anisou = np.array([u11, u22, u33, u12, u13, u23])
                     except (ValueError, KeyError):
                         # If at least one went wrong, set them all to None
                         for key, atom in atommap.items():
                             atom.anisou = None
-                        warnings.warn('Problem processing anisotropic '
-                                      'B-factors. Skipping', PDBWarning)
+                        warnings.warn('Problem processing anisotropic B-factors. Skipping', PDBWarning)
+            conn = cont.getObj("struct_conn")
+            if conn is not None:
+                try:
+                    cls._process_struct_conn(struct, conn)
+                except IndexError:
+                    pass
             if xyz:
                 if len(xyz) != len(struct.atoms) * 3:
-                    raise ValueError('Corrupt CIF; all models must have the '
-                                     'same atoms')
+                    raise ValueError('Corrupt CIF; all models must have the same atoms')
                 all_coords.append(xyz)
             if all_coords:
-                struct._coordinates = np.array(all_coords).reshape(
-                            (-1, len(struct.atoms), 3))
+                struct._coordinates = np.array(all_coords).reshape((-1, len(struct.atoms), 3))
 
         # Make sure we assign bonds for all of the structures we parsed
         if not skip_bonds:
             for struct in structures:
-                struct.assign_bonds()
+                if expanded_residue_template_match:
+                    struct.assign_bonds(get_standard_residue_template_library())
+                    _map_atomic_properties_from_templates(struct)
+                    _map_bond_types_from_templates(struct)
+                else:
+                    struct.assign_bonds()
         # Build the return value
         if len(structures) == 1:
             return structures[0]
@@ -1531,8 +1602,7 @@ class CIFFile(metaclass=FileFormatType):
         elif altlocs.lower() == 'occupancy'[:len(altlocs)]:
             altlocs = 'occupancy'
         else:
-            raise ValueError("Illegal value of occupancy [%s]; expected 'all', "
-                             "'first', or 'occupancy'" % altlocs)
+            raise ValueError(f"Illegal value of occupancy [{altlocs}]; expected 'all', 'first', or 'occupancy'")
         own_handle = False
         if not hasattr(dest, 'write'):
             dest = genopen(dest, 'w')
@@ -1594,14 +1664,10 @@ class CIFFile(metaclass=FileFormatType):
         cifatoms = containers.DataCategory('atom_site')
         cont.append(cifatoms)
         cifatoms.setAttributeNameList(
-                ['group_PDB', 'id', 'type_symbol', 'label_atom_id',
-                 'label_alt_id', 'label_comp_id', 'label_asym_id',
-                 'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code',
-                 'Cartn_x', 'Cartn_y', 'Cartn_z', 'occupancy', 'B_iso_or_equiv',
-                 'Cartn_x_esd', 'Cartn_y_esd', 'Cartn_z_esd', 'occupancy_esd',
-                 'B_iso_or_equiv_esd', 'pdbx_formal_charge', 'auth_seq_id',
-                 'auth_comp_id', 'auth_asym_id', 'auth_atom_id',
-                 'pdbx_PDB_model_num']
+            ['group_PDB', 'id', 'type_symbol', 'label_atom_id', 'label_alt_id', 'label_comp_id', 'label_asym_id',
+             'label_entity_id', 'label_seq_id', 'pdbx_PDB_ins_code', 'Cartn_x', 'Cartn_y', 'Cartn_z', 'occupancy',
+             'B_iso_or_equiv', 'Cartn_x_esd', 'Cartn_y_esd', 'Cartn_z_esd', 'occupancy_esd', 'B_iso_or_equiv_esd',
+             'pdbx_formal_charge', 'auth_seq_id', 'auth_comp_id', 'auth_asym_id', 'auth_atom_id', 'pdbx_PDB_model_num']
         )
         write_anisou = write_anisou and any(atom.anisou is not None
                                             for atom in struct.atoms)
@@ -1609,14 +1675,10 @@ class CIFFile(metaclass=FileFormatType):
             cifanisou = containers.DataCategory('atom_site_anisotrop')
             cont.append(cifanisou)
             cifanisou.setAttributeNameList(
-                    ['id', 'type_symbol', 'pdbx_label_atom_id',
-                    'pdbx_label_alt_id', 'pdbx_label_comp_id',
-                    'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]',
-                    'U[2][2]', 'U[3][3]', 'U[1][2]', 'U[1][3]', 'U[2][3]',
-                    'U[1][1]_esd', 'U[2][2]_esd', 'U[3][3]_esd', 'U[1][2]_esd',
-                    'U[1][3]_esd', 'U[2][3]_esd', 'pdbx_auth_seq_id',
-                    'pdbx_auth_comp_id', 'pdbx_auth_asym_id',
-                    'pdbx_auth_atom_id']
+                ['id', 'type_symbol', 'pdbx_label_atom_id', 'pdbx_label_alt_id', 'pdbx_label_comp_id',
+                 'pdbx_label_asym_id', 'pdbx_label_seq_id', 'U[1][1]', 'U[2][2]', 'U[3][3]', 'U[1][2]', 'U[1][3]',
+                 'U[2][3]', 'U[1][1]_esd', 'U[2][2]_esd', 'U[3][3]_esd', 'U[1][2]_esd', 'U[1][3]_esd', 'U[2][3]_esd',
+                 'pdbx_auth_seq_id', 'pdbx_auth_comp_id', 'pdbx_auth_asym_id', 'pdbx_auth_atom_id']
             )
         nmore = 0 # how many *extra* atoms have been added?
         last_number = 0
@@ -1644,20 +1706,15 @@ class CIFFile(metaclass=FileFormatType):
                     last_number = anum
                     last_rnumber = rnum
                     cifatoms.append(
-                            [atomrec, anum, Element[pa.atomic_number].upper(),
-                             pa.name, pa.altloc, resname, res.chain, '?', rnum,
-                             res.insertion_code, x, y, z, pa.occupancy,
-                             pa.bfactor, '?', '?', '?', '?', '?', '', rnum,
-                             resname, res.chain, pa.name, str(model+1)]
+                        [atomrec, anum, Element[pa.atomic_number].upper(), pa.name, pa.altloc, resname, res.chain, '?',
+                         rnum, res.insertion_code, x, y, z, pa.occupancy, pa.bfactor, '?', '?', '?', '?', '?', '', rnum,
+                         resname, res.chain, pa.name, str(model+1)]
                     )
                     if write_anisou and pa.anisou is not None:
                         cifanisou.append(
-                                [anum, Element[pa.atomic_number].upper(),
-                                 pa.name, pa.altloc, resname, res.chain, rnum,
-                                 pa.anisou[0], pa.anisou[1], pa.anisou[2],
-                                 pa.anisou[3], pa.anisou[4], pa.anisou[5], '?',
-                                 '?', '?', '?', '?', '?', rnum, resname,
-                                 res.chain, pa.name]
+                            [anum, Element[pa.atomic_number].upper(), pa.name, pa.altloc, resname, res.chain, rnum,
+                             pa.anisou[0], pa.anisou[1], pa.anisou[2], pa.anisou[3], pa.anisou[4], pa.anisou[5], '?',
+                             '?', '?', '?', '?', '?', rnum, resname, res.chain, pa.name]
                         )
                     for key in sorted(others.keys()):
                         oatom = others[key]
@@ -1670,27 +1727,85 @@ class CIFFile(metaclass=FileFormatType):
                         last_number = anum
                         el = Element[oatom.atomic_number].upper()
                         cifatoms.append(
-                                [atomrec, anum, el, oatom.name, oatom.altloc,
-                                 resname, res.chain, '?', rnum,
-                                 res.insertion_code, x, y, z, oatom.occupancy,
-                                 oatom.bfactor, '?', '?', '?', '?', '?', '',
-                                 rnum, resname, res.chain, oatom.name, '1']
+                            [atomrec, anum, el, oatom.name, oatom.altloc, resname, res.chain, '?', rnum,
+                             res.insertion_code, x, y, z, oatom.occupancy, oatom.bfactor, '?', '?', '?', '?', '?', '',
+                             rnum, resname, res.chain, oatom.name, '1']
                         )
                         if write_anisou and oatom.anisou is not None:
                             cifanisou.append(
-                                    [anum, Element[oatom.atomic_number].upper(),
-                                     oatom.name, oatom.altloc, resname,
-                                     res.chain, rnum, oatom.anisou[0],
-                                     oatom.anisou[1], oatom.anisou[2],
-                                     oatom.anisou[3], oatom.anisou[4],
-                                     oatom.anisou[5], '?', '?', '?', '?', '?',
-                                     '?', rnum, resname, res.chain, oatom.name]
+                                [anum, Element[oatom.atomic_number].upper(), oatom.name, oatom.altloc, resname,
+                                 res.chain, rnum, oatom.anisou[0], oatom.anisou[1], oatom.anisou[2],
+                                 oatom.anisou[3], oatom.anisou[4], oatom.anisou[5], '?', '?', '?', '?', '?',
+                                 '?', rnum, resname, res.chain, oatom.name]
                             )
         # Now write the PDBx file
         writer = PdbxWriter(dest)
         writer.write([cont])
         if own_handle:
             dest.close()
+
+    @staticmethod
+    def _process_struct_conn(struct, conn):
+        """Adds bonds from the connect record to the structure
+
+        May raise:
+         IndexError (badly formatted rows that do not have the right number of elements)
+        """
+        atom_by_residue_identifiers_map = {
+            (atom.residue.chain, atom.residue.name, atom.residue.number, atom.name): atom for atom in struct.atoms
+        }
+
+        chain_1_id = conn.getAttributeIndex("ptnr1_auth_asym_id")
+        residue_1_name_id = conn.getAttributeIndex("ptnr1_auth_comp_id")
+        residue_1_seq_id = conn.getAttributeIndex("ptnr1_auth_seq_id")
+        atom_1_name_id = conn.getAttributeIndex("ptnr1_label_atom_id")
+
+        chain_2_id = conn.getAttributeIndex("ptnr2_auth_asym_id")
+        residue_2_name_id = conn.getAttributeIndex("ptnr2_auth_comp_id")
+        residue_2_seq_id = conn.getAttributeIndex("ptnr2_auth_seq_id")
+        atom_2_name_id = conn.getAttributeIndex("ptnr2_label_atom_id")
+
+        order_id = conn.getAttributeIndex("pdbx_value_order")
+
+        bond_type_order_map = {
+            "sing": QualitativeBondType.SINGLE, "doub": QualitativeBondType.DOUBLE,
+            "trip": QualitativeBondType.TRIPLE, "quad": QualitativeBondType.QUADRUPLE,
+        }
+
+        # NOTE - we are not currently using the *_auth_* keys that are present in the atom_site container.
+        # They seem to be redundant, and the chain, residue name, and residue index seem to be enough (with the
+        # atom name) to identify each atom.
+
+        for i in range(conn.getRowCount()):
+            row = conn.getRow(i)
+            chain_1 = row[chain_1_id].strip().replace("?", "")
+            residue_1_name = row[residue_1_name_id].strip()
+            atom_1_name = row[atom_1_name_id].strip()
+            residue_1_seq = try_convert(row[residue_1_seq_id].strip(), int)
+            atom_1_key = (chain_1, residue_1_name, residue_1_seq, atom_1_name)
+
+
+            chain_2 = row[chain_2_id].strip().replace("?", "")
+            residue_2_name = row[residue_2_name_id].strip()
+            atom_2_name = row[atom_2_name_id].strip()
+            residue_2_seq = try_convert(row[residue_2_seq_id].strip(), int)
+            atom_2_key = (chain_2, residue_2_name, residue_2_seq, atom_2_name)
+
+            order = row[order_id].lower() if order_id != -1 else None
+
+            qualitative_type = bond_type_order_map.get(order, None)
+
+            a1 = atom_by_residue_identifiers_map.get(atom_1_key, None)
+            a2 = atom_by_residue_identifiers_map.get(atom_2_key, None)
+
+            if a1 is None or a2 is None:
+                LOGGER.warning(
+                    f"Cannot find 1 or more atoms in the bond {chain_1} {residue_1_name} {residue_1_seq} {atom_1_name}"
+                    f" -- {chain_2} {residue_2_name} {residue_2_seq} {atom_2_name}"
+                )
+                continue
+            struct.bonds.append(Bond(a1, a2, qualitative_type=qualitative_type))
+
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
