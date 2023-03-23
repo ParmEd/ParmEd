@@ -795,9 +795,11 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
             # To generate the patch definition, we need to apply it to a residue and see exactly what
             # changes.  We might get different definitions depending on which residue we pick, so try
-            # all possible residues to take the most common result.
+            # all possible residues to take the most common result.  We prefer versions that replace
+            # external bonds, since that is the intended use of most patches.
 
             versions = {}
+            versions_with_external = {}
             for residue_name in valid_residues_for_patch[name]:
                 try:
                     residue = self.residues[residue_name]
@@ -831,7 +833,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
 
                 for bond in patched_residue.bonds:
                     if (bond.atom1.name not in residue) or (bond.atom2.name not in residue):
-                        if (bond.atom1.atomic_number != 0) or (bond.atom2.atomic_number != 0): # CHARMM adds bonds to lone pairs, which we need to omit.
+                        if (bond.atom1.atomic_number != 0) and (bond.atom2.atomic_number != 0): # CHARMM adds bonds to lone pairs, which we need to omit.
                             instructions.append(('AddBond', dict(atomName1=bond.atom1.name, atomName2=bond.atom2.name)))
                 for bond in residue.bonds:
                     if (bond.atom1.name not in patched_residue) or (bond.atom2.name not in patched_residue):
@@ -859,8 +861,15 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
                     versions[instructions] += 1
                 else:
                     versions[instructions] = 1
+                if any(i[0] == 'RemoveExternalBond' for i in instructions):
+                    if instructions in versions_with_external:
+                        versions_with_external[instructions] += 1
+                    else:
+                        versions_with_external[instructions] = 1
 
             # Write the consensus definition.
+            if len(versions_with_external) > 0:
+                versions = versions_with_external
             max_count = max(versions.values())
             instructions = [key for key, value in versions.items() if value == max_count][0]
             for command, attrib in instructions:
