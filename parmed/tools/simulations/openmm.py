@@ -53,7 +53,7 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
     """
     parm = mask.parm # store the parm object
     try:
-        refc = refc.reshape((-1, len(parm.atoms), 3))
+        refc = refc.coordinates.reshape((-1, len(parm.atoms), 3))
     except ValueError:
         raise SimulationError('Invalid shape of coordinate array')
 
