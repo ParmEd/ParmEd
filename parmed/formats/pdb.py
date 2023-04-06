@@ -589,6 +589,7 @@ class PDBFile(metaclass=FileFormatType):
         parts['mass'] = Mass[elem]
         parts['bfactor'] = try_convert(parts['bfactor'], float, 0.0)
         parts['occupancy'] = try_convert(parts['occupancy'], float, 0.0)
+        parts['formal_charge'] = try_convert(parts['charge'], int, None)
         parts['charge'] = try_convert(parts['charge'], float, 0.0)
 
         return parts
@@ -680,7 +681,8 @@ class PDBFile(metaclass=FileFormatType):
         atom = AtomClass(atomic_number=atom_parts['atomic_number'], name=atom_parts['name'],
                          charge=atom_parts['charge'], mass=atom_parts['mass'],
                          occupancy=atom_parts['occupancy'], bfactor=atom_parts['bfactor'],
-                         altloc=atom_parts['alternate_location'], number=atom_number)
+                         altloc=atom_parts['alternate_location'], number=atom_number,
+                         formal_charge=atom_parts['formal_charge'])
         atom.xx = atom_parts['x']
         atom.xy = atom_parts['y']
         atom.xz = atom_parts['z']
