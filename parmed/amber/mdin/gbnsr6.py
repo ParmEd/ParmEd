@@ -5,7 +5,7 @@ default values found in that program (sander only).
 
                            GPL LICENSE INFO                             
 
-Copyright (C) 2022 Valdés-Tresanco MS, Valdés-Tresanco ME and Jason Swails
+Copyright (C) 2023 Valdés-Tresanco MS, Valdés-Tresanco ME and Jason Swails
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
