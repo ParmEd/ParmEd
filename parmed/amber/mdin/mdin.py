@@ -100,7 +100,13 @@ class Mdin:
                 if not header_printed:
                     file.write(f"{header}\n")
                     header_printed = True
-                if isinstance(val, str):
+                if isinstance(val, (list, tuple)):
+                    if isinstance(val[0], str):
+                        temp_out = ','.join(map(lambda x: f"'{x}'", val))
+                        line = addOn(line, f"{var}={temp_out}, ", file)
+                    else:
+                        line = addOn(line, f"{var}={','.join(map(str, val))}, ", file)
+                elif isinstance(val, str):
                     line = addOn(line, f"{var}='{val}', ", file)
                 else:
                     line = addOn(line, f"{var}={val}, ", file)
