@@ -225,9 +225,6 @@ class Mdin:
         if namelist in namelist_map:
 
             nml, nml_defaults = namelist_map[namelist]
-            if namelist == 'rism':
-                print(f"{nml}")
-                print(f"{nml_defaults}")
             if variable in nml:
                 mytype = type(nml_defaults[variable])
                 nml[variable] = mytype(value)
