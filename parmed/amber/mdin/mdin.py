@@ -125,7 +125,8 @@ class Mdin:
         pb_nml_name = "&apbs" if self.program == "sander.APBS" else "&pb"
         write_nml(self.pb_nml, self.pb_nml_defaults, file, pb_nml_name)
         write_nml(self.gbnsr6_nml, self.gbnsr6_nml_defaults, file, "&gb")
-        write_nml(self.rism_nml, self.rism_nml_defaults, file, "&rism")
+        if self.cntrl_nml.get('irism'):
+            write_nml(self.rism_nml, self.rism_nml_defaults, file, "&rism", True)
         if self.cntrl_nml.get("ifqnt") == 1:
             write_nml(self.qmmm_nml, self.qmmm_nml_defaults, file, "&qmmm")
 
