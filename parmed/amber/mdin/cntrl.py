@@ -95,3 +95,4 @@ class cntrl:
             'iamd' : 0, 'restraintwt' : 0.0, 'barostat' : 1, 'mcbarint' : 100,
             'lj1264' : 0, 'icnstph' : 0, 'solvph' : 7.0, 'ntcnstph' : 10,
         }
+        self.gbnsr6: Dict[str, InputDataType] = {'inp': 1}
