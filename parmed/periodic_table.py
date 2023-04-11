@@ -289,15 +289,14 @@ def element_by_name(name):
     if len(name) == 0:
         return Element[0]
     try:
-        atomic_number = AtomicNum[name[0].upper()]
-    except KeyError:
         sym = name[:2]
+        sym = '%s%s' % (sym[0].upper(), sym[1].lower())
+        atomic_number = AtomicNum[sym]
+    except (KeyError, IndexError):
         try:
-            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
-            atomic_number = AtomicNum[sym]
-        except (KeyError, IndexError):
+            atomic_number = AtomicNum[name[0].upper()]
+        except KeyError:
             atomic_number = 0 # give up
-
     return Element[atomic_number]
 
 # Add some mass aliases here. We need to do it *after* _sorted_masses is created above, since
