@@ -1672,7 +1672,6 @@ class Structure:
             self.unchange()
 
         self._topology = top = app.Topology()
-        chain = top.addChain()
         try:
             last_chain = self.residues[0].chain
             last_residue = None
@@ -1680,6 +1679,7 @@ class Structure:
         except IndexError:
             # Empty topology
             return self._topology
+        chain = top.addChain(id=last_chain)
         # Add the atoms
         for i, atom in enumerate(self.atoms):
             # See if we need to add a new residue
@@ -1687,7 +1687,7 @@ class Structure:
                 # See if we need a new chain
                 if last_chain != atom.residue.chain:
                     last_chain = atom.residue.chain
-                    chain = top.addChain()
+                    chain = top.addChain(id=last_chain)
                 last_residue = atom.residue
                 last_omm_residue = top.addResidue(atom.residue.name, chain)
             try:
