@@ -314,6 +314,53 @@ def _cross(v1, v2):
                      v1[2]*v2[0] - v1[0]*v2[2],
                      v1[0]*v2[1] - v1[1]*v2[0]])
 
+def _unit_diff(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Unit vector going from a to b"""
+    u = (b - a).astype(np.float64)
+    u /= sqrt(np.dot(u, u))
+    return u
+
+def _unit_cross(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Unit vector along cross product of a and b"""
+    u = _cross(a, b)
+    u /= sqrt(np.dot(u, u))
+    return u
+
+# Skipping type annotations for Atom bc it causes a circular import
+def local_axes(atom1, atom2, atom3) -> np.ndarray:
+    """Return an orthonormal basis defined by three atoms.
+
+    This can be used to bootstrap a cartesian coordinate system from internal
+    coordinates by choosing the origin and orientation based on a choice of
+    three atoms. In the present convention the first atom is placed at the
+    origin, the second atom is placed on the positive side of the z-axis and
+    the third atom is placed on the positive side of the x-axis.
+    """
+    x1 = np.array([atom1.xx, atom1.xy, atom1.xz])
+    x2 = np.array([atom2.xx, atom2.xy, atom2.xz])
+    x3 = np.array([atom3.xx, atom3.xy, atom3.xz])
+    z = _unit_diff(x1, x2)
+    u23 = _unit_diff(x2, x3)
+    if np.isclose(abs(np.dot(z, u23)), 1.0):
+        raise ValueError('Atoms defining local_frame are co-linear')
+    x = _unit_cross(z, _unit_cross(u23, z))
+    y = _unit_cross(z, x)
+    return np.array([x, y, z])
+
+# Skipping type annotations for Atom bc it causes a circular import
+def bat2xyz(atom1, atom2, atom3, atom4) -> np.ndarray:
+    """
+    Compute cartesian coordinates for atom4 using its bond/angle/torsion
+    coordinates relative to atoms 3, 2 and 1.
+    """
+    r = sqrt(distance2(atom3, atom4))
+    th = np.radians(angle(atom2, atom3, atom4))
+    ph = np.radians(dihedral(atom1, atom2, atom3, atom4))
+    sin_th = sin(th)
+    x_over_r = sin_th * cos(ph) # This matches the definition in local_axes()
+    y_over_r = sin_th * sin(ph)
+    z_over_r = cos(th)
+    return r * np.array([x_over_r, y_over_r, z_over_r])
 
 def _get_coords_from_atom_or_tuple(a):
     from .topologyobjects import Atom
