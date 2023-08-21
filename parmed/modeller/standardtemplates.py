@@ -179,6 +179,6 @@ def get_standard_residue_template_library() -> Dict[str, ResidueTemplate]:
 @cache
 def get_nonstandard_ccd_residues() -> Dict[str, ResidueTemplate]:
     import gzip
-    path = Path(__file__).parent / "data" / "nonstandard_ccd_residue_templates.json"
+    path = Path(__file__).parent / "data" / "nonstandard_ccd_residue_templates.json.gz"
     with TextIOWrapper(gzip.open(path, "rb")) as ifh:
         return load_ccd_residue_templates(ifh)
