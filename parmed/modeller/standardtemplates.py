@@ -2,7 +2,9 @@
 
 import json
 from collections import Counter
-from typing import Mapping, Dict, Any, List, Set
+from io import TextIOWrapper
+from functools import cache
+from typing import Mapping, Dict, Any, List, Set, TextIO
 try:
     from typing import Literal
 except ImportError:
@@ -20,21 +22,20 @@ StandardBiomolecularResidues = AmberOFFLibrary.parse(
     os.path.join(os.path.split(__file__)[0], 'data', 'standard_residues.lib')
 )
 
-def load_biomolecular_residues(path: Path) -> Mapping[str, ResidueTemplate]:
+def load_ccd_residue_templates(fileobj: TextIO) -> Mapping[str, ResidueTemplate]:
     """Loads a biopolymer residue database from a dictionary prepared from the chemical component dictionary
 
     Parameters
     ----------
-    path: ``Path``
-        The path to the file to load
+    fileobj: file-like
+        The file object to read the CCD residue templates from
 
     Returns
     -------
     The dictionary mapping residue template name with the ResidueTemplate object
     """
     residues = dict()
-    with path.open("r") as ifh:
-        all_residue_data = json.load(ifh)
+    all_residue_data = json.load(fileobj)
 
     for single_residue in all_residue_data:
         residues[single_residue["name"]] = _process_single_residue(single_residue)
@@ -80,12 +81,13 @@ def _add_bonds(bonds: List[Dict[str, Any]], template: ResidueTemplate) -> None:
     """Adds bonds to a template"""
     atom_map = {atom.name: atom for atom in template.atoms}
     _order_map = {
-        ("SING", False): 1.0, ("SING", True): 1.5, ("DOUB", False): 2.0, ("DOUB", True): 1.5, ("TRIP", False): 3.0
+        ("SING", False): 1.0, ("SING", True): 1.5, ("DOUB", False): 2.0, ("DOUB", True): 1.5, ("TRIP", False): 3.0,
+        ("TRIP", True): 2.5
     }
     _qualitative_map = {
         ("SING", False): QualitativeBondType.SINGLE, ("DOUB", False): QualitativeBondType.DOUBLE,
         ("SING", True): QualitativeBondType.AROMATIC, ("DOUB", True): QualitativeBondType.AROMATIC,
-        ("TRIP", False): QualitativeBondType.TRIPLE,
+        ("TRIP", False): QualitativeBondType.TRIPLE, ("TRIP", True): QualitativeBondType.AROMATIC,
     }
     for bond in bonds:
         key = (bond["order"], bond["aromatic"])
@@ -167,8 +169,16 @@ def _assign_head_tail(template: ResidueTemplate, removable_atoms: Set[str], resi
 
 _CACHED_RESIDUE_TEMPLATE_LIBRARY = None
 
+@cache
 def get_standard_residue_template_library() -> Dict[str, ResidueTemplate]:
-    global _CACHED_RESIDUE_TEMPLATE_LIBRARY
-    if _CACHED_RESIDUE_TEMPLATE_LIBRARY is None:
-        _CACHED_RESIDUE_TEMPLATE_LIBRARY = load_biomolecular_residues(Path(__file__).parent / "data" / "ccd_residue_templates.json")
-    return _CACHED_RESIDUE_TEMPLATE_LIBRARY
+    path = Path(__file__).parent / "data" / "ccd_residue_templates.json"
+    with path.open("r") as ifh:
+        return load_ccd_residue_templates(ifh)
+
+
+@cache
+def get_nonstandard_ccd_residues() -> Dict[str, ResidueTemplate]:
+    import gzip
+    path = Path(__file__).parent / "data" / "nonstandard_ccd_residue_templates.json"
+    with TextIOWrapper(gzip.open(path, "rb")) as ifh:
+        return load_ccd_residue_templates(ifh)

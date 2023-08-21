@@ -7,8 +7,9 @@ node ccd.js components.cif > components.json
 
 const { CIF } = require('molstar/lib/commonjs/mol-io/reader/cif');
 const fs = require('fs');
+const JSONStream = require('JSONStream');
 
-function isValidComponent(block) {
+function isLinkingMonomer(block) {
     const { chem_comp } = block.categories;
     const type = chem_comp.getField('type')?.str(0).toLowerCase() ?? '';
 
@@ -16,11 +17,29 @@ function isValidComponent(block) {
         && (type.includes('dna') || type.includes('rna') || type.includes('peptide'));
 }
 
+function isNotLinkingMonomer(block) {
+    return !isLinkingMonomer(block);
+}
+
 function formatComponent(block) {
     const { chem_comp, chem_comp_atom, chem_comp_bond } = block.categories;
 
     // Atoms info
     const atoms = [];
+    const bonds = [];
+    let atomCount = chem_comp_atom?.rowCount ?? 0;
+    if (atomCount === 0) {
+        console.info("No atoms found for", chem_comp.getField('id')?.str(0));
+        return {
+            name: chem_comp.getField('id')?.str(0),
+            one_letter_code: chem_comp.getField('one_letter_code')?.str(0),
+            full_name: chem_comp.getField('name')?.str(0),
+            type: chem_comp.getField('type')?.str(0),
+            formal_charge: chem_comp.getField('pdbx_formal_charge')?.int(0),
+            atoms,
+            bonds,
+        }
+    }
     for (let i = 0; i < chem_comp_atom.rowCount; i++) {
         atoms.push({
             name: chem_comp_atom.getField('atom_id').str(i),
@@ -33,9 +52,8 @@ function formatComponent(block) {
     }
 
     // Bonds info
-    const bonds = [];
     if (chem_comp_bond) {
-        for (let i = 0; i < chem_comp_bond.rowCount; i++) {
+        for (let i = 0; i < chem_comp_bond?.rowCount ?? 0; i++) {
             let bond = {
                 name_a: chem_comp_bond.getField('atom_id_1').str(i),
                 name_b: chem_comp_bond.getField('atom_id_2').str(i),
@@ -67,10 +85,21 @@ async function run() {
     }
 
     const components = parsed.result.blocks
-        .filter(isValidComponent)
+        .filter(isNotLinkingMonomer)
         .map(formatComponent);
 
-    console.log(JSON.stringify(components, null, 2));
+    var transformStream = JSONStream.stringify();
+    var outputStream = fs.createWriteStream('processed-components.json');
+    transformStream.pipe(outputStream);
+    components.forEach(transformStream.write);
+    transformStream.end();
+
+    outputStream.on(
+        "finish",
+        function handleFinish() {
+            console.log("Done");
+        }
+    );
 }
 
 run();
