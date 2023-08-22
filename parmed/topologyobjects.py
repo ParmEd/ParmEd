@@ -546,7 +546,7 @@ class Atom(_ListItem):
         self.children = []
         self.aromatic = aromatic
         self.formal_charge = formal_charge
-        self.hybridization = hybridization
+        self.hybridization = Hybridization(hybridization) if hybridization is not None else None
 
     #===================================================
 
@@ -1851,7 +1851,7 @@ class Bond:
         self.funct = 1
         self._order = None
         self.order = order
-        self.qualitative_type = qualitative_type
+        self.qualitative_type = QualitativeBondType(qualitative_type) if qualitative_type is not None else None
 
     def __contains__(self, thing):
         """ Quick and easy way to see if an Atom is in this Bond """
