@@ -495,7 +495,8 @@ class Structure:
         for b in self.bonds:
             c.bonds.append(
                 Bond(atoms[b.atom1.idx], atoms[b.atom2.idx],
-                     b.type and c.bond_types[b.type.idx], order=b.order)
+                     b.type and c.bond_types[b.type.idx], order=b.order,
+                     qualitative_type=b.qualitative_type)
             )
             c.bonds[-1].funct = b.funct
         for a in self.angles:
@@ -1166,7 +1167,7 @@ class Structure:
             if hasattr(otyp, 'claim'):
                 otyp.claim()
         copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
-                           self.bond_types, ['atom1', 'atom2'], ["order"])
+                           self.bond_types, ['atom1', 'atom2'], ["order", "qualitative_type"])
         copy_valence_terms(struct.angles, struct.angle_types, self.angles,
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.dihedrals, struct.dihedral_types,
