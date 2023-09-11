@@ -7,13 +7,14 @@ import math
 import os
 from collections import defaultdict
 from copy import copy, deepcopy
+import warnings
 
 import numpy as np
 
 from . import unit as u
 from . import residue
 from .constants import DEG_TO_RAD, SMALL
-from .exceptions import ParameterError
+from .exceptions import ParameterError, ParmedWarning
 from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
                        box_vectors_to_lengths_and_angles, distance2)
 from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
@@ -2479,11 +2480,23 @@ class Structure:
                 force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
+                    if typ.per == 0:
+                        warnings.warn(
+                            "Torsion with 0-periodicity is being omitted. This will shift the energy by a constant, "
+                            "but will not affect forces", ParmedWarning
+                        )
+                        continue
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx, tor.atom4.idx,
-                                     int(typ.per), typ.phase*DEG_TO_RAD, typ.phi_k*frc_conv)
+                                     abs(int(typ.per)), typ.phase*DEG_TO_RAD, typ.phi_k*frc_conv)
             else:
+                if tor.type.per == 0:
+                    warnings.warn(
+                        "Torsion with 0-periodicity is being omitted. This will shift the energy by a constant, "
+                        "but will not affect forces", ParmedWarning
+                    )
+                    continue
                 force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx, tor.atom4.idx,
-                                 int(tor.type.per), tor.type.phase*DEG_TO_RAD,
+                                 abs(int(tor.type.per)), tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
         if proper.getNumTorsions() == 0:
             return improper
