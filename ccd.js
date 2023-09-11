@@ -13,8 +13,7 @@ function isLinkingMonomer(block) {
     const { chem_comp } = block.categories;
     const type = chem_comp.getField('type')?.str(0).toLowerCase() ?? '';
 
-    return type.endsWith('linking')
-        && (type.includes('dna') || type.includes('rna') || type.includes('peptide'));
+    return type.endsWith('linking') && type.includes('peptide');
 }
 
 function isNotLinkingMonomer(block) {
@@ -34,6 +33,7 @@ function formatComponent(block) {
             name: chem_comp.getField('id')?.str(0),
             one_letter_code: chem_comp.getField('one_letter_code')?.str(0),
             full_name: chem_comp.getField('name')?.str(0),
+            synonyms: chem_comp.getField('pdbx_synonyms')?.str(0),
             type: chem_comp.getField('type')?.str(0),
             formal_charge: chem_comp.getField('pdbx_formal_charge')?.int(0),
             atoms,
@@ -69,6 +69,7 @@ function formatComponent(block) {
         name: chem_comp.getField('id')?.str(0),
         one_letter_code: chem_comp.getField('one_letter_code')?.str(0),
         full_name: chem_comp.getField('name')?.str(0),
+        synonyms: chem_comp.getField('pdbx_synonyms')?.str(0),
         type: chem_comp.getField('type')?.str(0),
         formal_charge: chem_comp.getField('pdbx_formal_charge')?.int(0),
         atoms,
@@ -85,7 +86,7 @@ async function run() {
     }
 
     const components = parsed.result.blocks
-        .filter(isNotLinkingMonomer)
+        .filter(isLinkingMonomer)
         .map(formatComponent);
 
     var transformStream = JSONStream.stringify();
