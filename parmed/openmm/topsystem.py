@@ -80,13 +80,16 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
     used to name the corresponding ParmEd AtomType object.
     """
     import openmm as mm
+    from openmm import app
+
     struct = Structure()
     atommap = dict()
     for c in topology.chains():
         chain = c.id
         for r in c.residues():
-            residue = r.name
-            resid = r.index
+            resname = r.name
+            resnum = int(r.id) if r.id.lstrip('-').isdigit() else r.index
+            inscode = str(r.insertionCode)
             for a in r.atoms():
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
@@ -98,10 +101,24 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
                     atype = aid if not isinstance(aid, int) else ''
                     atom = Atom(atomic_number=a.element.atomic_number,
                                 name=a.name, mass=a.element.mass, type=atype)
-                struct.add_atom(atom, residue, resid, chain)
+                struct.add_atom(atom, resname, resnum, chain, inscode)
                 atommap[a] = atom
-    for a1, a2 in topology.bonds():
-        struct.bonds.append(Bond(atommap[a1], atommap[a2]))
+
+    bond_orders_by_openmm_type = {
+        app.Single: 1.0,
+        app.Double: 2.0,
+        app.Triple: 3.0,
+        app.Amide: 1.25,
+        app.Aromatic: 1.5,
+    }
+    for b in topology.bonds():
+        if b.type in bond_orders_by_openmm_type:
+            order = bond_orders_by_openmm_type[b.type]
+        elif b.order is not None:
+            order = float(b.order)
+        else:
+            order = 1.0
+        struct.bonds.append(Bond(atommap[b.atom1], atommap[b.atom2], order=order))
 
     vectors = topology.getPeriodicBoxVectors()
     if vectors is not None:
