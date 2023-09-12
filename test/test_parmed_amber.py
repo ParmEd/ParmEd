@@ -1306,14 +1306,15 @@ class TestParameterFiles(FileIOTestCase):
     @unittest.skipIf(os.getenv('AMBERHOME') is None, 'Cannot test w/out Amber')
     def test_lib_without_residueconnect(self):
         """ Test parsing OFF library files without RESIDUECONNECT """
-        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
-                          'lipid14.lib')
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib', 'lipid14.lib')
+        if not os.path.exists(fn):
+            # Support newer versions of AmberTools where lipid14 is "oldff"
+            fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib', 'oldff', 'lipid14.lib')
         self.assertTrue(AmberOFFLibrary.id_format(fn))
         lib = AmberOFFLibrary.parse(fn)
         self.assertIs(lib['LA'].head, lib['LA'].tail) # weird...
         # Nucleic acid caps
-        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib',
-                          'cph_nucleic_caps.lib')
+        fn = os.path.join(os.getenv('AMBERHOME'), 'dat', 'leap', 'lib', 'cph_nucleic_caps.lib')
         self.assertTrue(AmberOFFLibrary.id_format(fn))
         lib = AmberOFFLibrary.parse(fn)
         self.assertEqual(len(lib), 2)

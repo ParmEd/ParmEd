@@ -3,7 +3,7 @@ from io import StringIO
 from typing import TYPE_CHECKING
 
 from ..periodic_table import Element
-from ..topologyobjects import QualitativeBondType, Hybridization
+from ..topologyobjects import QualitativeBondType
 
 class RDKit:
 
@@ -88,7 +88,7 @@ class RDKit:
     @classmethod
     def to_mol(cls, structure: "Structure"):
         """ Instantiates an RDKit Mol object from a ParmEd Structure """
-        from rdkit.Chem import Atom, RWMol
+        from rdkit.Chem import Atom, RWMol, Conformer, HybridizationType
         from rdkit.Chem.rdchem import BondType
 
         mol = RWMol()
@@ -99,7 +99,7 @@ class RDKit:
             if atom.formal_charge is not None:
                 rdatom.SetFormalCharge(atom.formal_charge)
             if atom.hybridization is not None:
-                rdatom.SetHybridization(getattr(Hybridization, atom.hybridization.name))
+                rdatom.SetHybridization(getattr(HybridizationType, atom.hybridization.name))
             pdb_info = cls._get_pdb_info(atom)
             rdatom.SetMonomerInfo(pdb_info)
             mol.AddAtom(rdatom)
@@ -116,6 +116,16 @@ class RDKit:
                 else BondType.UNSPECIFIED
             )
             mol.AddBond(bond.atom1.idx, bond.atom2.idx, bond_type)
+
+        coordinates = structure.get_coordinates("all")
+        if coordinates is None:
+            return mol.GetMol()
+
+        for i in range(coordinates.shape[0]):
+            conformer = Conformer(len(structure.atoms))
+            for j in range(len(structure.atoms)):
+                conformer.SetAtomPosition(j, coordinates[i, j, :])
+            mol.AddConformer(conformer)
 
         return mol.GetMol()
 
