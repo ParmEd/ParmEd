@@ -13,11 +13,11 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.9", "3.10"]
 
     steps:
     - name: Check out source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -29,7 +29,7 @@ jobs:
         environment-file: devtools/environment-dev.yaml
         activate-environment: parmed-dev
         channels: conda-forge,bioconda
-        # mamba-version: "*"
+        mamba-version: "*"
 
     - name: Environment Information
       shell: bash -l {0}
@@ -38,7 +38,7 @@ jobs:
         conda list
 
     - name: Install and test
-      shell: bash -lex {0}
+      shell: bash -l {0}
       run: |
         bash -ex devtools/ci/install.sh
 

@@ -7,13 +7,14 @@ import math
 import os
 from collections import defaultdict
 from copy import copy, deepcopy
+import warnings
 
 import numpy as np
 
 from . import unit as u
 from . import residue
 from .constants import DEG_TO_RAD, SMALL
-from .exceptions import ParameterError
+from .exceptions import ParameterError, ParmedWarning
 from .geometry import (STANDARD_BOND_LENGTHS_SQUARED, box_lengths_and_angles_to_vectors,
                        box_vectors_to_lengths_and_angles, distance2)
 from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, ChiralFrame, Cmap,
@@ -495,7 +496,8 @@ class Structure:
         for b in self.bonds:
             c.bonds.append(
                 Bond(atoms[b.atom1.idx], atoms[b.atom2.idx],
-                     b.type and c.bond_types[b.type.idx], order=b.order)
+                     b.type and c.bond_types[b.type.idx], order=b.order,
+                     qualitative_type=b.qualitative_type)
             )
             c.bonds[-1].funct = b.funct
         for a in self.angles:
@@ -1119,16 +1121,14 @@ class Structure:
         scan = [x * y for x, y in zip(scan, selection)]
         # Copy all parameters
         struct = type(self)()
+        res_numbers_are_fake = {res.number for res in self.residues} == {0}
+        res_number_attr = "idx" if res_numbers_are_fake else "number"
         for i, atom in enumerate(self.atoms):
             if not selection[i]:
                 continue
             res = atom.residue
-            if res.number == 0:
-                num = res.idx
-            else:
-                num = res.number
-            struct.add_atom(copy(atom), res.name, num,
-                            res.chain, res.insertion_code, res.segid)
+            num = getattr(res, res_number_attr)
+            struct.add_atom(copy(atom), res.name, num, res.chain, res.insertion_code, res.segid)
 
         def copy_valence_terms(oval, otyp, sval, styp, atom_attrs, extra_attrs=None):
             """ Copies the valence terms from one list to another;
@@ -1166,7 +1166,7 @@ class Structure:
             if hasattr(otyp, 'claim'):
                 otyp.claim()
         copy_valence_terms(struct.bonds, struct.bond_types, self.bonds,
-                           self.bond_types, ['atom1', 'atom2'], ["order"])
+                           self.bond_types, ['atom1', 'atom2'], ["order", "qualitative_type"])
         copy_valence_terms(struct.angles, struct.angle_types, self.angles,
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(struct.dihedrals, struct.dihedral_types,
@@ -2504,11 +2504,23 @@ class Structure:
                 force = proper
             if isinstance(tor.type, DihedralTypeList):
                 for typ in tor.type:
+                    if typ.per == 0:
+                        warnings.warn(
+                            "Torsion with 0-periodicity is being omitted. This will shift the energy by a constant, "
+                            "but will not affect forces", ParmedWarning
+                        )
+                        continue
                     force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx, tor.atom4.idx,
-                                     int(typ.per), typ.phase*DEG_TO_RAD, typ.phi_k*frc_conv)
+                                     abs(int(typ.per)), typ.phase*DEG_TO_RAD, typ.phi_k*frc_conv)
             else:
+                if tor.type.per == 0:
+                    warnings.warn(
+                        "Torsion with 0-periodicity is being omitted. This will shift the energy by a constant, "
+                        "but will not affect forces", ParmedWarning
+                    )
+                    continue
                 force.addTorsion(tor.atom1.idx, tor.atom2.idx, tor.atom3.idx, tor.atom4.idx,
-                                 int(tor.type.per), tor.type.phase*DEG_TO_RAD,
+                                 abs(int(tor.type.per)), tor.type.phase*DEG_TO_RAD,
                                  tor.type.phi_k*frc_conv)
         if proper.getNumTorsions() == 0:
             return improper

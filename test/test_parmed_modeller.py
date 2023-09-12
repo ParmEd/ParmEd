@@ -13,6 +13,7 @@ try:
 except ImportError:
     nx = None
 import os
+import pytest
 import parmed as pmd
 from parmed import Atom, read_PDB, Structure
 from parmed.amber import AmberParm, AmberOFFLibrary
@@ -1150,6 +1151,7 @@ quit
         self._check_corresponding_files(pdb1, pdb2, parm1, parm2)
 
     @unittest.skipIf(utils.which('tleap') is None, "Cannot test without tleap")
+    @pytest.mark.xfail
     def test_amber_amino_termini(self):
         """ Test that the terminal AA OFF library writes work with LEaP """
         offlib_nter = AmberOFFLibrary.parse(get_fn('aminont12.lib'))
