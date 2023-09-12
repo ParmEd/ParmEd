@@ -89,7 +89,7 @@ def load_topology(topology, system=None, xyz=None, box=None, condense_atom_types
         for r in c.residues():
             resname = r.name
             resnum = int(r.id) if r.id.lstrip('-').isdigit() else r.index
-            inscode = str(r.insertionCode)
+            inscode = r.insertionCode
             for a in r.atoms():
                 if a.element is None:
                     atom = ExtraPoint(name=a.name)
