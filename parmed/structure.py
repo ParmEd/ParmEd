@@ -1689,7 +1689,12 @@ class Structure:
                     last_chain = atom.residue.chain
                     chain = top.addChain(id=last_chain)
                 last_residue = atom.residue
-                last_omm_residue = top.addResidue(atom.residue.name, chain)
+                last_omm_residue = top.addResidue(
+                    atom.residue.name,
+                    chain,
+                    id=str(atom.residue.number),
+                    insertionCode=atom.residue.insertion_code,
+                )
             try:
                 elem = app.element.Element.getByAtomicNumber(
                     atom.atomic_number)
@@ -1697,9 +1702,28 @@ class Structure:
                 elem = None
             top.addAtom(atom.name, elem, last_omm_residue)
         # Add the bonds
+        bond_orders_by_openmm_type = {
+            app.Single: 1.0,
+            app.Double: 2.0,
+            app.Triple: 3.0,
+            app.Amide: 1.25,
+            app.Aromatic: 1.5,
+        }
         atoms = list(top.atoms())
         for bond in self.bonds:
-            top.addBond(atoms[bond.atom1.idx], atoms[bond.atom2.idx])
+            # Determine the bond type
+            type = None
+            for t, o in bond_orders_by_openmm_type.items():
+                if math.isclose(bond.order, o):
+                    type = t
+            # Determine the bond order (an integer)
+            order = None
+            n = round(bond.order)
+            if math.isclose(bond.order, n):
+                order = n
+            top.addBond(
+                atoms[bond.atom1.idx], atoms[bond.atom2.idx], type=type, order=order
+            )
         # Set the unit cell dimensions
         if self.box is not None:
             top.setPeriodicBoxVectors(
