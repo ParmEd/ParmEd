@@ -22,20 +22,11 @@ jobs:
         fetch-depth: 0
 
     - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: mamba-org/setup-micromamba@v1
       with:
-        auto-update-conda: false
-        python-version: ${{ matrix.python-version }}
         environment-file: devtools/environment-dev.yaml
-        activate-environment: parmed-dev
-        channels: conda-forge,bioconda
-        mamba-version: "*"
-
-    - name: Environment Information
-      shell: bash -l {0}
-      run: |
-        conda info
-        conda list
+        create-args: >-
+          python=${{ matrix.python-version }}
 
     - name: Install and test
       shell: bash -l {0}

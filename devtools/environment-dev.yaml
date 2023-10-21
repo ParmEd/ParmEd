@@ -1,7 +1,6 @@
 name: parmed-dev
 channels:
-  - https://conda.anaconda.org/conda-forge
-  - https://conda.anaconda.org/bioconda
+  - conda-forge
 dependencies:
   - pandas
   - openmm >=7.6.0
