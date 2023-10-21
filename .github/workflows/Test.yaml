@@ -13,11 +13,11 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
     - name: Check out source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -43,7 +43,7 @@ jobs:
         bash -ex devtools/ci/install.sh
 
     - name: Upload Coverage Results
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       if: endsWith(github.ref, '/master')
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
