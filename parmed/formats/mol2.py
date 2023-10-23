@@ -91,7 +91,7 @@ class Mol2File(metaclass=FileFormatType):
             headtail = 'head'
             molecule_number = 0
             for line in f:
-                if line.startswith('#') or (not line.strip() and section is None):
+                if line.startswith('#') or (not line.strip() and section is None) or line == '\n':
                     continue
                 if line.startswith('@<TRIPOS>'):
                     section = line[9:].strip()

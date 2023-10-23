@@ -16,8 +16,8 @@ import random
 import os
 import sys
 import unittest
-from utils import get_fn, diff_files, run_all_tests, is_jenkins, HAS_GROMACS, FileIOTestCase
-import warnings
+import pytest
+from utils import get_fn, diff_files, run_all_tests, is_local, HAS_GROMACS, FileIOTestCase
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -288,6 +288,21 @@ class TestFileLoader(FileIOTestCase):
         np.testing.assert_almost_equal(parm.coordinates[0], [2.0000, 2.7672, 0.0000], decimal=3)
         np.testing.assert_almost_equal(parm.coordinates[-1], [9.9858, -2.8473, 0.0000], decimal=3)
 
+def assert_no_bonds_in_1az5_gaps(struct: Structure):
+    expected_sequence = []
+    actual_sequence = []
+    # Only the first 95 residues are actually amino acids. Rest are water
+    for residue in struct.residues[:95]:
+        if residue.number + 1 == struct.residues[residue.idx + 1].number:
+            expected_sequence.append(1)
+        else:
+            expected_sequence.append(0)
+        actual_sequence.append(0)
+        for atom in residue.atoms:
+            for partner in atom.bond_partners:
+                actual_sequence[-1] += int(partner.residue.idx > atom.residue.idx)
+    assert expected_sequence == actual_sequence
+
 class TestPDBStructure(FileIOTestCase):
 
     def setUp(self):
@@ -297,6 +312,7 @@ class TestPDBStructure(FileIOTestCase):
         self.models = get_fn('2koc.pdb')
         self.overflow = get_fn('4lyt_vmd.pdb')
         self.simple = get_fn('ala_ala_ala.pdb')
+        self._1az5 = get_fn('1az5.pdb')
         self.format_test = get_fn('SCM_A.pdb')
         self.overflow2 = get_fn('overflow.pdb')
         self.ATOMLINE = "ATOM  %5s %4s%1s%3s %1s%4s%-2s  %8s%8s%8s%6s%6s          %-2s%2s\n"
@@ -306,6 +322,10 @@ class TestPDBStructure(FileIOTestCase):
     def test_pdb_anisou_inscode(self):
         """ Tests that PDB files with ANISOU records on inscodes work """
         formats.PDBFile.parse(get_fn('1gdu.pdb'))
+
+    def test_no_bond_across_gaps(self):
+        struct = formats.PDBFile.parse(self._1az5)
+        assert_no_bonds_in_1az5_gaps(struct)
 
     def test_pdb_format_detection(self):
         """ Tests PDB file detection from contents """
@@ -360,7 +380,7 @@ class TestPDBStructure(FileIOTestCase):
         np.testing.assert_allclose(all_crds[0][0], [-8.886, -5.163, 9.647])
         np.testing.assert_allclose(all_crds[19][-1], [-12.051, 5.205, -2.146])
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download(self):
         """ Tests downloading PDB files """
         self._check4lzt(download_PDB('4lzt'))
@@ -368,7 +388,7 @@ class TestPDBStructure(FileIOTestCase):
         self.assertRaises(ValueError, lambda: download_PDB('not a PDB ID'))
         self.assertRaises(IOError, lambda: download_PDB('@#63'))
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download_save(self):
         """ Tests downloading PDB files and saving a copy """
         fname = self.get_fn('downloaded.pdb', written=True)
@@ -1539,7 +1559,12 @@ class TestCIFStructure(FileIOTestCase):
         self.lztpdb = get_fn('4lzt.pdb')
         self.lzt = get_fn('4LZT.cif')
         self.largecif = get_fn('1ffk.cif')
+        self._1az5 = get_fn('1az5.cif')
         super().setUp()
+
+    def test_no_bond_across_gaps(self):
+        struct = formats.CIFFile.parse(self._1az5)
+        assert_no_bonds_in_1az5_gaps(struct)
 
     def test_write_cif(self):
         """ Test CIF writing capabilities """
@@ -1631,7 +1656,7 @@ class TestCIFStructure(FileIOTestCase):
         """ Test CIF parsing on 4LZT (w/ ANISOU, altlocs, etc.) """
         self._check4lzt(read_CIF(self.lzt))
 
-    @unittest.skipUnless(is_jenkins(), 'PDB blocks Travis from downloading files')
+    @unittest.skipUnless(is_local(), 'PDB blocks CI systems from downloading files')
     def test_download(self):
         """ Test CIF downloading on 4LZT """
         fn = self.get_fn('4lzt.cif', written=True)
@@ -2284,3 +2309,53 @@ class TestFileDownloader(unittest.TestCase):
         """ Tests that NetCDF files always fail when trying to download them """
         self.assertFalse(amber.NetCDFRestart.id_format(self.url + 'ncinpcrd.rst7'))
         self.assertFalse(amber.NetCDFTraj.id_format(self.url + 'tz2.truncoct.nc'))
+
+
+def test_4z10_advanced_ccd_bonding():
+    cif_file = get_fn("4z10.cif")
+    pdb_file = get_fn("4z10.pdb")
+
+    cif_struct = read_CIF(cif_file, expanded_residue_template_match=True)
+    pdb_struct = read_PDB(pdb_file, expanded_residue_template_match=True)
+
+    assert len(cif_struct.atoms) == len(pdb_struct.atoms)
+    assert [(a.name, a.residue.name, a.residue.number) for a in cif_struct.atoms] == [(a.name, a.residue.name, a.residue.number) for a in pdb_struct.atoms]
+    assert all(a1.hybridization == a2.hybridization for a1, a2 in zip(cif_struct.atoms, pdb_struct.atoms))
+
+    cif_bonds = {frozenset({(b.atom1.name, b.atom1.residue.number), (b.atom2.name, b.atom2.residue.number)}) for b in cif_struct.bonds}
+    pdb_bonds = {frozenset({(b.atom1.name, b.atom1.residue.number), (b.atom2.name, b.atom2.residue.number)}) for b in pdb_struct.bonds}
+    assert cif_bonds == pdb_bonds
+
+    # Make sure that all bonds have types applied
+    def make_bond_key(bond):
+        a1, a2 = sorted([bond.atom1, bond.atom2])
+        return (a1.residue.idx, a1.idx, a2.residue.idx, a2.idx)
+
+    bond_map = {make_bond_key(bond): bond for bond in pdb_struct.bonds}
+    for bond in cif_struct.bonds:
+        pdb_bond = bond_map[make_bond_key(bond)]
+        assert bond.qualitative_type == pdb_bond.qualitative_type
+
+    assert not all(bond.qualitative_type is None for bond in cif_struct.bonds)
+
+
+@pytest.mark.parametrize("filename", ["1az5_charges.pdb", "1az5_charges.cif"])
+def test_formal_charge_preservation(filename: str):
+    struct = pmd.load_file(get_fn(filename), expanded_residue_template_match=True)
+
+    assert struct.atoms[0].formal_charge == -1
+    assert struct.atoms[1].formal_charge == 0
+    assert struct.atoms[2].formal_charge == 1
+    assert struct.atoms[3].formal_charge == 2
+    assert struct.atoms[4].formal_charge == 3
+    assert struct.atoms[5].formal_charge == 4
+
+    # Now the rest are assigned from templates
+    residue_template_libraries = pmd.modeller.get_standard_residue_template_library()
+    for atom in struct.atoms[6:]:
+        atom_map = pmd.formats.pdb._atom_name_to_atom_map(atom.residue.name)
+        if not atom_map:
+            continue
+        template_charge = atom_map[atom.name].formal_charge if atom.name in atom_map else None
+        assert atom.formal_charge == template_charge
+

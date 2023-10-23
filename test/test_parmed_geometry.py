@@ -84,6 +84,37 @@ class TestChemistryGeometry(unittest.TestCase):
         masses = np.asarray([2, 1])
         almost_equal(geo.center_of_mass(array, masses), np.array([1/3, 0, 0]))
 
+    def test_local_axes(self):
+        """
+        Tests use of a local axes to convert internal to cartesian coordinates
+        """
+        a1, a2, a3, a4 = Atom(), Atom(), Atom(), Atom()
+        a1.xx, a1.xy, a1.xz = 0, 0, 0
+        a2.xx, a2.xy, a2.xz = 0, 0, 1
+        a3.xx, a3.xy, a3.xz = 1, 0, 0
+        # Since we placed atoms on the actual axes, the local axes are just
+        # the normal xyz basis...
+        #
+        local_axes = geo.local_axes(a1, a2, a3)
+        assert np.allclose(local_axes[0], [1, 0, 0])
+        assert np.allclose(local_axes[1], [0, 1, 0])
+        assert np.allclose(local_axes[2], [0, 0, 1])
+        # We now define a4 in Z-matrix format relative to a _different_ local
+        # frame with a3 at the origin, etc. and then transform that
+        # displacement into our new local axes.
+        #
+        r = 1.0
+        th = math.pi / 2
+        ph = math.pi / 2
+        x = r * math.sin(th) * math.cos(ph)
+        y = r * math.sin(th) * math.sin(ph)
+        z = r * math.cos(th)
+        dx = np.dot(np.array([x, y, z]), local_axes)
+        a4.xx = a3.xx + dx[0]
+        a4.xy = a3.xy + dx[1]
+        a4.xz = a3.xz + dx[2]
+        assert np.allclose([a4.xx, a4.xy, a4.xz], [1, 1, 0])
+
 def strip_units(x):
     if u.is_quantity(x):
         return x.value_in_unit_system(u.akma_unit_system)

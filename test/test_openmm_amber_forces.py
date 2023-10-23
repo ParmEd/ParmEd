@@ -50,7 +50,10 @@ class TestAmberParm(TestCaseRelative, QuantityTestCase):
         # Compare OpenMM energies with the Amber energies (above)
         self.assertAlmostEqual(energies['bond'], 0.0319, places=4)
         self.assertAlmostEqual(energies['angle'], 2.1690, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 0.2218, places=4)
+        # Cannot compare torsional potentials because Amber has a 0-periodicity term that shifts
+        # the energy by a constant (does not impact forces), and OpenMM has stopped supporting those
+        # terms.
+        # self.assertAlmostEqual(energies['dihedral'], 0.2218, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 0.0, places=3)
 
         # Now test the forces to make sure that they are computed correctly in
@@ -87,7 +90,10 @@ class TestAmberParm(TestCaseRelative, QuantityTestCase):
         # Compare OpenMM energies with the Amber energies (above)
         self.assertAlmostEqual(energies['bond'], 0.0319, places=4)
         self.assertAlmostEqual(energies['angle'], 2.1690, places=4)
-        self.assertAlmostEqual(energies['dihedral'],-2.7931, places=4)
+        # Cannot compare torsional potentials because Amber has a 0-periodicity term that shifts
+        # the energy by a constant (does not impact forces), and OpenMM has stopped supporting those
+        # terms.
+        # self.assertAlmostEqual(energies['dihedral'],-2.7931, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 0.0, places=3)
 
         # Now test the forces to make sure that they are computed correctly in
@@ -163,7 +169,10 @@ class TestAmberParm(TestCaseRelative, QuantityTestCase):
         # Compare OpenMM energies with the Amber energies (above)
         self.assertAlmostEqual(energies['bond'], 0.0239, places=4)
         self.assertAlmostEqual(energies['angle'], 0.0298, places=4)
-        self.assertAlmostEqual(energies['dihedral'], 0.0093, places=4)
+        # Cannot compare torsional potentials because Amber has a 0-periodicity term that shifts
+        # the energy by a constant (does not impact forces), and OpenMM has stopped supporting those
+        # terms.
+        # self.assertAlmostEqual(energies['dihedral'], 0.0093, places=4)
         self.assertRelativeEqual(energies['nonbonded'], 0.0000+6.7526+0.0492-6.0430, places=3)
 
         # Now test the forces to make sure that they are computed correctly in

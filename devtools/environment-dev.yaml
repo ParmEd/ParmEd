@@ -4,17 +4,14 @@ channels:
   - https://conda.anaconda.org/bioconda
 dependencies:
   - pandas
-  - nose
-  - openmm >=7.6.0,<7.7.0a
+  - openmm >=7.6.0
   - coverage
-  - nose-timer
   - netCDF4
-  - rdkit ==2020.09.4
+  - rdkit >=2020.09.4
   - nglview
-  - ambertools ==20.15
+  - ambertools >=20.15
   - networkx
   - lxml
-  - nose-timer
   - gromacs
   - pytest
   - pytest-cov
