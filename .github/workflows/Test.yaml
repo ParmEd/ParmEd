@@ -14,6 +14,7 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        ambertools: ["true", "false"]
 
     steps:
     - name: Check out source code
@@ -21,12 +22,16 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup Miniconda
+    - name: Setup conda environment
       uses: mamba-org/setup-micromamba@v1
       with:
         environment-file: devtools/environment-dev.yaml
         create-args: >-
           python=${{ matrix.python-version }}
+
+    - name: Optionall install AmberTools
+      if: {{ matrix.ambertools == false && matrix.python_version != 3.12 }}
+      run: micromamba install ambertools -c conda-forge -yq
 
     - name: Install and test
       shell: bash -l {0}
