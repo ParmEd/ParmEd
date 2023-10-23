@@ -31,7 +31,7 @@ jobs:
 
     - name: Optionall install AmberTools
       if: ${{ matrix.ambertools == false && matrix.python-version != 3.12 }}
-      run: micromamba install ambertools -c conda-forge -yq
+      run: micromamba install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
       shell: bash -l {0}

@@ -8,7 +8,6 @@ dependencies:
   - netCDF4
   - rdkit >=2020.09.4
   - nglview
-  - ambertools >=20.15
   - networkx
   - lxml
   - gromacs
