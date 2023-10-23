@@ -24,6 +24,7 @@ jobs:
     - name: Setup conda environment
       uses: mamba-org/setup-micromamba@v1
       with:
+        environment-name: parmed-dev
         environment-file: devtools/environment-dev.yaml
         create-args: >-
           python=${{ matrix.python-version }}
