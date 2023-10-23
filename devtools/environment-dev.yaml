@@ -1,15 +1,13 @@
 name: parmed-dev
 channels:
-  - https://conda.anaconda.org/conda-forge
-  - https://conda.anaconda.org/bioconda
+  - conda-forge
+  - conda-forge/label/openmm_rc
 dependencies:
   - pandas
   - openmm >=7.6.0
-  - coverage
   - netCDF4
   - rdkit >=2020.09.4
   - nglview
-  - ambertools >=20.15
   - networkx
   - lxml
   - gromacs
