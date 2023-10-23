@@ -7,8 +7,8 @@ try:
     from functools import cache
 except ImportError:
     # Patch to support a `cache` decorator in Python 3.8 equivalent to functools.cache in Python 3.9+
-    from functools import lru_cache, partial
-    cache = partial(lru_cache, maxsize=None)
+    from functools import lru_cache
+    cache = lru_cache(maxsize=None)
 from typing import Mapping, Dict, Any, List, Set, TextIO
 try:
     from typing import Literal
