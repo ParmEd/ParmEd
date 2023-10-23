@@ -14,7 +14,6 @@ jobs:
       matrix:
         os: ["ubuntu-latest"]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        ambertools: ["true", "false"]
 
     steps:
     - name: Check out source code
@@ -29,8 +28,8 @@ jobs:
         create-args: >-
           python=${{ matrix.python-version }}
 
-    - name: Optionall install AmberTools
-      if: ${{ matrix.ambertools == false && matrix.python-version != 3.12 }}
+    - name: Optionally install AmberTools
+      if: ${{ matrix.python-version != 3.12 }}
       run: micromamba install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
