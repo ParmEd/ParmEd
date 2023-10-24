@@ -10,3 +10,5 @@ package-lock.json
 package.json
 .pytest_cache
 .ipynb_checkpoints
+*.egg-info/
+*.so
