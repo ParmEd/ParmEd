@@ -817,7 +817,8 @@ def energy(parm, args, output=sys.stdout):
     if applayer:
         # Write out a temporary topology file, load an amberprmtopfile, then
         # delete that file
-        tmp = tempfile.mktemp(suffix='.parm7')
+        fd, tmp = tempfile.mkstemp(suffix='.parm7')
+        os.close(fd)
         try:
             parm.write_parm(tmp)
             parm_ = amberprmtopfile.AmberPrmtopFile(tmp)
