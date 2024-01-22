@@ -13,7 +13,7 @@ import numpy as np
 from .. import unit as u
 from ..constants import PrmtopPointers, TRUNCATED_OCTAHEDRON_ANGLE, RAD_TO_DEG, SMALL, DEG_TO_RAD
 from ..exceptions import AmberError, AmberWarning, MoleculeError
-from ..geometry import box_lengths_and_angles_to_vectors
+from ..geometry import box_lengths_and_angles_to_vectors, _cross
 from ..periodic_table import AtomicNum, element_by_mass
 from ..residue import ALLION_NAMES, SOLVENT_NAMES
 from ..structure import Structure, needs_openmm
