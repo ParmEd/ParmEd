@@ -786,7 +786,9 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
                 a1, a2, a3, a4 = a2, a4, a3, a1
             elif a4 == 'X':
                 a1, a2, a3, a4 = a4, a1, a3, a2
-            a1, a2, a4 = sorted([a1, a2, a4])
+                a2, a4 = sorted([a2, a4])
+            else:
+                a1, a2, a4 = sorted([a1, a2, a4])
             if (a1, a2, a3, a4) in written_impropers:
                 if written_impropers[(a1, a2, a3, a4)] != typ:
                     raise ValueError('Multiple impropers with the same atom set not allowed')
