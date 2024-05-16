@@ -25,13 +25,13 @@ subs = dict(FLOATRE=r'([+-]?(?:\d+(?:\.\d*)?|\.\d+))',
 _bondre = re.compile(r'(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _anglere = re.compile(r'(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _dihedre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+%(FLOATRE)s\s+'
-                      '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+                      r'%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 _dihed2re = re.compile(r'\s*%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s\s+'
                        '%(FLOATRE)s' % subs)
 _sceere = re.compile(r'SCEE=\s*%(FLOATRE)s' % subs)
 _scnbre = re.compile(r'SCNB=\s*%(FLOATRE)s' % subs)
 _impropre = re.compile(r'(..?)-(..?)-(..?)-(..?)\s+'
-                       '%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
+                       r'%(FLOATRE)s\s+%(FLOATRE)s\s+%(FLOATRE)s' % subs)
 # Leaprc regexes
 _atomtypere = re.compile(r"""({\s*["']([\w\+\-]+)["']\s*["'](\w+)["']\s*"""
                          r"""["'](\w+)["']\s*})""")
