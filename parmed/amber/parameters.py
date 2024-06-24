@@ -196,6 +196,33 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
 
     def __init__(self, *filenames):
         super(AmberParameterSet, self).__init__()
+
+
+        # See: <AmberSourceDist>/AmberTools/src/leap/src/leap/commands.c:1694
+        # (`oCmd_loadAmberParams`). Amber's loadAmberParams uses a "nasty,
+        # special kludge" to ensure parm10, parm99, and parm15 are loaded no
+        # more than once.  If this behavior is not replicated in ParmEd, Amber
+        # parameters may be loaded incorrectly. For example, consider the
+        # following leaprc:
+        # > source leaprc.protein.ff14sb
+        #   # ...
+        #   # parm10 = loadAmberParams parm10.dat
+        #   # frcmod14SB = loadAmberParams frcmod.ff14SB
+        #   # ...
+        # > source leaprc.RNA.OL3
+        #   # ...
+        #   # parm10 = loadAmberParams parm10.dat
+        #   # ...
+        # Without replicating the "special kludge", leaprc.RNA.OL3 will reload
+        # parm10 and overwrite many of the changes introduced by loading
+        # frcmod.ff14SB.  The solution is to match Amber's behavior and ensure
+        # each of parm15, parm99, and parm15 are loaded at most once.
+        self.__is_parm_loaded = {
+            "parm10.dat": False,
+            "parm99.dat": False,
+            "parm15": False,
+        }
+
         self.default_scee = 1.2
         self.default_scnb = 2.0
         self.titles = []
@@ -280,6 +307,21 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
             line = line.replace(r'\ ', '_BSTOKEN_')
             if _loadparamsre.findall(line):
                 fname = process_fname(_loadparamsre.findall(line)[0])
+
+                # In Amber, loading any parm file beginning with "parm15"
+                # (e.g., "parm15ipq.dat") qualifies as loading parm15
+                parm_loaded_key = fname
+                if fname.startswith("parm15"):
+                    parm_loaded_key = "parm15"
+
+                # Match amber's `tleap` by ensuring that certain parm files
+                # (e.g., "parm10.dat") are loaded exactly once.
+                if parm_loaded_key in params.__is_parm_loaded:
+                    if params.__is_parm_loaded[parm_loaded_key]:
+                        warnings.warn(f"Skipping {fname}: already loaded")
+                        continue
+                    params.__is_parm_loaded[parm_loaded_key] = True
+
                 params.load_parameters(_find_amber_file(fname, search_oldff))
             elif _loadoffre.findall(line):
                 fname = process_fname(_loadoffre.findall(line)[0])
