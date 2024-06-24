@@ -192,7 +192,7 @@ class PDBFile(metaclass=FileFormatType):
                         'ANISOU', 'CISPEP', 'CONECT', 'DBREF ', 'HELIX ', 'HET   ', 'LINK  ', 'MODRES',
                         'REVDAT', 'SEQADV', 'SHEET ', 'SSBOND', 'FORMUL', 'HETNAM', 'HETSYN', 'SEQRES', 'SITE  ',
                         'ENDMDL', 'MODEL ', 'TER   ', 'JRNL  ', 'REMARK', 'TER', 'DBREF ', 'DBREF2', 'DBREF1',
-                        'DBREF', 'HET', 'LINKR '}:
+                        'DBREF', 'HET', 'LINKR ', 'TURN  '}:
                     continue
                 # Hack to support reduce-added flags
                 elif line[:6] == 'USER  ' and line[6:9] == 'MOD':
