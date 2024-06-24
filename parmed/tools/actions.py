@@ -1044,7 +1044,7 @@ class changeLJSingleType(Action):
         return (
             f"Changing {self.mask} Lennard-Jones well depth from {self.orig_depth:.4f} to "
             f"{self.depth:.4f} (kal/mol) and radius from {self.orig_radius:.4f} to "
-            "{self.radius:.4f} (Angstroms)"
+            f"{self.radius:.4f} (Angstroms)"
         )
 
     def execute(self):
