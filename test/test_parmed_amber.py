@@ -1050,7 +1050,7 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(d[0].per, 3)
         self.assertEqual(d[0].phase, 0)
         # Check a couple random improper types
-        d = params.improper_periodic_types[('O', 'X', 'C', 'X')]
+        d = params.improper_periodic_types[('X', 'X', 'C', 'O')]
         self.assertEqual(d.phi_k, 10.5)
         self.assertEqual(d.per, 2)
         self.assertEqual(d.phase, 180)
@@ -1058,7 +1058,7 @@ class TestParameterFiles(FileIOTestCase):
         self.assertEqual(d.phi_k, 1.0)
         self.assertEqual(d.per, 2)
         self.assertEqual(d.phase, 180)
-        d = params.improper_periodic_types[('CC', 'CR', 'NA', 'P')]
+        d = params.improper_periodic_types[('CR', 'CC', 'NA', 'P')]
         self.assertEqual(d.phi_k, 1.1)
         self.assertEqual(d.per, 2)
         self.assertEqual(d.phase, 180)
