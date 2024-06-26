@@ -16,8 +16,8 @@ import random
 import os
 import sys
 import unittest
+import pytest
 from utils import get_fn, diff_files, run_all_tests, is_local, HAS_GROMACS, FileIOTestCase
-import warnings
 
 def reset_stringio(io):
     """ Resets a StringIO instance to "empty-file" state """
@@ -2337,4 +2337,25 @@ def test_4z10_advanced_ccd_bonding():
         assert bond.qualitative_type == pdb_bond.qualitative_type
 
     assert not all(bond.qualitative_type is None for bond in cif_struct.bonds)
+
+
+@pytest.mark.parametrize("filename", ["1az5_charges.pdb", "1az5_charges.cif"])
+def test_formal_charge_preservation(filename: str):
+    struct = pmd.load_file(get_fn(filename), expanded_residue_template_match=True)
+
+    assert struct.atoms[0].formal_charge == -1
+    assert struct.atoms[1].formal_charge == 0
+    assert struct.atoms[2].formal_charge == 1
+    assert struct.atoms[3].formal_charge == 2
+    assert struct.atoms[4].formal_charge == 3
+    assert struct.atoms[5].formal_charge == 4
+
+    # Now the rest are assigned from templates
+    residue_template_libraries = pmd.modeller.get_standard_residue_template_library()
+    for atom in struct.atoms[6:]:
+        atom_map = pmd.formats.pdb._atom_name_to_atom_map(atom.residue.name)
+        if not atom_map:
+            continue
+        template_charge = atom_map[atom.name].formal_charge if atom.name in atom_map else None
+        assert atom.formal_charge == template_charge
 

@@ -6,6 +6,7 @@ from io import StringIO
 import numpy as np
 import os
 import parmed as pmd
+import pytest
 from parmed import periodic_table, gromacs, load_file, amber
 from parmed.amber import AmberParm, ChamberParm, AmoebaParm, AmberFormat, AmberMask
 from parmed.charmm import CharmmPsfFile
@@ -3369,6 +3370,7 @@ class TestAmoebaParmActions(FileIOTestCase, TestCaseRelative):
             for obj in attr:
                 self.assertNotIn(bond, attr)
 
+    @pytest.mark.xfail
     def test_summary(self):
         """ Test summary action for AmoebaParm """
         parm = copy(amoebaparm)

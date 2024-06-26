@@ -40,7 +40,7 @@ AtomicNum = { 'H'  :  1, 'He' :  2, 'Li' :  3, 'Be' :  4, 'B'  :  5, 'C'  :  6,
               'Lr' :103, 'Rf' :104, 'Db' :105, 'Sg' :106, 'Bh' :107, 'Hs' :108,
               'Mt' :109, 'Ds' :110, 'Rg' :111, 'Cn' :112, 'Nh' :113, 'Fl' :114,
               'Mc' :115, 'Lv' :116, 'Ts' :117, 'Og' :118, 'EP' : 0 , 'LP' :  0,
-              'Lp' :  0, 'Ep' :  0}
+              'Lp' :  0, 'Ep' :  0, 'D'  :  1, 'T'  :  1,}
 
 Element = [ 'EP',
             'H' ,'He','Li','Be','B' ,'C' ,'N' ,'O' ,'F' ,'Ne','Na','Mg',
@@ -93,7 +93,8 @@ Mass = { 'H'  :   1.0079 , 'He' :   4.0026 , 'Li' :   6.941  ,
          'Mt' : 268.     , 'Ds' : 281.     , 'Rg' : 272.     ,
          'Cn' : 285.     , 'Nh' : 286.     , 'Fl' : 289.     ,
          'Mc' : 289.     , 'Lv' : 293.     , 'Ts' : 294.     ,
-         'Og' : 294.     , 'EP' : 0.000000 }
+         'Og' : 294.     , 'EP' : 0.000000 , 'D'  :   2.0141 ,
+         'T'  :  3.0160}
 
 Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Be' : 'Beryllium'    ,'B'  : 'Boron'        ,'C'  : 'Carbon'       ,
@@ -135,7 +136,8 @@ Name = { 'H'  : 'Hydrogen'     ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
          'Cn' : 'Copernicium'  ,'Nh' : 'Nihonium'     ,'Fl' : 'Flerovium'    ,
          'Mc' : 'Moscovium'    ,'Lv' : 'Livermorium'  ,'Ts' : 'Tennessine'   ,
          'Og' : 'Oganesson'    ,'EP' : 'Extra Point'  ,'LP' : 'Extra Point'  ,
-         'Ep' : 'Extra Point'  ,'Lp' : 'Extra Point'}
+         'Ep' : 'Extra Point'  ,'Lp' : 'Extra Point'  ,'D'  : 'Deuterium'    ,
+         'T'  : 'Tritium'}
 
 OriginName = {
         'H'  : 'Hydrogen'   ,'He' : 'Helium'       ,'Li' : 'Lithium'      ,
@@ -224,7 +226,7 @@ Phase = { 'H'  : 'Gas'          ,'He' : 'Gas'          ,'Li' : 'Solid'        ,
           'LP' : 'N/A'          ,'Lp' : 'N/A'
 }
 
-_sorted_masses = sorted(Mass.items(), key=lambda x: x[1])
+_sorted_masses = sorted([(k, v) for k, v in Mass.items() if k not in ("D", "T")], key=lambda x: x[1])
 
 def element_by_mass(mass):
     """

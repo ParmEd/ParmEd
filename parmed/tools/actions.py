@@ -574,21 +574,28 @@ class changeRadii(Action):
 class changeLJPair(Action):
     """
     Changes a particular Lennard Jones pair based on a given (pre-combined)
-    epsilon/Rmin
+    epsilon/Rmin/[C4_coef]
     """
-    usage = '<mask1> <mask2> <Rmin> <epsilon>'
+    usage = '<mask1> <mask2> <Rmin> <epsilon> [<C4_coef>]'
     strictly_supported = (AmberParm, ChamberParm)
     def init(self, arg_list):
         self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
         self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
         self.rmin = arg_list.get_next_float()
         self.eps = arg_list.get_next_float()
+        self.c4 = arg_list.get_next_float(optional=True, default=None)
 
     def __str__(self):
-        return (
-            f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
-            f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
-        )
+        if self.c4 is None:
+            return (
+                f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+                f'{self.rmin:16.5f} and Epsilon = {self.eps:16.5f}'
+            )
+        else:
+            return (
+                f'Setting LJ {self.mask1}-{self.mask2} pairwise interaction to have Rmin = '
+                f'{self.rmin:16.5f}, Epsilon = {self.eps:16.5f} and C4_coef = {self.c:16.5f}'
+            )
 
     def execute(self):
         selection1 = self.mask1.Selection()
@@ -612,7 +619,9 @@ class changeLJPair(Action):
                 else:
                     if attype2 != atom.nb_idx:
                         raise ChangeLJPairError('Second mask matches multiple atom types!')
-        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps)
+        if self.c4 is not None and 'LENNARD_JONES_CCOEF' not in self.parm.flag_list:
+            raise ChangeLJPairError('No C4 information in parm. Please use the "add12_6_4" command first.')
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, c4=self.c4)   
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -662,7 +671,7 @@ class changeLJ14Pair(Action):
                         raise ChangeLJPairError('Second mask matches multiple atom types!')
 
         # Adjust 1-4 non-bonded terms as well if we're using a chamber-prmtop
-        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, True)
+        _change_lj_pair(self.parm, attype1, attype2, self.rmin, self.eps, one_4=True)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -1035,7 +1044,7 @@ class changeLJSingleType(Action):
         return (
             f"Changing {self.mask} Lennard-Jones well depth from {self.orig_depth:.4f} to "
             f"{self.depth:.4f} (kal/mol) and radius from {self.orig_radius:.4f} to "
-            "{self.radius:.4f} (Angstroms)"
+            f"{self.radius:.4f} (Angstroms)"
         )
 
     def execute(self):
@@ -3163,30 +3172,37 @@ class deletePDB(Action):
 
 class add12_6_4(Action):
     """
-    Adds the LENNARD_JONES_CCOEF term for the new divalent metal ion 12-6-4
-    Lennard-Jones potential term. If provided, the mask will allow you to
-    specify which ions are divalent. The C4 parameter between the metal ion and
-    water can either be taken from Ref. [1] for the requested [watermodel]
-    (TIP3P, TIP4PEW, or SPCE) or provided in the file specified by the c4file
-    keyword.  The polarizabilities must be present in the the polfile file. The
-    chemical symbol of the element will be used to determine the atom type.
+    Adds the LENNARD_JONES_CCOEF term for the ion 12-6-4 Lennard-Jones potential
+    term. If provided, the mask will allow you to specify which ions. If not
+    provided, :ZN will be used for the mask by default. The C4 parameter between
+    the ion and water can either be taken from the references for the requested
+    [watermodel] (TIP3P, TIP4PEW, SPCE, OPC3, OPC, FB3, and FB4) or provided in
+    the file specified by the c4file keyword. The polarizabilities must be
+    present in the the polfile file. The chemical symbol of the element will be
+    used to determine the atom type.
     Parameters are expected in a file with 2 columns:
         <atom type>   <parameter>
 
-    All defaults come from Ref. [1], [2] and [3]
+    All defaults come from Ref. [1], [2], [3], [4], [5] and [6]
 
     [1] Pengfei Li and Kenneth M. Merz, J. Chem. Theory Comput., 2014, 10,
-        289-297
+        289-297.
     [2] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Phys. Chem. B, 2015,
-        119, 883-895
+        119, 883-895.
     [3] Pengfei Li, Lin F. Song and Kenneth M. Merz, J. Chem. Theory Comput.,
         2015, 11, 1645-1657.
+    [4] Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M. Merz Jr. J. Chem.
+        Theory Comput., 2020, 16, 4429-4442.
+    [5] Arkajyoti Sengupta, Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M.
+        Merz Jr., J. Chem. Inf. Model., 2021, 61, 869-880.
+    [6] Zhen Li, Lin Frank Song, Pengfei Li, and Kenneth M. Merz Jr. J. Chem.
+        Theory Comput., 2021, 17, 2342-2354.
     """
-    usage = ('[<divalent ion mask>] [c4file <C4 Param. File> | watermodel '
-            '<water model>] [polfile <Pol. Param File> [tunfactor <tunfactor>]')
+    usage = ('[<ion mask>] [c4file <C4 Param. File> | watermodel <water model>] '
+             '[polfile <Pol. Param File> [tunfactor <tunfactor>]')
     strictly_supported = (AmberParm, ChamberParm)
 
-    _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE')
+    _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE', 'OPC3', 'OPC', 'FB3', 'FB4')
 
     def init(self, arg_list):
         self.mask = AmberMask(self.parm,
@@ -3227,7 +3243,7 @@ class add12_6_4(Action):
         self.parm.delete_flag('LENNARD_JONES_CCOEF')
         self.parm.add_flag('LENNARD_JONES_CCOEF', '5E16.8',
                 num_items=len(self.parm.parm_data['LENNARD_JONES_ACOEF']),
-                comments=['For 12-6-4 potential used for divalent metal ions'])
+                comments=['For 12-6-4 potential used for ions'])
         for i, param in enumerate(
             params(self.parm, self.mask, self.c4file, self.watermodel, self.polfile, self.tunfactor)
         ):
@@ -4242,7 +4258,7 @@ class gromber(Action):
 
 # Private helper methods
 
-def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
+def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
 
     if one_4:
         key = 'LENNARD_JONES_14'
@@ -4259,3 +4275,7 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, one_4=False):
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data[f'{key}_ACOEF'][term_idx] = eps * rmin**12
     parm.parm_data[f'{key}_BCOEF'][term_idx] = 2 * eps * rmin**6
+    
+    # Change the CCOEF arrays if provided
+    if c4 is not None and not one_4:
+        parm.parm_data[f'{key}_CCOEF'][term_idx] = c4

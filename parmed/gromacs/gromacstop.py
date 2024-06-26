@@ -1435,13 +1435,11 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             # Print all atom types
             if not itp :
                 parfile.write('[ atomtypes ]\n')
-                if any(typ._bond_type is not None
-                        for key, typ in params.atom_types.items()):
+                if any(typ._bond_type is not None for key, typ in params.atom_types.items()):
                     print_bond_types = True
                 else:
                     print_bond_types = False
-                if all(typ.atomic_number != -1
-                        for key, typ in params.atom_types.items()):
+                if all(typ.atomic_number != -1 for key, typ in params.atom_types.items()):
                     print_atnum = True
                 else:
                     print_atnum = False

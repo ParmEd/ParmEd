@@ -53,7 +53,7 @@ def positional_restraints(mask, weights, refc, scriptfile=None):
     """
     parm = mask.parm # store the parm object
     try:
-        refc = refc.reshape((-1, len(parm.atoms), 3))
+        refc = refc.coordinates.reshape((-1, len(parm.atoms), 3))
     except ValueError:
         raise SimulationError('Invalid shape of coordinate array')
 
@@ -562,7 +562,7 @@ def simulate(parm, args):
                                       maxIterations=mdin.cntrl_nml['maxcyc'])
             rep.report(simulation)
             # Write a restart file with the new coordinates
-            restrt_reporter = RestartReporter(restart, 1, parm.ptr('natom'), False,
+            restrt_reporter = RestartReporter(restart, 1, False,
                                               mdin.cntrl_nml['ntxo'] == 2, write_velocities=False)
             restrt_reporter.report(simulation, simulation.context.getState(getPositions=True,
                                    enforcePeriodicBox=bool(mdin.cntrl_nml['ntb'])))
@@ -817,7 +817,8 @@ def energy(parm, args, output=sys.stdout):
     if applayer:
         # Write out a temporary topology file, load an amberprmtopfile, then
         # delete that file
-        tmp = tempfile.mktemp(suffix='.parm7')
+        fd, tmp = tempfile.mkstemp(suffix='.parm7')
+        os.close(fd)
         try:
             parm.write_parm(tmp)
             parm_ = amberprmtopfile.AmberPrmtopFile(tmp)

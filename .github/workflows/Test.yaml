@@ -13,37 +13,34 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
     - name: Check out source code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Setup Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Setup conda environment
+      uses: mamba-org/setup-micromamba@v1
       with:
-        auto-update-conda: false
-        python-version: ${{ matrix.python-version }}
+        environment-name: parmed-dev
         environment-file: devtools/environment-dev.yaml
-        activate-environment: parmed-dev
-        channels: conda-forge,bioconda
-        # mamba-version: "*"
+        create-args: >-
+          python=${{ matrix.python-version }}
 
-    - name: Environment Information
+    - name: Optionally install AmberTools
+      if: ${{ matrix.python-version != 3.12 }}
       shell: bash -l {0}
-      run: |
-        conda info
-        conda list
+      run: micromamba install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
-      shell: bash -lex {0}
+      shell: bash -l {0}
       run: |
         bash -ex devtools/ci/install.sh
 
     - name: Upload Coverage Results
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       if: endsWith(github.ref, '/master')
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
