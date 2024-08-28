@@ -35,8 +35,9 @@ jobs:
       run: micromamba install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
-      shell: bash -l {0}
+      shell: bash -lx {0}
       run: |
+        env
         bash -ex devtools/ci/install.sh
 
     - name: Upload Coverage Results
