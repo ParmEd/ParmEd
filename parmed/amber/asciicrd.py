@@ -317,7 +317,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def coordinates(self, stuff):
         if self._status == 'old':
             raise RuntimeError('Cannot set coordinates on an old restart')
-        stuff = np.array(stuff, copy=False).ravel()
+        stuff = np.asarray(stuff).ravel()
         if self.natom > 0 and len(stuff) != 3 * self.natom:
             raise ValueError(f'Got {len(stuff)} coordinates for {self.natom} atoms')
         if self._coords_written:
@@ -351,7 +351,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
     def velocities(self, stuff):
         if self._status == 'old':
             raise RuntimeError('Cannot set velocities on an old restart')
-        stuff = np.array(stuff, copy=False).ravel()
+        stuff = np.asarray(stuff).ravel()
         if not self._coords_written:
             raise RuntimeError('Coordinates must be set before velocities')
         if self._cell_lengths_written or self._cell_angles_written:
@@ -413,7 +413,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Can only write cell lengths once')
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell lengths')
-        self._cell_lengths = np.array(stuff, copy=False)
+        self._cell_lengths = np.asarray(stuff)
         self._file.write('%12.7f%12.7f%12.7f' % (stuff[0], stuff[1], stuff[2]))
         self._cell_lengths_written = True
 
@@ -429,7 +429,7 @@ class AmberAsciiRestart(_AmberAsciiCoordinateFile):
             raise RuntimeError('Can only write cell angles once')
         if len(stuff) != 3:
             raise ValueError('Expected 3 numbers for cell angles')
-        self._cell_angles = np.array(stuff, copy=False)
+        self._cell_angles = np.asarray(stuff)
         self._file.write('%12.7f%12.7f%12.7f\n' % (stuff[0],stuff[1],stuff[2]))
         self._cell_angles_written = True
 
