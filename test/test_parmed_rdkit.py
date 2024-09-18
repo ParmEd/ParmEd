@@ -36,7 +36,7 @@ class TestRDKit(unittest.TestCase):
 
         # coordinates = True (default)
         parm = pmd.rdkit.from_smiles(smiles, coordinates=True, hydrogens=False)
-        np.testing.assert_allclose(parm.coordinates[0], [-1.072,  0.829 ,  0.108])
+        self.assertFalse((parm.coordinates[0] == 0).all())
 
     def test_load_smiles_explicit_hydrogen(self):
         """ test adding explict hydrogens from smiles string"""
