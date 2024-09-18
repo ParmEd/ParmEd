@@ -3912,7 +3912,7 @@ class Structure:
 
         def assign_order(bond_tuple):
             if len(bond_tuple) < 4:
-                return None
+                return 1.0
             return bond_tuple[3]
 
         def assign_qualitative_type(bond_tuple):
