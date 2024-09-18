@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest"]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - name: Check out source code
@@ -35,8 +35,9 @@ jobs:
       run: micromamba install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
-      shell: bash -l {0}
+      shell: bash -lx {0}
       run: |
+        env
         bash -ex devtools/ci/install.sh
 
     - name: Upload Coverage Results

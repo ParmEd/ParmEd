@@ -23,7 +23,7 @@ from .topologyobjects import (AcceptorDonor, Angle, Atom, AtomList, Bond, Chiral
                               OutOfPlaneExtraPointFrame, PiTorsion, ResidueList, StretchBend,
                               ThreeParticleExtraPointFrame, TorsionTorsion, TrackedList,
                               TrigonalAngle, TwoParticleExtraPointFrame, UnassignedAtomType,
-                              UreyBradley, Link, LocalCoordinatesFrame)
+                              UreyBradley, Link, LocalCoordinatesFrame, QualitativeBondType)
 from .utils import PYPY, find_atom_pairs, tag_molecules
 from .utils.decorators import needs_openmm
 from .vec3 import Vec3
@@ -1796,7 +1796,7 @@ class Structure:
             if u.is_quantity(value):
                 value = value.value_in_unit(u.angstroms)
             value = list(value)
-            coords = np.array(value, dtype=np.float64, copy=False, subok=True)
+            coords = np.asanyarray(value, dtype=np.float64)
             coords = coords.reshape((-1, len(self.atoms), 3))
             if len(coords) > 0:
                 for a, xyz in zip(self.atoms, coords[0]):
@@ -1877,7 +1877,7 @@ class Structure:
                 box = value
             else:
                 box = _strip_box_units(list(value))
-            box = np.array(box, dtype=np.float64, copy=False, subok=True)
+            box = np.asanyarray(box, dtype=np.float64)
             if box.shape != (6,):
                 if len(box.shape) != 2 or box.shape[-1] != 6:
                     raise ValueError('Box information must be 6 floats')
@@ -1944,7 +1944,7 @@ class Structure:
                 except AttributeError:
                     pass
         else:
-            value = np.array(value, copy=False).reshape(
+            value = np.asarray(value).reshape(
                 (-1, len(self.atoms), 3))
             for atom, xyz in zip(self.atoms, value[0]):
                 atom.vx, atom.vy, atom.vz = xyz
@@ -3833,7 +3833,7 @@ class Structure:
 
         def idx(thing):
             return thing.idx if thing is not None else None
-        retdict['bonds'] = [(b.atom1.idx, b.atom2.idx, idx(b.type))
+        retdict['bonds'] = [(b.atom1.idx, b.atom2.idx, idx(b.type), b.order, b.qualitative_type)
                             for b in self.bonds]
         retdict['angles'] = [(a.atom1.idx, a.atom2.idx, a.atom3.idx,
                               idx(a.type)) for a in self.angles]
@@ -3910,15 +3910,27 @@ class Structure:
                 return None
             return typelist[idx]
 
+        def assign_order(bond_tuple):
+            if len(bond_tuple) < 4:
+                return 1.0
+            return bond_tuple[3]
+
+        def assign_qualitative_type(bond_tuple):
+            if len(bond_tuple) < 5:
+                return None
+            qualitative_type = bond_tuple[4]
+            return QualitativeBondType(qualitative_type) if qualitative_type is not None else None
+
         # Set the topology arrays
         self.bonds = TrackedList(
-            Bond(self.atoms[it[0]], self.atoms[it[1]],
-                 type=assign_type(self.bond_types, it[2]))
+            Bond(
+                self.atoms[it[0]], self.atoms[it[1]], type=assign_type(self.bond_types, it[2]),
+                order=assign_order(it), qualitative_type=assign_qualitative_type(it),
+            )
             for it in d['bonds']
         )
         self.angles = TrackedList(
-            Angle(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
-                  type=assign_type(self.angle_types, it[3]))
+            Angle(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]], type=assign_type(self.angle_types, it[3]))
             for it in d['angles']
         )
         self.dihedrals = TrackedList(
@@ -3957,8 +3969,7 @@ class Structure:
         )
         self.pi_torsions = TrackedList(
             PiTorsion(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]], self.atoms[it[3]],
-                      self.atoms[it[4]], self.atoms[it[5]],
-                      type=assign_type(self.pi_torsion_types, it[6]))
+                      self.atoms[it[4]], self.atoms[it[5]], type=assign_type(self.pi_torsion_types, it[6]))
             for it in d['pi_torsions']
         )
         self.stretch_bends = TrackedList(
@@ -3968,8 +3979,7 @@ class Structure:
         )
         self.torsion_torsions = TrackedList(
             TorsionTorsion(self.atoms[it[0]], self.atoms[it[1]], self.atoms[it[2]],
-                           self.atoms[it[3]], self.atoms[it[4]],
-                           type=assign_type(self.torsion_torsion_types, it[5]))
+                           self.atoms[it[3]], self.atoms[it[4]], type=assign_type(self.torsion_torsion_types, it[5]))
             for it in d['torsion_torsions']
         )
         self.chiral_frames = TrackedList(
@@ -3979,8 +3989,7 @@ class Structure:
             MultipoleFrame(self.atoms[it[0]], *it[1:]) for it in d['multipole_frames']
         )
         self.adjusts = TrackedList(
-            NonbondedException(self.atoms[it[0]], self.atoms[it[1]],
-                               assign_type(self.adjust_types, it[2]))
+            NonbondedException(self.atoms[it[0]], self.atoms[it[1]], assign_type(self.adjust_types, it[2]))
             for it in d['adjusts']
         )
         self.acceptors = TrackedList(
