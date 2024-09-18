@@ -971,7 +971,7 @@ class PDBFile(metaclass=FileFormatType):
                 symm_line = "REMARK 290   SMTRY" + fmt % tuple(arr_list)
                 dest.write(symm_line)
         if coordinates is not None:
-            coords = np.array(coordinates, copy=False, subok=True)
+            coords = np.asanyarray(coordinates)
             try:
                 coords = coords.reshape((-1, len(struct.atoms), 3))
             except ValueError:
@@ -1646,7 +1646,7 @@ class CIFFile(metaclass=FileFormatType):
         sym.append([struct.space_group])
         cont.append(sym)
         if coordinates is not None:
-            coords = np.array(coordinates, copy=False, subok=True)
+            coords = np.asanyarray(coordinates)
             try:
                 coords = coords.reshape((-1, len(struct.atoms), 3))
             except ValueError:
