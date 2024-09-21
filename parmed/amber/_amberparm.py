@@ -2147,7 +2147,7 @@ class AmberParm(AmberFormat, Structure):
                     box[4] = box[4].value_in_unit(u.degrees)
                 if u.is_quantity(box[5]):
                     box[5] = box[5].value_in_unit(u.degrees)
-            box = np.array(box, dtype=np.float64, copy=False, subok=True).reshape((-1, 6))
+            box = np.asanyarray(box, dtype=np.float64).reshape((-1, 6))
 
             # We are adding a box for the first time, so make sure we add some flags
             if self._box is None:
@@ -2373,7 +2373,7 @@ class Rst7(object):
     @property
     def velocities(self):
         """ Atomic velocities in units of angstroms/picoseconds """
-        return np.array(self.vels, copy=False).reshape(self.natom, 3)
+        return np.asarray(self.vels).reshape(self.natom, 3)
 
     @property
     def box_vectors(self):

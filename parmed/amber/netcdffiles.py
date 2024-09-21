@@ -241,7 +241,7 @@ class NetCDFRestart(metaclass=FileFormatType):
 
     @coordinates.setter
     def coordinates(self, stuff):
-        stuff = np.array(stuff, copy=False).reshape((self.atom, 3))
+        stuff = np.asarray(stuff).reshape((self.atom, 3))
         self._ncfile.variables['coordinates'][:] = stuff
         self.flush()
 

@@ -10,6 +10,7 @@ import random
 from string import ascii_uppercase as uppercase
 import unittest
 import utils
+from parmed.topologyobjects import QualitativeBondType
 from utils import HAS_GROMACS
 
 class TestParmedSerialization(unittest.TestCase):
@@ -53,7 +54,9 @@ class TestParmedSerialization(unittest.TestCase):
         fobj.seek(0)
         unpickled = pickle.load(fobj)
 
-        self.assertIsInstance(bond, pmd.Bond)
+        self.assertIsInstance(unpickled, pmd.Bond)
+        self.assertEqual(unpickled.order, bond.order)
+        self.assertEqual(unpickled.qualitative_type, bond.qualitative_type)
 
     def test_bondtype_serialization(self):
         """ Tests the serialization of BondType """
@@ -96,6 +99,20 @@ class TestParmedSerialization(unittest.TestCase):
         unpickled = pickle.load(fobj)
 
         self._compare_structures(unpickled, structure)
+
+    def test_structure_serialization_with_bond_types(self):
+        """Tests the serialization of Structure with extra bond attributes."""
+        structure = utils.create_random_structure(parametrized=True)
+        # Add some bond types
+        structure.bonds[0].order = 2.0
+        structure.bonds[0].qualitative_type = QualitativeBondType.AROMATIC
+        fobj = BytesIO()
+        pickle.dump(structure, fobj)
+        fobj.seek(0)
+        unpickled = pickle.load(fobj)
+        self._compare_structures(unpickled, structure)
+        self.assertEqual(unpickled.bonds[0].order, 2.0)
+        self.assertEqual(unpickled.bonds[0].qualitative_type, QualitativeBondType.AROMATIC)
 
     def test_fortran_format_serialization(self):
         """ Tests the serialization of FortranFormat """

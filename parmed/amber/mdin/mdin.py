@@ -4,6 +4,7 @@ pmemd (or others). The program specification loads the appropriate
 dictionaries with default values, etc. It can read and write mdins.
 """
 from io import TextIOBase
+from re import findall
 
 # This module will create and read a sander/pmemd input
 from .cntrl import cntrl
@@ -23,6 +24,13 @@ def addOn(line, string, file):
         return ' ' + string
     else:
         return line + string
+
+def splitStr(string):
+    # split string at commas not within single or double quotes
+    pattern = r"""('[^']*'|"[^"]*"|[^'",\s]+)"""
+    matches = findall(pattern, string)
+
+    return matches
 
 
 class Mdin:
@@ -176,7 +184,7 @@ class Mdin:
             elif inblock and lines[i].strip().startswith('&'):
                 raise InputError(f"Invalid input file ({filename}). Namelist not terminated")
             elif inblock:
-                items = lines[i].strip().split(',')
+                items = splitStr(lines[i].strip())
                 j = 0
                 while j < len(items):
                     items[j] = items[j].strip()
@@ -194,11 +202,20 @@ class Mdin:
         begin_field = -1
         for i in range(len(block_fields)):
             for j in range(len(block_fields[i])):
-                if not '=' in block_fields[i][j]:
+                if block_fields[i][j].startswith("'") or block_fields[i][j].startswith("\"") or not '=' in block_fields[i][j]:
                     if begin_field == -1:
                         raise InputError(f'Invalid input file ({filename}).')
                     else:
-                        block_fields[i][begin_field] += ',' + block_fields[i][j]
+                        if block_fields[i][j].startswith("'") or block_fields[i][j].startswith("\""):
+                            block_fields[i][begin_field] += block_fields[i][j]
+                        
+                            # prevents treating '=' in quoted field values (e.g. wildcards for restraintmask)
+                            # from delimiting new fields
+                            if '=' in block_fields[i][j]:
+                                block_fields[i][j] = block_fields[i][j].replace('=','')
+                        
+                        else:
+                            block_fields[i][begin_field] += ',' + block_fields[i][j]
                 else:
                     begin_field = j
 
@@ -208,7 +225,7 @@ class Mdin:
                 if not '=' in block_fields[i][j]:
                     continue
                 else:
-                    var = block_fields[i][j].split('=')
+                    var = block_fields[i][j].split('=', 1)
                     self.change(blocks[i], var[0].strip(), var[1].strip())
 
     def change(self, namelist, variable, value):

@@ -16,6 +16,7 @@ from ..exceptions import SimulationError, SimulationWarning, UnhandledArgumentWa
 import sys
 import warnings
 from ...vec3 import Vec3
+from ...geometry import reduce_box_vectors
 try:
     from openmm.app import (
         forcefield as ff, OBC1, OBC2, GBn, HCT, GBn2, Simulation, DCDReporter, amberprmtopfile
@@ -41,6 +42,7 @@ from parmed.amber import AmberParm, Rst7, AmberMdcrd, AmberMask, NetCDFTraj
 from parmed.openmm import (StateDataReporter, NetCDFReporter, MdcrdReporter,
         RestartReporter, ProgressReporter, EnergyMinimizerReporter)
 from parmed import unit as u
+from parmed.geometry import reduce_box_vectors
 
 # Load the Amber topology file
 parm = AmberParm('%s', '%s')
@@ -495,8 +497,10 @@ def simulate(parm, args):
     if parm.ptr('ifbox') > 0:
         # Only set box vectors if box is present
         if scriptfile is not None:
-            scriptfile.write('simulation.context.setPeriodicBoxVectors(*parm.box_vectors)\n\n')
-        simulation.context.setPeriodicBoxVectors(*position_container.box_vectors)
+            scriptfile.write('reduced_box_vecs = reduce_box_vectors(*position_container.box_vectors)*u.angstroms\n'
+                             'simulation.context.setPeriodicBoxVectors(*reduced_box_vecs)\n\n')
+        reduced_box_vecs = reduce_box_vectors(*position_container.box_vectors)*u.angstroms
+        simulation.context.setPeriodicBoxVectors(*reduced_box_vecs)
 
     # Velocities
     if runmd and mdin.cntrl_nml['irest'] == 1 and position_container.hasvels:
