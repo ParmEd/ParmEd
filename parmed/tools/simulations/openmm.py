@@ -506,8 +506,8 @@ def simulate(parm, args):
     if runmd and mdin.cntrl_nml['irest'] == 1 and position_container.hasvels:
         if scriptfile is not None:
             scriptfile.write('# Set velocities\n')
-            scriptfile.write('simulation.context.setVelocities(parm.velocities)\n')
-        simulation.context.setVelocities(position_container.velocities)
+            scriptfile.write('simulation.context.setVelocities(parm.velocities/10)\n')
+        simulation.context.setVelocities(position_container.velocities/10) # /10 for Å/ps to nm/ps
     elif runmd:
         if scriptfile is not None:
             scriptfile.write('# Set velocities\n')
