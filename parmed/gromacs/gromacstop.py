@@ -45,6 +45,16 @@ except ImportError:
     _uname = platform.node()        # pragma: no cover
 
 
+def _parse_number_as_integer(string):
+    try:
+        return int(string)
+    except ValueError as err:
+        as_float = float(string)
+        as_int = int(as_float)
+        if as_float != as_int:
+            raise ValueError(f'Could not convert {string} to an integer') from err
+        return as_int
+
 
 # Gromacs uses "funct" flags in its parameter files to indicate what kind of
 # functional form is used for each of its different parameter types. This is
@@ -868,8 +878,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         r = float(words[3]) * u.nanometers
         k = (float(words[4]) / 2) * (u.kilojoules_per_mole / u.nanometers**2)
         if words[2] != '1':
-            warnings.warn('bondtypes funct != 1; unknown functional',
-                          GromacsWarning)
+            warnings.warn('bondtypes funct != 1; unknown functional', GromacsWarning)
             self.unknown_functional = True
         return words[0], words[1], BondType(k, r)
 
@@ -881,8 +890,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         theta = float(words[4]) * u.degrees
         k = (float(words[5]) / 2) * (u.kilojoules_per_mole / u.radians**2)
         if words[3] != '1' and words[3] != '5':
-            warnings.warn('angletypes funct != 1 or 5; unknown functional',
-                          GromacsWarning)
+            warnings.warn('angletypes funct != 1 or 5; unknown functional', GromacsWarning)
             self.unknown_functional = True
         ub = None
         if words[3] == '5':
@@ -925,10 +933,8 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         if dtype == 'normal':
             phase = float(words[si+1]) * u.degrees
             phi_k = float(words[si+2]) * u.kilojoules_per_mole
-            per = int(words[si+3])
-            ptype = DihedralType(phi_k, per, phase,
-                                 scee=1/self.defaults.fudgeQQ,
-                                 scnb=1/self.defaults.fudgeLJ)
+            per = _parse_number_as_integer(words[si+3])
+            ptype = DihedralType(phi_k, per, phase, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
             if improper_periodic:
                 # must do this here, since dtype has to be 'normal' above
                 dtype = 'improper_periodic'
@@ -939,11 +945,10 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             ptype = ImproperType(k, theta)
         elif dtype == 'rbtorsion':
             a1, a2, a3, a4 = words[:4]
-            c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoules_per_mole
-                                        for x in words[si+1:si+7])
-            ptype = RBTorsionType(c0, c1, c2, c3, c4, c5,
-                                  scee=1/self.defaults.fudgeQQ,
-                                  scnb=1/self.defaults.fudgeLJ)
+            c0, c1, c2, c3, c4, c5 = (float(x)*u.kilojoules_per_mole for x in words[si+1:si+7])
+            ptype = RBTorsionType(c0, c1, c2, c3, c4, c5, scee=1/self.defaults.fudgeQQ, scnb=1/self.defaults.fudgeLJ)
+        else:
+            raise ValueError(f"Dihedral type unrecognized: {dtype}")
         return (a1, a2, a3, a4), dtype, ptype, replace
 
     def _parse_cmaptypes(self, line):
@@ -1072,8 +1077,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                 pair.type = params.pair_types[key]
                 pair.type.used = True
             elif self.defaults.gen_pairs == 'yes':
-                assert self.combining_rule in ('geometric', 'lorentz'), \
-                        'Unrecognized combining rule'
+                assert self.combining_rule in ('geometric', 'lorentz'), 'Unrecognized combining rule'
                 if self.combining_rule == 'geometric':
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = math.sqrt(pair.atom1.sigma * pair.atom2.sigma)
@@ -1081,8 +1085,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     eps = math.sqrt(pair.atom1.epsilon * pair.atom2.epsilon)
                     sig = 0.5 * (pair.atom1.sigma + pair.atom2.sigma)
                 eps *= self.defaults.fudgeLJ
-                pairtype = NonbondedExceptionType(sig*2**(1/6), eps,
-                            self.defaults.fudgeQQ, list=self.adjust_types)
+                pairtype = NonbondedExceptionType(sig*2**(1/6), eps, self.defaults.fudgeQQ, list=self.adjust_types)
                 self.adjust_types.append(pairtype)
                 pair.type = pairtype
                 pair.type.used = True
@@ -1114,27 +1117,21 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             else:
                 raise ParameterError('Not all bond parameters found')
         if len(true_14 - gmx_pair) > 0:
-            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0,
-                                                   list=self.adjust_types)
+            zero_pairtype = NonbondedExceptionType(0.0, 0.0, 0.0, list=self.adjust_types)
             self.adjust_types.append(zero_pairtype)
             num_zero_14 = 0
             for a1, a2 in (true_14 - gmx_pair):
                 self.adjusts.append(NonbondedException(a1, a2, zero_pairtype))
                 num_zero_14 += 1
-            warnings.warn('%i 1-4 pairs were missing from the [ pairs ] '
-                          'section and were set to zero; make sure you '
-                          'know what you\'re doing!' % num_zero_14,
-                          GromacsWarning)
+            warnings.warn(f"{num_zero_14} 1-4 pairs were missing from the [ pairs ] section and were set to zero; "
+                          "make sure you know what you're doing!", GromacsWarning)
         if len(gmx_pair - true_14) > 0:
-            warnings.warn('The [ pairs ] section contains %i exceptions that '
-                          'aren\'t 1-4 pairs; make sure you know what '
-                          'you\'re doing!' % (len(gmx_pair - true_14)),
-                          GromacsWarning)
+            warnings.warn(f"The [ pairs ] section contains {len(gmx_pair - true_14)} exceptions that aren't 1-4 pairs;"
+                          " make sure you know what you're doing!", GromacsWarning)
         update_typelist_from(params.bond_types, self.bond_types)
         for angle in self.angles:
             if angle.type is not None: continue
-            key = (_gettype(angle.atom1), _gettype(angle.atom2),
-                   _gettype(angle.atom3))
+            key = (_gettype(angle.atom1), _gettype(angle.atom2), _gettype(angle.atom3))
             if key in params.angle_types:
                 angle.type = params.angle_types[key]
                 angle.type.used = True
@@ -1157,14 +1154,11 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         update_typelist_from(params.urey_bradley_types, self.urey_bradley_types)
         for t in self.dihedrals:
             if t.type is not None: continue
-            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
-                   _gettype(t.atom4))
+            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4))
             if not t.improper:
                 wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
-                wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
-                          _gettype(t.atom3), 'X')
-                wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
-                          _gettype(t.atom4))
+                wckey1 = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3), 'X')
+                wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4))
                 if key in params.dihedral_types:
                     t.type = params.dihedral_types[key]
                     t.type.used = True
@@ -1184,28 +1178,22 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     t.type = params.improper_periodic_types[key]
                     t.type.used = True
                 else:
-                    for wckey in [(key[0],key[1],key[2],'X'),
-                                  ('X',key[1],key[2],key[3]),
-                                  (key[0],key[1],'X','X'),
-                                  ('X','X',key[2],key[3])]:
+                    for wckey in [(key[0],key[1],key[2],'X'), ('X',key[1],key[2],key[3]),
+                                  (key[0],key[1],'X','X'), ('X','X',key[2],key[3])]:
                         if wckey in params.improper_periodic_types:
                             t.type = params.improper_periodic_types[wckey]
                             t.type.used = True
                             break
                     else:
-                        raise ParameterError('Not all improper torsion '
-                                             'parameters found')
+                        raise ParameterError('Not all improper torsion parameters found')
         update_typelist_from(params.dihedral_types, self.dihedral_types)
         update_typelist_from(params.improper_periodic_types, self.dihedral_types)
         for t in self.rb_torsions:
             if t.type is not None: continue
-            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3),
-                   _gettype(t.atom4))
+            key = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4))
             wckey = ('X', _gettype(t.atom2), _gettype(t.atom3), 'X')
-            wckey1 = (_gettype(t.atom1), _gettype(t.atom2),
-                      _gettype(t.atom3), 'X')
-            wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3),
-                      _gettype(t.atom4))
+            wckey1 = (_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3), 'X')
+            wckey2 = ('X', _gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4))
             if key in params.rb_torsion_types:
                 t.type = params.rb_torsion_types[key]
                 t.type.used = True
@@ -1224,8 +1212,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         self.update_dihedral_exclusions()
         for t in self.impropers:
             if t.type is not None: continue
-            key = tuple(sorted([_gettype(t.atom1), _gettype(t.atom2),
-                                _gettype(t.atom3), _gettype(t.atom4)]))
+            key = tuple(sorted([_gettype(t.atom1), _gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4)]))
             if key in params.improper_types:
                 t.type = params.improper_types[key]
                 t.type.used = True
@@ -1233,8 +1220,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             # Now we will try to find a compatible wild-card... the first atom
             # is the central atom. So take each of the other three and plug that
             # one in
-            for anchor in (_gettype(t.atom2), _gettype(t.atom3),
-                           _gettype(t.atom4)):
+            for anchor in (_gettype(t.atom2), _gettype(t.atom3), _gettype(t.atom4)):
                 wckey = tuple(sorted([_gettype(t.atom1), anchor, 'X', 'X']))
                 if wckey not in params.improper_types: continue
                 t.type = params.improper_types[wckey]
@@ -1245,8 +1231,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
         update_typelist_from(params.improper_types, self.improper_types)
         for c in self.cmaps:
             if c.type is not None: continue
-            key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
-                    _gettype(c.atom4), _gettype(c.atom5))
+            key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3), _gettype(c.atom4), _gettype(c.atom5))
             key = (key[0],key[1],key[2],key[3],key[1],key[2],key[3],key[4])
             if key in params.cmap_types:
                 c.type = params.cmap_types[key]
@@ -1457,8 +1442,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     if print_atnum:
                         parfile.write('%8d ' % atom_type.atomic_number)
                     parfile.write('%10.6f  %10.8f  A %14.8g %14.8g\n' % (
-                                  atom_type.mass, atom_type.charge, atom_type.sigma/10,
-                                  atom_type.epsilon*econv))
+                                  atom_type.mass, atom_type.charge, atom_type.sigma/10, atom_type.epsilon*econv))
                 parfile.write('\n')
             # Nonbonded parameters
             if not itp and self.has_NBFIX():
@@ -1479,8 +1463,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     parfile.write('[ bondtypes ]\n')
                     parfile.write('; i    j  func       b0          kb\n')
                     used_keys = set()
-                    conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
-                                u.kilojoule/u.nanometer**2) * 2
+                    conv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(u.kilojoule/u.nanometer**2) * 2
                     for key, param in params.bond_types.items():
                         if key in used_keys: continue
                         used_keys.add(key)
@@ -1506,10 +1489,8 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     parfile.write('[ angletypes ]\n')
                     parfile.write(';  i    j    k  func       th0       cth    rub         kub\n')
                     used_keys = set()
-                    conv = (u.kilocalorie/u.radian**2).conversion_factor_to(
-                                u.kilojoule/u.radian**2) * 2
-                    bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(
-                                u.kilojoule/u.nanometer**2) * 2
+                    conv = (u.kilocalorie/u.radian**2).conversion_factor_to(u.kilojoule/u.radian**2) * 2
+                    bconv = (u.kilocalorie/u.angstrom**2).conversion_factor_to(u.kilojoule/u.nanometer**2) * 2
                     for key, param in params.angle_types.items():
                         if key in used_keys:
                             continue
