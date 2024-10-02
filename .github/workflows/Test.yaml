@@ -22,17 +22,18 @@ jobs:
         fetch-depth: 0
 
     - name: Setup conda environment
-      uses: mamba-org/setup-micromamba@v1
+      uses: conda-incubator/setup-miniconda@v3
       with:
-        environment-name: parmed-dev
+        activate-environment: parmed-dev
+        auto-activate-base: false
         environment-file: devtools/environment-dev.yaml
-        create-args: >-
-          python=${{ matrix.python-version }}
+        miniforge-variant: Miniforge3
+        python-version: ${{ matrix.python-version }}
 
     - name: Optionally install AmberTools
       if: ${{ matrix.python-version != 3.12 }}
       shell: bash -l {0}
-      run: micromamba install "ambertools >=20.15" -c conda-forge -yq
+      run: conda install "ambertools >=20.15" -c conda-forge -yq
 
     - name: Install and test
       shell: bash -lx {0}
