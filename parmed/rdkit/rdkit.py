@@ -30,7 +30,9 @@ class RDKit:
         from ..formats.pdb import PDBFile
         from rdkit import Chem
         fh = StringIO(Chem.MolToPDBBlock(rmol))
-        return PDBFile.parse(fh)
+        struct = PDBFile.parse(fh)
+        struct.coordinates = rmol.GetConformer(0).GetPositions()
+        return struct
 
     @staticmethod
     def from_smiles(smiles, coordinates=True, hydrogens=True):
