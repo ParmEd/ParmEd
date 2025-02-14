@@ -31,7 +31,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Optionally install AmberTools
-      if: ${{ matrix.python-version != 3.12 }}
+      if: ${{ matrix.python-version != 3.13 }}
       shell: bash -l {0}
       run: conda install "ambertools >=20.15" -c conda-forge -yq
 
