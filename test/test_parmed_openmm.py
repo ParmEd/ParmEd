@@ -68,7 +68,7 @@ class TestOpenMM(FileIOTestCase, EnergyTestCase):
         """ Tests automatic deserialization of an Integrator XML file """
         integrator = openmm.XmlFile.parse(get_fn('integrator.xml'))
         self.assertIsInstance(integrator, mm.Integrator)
-        self.assertIsInstance(integrator, mm.LangevinIntegrator)
+        self.assertIsInstance(integrator, mm.LangevinMiddleIntegrator)
 
     def test_deserialize_force_field(self):
         """ Tests automatic deserialization of an OpenMM ForceField XML file """
