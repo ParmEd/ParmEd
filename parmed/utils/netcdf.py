@@ -39,14 +39,24 @@ import weakref
 from operator import mul
 from collections import OrderedDict
 from platform import python_implementation
+from typing import Any
 
 import mmap as mm
 
 import numpy as np
-from numpy.compat import asbytes, asstr
 from numpy import frombuffer, dtype, empty, array, asarray
 from numpy import little_endian as LITTLE_ENDIAN
 from functools import reduce
+
+def asbytes(s: Any) -> bytes:
+    """Ensures input is in bytes format. Mimics numpy.compat.asbytes"""
+    return str(s).encode("latin1") if isinstance(s, str) else s
+
+
+def asstr(b: Any) -> str:
+    """Ensures input is in string format. Mimics numpy.compat.asstr"""
+    return b.decode("latin1") if isinstance(b, bytes) else str(b)
+
 
 
 IS_PYPY = python_implementation() == 'PyPy'
