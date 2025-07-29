@@ -2904,7 +2904,7 @@ class Structure:
                     continue  # already assigned
                 if atype2 is atype:
                     lj_idx_list[j] = num_lj_types
-                elif not atype.nbfix:
+                elif not atype.nbfix and not atype2.nbfix:
                     # Only non-NBFIXed atom types can be compressed
                     ljtype2 = (atype2.rmin, abs(atype2.epsilon))
                     if ljtype == ljtype2:
