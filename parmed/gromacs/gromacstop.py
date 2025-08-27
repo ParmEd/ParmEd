@@ -1463,7 +1463,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             # Nonbonded parameters
             if not itp and self.has_NBFIX():
                 typemap = dict(self.parameterset.nbfix_types)
-                types_in_system = self.parameterset.atom_types.keys()
+                types_in_system = params.atom_types.keys()
                 dest.write('[ nonbond_params ]\n')
                 eps_conversion = u.kilocalorie.conversion_factor_to(u.kilojoule)
                 for key, val in typemap.items():
