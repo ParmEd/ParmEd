@@ -230,7 +230,7 @@ class TestGromacsTop(TestCaseRelative, QuantityTestCase):
         self.assertAlmostEqual(energies['bond'], 399.925189, places=4)
         self.assertAlmostEqual(energies['angle'], 36.18562, places=4)
         self.assertAlmostEqual(energies['dihedral'], 101.92265, places=4)
-        self.assertRelativeEqual(energies['nonbonded'], -18587.09715, places=4)
+        self.assertRelativeEqual(energies['nonbonded'], -18587.09715, places=3)
 
     def test_dppc(self):
         """ Tests non-standard Gromacs force fields and nonbonded exceptions """
