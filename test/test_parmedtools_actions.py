@@ -2041,6 +2041,23 @@ Basic MD simulation
                        get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
+    def test_add12_6_4_onlywater(self):
+        """ Test add12_6_4 action on AmberParm specifying onlywater """
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
+        PT.addLJType(parm, '@14').execute()
+        PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
+        act = PT.add12_6_4(parm, ':MG', 'onlywater', watermodel='TIP4PEW',
+                           polfile=self.get_fn('lj_1264_pol.dat'))
+        self.assertEqual(act.tunfactor, 0.0)
+        act.execute()
+        str(act)
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264_ow.parm7', written=True))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264_ow.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264_ow.parm7'),
+                       relative_error=1e-3)
+        )
+
     def test_add_12_6_4_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(self.get_fn('mg_na_cl.parm7'))
@@ -2049,6 +2066,24 @@ Basic MD simulation
         PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P', polfile=self.get_fn('lj_1264_pol.dat')).execute()
         self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')), saved.PRINTLJMATRIX_MGNACL)
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')), saved.PRINTLJMATRIX_NACLMG)
+
+    def test_change_c4_atom_type_pair(self):
+        """ Test changeC4AtomTypePair on AmberParm """
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
+        PT.addLJType(parm, '@14').execute()
+        PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
+                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
+
+        act = PT.changeC4AtomTypePair(parm, ':WAT@O', ':MG', 100.0)
+        act.execute()
+        str(act)
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264_ow_100.parm7', written=True))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264_ow_100.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264_ow_100.parm7'),
+                       relative_error=1e-3)
+        )
 
     @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):
