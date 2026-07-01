@@ -38,6 +38,10 @@ class TestRDKit(unittest.TestCase):
         parm = pmd.rdkit.from_smiles(smiles, coordinates=True, hydrogens=False)
         self.assertFalse((parm.coordinates[0] == 0).all())
 
+        # check bond orders
+        for bond in parm.bonds:
+            self.assertEqual(bond.order,1.5) # aromatic bonds
+
     def test_load_smiles_explicit_hydrogen(self):
         """ test adding explict hydrogens from smiles string"""
         smiles = "CC"
