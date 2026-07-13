@@ -927,7 +927,333 @@ class AmberParm(AmberFormat, Structure):
         self.hasbox = self.box is not None
         if self.hasvels:
             self.velocities = rst7.vels
+    
+    #===================================================
 
+    def load_cmap_frcmod(self, frcmod):
+        """ Loads CMAP frcmod into the AmberParm class
+
+        Parameter
+        ----------
+        frcmod : str  or :class:`CMAP`
+        The Amber frcmod file but only the CMAP portion 
+        self.cmaps_frcmod hold all the CMAPS loaded
+        Open and parse CMAP FILE 
+        """
+        self.cmaps_frcmod={}
+
+        try:
+            # Open up the file and read the data into memory
+            with open(frcmod, 'r') as f:
+                data = f.readlines()
+
+            # Check if the file has enough lines before accessing index 1 
+            if len(data) < 2 or data[1].strip() != 'CMAP':
+                raise AmberError(f'Invalid CMAP format in file {frcmod}')
+
+            current_flag = None
+            cmap_title = None
+
+            for idx, line in enumerate(data):
+                line = line.strip()
+
+                if line.startswith('%'):
+                    if line.startswith('%FLAG'):
+                        parts = line.split()
+                        if len(parts) < 2:
+                            raise AmberError(f'Unexpected %FLAG format at line {idx} in {frcmod}')
+                        current_flag = parts[1]
+                        if (current_flag) == 'CMAP_TITLE':
+                            if idx + 1 >= len(data):
+                                raise AmberError(f'Missing CMAP title at line {idx+1} in {frcmod}')
+                    
+                            # deal with title in lower case to handle cases like Ala ala ALA 
+                            cmap_title = data[idx+1].strip().lower()
+                            self.cmaps_frcmod[cmap_title] = CMAP(cmap_title)
+
+                        # To do: Need to check duplicates of key
+                        elif (current_flag) == 'CMAP_RESLIST':
+                            if cmap_title is None:
+                                raise AmberError(f'CMAP_TITLE must be defined before CMAP_RESLIST in {frcmod}')
+                    
+                            if idx + 1 >= len(data):
+                                raise AmberError(f'Missing CMAP_RESLIST data at line {idx+1} in {frcmod}')
+
+                            reslist = data[idx+1].strip()
+                            self.cmaps_frcmod[cmap_title].set_reslist(reslist)
+                            
+
+                        elif current_flag == 'CMAP_RESOLUTION':
+                            if cmap_title is None:
+                                raise AmberError(f'CMAP_TITLE must be defined before CMAP_RESOLUTION in {frcmod}')
+                            parts = line.split()
+                            if len(parts) < 2:
+                                raise AmberError(f'Missing resolution value for CMAP at line {idx} in {frcmod}')
+                            try:
+                                resolution = int(parts[2])
+                            except ValueError:
+                                raise AmberError(f'Invalid resolution value "{parts[1]}" at line {idx} in {frcmod}')
+                            self.cmaps_frcmod[cmap_title].set_resolution(resolution)
+
+                        elif current_flag == 'CMAP_PARAMETER':
+                            if cmap_title is None:
+                                raise AmberError(f'CMAP_TITLE must be defined before CMAP_PARAMETER in {frcmod}')
+                    
+                            try:
+                                n_parm_lines = int(self.cmaps_frcmod[cmap_title].get_resolution())
+                                n_parm_lines = (n_parm_lines * n_parm_lines) // 8
+                            except (ValueError, AttributeError):
+                                raise AmberError(f'Invalid resolution value for CMAP at line {idx} in {frcmod}')
+                    
+                            if idx + n_parm_lines >= len(data):
+                                raise AmberError(f'Not enough CMAP_PARAMETER lines in {frcmod}')
+                    
+                            parameters = data[idx+1:idx+n_parm_lines+1]
+                            self.cmaps_frcmod[cmap_title].set_parameters(parameters)
+        except (IndexError, KeyError, ValueError) as e:
+            raise AmberError(f'Error parsing CMAP file {frcmod}: {str(e)}')
+ 
+        #print (self.cmaps_frcmod)
+    #===================================================
+
+    def printCmaps(self):
+        """Prints CMAPs found in the topology and those loaded from frcmod files."""
+    
+        # Check if CMAP_TYPES exists
+        if 'CMAP_TYPES' not in self.pointers:
+            print("CMAP_TYPES key is missing in self.pointers")
+            return
+
+        parameter_key = f"{self._cmap_prefix}CMAP_PARAMETER_{{:02d}}"
+
+        # Print CMAPs found in topology
+        print("CMAPs in topology:")
+        for i in range(self.pointers['CMAP_TYPES']):
+            key = parameter_key.format(i + 1)
+
+            # Ensure key exists in parm_comments
+            if key not in self.parm_comments:
+                print(f"Warning: {key} not found in parm_comments.")
+                continue
+
+            cmts = self.parm_comments.get(key, [])
+            if not cmts:
+                print(f"Warning: {key} has no associated comments.")
+                continue
+
+            resname = cmts[0].split('CMAP')[0].strip().lower()
+            print(f"  - {resname}")
+
+        # Print CMAPs loaded from frcmod
+        print("\nCMAPs loaded from frcmod:")
+        if not self.cmaps_frcmod:
+            print("  No CMAPs loaded from frcmod.")
+            return
+
+        for idx, cmap_obj in self.cmaps_frcmod.items():
+            resname = cmap_obj.get_title()
+            print(f"  - {resname} (ID: {idx})")
+
+    #===================================================
+    def generate_cmap_phipsi_index(self, mask_flag, mask_selection):
+        """
+        Helper function that generates an array with the phi psi atom indices
+        """
+        # the phi psi atom name that correspond to the cmap index
+        phipsi_atom_name = ['C', 'N', 'CA', 'C', 'N']
+        # array to hold the cmap atom index for the backbone 
+        cmap_atom_index_array = []
+        if mask_flag:
+            # find the atom index that correrspond to the mask 
+            # loop throught the atoms that fit the mask 
+            for i, atom in enumerate(self.atoms):
+                # if the atom name is C
+                if mask_selection[i] == 1 and atom.name == phipsi_atom_name[0]:
+                    temp_arr=[];temp_arr.append(atom.idx)
+                    # loop through all atoms bound to C
+                    for atom2 in atom.bond_partners:
+                        # if bonded atom to C is N then add the atom index
+                        if atom2.name == phipsi_atom_name[1]:
+                            temp_arr.append(atom2.idx)
+                            for atom3 in atom2.bond_partners:
+                                 if atom3.name == phipsi_atom_name[2]:
+                                      temp_arr.append(atom3.idx)
+                                      for atom4 in atom3.bond_partners:
+                                          if atom4.residue.idx == atom3.residue.idx and atom4.name == phipsi_atom_name[3]:
+                                               temp_arr.append(atom4.idx)
+                                               for atom5 in atom4.bond_partners:
+                                                   if atom5.name == phipsi_atom_name[4]:
+                                                       temp_arr.append(atom5.idx)
+                    cmap_atom_index_array.append(temp_arr) 
+        # else five atom mask was given (e.g :2@C :3@N :3@CA :3@C :4@N)
+        else: 
+            temp_arr = [None] * 5  # Ensure fixed order of [C, N, CA, C, N]
+            for j, mask in enumerate(mask_selection):
+                for i, atom in enumerate(self.atoms):
+                    if mask and mask.Selection()[i] == 1:
+                        # Assign atom index to correct position based on its expected phi-psi type
+                        if atom.name == "C" and temp_arr[0] is None:
+                            temp_arr[0] = atom.idx  # First "C"
+                        elif atom.name == "N" and temp_arr[1] is None:
+                            temp_arr[1] = atom.idx  # First "N"
+                        elif atom.name == "CA" and temp_arr[2] is None:
+                            temp_arr[2] = atom.idx  # "CA"
+                        elif atom.name == "C" and temp_arr[3] is None:
+                            temp_arr[3] = atom.idx  # Second "C"
+                        elif atom.name == "N" and temp_arr[4] is None:
+                            temp_arr[4] = atom.idx  # Second "N"
+            cmap_atom_index_array.append(temp_arr)
+        return cmap_atom_index_array 
+
+    #===================================================
+    def modify_cmap(self, query_cmaptitle, mask_flag, mask1, mask2="", mask3="", mask4="", mask5="" ): 
+        """
+        Modify CMAP entries in topology 
+           query_cmaptitle is the query CMAP given e.g LYS in the command
+             >... assignCmap :2@C :3@N :3@CA :3@C :4@N LYS
+           self.cmaps_type is the cmaps in the topology 
+           self.cmaps_frcmod is the cmaps from the frcmod loaded 
+        """
+        if not self.has_cmap: 
+            return
+
+        # get the resolution key 
+        resolution_key = f"{self._cmap_prefix}CMAP_RESOLUTION"
+        parameter_key_template = f"{self._cmap_prefix}CMAP_PARAMETER_{{:02d}}"
+        
+        # if residue was selected as a mask e.g ":ALA"
+        if mask_flag:
+            # if the mask is not present in topology 
+            if not any(mask1.Selection()):
+                Action.stderr.write(f'Mask selected {mask1.mask} not found in topology')
+                return 0
+
+            # find the atom index that correrspond to the mask 
+            mask_selection = mask1.Selection() 
+            cmap_atom_index_array = self.generate_cmap_phipsi_index(mask_flag, mask_selection)
+        # else five atom mask was given (e.g :2@C :3@N :3@CA :3@C :4@N)
+        else: 
+            mask_selection = [mask1, mask2, mask3, mask4, mask5]
+            for mask in mask_selection:
+                if mask and not any(mask.Selection()):
+                    Action.stderr.write(f"Error: Mask {mask.mask} not found in topology")
+                    return 0
+            cmap_atom_index_array = self.generate_cmap_phipsi_index(mask_flag, mask_selection)
+
+        # now find the cmap we need from the frcmod file or in the topology file  
+        # Loop through all the cmaps from the loaded frcmod file 
+        for idx, cmap_obj in self.cmaps_frcmod.items():
+            # if the resname of the CMAP equals the query resname given 
+            #  by the assign CMAP command
+            # Get title and residue list
+            cmap_title = cmap_obj.get_title().lower().split()[0]  # CMAP title (first word)
+            cmap_residues = cmap_obj.get_reslist()  # List of residues
+
+            # If it's a single string, convert to a list
+            if isinstance(cmap_residues, str):  
+                # Convert all to lowercase for comparison
+                cmap_residues = [res.lower() for res in cmap_residues.split()] 
+            
+            #  Check if query cmap title matches title or any residue in the list
+            if query_cmaptitle.lower() == cmap_title or query_cmaptitle.lower() in cmap_residues:
+                print(f"{query_cmaptitle} cmap found in loaded frcmod with title {cmap_obj.get_title()}")
+                # we found the cmap title in the frcmod, let's check if it already exist in the topology 
+                existing_cmap_type = None 
+                for ct in self.cmap_types:
+                    if (ct.comments[0].split()[0]).lower() == query_cmaptitle.lower():
+                        # the title match, but let's check if the CMAP parameters match 
+                        # if the title match and the parameters match, keep the topology 
+                        if cmap_obj.compare_cmaps(ct.grid):
+                            print(f"Warning: CMAP for {query_cmaptitle} already exists in topology and matches frcmod. Keeping topology version.")
+                            existing_cmap_type = ct 
+                            break 
+                        else:
+                            print(f"Warning: CMAP for {query_cmaptitle} in topology differs from frcmod. Keeping frcmod version and ignoring topology version.")
+                            break
+                
+                # add the cmaps from the frcmod
+                grid = cmap_obj.get_parameters()  # Pull CMAP parameters from frcmod
+                resolution = cmap_obj.get_resolution()
+                comments = cmap_obj.get_title()
+                after = resolution_key
+                num_cmap_types = len(self.cmap_types)
+
+                ### At this point, we have the query_cmaptitle and possibly an existing cmap_type from topology
+                # Now we will use the phipsi index mask to modify the CMAP
+                # Find and replace existing CMAPs instead of appending new ones
+                #for phipsi_idx in cmap_atom_index_array:
+                cmap_found = False
+                #phipsi_idx = cmap_atom_index_array[0]
+                for phipsi_idx in cmap_atom_index_array:
+                    # loop throuh the cmap phipsi index that exist in the topology 
+                    for i, cmap in enumerate(self.cmaps):
+                        cmap_atom_indices = [
+                             cmap.atom1.idx, cmap.atom2.idx, cmap.atom3.idx, cmap.atom4.idx, cmap.atom5.idx
+                        ]
+                        # Check if CMAP exists
+                        if tuple(cmap_atom_indices) == tuple(phipsi_idx):
+                            #print (f"{tuple(cmap_atom_indices)} == {tuple(phipsi_idx)}")
+                            print(f"Replacing existing CMAP at index {phipsi_idx} for {query_cmaptitle}")
+                            # now we found matching indices, we can replace the cmap
+                              # if the cmap already existed in the topology file 
+                            cmap_found = True
+                            if existing_cmap_type:
+                                 self.cmaps[i] = Cmap(
+                                 self.atoms[phipsi_idx[0]], self.atoms[phipsi_idx[1]],
+                                 self.atoms[phipsi_idx[2]], self.atoms[phipsi_idx[3]],
+                                 self.atoms[phipsi_idx[4]], existing_cmap_type # Assign topology CMAP type
+                                 )
+                                 break     
+                     
+                            else: # cmap don't exist in topology so take it from frcmod 
+                                 if cmap_obj.get_already_loaded():
+                                     self.cmaps[i] = Cmap(  # Replace instead of append
+                                         self.atoms[phipsi_idx[0]], self.atoms[phipsi_idx[1]], 
+                                         self.atoms[phipsi_idx[2]], self.atoms[phipsi_idx[3]], 
+                                         self.atoms[phipsi_idx[4]], cmap_obj.get_ct()
+                                         #self.atoms[phipsi_idx[4]], new_cmap_type
+				         #self.atoms[phipsi_idx[4]], self.cmap_types[-1]
+                                         )
+                                     break
+                                 else:
+                                     new_cmap_type = CmapType(resolution, grid, comments, list=self.cmap_types)
+                                     self.cmap_types.append(new_cmap_type)
+                                     newflag = parameter_key_template.format(num_cmap_types + 1)
+                                     self.add_flag(newflag, '(8F9.5)', data=grid, comments=comments, after=after)
+                                     self.cmaps[i] = Cmap(  # Replace instead of append
+                                         self.atoms[phipsi_idx[0]], self.atoms[phipsi_idx[1]], 
+                                         self.atoms[phipsi_idx[2]], self.atoms[phipsi_idx[3]], 
+                                         self.atoms[phipsi_idx[4]], new_cmap_type
+				         #self.atoms[phipsi_idx[4]], self.cmap_types[-1]
+                                         )
+                                     cmap_obj.set_already_loaded(True)
+                                     cmap_obj.set_ct(new_cmap_type)
+                                     break
+                            
+                    if not cmap_found: # we have a new set of phipsi indices like in circular peptides
+                            print(f"CMAP for the phipsi indices {phipsi_idx} doesn't exist")
+                            print(f"Adding new CMAP for {query_cmaptitle}")
+                            if cmap_obj.get_already_loaded():
+                                self.cmaps.append(
+                                    Cmap(
+                                    self.atoms[phipsi_idx[0]], self.atoms[phipsi_idx[1]],
+                                    self.atoms[phipsi_idx[2]], self.atoms[phipsi_idx[3]],
+                                    self.atoms[phipsi_idx[4]], cmap_obj.get_ct()
+                                    )
+                                )
+                            else: 
+                                new_cmap_type = CmapType(resolution, grid, comments, list=self.cmap_types)
+                                self.cmap_types.append(new_cmap_type)
+                                self.cmaps.append(
+                                    Cmap(
+                                    self.atoms[phipsi_idx[0]], self.atoms[phipsi_idx[1]], 
+                                    self.atoms[phipsi_idx[2]], self.atoms[phipsi_idx[3]], 
+                                    self.atoms[phipsi_idx[4]], new_cmap_type 
+                                    )
+                                )
+                                cmap_obj.set_already_loaded(True)
+                                cmap_obj.set_ct(new_cmap_type)
+                                 
     #===================================================
 
     @needs_openmm
@@ -2236,6 +2562,60 @@ class AmberParm(AmberFormat, Structure):
             if attr in d:
                 setattr(self, attr, d[attr])
 
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CMAP(object):
+
+    def __init__(self, title): 
+        """
+        Initialize CMAP object for loading and modifying Amber CMAP
+        """
+        self.title = title  
+        self.parameters = []
+        self.resolution = -1
+        self.residue_list = []
+        self.already_loaded = False
+        self.ct = []
+         
+    def set_parameters(self, parameters):
+        """
+        Set CMAP parameters from input lines.
+        """
+        array = []
+        for line in parameters:
+            clean_line = line.strip()  # Removes leading/trailing whitespace (including \n)
+            array.extend([val for val in clean_line.split() if val])  # Removes multiple spaces
+
+        self.parameters = np.array(array, dtype=float)  # Converts to NumPy float array
+
+    def set_reslist(self, reslist):
+        self.residue_list = reslist
+    def set_resolution(self, resolution):
+        self.resolution = resolution
+    def set_already_loaded(self, flag):
+        self.already_loaded = flag
+    def set_ct(self, ct):
+        self.ct = ct
+    def get_ct(self):
+        return self.ct
+    def get_title(self):
+        return self.title
+    def get_parameters(self):
+        return self.parameters
+    def get_resolution(self):
+        return int(self.resolution)    
+    def get_already_loaded(self):
+        return self.already_loaded
+    def get_reslist(self):
+        if not self.residue_list:
+            return "No residue list assigned"
+        elif len(self.residue_list) == 1:
+            return self.residue_list[0]
+        else:
+            return self.residue_list  
+
+    def compare_cmaps(self, cmap_parameters):
+        return np.allclose(np.array(cmap_parameters, dtype=float), self.parameters)
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
