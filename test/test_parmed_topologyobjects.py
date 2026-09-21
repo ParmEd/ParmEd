@@ -13,11 +13,13 @@ from parmed.topologyobjects import _ListItem, _FourAtomTerm, _strip_units
 from parmed.topologyobjects import *
 from parmed.structure import Structure
 import parmed.unit as u
-from copy import copy
+from copy import copy, deepcopy
 import unittest
 from utils import get_fn, has_openmm
 import random
 import warnings
+from unittest.mock import patch
+
 
 class TestTopologyObjects(unittest.TestCase):
     """
@@ -2040,3 +2042,10 @@ class TestTopologyObjects(unittest.TestCase):
         self.assertEqual(_strip_units(10*u.kilojoule_per_mole, u.kilocalorie_per_mole),
                          10/4.184)
         self.assertAlmostEqual(_strip_units(180*u.degree, u.radians), math.pi)
+
+
+@patch("parmed.topologyobjects.Atom._copy")
+def test_deepcopy(mock_copy):
+    a = Atom(name='O', atomic_number=8)
+    b = deepcopy(a)
+    mock_copy.assert_called()
