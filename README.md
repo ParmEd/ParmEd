@@ -37,7 +37,7 @@ using ParmEd on high-performant hardware, like AMD and NVidia GPUs.
 To install ParmEd, either clone this git repository or download [the latest
 release](https://github.com/ParmEd/ParmEd/releases) and unpack the resulting
 tarball. This should create a new ParmEd source code directory. Change to that
-directory and build ParmEd with the command
+directory and build ParmEd with the command:
 
 ```sh
 python setup.py install
@@ -47,7 +47,7 @@ Note, if you are using the system Python, you may need to either run the above
 command as root (e.g., by using ``sudo``) or add the ``--user`` flag to install
 it to your home directory. I would suggest the latter choice.
 
-AMBER user can overwrite installed version by
+AMBER users can overwrite the installed version using:
 
 ```sh
 python setup.py install --prefix=$AMBERHOME
