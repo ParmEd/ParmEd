@@ -1716,6 +1716,18 @@ class AmberParm(AmberFormat, Structure):
             if 'CMAP_TYPES' in self.pointers:
                 del self.pointers['CMAP_TYPES']
             return
+        # Newly introduced CMAP terms need their file sections before transfer.
+        if self._cmap_prefix + 'CMAP_COUNT' not in self.parm_data:
+            self.add_flag(self._cmap_prefix + 'CMAP_COUNT', '2I8', num_items=2,
+                          comments=['Number of CMAP terms, number of unique CMAP parameters'])
+        if self._cmap_prefix + 'CMAP_RESOLUTION' not in self.parm_data:
+            self.add_flag(self._cmap_prefix + 'CMAP_RESOLUTION', '20I4', num_items=0,
+                          comments=['Number of steps along each phi/psi CMAP axis',
+                                    'for each CMAP_PARAMETER grid'])
+        if self._cmap_prefix + 'CMAP_INDEX' not in self.parm_data:
+            self.add_flag(self._cmap_prefix + 'CMAP_INDEX', '6I8', num_items=0,
+                          comments=['Atom index i,j,k,l,m of the cross term',
+                                    'and then pointer to CMAP_PARAMETER_n'])
         # Time to transfer our CMAP types
         data = self.parm_data
         for ct in self.cmap_types:
