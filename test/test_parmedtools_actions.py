@@ -2061,7 +2061,8 @@ Basic MD simulation
     def test_add12_6_4_then_addLJType_10_12_pair(self):
         """ Test addLJType on a 12-6-4 parm with a 10-12 (water OW-HW) pair """
         parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
-        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW').execute()
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
+                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
         ntypes = parm.ptr('ntypes')
         nbidx = parm.parm_data['NONBONDED_PARM_INDEX']
         ow, hw = next((i // ntypes + 1, i % ntypes + 1) for i, x in enumerate(nbidx) if x < 0)
