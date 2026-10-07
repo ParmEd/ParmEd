@@ -69,17 +69,16 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
     # atom type to the new atom type, as defined by the type of the first atom
     # that got assigned the "new" type.
     if 'LENNARD_JONES_CCOEF' in parm.parm_data:
-        # A negative NONBONDED_PARM_INDEX points into the 10-12 (HBOND) tables
-        # (e.g., the water OW-HW "fast water" flag), not into CCOEF, so such
-        # pairs have no C term. Indexing CCOEF with it would silently read an
-        # unrelated (just-appended) entry.
         ccoeffs = parm.parm_data['LENNARD_JONES_CCOEF']
         for i in range(old_ntypes):
             nbi = parm.ptr('ntypes')*(old_type-1) + i
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
+            # A negative NONBONDED_PARM_INDEX points into the 10-12 (HBOND) tables (eg: the water
+            # OW-HW "fast water" flag), not into CCOEF, so such airs have no C term.
             ccoeffs.append(ccoeffs[idx] if idx >= 0 else 0.0)
 
         # Now the last type interacting with itself
         nbi = parm.ptr('ntypes')*(old_type-1) + old_type - 1
         idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
+        # Same, drop negative NONBONDED_PARM_INDEX
         ccoeffs.append(ccoeffs[idx] if idx >= 0 else 0.0)
