@@ -790,6 +790,24 @@ class TestReadParm(FileIOTestCase):
             readparm.AmberParm(get_fn('ash.parm7')).box = [1, 2, 3, 4]
         self.assertRaises(ValueError, assign_box_badly)
 
+    def test_extra_points_survive_copy(self):
+        """ Tests that copying a structure does not duplicate ExtraPoints """
+        struct = load_file(get_fn(os.path.join('02.6water', 'topol.top')),
+                           xyz=get_fn(os.path.join('02.6water', 'conf.gro')))
+        for cp in (copy(struct), pickle.loads(pickle.dumps(struct)),
+                   readparm.AmberParm.from_structure(struct)):
+            ep_parents = [a for a in cp.atoms
+                          if any(isinstance(p, topologyobjects.ExtraPoint)
+                                 for p in a.bond_partners)]
+            self.assertTrue(ep_parents)
+            for atom in ep_parents:
+                for partner in atom.bond_partners:
+                    if isinstance(partner, topologyobjects.ExtraPoint):
+                        self.assertIn(partner, cp.atoms)
+            for atom in cp.atoms:
+                for child in atom.children:
+                    self.assertIn(child, cp.atoms)
+
     def test_old_parm_format(self):
         """ Test reading old Amber prmtop file format """
         self.assertTrue(readparm.AmberParm.id_format(get_fn('old.prmtop')))
