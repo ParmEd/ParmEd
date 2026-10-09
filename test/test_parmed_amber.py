@@ -13,7 +13,8 @@ from parmed.amber import (
     readparm, asciicrd, mask, parameters, mdin, FortranFormat, titratable_residues, AmberOFFLibrary
 )
 from parmed.exceptions import (
-    AmberWarning, MoleculeError, AmberError, MaskError, InputError, ParameterWarning
+    AmberWarning, MoleculeError, AmberError, MaskError, InputError, ParameterWarning,
+    ParameterError
 )
 from parmed.modeller import ResidueTemplateContainer
 from parmed import topologyobjects, load_file, Structure
@@ -1606,6 +1607,14 @@ class TestCoordinateFiles(FileIOTestCase):
         parm2 = pmd.load_file(written_fn)
         self.assertNotIn("CTITLE", parm2.flag_list)
         self.assertIsInstance(parm2, readparm.AmberParm)
+
+    def test_write_parm_missing_bond_type(self):
+        """ Test writing a prmtop fails with a clear error when a bond has no type """
+        parm = pmd.load_file(get_fn('ala_ala_ala.parm7'))
+        parm.bonds[0].type = None
+        written_fn = self.get_fn('missing-bond-type.prmtop', written=True)
+        with self.assertRaisesRegex(ParameterError, 'no bond type'):
+            parm.save(written_fn)
 
 
 class TestAmberMask(unittest.TestCase):
