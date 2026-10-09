@@ -1248,11 +1248,76 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
             key = (_gettype(c.atom1), _gettype(c.atom2), _gettype(c.atom3),
                     _gettype(c.atom4), _gettype(c.atom5))
             key = (key[0],key[1],key[2],key[3],key[1],key[2],key[3],key[4])
-            if key in params.cmap_types:
-                c.type = params.cmap_types[key]
-                c.type.used = True
-            else:
-                raise ParameterError('Not all cmap parameters found')
+
+            # Support for residue-aware cmap (GMX 26)
+            cmap_atom_types = sum([key for key in params.cmap_types], ())
+            cmaptypes_w_res  = all(['-' in at for at in cmap_atom_types])
+            cmaptypes_wo_res = all(['-' not in at for at in cmap_atom_types])
+            
+            try:
+                assert cmaptypes_w_res or cmaptypes_wo_res
+            except AssertionError:
+                raise ParameterError("All cmaps should be defined either with or without residues.")
+
+            if cmaptypes_wo_res:
+                # Original behavior
+                if key in params.cmap_types:
+                    c.type = params.cmap_types[key]
+                    c.type.used = True
+                else:
+                    raise ParameterError('Not all cmap parameters found')
+            
+            if cmaptypes_w_res:
+                def _getresidue(a):
+                    return a.residue.name
+                
+                def compare_reskeys(a, b):
+                    if type(a) != tuple:
+                        #print("A not a tuple")
+                        return False
+                    if type(b) != tuple:
+                        #print("b NOT A TUPLE")
+                        return False
+                    if len(a) != len(b):
+                        #print("Different len")
+                        return False
+                    for _a, _b in zip(a, b):
+                        if _a != _b and _a != '*' and _b != '*':
+                            #print(_a, _b)
+                            return False
+                    return True
+                            
+                
+                keyres = (_getresidue(c.atom1), 
+                          _getresidue(c.atom2), 
+                          _getresidue(c.atom3),
+                          _getresidue(c.atom4), 
+                          _getresidue(c.atom5))
+                keyres = (keyres[0],
+                          keyres[1],
+                          keyres[2],
+                          keyres[3],
+                          keyres[1],
+                          keyres[2],
+                          keyres[3],
+                          keyres[4])
+                
+                _found = False
+                for _key in params.cmap_types:
+                    pkey = tuple([at.split('-')[0] for at in _key])
+                    pkeyres = tuple([at.split('-')[1] for at in _key])
+
+                    if pkey == key and compare_reskeys(keyres, pkeyres):
+                        if not _found:
+                            _found = True
+                            c.type = params.cmap_types[_key]
+                            c.type.used = True
+                            break
+                        else:
+                            raise ParameterError("More than a cmap fit to this set of atoms!")
+                if not _found:
+                    raise ParameterError('Not all cmap parameters found')
+            
         update_typelist_from(params.cmap_types, self.cmap_types)
 
     #===================================================
