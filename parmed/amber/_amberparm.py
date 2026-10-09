@@ -12,7 +12,7 @@ import numpy as np
 
 from .. import unit as u
 from ..constants import PrmtopPointers, TRUNCATED_OCTAHEDRON_ANGLE, RAD_TO_DEG, SMALL, DEG_TO_RAD
-from ..exceptions import AmberError, AmberWarning, MoleculeError
+from ..exceptions import AmberError, AmberWarning, MoleculeError, ParameterError
 from ..geometry import box_lengths_and_angles_to_vectors
 from ..periodic_table import AtomicNum, element_by_mass
 from ..residue import ALLION_NAMES, SOLVENT_NAMES
@@ -1557,6 +1557,8 @@ class AmberParm(AmberFormat, Structure):
         for bond_type in self.bond_types:
             bond_type.used = False
         for bond in self.bonds:
+            if bond.type is None:
+                raise ParameterError(f'{bond} has no bond type; missing bond parameters')
             bond.type.used = True
         self.bond_types.prune_unused()
         data['BOND_FORCE_CONSTANT'] = [type.k for type in self.bond_types]
@@ -1591,6 +1593,8 @@ class AmberParm(AmberFormat, Structure):
         for angle_type in self.angle_types:
             angle_type.used = False
         for angle in self.angles:
+            if angle.type is None:
+                raise ParameterError(f'{angle} has no angle type; missing angle parameters')
             angle.type.used = True
         self.angle_types.prune_unused()
         data['ANGLE_FORCE_CONSTANT'] = [type.k for type in self.angle_types]
@@ -1629,6 +1633,8 @@ class AmberParm(AmberFormat, Structure):
         for dihedral_type in self.dihedral_types:
             dihedral_type.used = False
         for dihed in self.dihedrals:
+            if dihed.type is None:
+                raise ParameterError(f'{dihed} has no dihedral type; missing dihedral parameters')
             dihed.type.used = True
         self.dihedral_types.prune_unused()
         data['DIHEDRAL_FORCE_CONSTANT'] = [type.phi_k for type in self.dihedral_types]
@@ -1721,6 +1727,8 @@ class AmberParm(AmberFormat, Structure):
         for ct in self.cmap_types:
             ct.used = False
         for cmap in self.cmaps:
+            if cmap.type is None:
+                raise ParameterError(f'{cmap} has no cmap type; missing cmap parameters')
             cmap.type.used = True
         self.cmap_types.prune_unused()
         # All of our CMAP types are in different topology file sections. We need
