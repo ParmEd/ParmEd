@@ -73,9 +73,12 @@ def AddLJType(parm, sel_atms, radius, epsilon, radius14, epsilon14):
         for i in range(old_ntypes):
             nbi = parm.ptr('ntypes')*(old_type-1) + i
             idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
-            ccoeffs.append(ccoeffs[idx])
+            # A negative NONBONDED_PARM_INDEX points into the 10-12 (HBOND) tables (eg: the water
+            # OW-HW "fast water" flag), not into CCOEF, so such airs have no C term.
+            ccoeffs.append(ccoeffs[idx] if idx >= 0 else 0.0)
 
         # Now the last type interacting with itself
         nbi = parm.ptr('ntypes')*(old_type-1) + old_type - 1
         idx = parm.parm_data['NONBONDED_PARM_INDEX'][nbi] - 1
-        ccoeffs.append(ccoeffs[idx])
+        # Same, drop negative NONBONDED_PARM_INDEX
+        ccoeffs.append(ccoeffs[idx] if idx >= 0 else 0.0)
