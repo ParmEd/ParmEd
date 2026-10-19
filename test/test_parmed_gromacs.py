@@ -989,6 +989,31 @@ class TestGromacsTopHelperFunctions(FileIOTestCase):
         self.top.add_atom(Atom(name='C1'), 'PQR', 5)
         FileIOTestCase.setUp(self)
 
+    def test_read_explicit_exclusions(self):
+        """ Tests explicit exclusions survive molecule assembly """
+        topology = '''[ defaults ]
+1 2 yes 0.5 0.8333333333
+[ atomtypes ]
+C 6 12.0 0.0 A 0.3 0.0
+[ moleculetype ]
+MOL 3
+[ atoms ]
+1 C 1 MOL C1 1 1.0 12.0
+2 C 1 MOL C2 2 -1.0 12.0
+[ exclusions ]
+1 2
+[ system ]
+Explicit exclusions
+[ molecules ]
+'''
+        for molecules, ncopies in (('MOL 1', 1), ('MOL 2', 2), ('MOL 1\nMOL 2', 3)):
+            with self.subTest(molecules=molecules):
+                top = GromacsTopologyFile(StringIO(topology + molecules + '\n'))
+                self.assertEqual(len(top.atoms), 2 * ncopies)
+                for i in range(0, len(top.atoms), 2):
+                    self.assertEqual(top.atoms[i].exclusion_partners, [top.atoms[i + 1]])
+                    self.assertEqual(top.atoms[i + 1].exclusion_partners, [top.atoms[i]])
+
     def test_parse_pairs(self):
         """ Test GromacsTopologyFile._parse_pairs """
         with self.assertWarns(GromacsWarning):

@@ -437,6 +437,11 @@ class Structure:
             a = deepcopy(atom)
             c.add_atom(a, res.name, res.number, res.chain,
                        res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in self.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    c.atoms[atom.idx].exclude(c.atoms[partner.idx])
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(deepcopy(bt))
@@ -3608,6 +3613,11 @@ class Structure:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset,
                           res.chain, res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in other.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
 
         def copy_valence_terms(oval, otyp, sval, styp, attrlist, extra_attrs=None):
             """ Copies the valence terms from one list to another;
@@ -3733,6 +3743,11 @@ class Structure:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
                               res.insertion_code, res.segid)
+            # Copy explicit exclusions once per pair
+            for atom in other.atoms:
+                for partner in atom._exclusion_partners:
+                    if atom.idx < partner.idx:
+                        self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'],
                                ['order', 'qualitative_type'])
