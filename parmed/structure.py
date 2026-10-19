@@ -2400,6 +2400,8 @@ class Structure:
                 # we can rely on is_water to be correct for our needs
                 # regardless
                 continue
+            if isinstance(bond.atom1, (ExtraPoint, DrudeAtom)) or isinstance(bond.atom2, (ExtraPoint, DrudeAtom)):
+                continue
             if bond.type is None:
                 raise ParameterError('Cannot find necessary parameters')
             if isinstance(force, mm.HarmonicBondForce):
