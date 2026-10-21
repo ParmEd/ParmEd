@@ -364,6 +364,62 @@ class TestReadParm(FileIOTestCase):
         self.assertIs(type(from_struct_parm), type(parm))
         check_parm_for_cmap(from_struct_parm)
 
+    def test_amber_cmap_add(self):
+        """Merging CMAP terms creates their topology sections in either order."""
+        cmap_parm = readparm.AmberParm(get_fn('amber-parm-with-cmap.parm7'))
+        plain_parm = copy(cmap_parm)
+        for cmap in plain_parm.cmaps:
+            cmap.delete()
+        del plain_parm.cmaps[:]
+        del plain_parm.cmap_types[:]
+        plain_parm.remake_parm()
+        self.assertFalse(plain_parm.has_cmap)
+
+        for cmap_first in (True, False):
+            for inplace in (False, True):
+                with self.subTest(cmap_first=cmap_first, inplace=inplace):
+                    left, right = (cmap_parm, plain_parm) if cmap_first else (plain_parm, cmap_parm)
+                    combined = copy(left)
+                    if inplace:
+                        combined += right
+                    else:
+                        combined = combined + right
+                    self.assertEqual(len(combined.atoms), 2 * len(cmap_parm.atoms))
+                    self.assertEqual(combined.parm_data['CMAP_COUNT'], cmap_parm.parm_data['CMAP_COUNT'])
+                    expected_index = np.array(cmap_parm.parm_data['CMAP_INDEX']).reshape(-1, 6).copy()
+                    if not cmap_first:
+                        expected_index[:, :5] += len(plain_parm.atoms)
+                    np.testing.assert_array_equal(combined.parm_data['CMAP_INDEX'], expected_index.ravel())
+                    stream = StringIO()
+                    combined.write_parm(stream)
+                    stream.seek(0)
+                    reread = readparm.AmberParm(stream)
+                    self.assertEqual(len(reread.atoms), len(combined.atoms))
+                    self.assertEqual(len(reread.cmaps), len(cmap_parm.cmaps))
+                    self.assertEqual(len(reread.cmap_types), len(cmap_parm.cmap_types))
+                    for original, restored in zip(cmap_parm.cmap_types, reread.cmap_types):
+                        self.assertEqual(original.resolution, restored.resolution)
+                        np.testing.assert_array_equal(list(original.grid), list(restored.grid))
+
+    def test_chamber_cmap_missing_flags(self):
+        """Remaking a topology restores required CMAP sections and their formats."""
+        original = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
+        flags = ['CHARMM_CMAP_COUNT', 'CHARMM_CMAP_RESOLUTION', 'CHARMM_CMAP_INDEX']
+        for removed in ([flags[0]], [flags[1]], [flags[2]], flags):
+            with self.subTest(removed=removed):
+                parm = copy(original)
+                for flag in removed:
+                    parm.delete_flag(flag)
+                parm.remake_parm()
+                stream = StringIO()
+                parm.write_parm(stream)
+                stream.seek(0)
+                restored = readparm.ChamberParm(stream)
+                self.assertEqual(len(restored.cmaps), len(original.cmaps))
+                self.assertEqual(len(restored.cmap_types), len(original.cmap_types))
+                for flag in flags:
+                    self.assertEqual(restored.parm_data[flag], original.parm_data[flag])
+
     def test_chamber_gas_parm(self):
         """Test the ChamberParm class with a non-periodic (gas phase) prmtop"""
         parm = readparm.ChamberParm(get_fn('ala_ala_ala.parm7'))
