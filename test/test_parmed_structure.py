@@ -886,6 +886,26 @@ class TestStructureAdd(FileIOTestCase):
         s1cp = s1[:]
         self.assertEqual(s1cp.bonds[0].order, 1.25)
 
+    def test_add_bond_order(self):
+        """ Tests that addition and multiplication keep bond orders """
+        from parmed.topologyobjects import QualitativeBondType
+        s1 = create_random_structure(parametrized=True)
+        s2 = create_random_structure(parametrized=True)
+        s2.bonds[0].order = 2.0
+        s2.bonds[0].qualitative_type = QualitativeBondType.DOUBLE
+
+        s = s1 + s2
+        last = s.bonds[-len(s2.bonds)]
+        self.assertEqual(last.order, 2.0)
+        self.assertEqual(last.qualitative_type, QualitativeBondType.DOUBLE)
+
+        s1.bonds[0].order = 3.0
+        s1.bonds[0].qualitative_type = QualitativeBondType.TRIPLE
+        s3 = s1 * 2
+        replica = s3.bonds[len(s1.bonds)]
+        self.assertEqual(replica.order, 3.0)
+        self.assertEqual(replica.qualitative_type, QualitativeBondType.TRIPLE)
+
     def test_add_not_parametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
         s1 = create_random_structure(parametrized=False)

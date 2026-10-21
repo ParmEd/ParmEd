@@ -437,6 +437,11 @@ class Structure:
             a = deepcopy(atom)
             c.add_atom(a, res.name, res.number, res.chain,
                        res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in self.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    c.atoms[atom.idx].exclude(c.atoms[partner.idx])
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(deepcopy(bt))
@@ -3608,8 +3613,13 @@ class Structure:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset,
                           res.chain, res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in other.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
 
-        def copy_valence_terms(oval, otyp, sval, styp, attrlist):
+        def copy_valence_terms(oval, otyp, sval, styp, attrlist, extra_attrs=None):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
             styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
@@ -3626,6 +3636,9 @@ class Structure:
                     kws['type'] = NoUreyBradley  # special-case singleton
                 elif otypcp and val.type is not None:
                     kws['type'] = otypcp[val.type.idx]
+                if extra_attrs:
+                    kws.update({attr: getattr(val, attr)
+                               for attr in extra_attrs})
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
@@ -3634,7 +3647,8 @@ class Structure:
             if hasattr(styp, 'claim'):
                 styp.claim()
         copy_valence_terms(other.bonds, other.bond_types, self.bonds,
-                           self.bond_types, ['atom1', 'atom2'])
+                           self.bond_types, ['atom1', 'atom2'],
+                           ['order', 'qualitative_type'])
         copy_valence_terms(other.angles, other.angle_types, self.angles,
                            self.angle_types, ['atom1', 'atom2', 'atom3'])
         copy_valence_terms(other.dihedrals, other.dihedral_types,
@@ -3698,7 +3712,7 @@ class Structure:
         # we don't have to extend the type arrays at all -- we just point to the
         # same one that the first copy pointed to.
 
-        def copy_valence_terms(oval, aoffset, sval, styp, attrlist):
+        def copy_valence_terms(oval, aoffset, sval, styp, attrlist, extra_attrs=None):
             """ Copies the valence terms from one list to another;
             oval=Other VALence; otyp=Other TYPe; sval=Self VALence;
             styp=Self TYPe; attrlist=ATTRibute LIST (atom1, atom2, ...)
@@ -3714,6 +3728,9 @@ class Structure:
                     kws['type'] = NoUreyBradley  # special-case singleton
                 elif styp and val.type is not None:
                     kws['type'] = styp[val.type.idx]
+                if extra_attrs:
+                    kws.update({attr: getattr(val, attr)
+                               for attr in extra_attrs})
                 sval.append(type(val)(*ats, **kws))
                 if hasattr(val, 'funct'):
                     sval[-1].funct = val.funct
@@ -3726,8 +3743,14 @@ class Structure:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
                               res.insertion_code, res.segid)
+            # Copy explicit exclusions once per pair
+            for atom in other.atoms:
+                for partner in atom._exclusion_partners:
+                    if atom.idx < partner.idx:
+                        self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
             copy_valence_terms(other.bonds, aoffset, self.bonds,
-                               self.bond_types, ['atom1', 'atom2'])
+                               self.bond_types, ['atom1', 'atom2'],
+                               ['order', 'qualitative_type'])
             copy_valence_terms(other.angles, aoffset, self.angles,
                                self.angle_types, ['atom1', 'atom2', 'atom3'])
             copy_valence_terms(other.dihedrals, aoffset, self.dihedrals,

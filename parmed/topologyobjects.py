@@ -1021,7 +1021,7 @@ class Atom(_ListItem):
                       tree=self.tree, join=self.join, irotat=self.irotat, bfactor=self.bfactor,
                       altloc=self.altloc, occupancy=self.occupancy, number=self.number,
                       anisou=self.anisou, _rmin=self._rmin, _epsilon=self._epsilon,
-                      _rmin14=self._rmin14, _epsilon14=self._epsilon14, children=self.children,
+                      _rmin14=self._rmin14, _epsilon14=self._epsilon14,
                       atomic_number=self.atomic_number, formal_charge=self.formal_charge,
                       hybridization=self.hybridization, aromatic=self.aromatic)
         for key in ('xx', 'xy', 'xz', 'vx', 'vy', 'vz', 'multipoles', 'type_idx', 'class_idx',
@@ -1039,6 +1039,7 @@ class Atom(_ListItem):
         self._dihedral_partners = []
         self._tortor_partners = []
         self._exclusion_partners = []
+        self.children = []
         self.residue = None
         self.marked = 0
         self.bonds, self.angles, self.dihedrals = [], [], []

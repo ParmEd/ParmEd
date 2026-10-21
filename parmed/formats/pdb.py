@@ -1297,6 +1297,7 @@ class CIFFile(metaclass=FileFormatType):
             if own_handle: fileobj.close()
 
         structures = []
+        chemcomp_structs = set()
         for cont in data:
             struct = Structure()
             structures.append(struct)
@@ -1379,6 +1380,13 @@ class CIFFile(metaclass=FileFormatType):
             # the empty string. This avoids needing any conditionals inside the
             # loop
             atoms = cont.getObj('atom_site')
+            if atoms is None:
+                # Chemical component (e.g., ligand) files have no atom_site
+                # category; their atoms and bonds are in _chem_comp_atom and
+                # _chem_comp_bond instead
+                if cls._process_chem_comp(struct, cont):
+                    chemcomp_structs.add(struct)
+                continue
             atnumid = atoms.getAttributeIndex('id')
             elemid = atoms.getAttributeIndex('type_symbol')
             atnameid = atoms.getAttributeIndex('auth_atom_id')
@@ -1552,6 +1560,10 @@ class CIFFile(metaclass=FileFormatType):
         # Make sure we assign bonds for all the structures we parsed
         if not skip_bonds:
             for struct in structures:
+                if not struct.atoms or struct in chemcomp_structs:
+                    # Nothing to assign, or bonds already assigned from
+                    # _chem_comp_bond
+                    continue
                 if expanded_residue_template_match:
                     residue_libraries = [get_standard_residue_template_library()]
                     if all_residue_template_match:
@@ -1830,6 +1842,118 @@ class CIFFile(metaclass=FileFormatType):
                 )
                 continue
             struct.bonds.append(Bond(a1, a2, qualitative_type=qualitative_type))
+
+    @staticmethod
+    def _process_chem_comp(struct, cont):
+        """Adds atoms, coordinates and bonds to the structure from the
+        _chem_comp_atom and _chem_comp_bond categories found in chemical
+        component (e.g., ligand) CIF files
+
+        Returns True if bonds were assigned from _chem_comp_bond, so the
+        generic bond assignment can be skipped for this structure.
+        """
+        atoms = cont.getObj('chem_comp_atom')
+        if atoms is None:
+            return False
+        resnameid = atoms.getAttributeIndex('comp_id')
+        atnameid = atoms.getAttributeIndex('atom_id')
+        elemid = atoms.getAttributeIndex('type_symbol')
+        chargeid = atoms.getAttributeIndex('charge')
+        atnumid = atoms.getAttributeIndex('pdbx_ordinal')
+        # Rows get an empty string appended so missing attributes (index -1)
+        # resolve to '' and simply fail conversion
+        coord_ids = [
+            (atoms.getAttributeIndex('model_Cartn_x'),
+             atoms.getAttributeIndex('model_Cartn_y'),
+             atoms.getAttributeIndex('model_Cartn_z')),
+            (atoms.getAttributeIndex('pdbx_model_Cartn_x_ideal'),
+             atoms.getAttributeIndex('pdbx_model_Cartn_y_ideal'),
+             atoms.getAttributeIndex('pdbx_model_Cartn_z_ideal')),
+        ]
+        xyz = []
+        have_all_coords = True
+        resids = dict()
+        atommap = dict()
+        for i in range(atoms.getRowCount()):
+            row = atoms.getRow(i) + ['']
+            resname = row[resnameid]
+            atname = row[atnameid]
+            if resname not in resids:
+                resids[resname] = len(resids) + 1
+            try:
+                atnum = int(row[atnumid])
+            except ValueError:
+                atnum = i + 1
+            try:
+                formal_charge = int(row[chargeid])
+            except ValueError:
+                formal_charge = None
+            try:
+                atsym = row[elemid].strip().title()
+                atomic_number = AtomicNum[atsym]
+                mass = Mass[atsym]
+            except KeyError:
+                # Now try based on the atom name... but don't try too hard
+                # (e.g., don't try to differentiate b/w Ca and C)
+                try:
+                    atomic_number = AtomicNum[atname.strip()[0].upper()]
+                    mass = Mass[atname.strip()[0].upper()]
+                except KeyError:
+                    try:
+                        sym = atname.strip()[:2]
+                        sym = '%s%s' % (sym[0].upper(), sym[1].lower())
+                        atomic_number = AtomicNum[sym]
+                        mass = Mass[sym]
+                    except KeyError:
+                        atomic_number = 0 # give up
+                        mass = 0.0
+            atom = Atom(atomic_number=atomic_number, name=atname, mass=mass,
+                        number=atnum, formal_charge=formal_charge)
+            for xid, yid, zid in coord_ids:
+                try:
+                    x, y, z = float(row[xid]), float(row[yid]), float(row[zid])
+                    break
+                except ValueError:
+                    continue
+            else:
+                have_all_coords = False
+                x = y = z = None
+            if x is not None:
+                atom.xx, atom.xy, atom.xz = x, y, z
+                xyz.extend([x, y, z])
+            struct.add_atom(atom, resname, resids[resname], '')
+            atommap[(resname, atname)] = atom
+        if have_all_coords:
+            struct._coordinates = np.array(xyz).reshape((-1, len(struct.atoms), 3))
+
+        bonds = cont.getObj('chem_comp_bond')
+        if bonds is None:
+            return False
+        resnameid = bonds.getAttributeIndex('comp_id')
+        atom1id = bonds.getAttributeIndex('atom_id_1')
+        atom2id = bonds.getAttributeIndex('atom_id_2')
+        orderid = bonds.getAttributeIndex('value_order')
+        bond_type_order_map = {
+            "sing": QualitativeBondType.SINGLE, "doub": QualitativeBondType.DOUBLE,
+            "trip": QualitativeBondType.TRIPLE, "quad": QualitativeBondType.QUADRUPLE,
+            "arom": QualitativeBondType.AROMATIC,
+        }
+        nbonds = 0
+        for i in range(bonds.getRowCount()):
+            row = bonds.getRow(i) + ['']
+            a1 = atommap.get((row[resnameid].strip(), row[atom1id].strip()), None)
+            a2 = atommap.get((row[resnameid].strip(), row[atom2id].strip()), None)
+            if a1 is None or a2 is None:
+                LOGGER.warning(
+                    f"Cannot find 1 or more atoms in the bond {row[resnameid]} "
+                    f"{row[atom1id]} -- {row[atom2id]}"
+                )
+                continue
+            order = row[orderid].lower() if orderid != -1 else ''
+            struct.bonds.append(Bond(a1, a2,
+                qualitative_type=bond_type_order_map.get(order, None)))
+            nbonds += 1
+        return nbonds > 0
 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
