@@ -12,3 +12,8 @@ package.json
 .ipynb_checkpoints
 *.egg-info/
 *.so
+__pycache__
+.github
+.vscode
+*.log
+dist/
