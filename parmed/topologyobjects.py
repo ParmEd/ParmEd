@@ -570,6 +570,10 @@ class Atom(_ListItem):
         """ Returns a deep copy of this atom, but not attached to any list """
         return type(self)._copy(self)
 
+    def __deepcopy__(self, *_arg, **_kwargs):
+        """ Returns a deep copy of this atom, but not attached to any list """
+        return type(self)._copy(self)
+
     #===================================================
 
     @property
