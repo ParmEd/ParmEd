@@ -68,7 +68,6 @@ class ChamberParm(AmberParm):
     See Also
     --------
     :class:`AmberParm`
-
     """
 
     _cmap_prefix = "CHARMM_"
