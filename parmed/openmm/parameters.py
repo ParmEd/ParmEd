@@ -497,7 +497,7 @@ class OpenMMParameterSet(ParameterSet, CharmmImproperMatchingMixin, metaclass=Fi
             else:
                 # Store this improper
                 unique_keys[unique_key] = atoms
-                improper_types[atoms] = improper
+                improper_types[atoms] = copy(improper)
 
         self.improper_types = improper_types
 
