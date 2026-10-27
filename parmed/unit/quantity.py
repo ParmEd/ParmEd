@@ -381,11 +381,11 @@ class Quantity(object):
         multiplied by other.
         """
         if is_unit(other):
-            raise NotImplementedError('programmer is surprised __rmul__ was called instead of __mul__')
+            raise TypeError('programmer is surprised __rmul__ was called instead of __mul__')
             # print "R unit * quantity"
         elif is_quantity(other):
             # print "R quantity * quantity"
-            raise NotImplementedError('programmer is surprised __rmul__ was called instead of __mul__')
+            raise TypeError('programmer is surprised __rmul__ was called instead of __mul__')
         else:
             # print "scalar * quantity"
             return self._change_units_with_factor(self.unit, other, post_multiply=True)
@@ -420,9 +420,9 @@ class Quantity(object):
         """
         if is_unit(other):
             # print "R unit / quantity"
-            raise NotImplementedError('programmer is surprised __rtruediv__ was called instead of __truediv__')
+            raise TypeError('programmer is surprised __rtruediv__ was called instead of __truediv__')
         elif is_quantity(other):
-            raise NotImplementedError('programmer is surprised __rtruediv__ was called instead of __truediv__')
+            raise TypeError('programmer is surprised __rtruediv__ was called instead of __truediv__')
         else:
             # print "R scalar / quantity"
             return other * pow(self, -1.0)
