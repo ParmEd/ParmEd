@@ -1066,6 +1066,16 @@ class TestStructureAdd(FileIOTestCase):
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
 
+    def test_multiply_rejects_nonpositive_count(self):
+        """Replication counts must not silently return the original structure."""
+        s1 = create_random_structure(parametrized=False)
+        with self.assertRaises(ValueError):
+            s1 * 0
+        with self.assertRaises(ValueError):
+            s1 * -1
+        with self.assertRaises(ValueError):
+            s1.__imul__(0)
+
     def test_mult_no_valence(self):
         """ Tests addition of two minimal Structure instances """
         s1 = create_random_structure(parametrized=False, novalence=True)

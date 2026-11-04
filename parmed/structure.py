@@ -3708,6 +3708,8 @@ class Structure:
     def __imul__(self, ncopies, other=None):
         if not isinstance(ncopies, int):
             return NotImplemented
+        if ncopies <= 0:
+            raise ValueError('ncopies must be a positive integer')
         # The basic approach here is similar to what we used in __iadd__, except
         # we don't have to extend the type arrays at all -- we just point to the
         # same one that the first copy pointed to.
