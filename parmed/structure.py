@@ -437,6 +437,11 @@ class Structure:
             a = deepcopy(atom)
             c.add_atom(a, res.name, res.number, res.chain,
                        res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in self.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    c.atoms[atom.idx].exclude(c.atoms[partner.idx])
         # Now copy all of the types
         for bt in self.bond_types:
             c.bond_types.append(deepcopy(bt))
@@ -3608,6 +3613,11 @@ class Structure:
             res = atom.residue
             self.add_atom(copy(atom), res.name, res.idx+roffset,
                           res.chain, res.insertion_code, res.segid)
+        # Copy explicit exclusions once per pair
+        for atom in other.atoms:
+            for partner in atom._exclusion_partners:
+                if atom.idx < partner.idx:
+                    self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
 
         def copy_valence_terms(oval, otyp, sval, styp, attrlist, extra_attrs=None):
             """ Copies the valence terms from one list to another;
@@ -3686,6 +3696,10 @@ class Structure:
             nframes = min(ocrd.shape[0], mycrd.shape[0])
             self._coordinates = np.concatenate(
                 (mycrd[:nframes, :, :], ocrd[:nframes, :, :]), axis=1)
+        # Adding to an empty structure should preserve the other's periodic
+        # box, just as it preserves its atoms and coordinates.
+        if aoffset == 0:
+            self._box = deepcopy(other._box)
         return self
 
     def __mul__(self, ncopies):
@@ -3698,6 +3712,8 @@ class Structure:
     def __imul__(self, ncopies, other=None):
         if not isinstance(ncopies, int):
             return NotImplemented
+        if ncopies <= 0:
+            raise ValueError('ncopies must be a positive integer')
         # The basic approach here is similar to what we used in __iadd__, except
         # we don't have to extend the type arrays at all -- we just point to the
         # same one that the first copy pointed to.
@@ -3733,6 +3749,11 @@ class Structure:
                 res = atom.residue
                 self.add_atom(copy(atom), res.name, res.idx+roffset, res.chain,
                               res.insertion_code, res.segid)
+            # Copy explicit exclusions once per pair
+            for atom in other.atoms:
+                for partner in atom._exclusion_partners:
+                    if atom.idx < partner.idx:
+                        self.atoms[atom.idx+aoffset].exclude(self.atoms[partner.idx+aoffset])
             copy_valence_terms(other.bonds, aoffset, self.bonds,
                                self.bond_types, ['atom1', 'atom2'],
                                ['order', 'qualitative_type'])

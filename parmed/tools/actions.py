@@ -1114,6 +1114,9 @@ class changeLJSingleType(Action):
         ntypes = self.parm.ptr('NTYPES')
         for i in range(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+attype-1] - 1
+            if lj_index < 0:
+                # 10-12 (HBOND) pair, e.g. water OW-HW: no A/B entry to change
+                continue
             rij = self.parm.LJ_radius[i] + self.radius
             wij = math.sqrt(self.parm.LJ_depth[i] * self.depth)
             acoef = wij * rij ** 12
@@ -2254,10 +2257,14 @@ class printLJMatrix(Action):
             for ty2 in range(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
                 idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(type1-1)+type2-1]
-                acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
-                bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
-                if has_1264:
-                    ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
+                if idx < 0:
+                    # 10-12 (HBOND) pair, e.g. water OW-HW: no 12-6(-4) term
+                    acoef = bcoef = ccoef = 0.0
+                else:
+                    acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
+                    bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
+                    if has_1264:
+                        ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
                 if bcoef == 0 or acoef == 0:
                     rij = eij = 0.0
                 else:
@@ -4324,6 +4331,9 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
 
     # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
     term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
+    if term_idx < 0:
+        raise ChangeLJPairError(f'Atom types {a1} and {a2} interact through a 10-12 '
+                                '(HBOND) term; there is no LJ pair term to change')
 
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data[f'{key}_ACOEF'][term_idx] = eps * rmin**12
@@ -4343,6 +4353,9 @@ def _change_c4_atom_type_pair(parm, atom_1, atom_2, c4):
 
     # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
     term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
+    if term_idx < 0:
+        raise ChangeC4AtomTypePairError(f'Atom types {a1} and {a2} interact through a '
+                                        '10-12 (HBOND) term; there is no C4 term to change')
 
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data[f'LENNARD_JONES_CCOEF'][term_idx] = c4
