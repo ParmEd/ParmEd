@@ -862,6 +862,18 @@ class TestStructureAdd(FileIOTestCase):
         s2 += s1
         self._check_sum(s2, structure.Structure(), s1)
 
+    def test_add_to_empty_structure_preserves_box(self):
+        """Adding a periodic structure to an empty one keeps its unit cell."""
+        s1 = structure.Structure()
+        s1.add_atom(Atom(name='C', atomic_number=6, mass=12.0), 'MOL', 1)
+        s1.coordinates = [[0.0, 0.0, 0.0]]
+        s1.box = [10.0, 11.0, 12.0, 90.0, 90.0, 90.0]
+
+        s2 = structure.Structure()
+        s2 += s1
+
+        np.testing.assert_array_equal(s2.box, s1.box)
+
     def test_iadd(self):
         """ Tests in-place addition of two Structure instances """
         s1 = create_random_structure(parametrized=True)

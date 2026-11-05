@@ -3696,6 +3696,10 @@ class Structure:
             nframes = min(ocrd.shape[0], mycrd.shape[0])
             self._coordinates = np.concatenate(
                 (mycrd[:nframes, :, :], ocrd[:nframes, :, :]), axis=1)
+        # Adding to an empty structure should preserve the other's periodic
+        # box, just as it preserves its atoms and coordinates.
+        if aoffset == 0:
+            self._box = deepcopy(other._box)
         return self
 
     def __mul__(self, ncopies):
