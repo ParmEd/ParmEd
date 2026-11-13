@@ -1455,8 +1455,16 @@ class TestStructureSave(FileIOTestCase):
 
     def test_save_psf2(self):
         """ Test saving PSF file for unparametrized system """
-        url = 'http://ambermd.org/tutorials/advanced/tutorial1/files/polyAT.pdb'
-        pmd.load_file(url).save(self.get_fn('test.psf', written=True))
+        # Use bundled nucleic acid coordinates to avoid a network dependency.
+        pdb = pmd.load_file(get_fn('gaucu.pdb'))
+        fname = self.get_fn('test.psf', written=True)
+        pdb.save(fname)
+        psf = pmd.load_file(fname)
+        self.assertEqual([a.name for a in pdb.atoms],
+                         [a.name for a in psf.atoms])
+        self.assertEqual([r.name for r in pdb.residues],
+                         [r.name for r in psf.residues])
+        self.assertEqual(len(pdb.bonds), len(psf.bonds))
 
     def test_save_gro(self):
         """ Test saving various Structure instances as a PDB """
