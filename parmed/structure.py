@@ -1621,6 +1621,7 @@ class Structure:
                 d.type = dtl
         # Now drop the new dihedral types into place
         self.dihedral_types = new_dihedral_types
+        self.dihedral_types.claim()
         # Remove the "duplicate" dihedrals
         for i in reversed(dihedrals_to_delete):
             self.dihedrals[i].delete()
