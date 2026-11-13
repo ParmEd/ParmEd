@@ -513,6 +513,33 @@ class TestStructureAPI(unittest.TestCase):
         self.assertEqual(len(s[0].dihedral_partners), 3)
         self.assertEqual(len(s[0].dihedrals), 1)
 
+    def test_join_dihedrals_copy(self):
+        """ Tests copying distinct joined dihedral parameter lists """
+        s = self.s
+        dt1 = DihedralType(10, 2, 0)
+        dt2 = DihedralType(12, 1, 180)
+        dt3 = DihedralType(13, 3, 0)
+        s.dihedrals.append(Dihedral(s[0], s[1], s[2], s[3], type=dt1))
+        s.dihedrals.append(Dihedral(s[3], s[2], s[1], s[0], type=dt2))
+        s.dihedrals.append(Dihedral(s[4], s[5], s[6], s[7], type=dt3))
+        s.dihedral_types.extend([dt1, dt2, dt3])
+        s.dihedral_types.claim()
+        s.join_dihedrals()
+        expected = [[dt1, dt2], [dt3]]
+        for copied, count in ((copy(s), 1), (s + s, 2)):
+            self.assertEqual([d.type for d in copied.dihedrals],
+                             expected * count)
+            for d in copied.dihedrals:
+                self.assertIs(d.type, copied.dihedral_types[d.type.idx])
+                self.assertIs(d.type.list, copied.dihedral_types)
+        split = s.copy(structure.Structure, split_dihedrals=True)
+        self.assertEqual([d.type for d in split.dihedrals], [dt1, dt2, dt3])
+        for i, typ in enumerate(s.dihedral_types):
+            self.assertEqual(typ.idx, i)
+            self.assertIs(typ.list, s.dihedral_types)
+        s.join_dihedrals()
+        self.assertEqual([d.type for d in s.dihedrals], expected)
+
     def test_prune_empty(self):
         """ Tests the prune_empty_terms function """
         s = create_random_structure(parametrized=True)
@@ -1428,8 +1455,16 @@ class TestStructureSave(FileIOTestCase):
 
     def test_save_psf2(self):
         """ Test saving PSF file for unparametrized system """
-        url = 'http://ambermd.org/tutorials/advanced/tutorial1/files/polyAT.pdb'
-        pmd.load_file(url).save(self.get_fn('test.psf', written=True))
+        # Use bundled nucleic acid coordinates to avoid a network dependency.
+        pdb = pmd.load_file(get_fn('gaucu.pdb'))
+        fname = self.get_fn('test.psf', written=True)
+        pdb.save(fname)
+        psf = pmd.load_file(fname)
+        self.assertEqual([a.name for a in pdb.atoms],
+                         [a.name for a in psf.atoms])
+        self.assertEqual([r.name for r in pdb.residues],
+                         [r.name for r in psf.residues])
+        self.assertEqual(len(pdb.bonds), len(psf.bonds))
 
     def test_save_gro(self):
         """ Test saving various Structure instances as a PDB """
