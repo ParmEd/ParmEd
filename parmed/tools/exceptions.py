@@ -2,7 +2,7 @@
 __all__ = [
     'ParmedError', 'ParmedWarning', 'InputError', 'ParmError', 'ParmWarning', 'SeriousParmWarning',
     'ChangeRadiiError', 'WriteOFFError', 'ParmedUtilsError', 'ParmedChangeError',
-    'ParmedAddLJTypeError', 'ChangeLJPairError', 'LJ_TypeError', 'ParmedMoleculeError',
+    'ParmedAddLJTypeError', 'ChangeLJPairError', 'ChangeC4AtomTypePairError', 'LJ_TypeError', 'ParmedMoleculeError',
     'ChangeStateError', 'TiMergeError', 'WarningList', 'DeleteDihedralError', 'ArgumentError',
     'NoArgument', 'InterpreterError', 'AmberIncompatibleWarning', 'BadParmWarning', 
     'FixableParmWarning', 'NonfatalWarning', 'NonUniversalWarning', 'MissingDisulfide',
@@ -53,6 +53,9 @@ class ParmedAddLJTypeError(ParmError):
     pass
 
 class ChangeLJPairError(ParmError):
+    pass
+
+class ChangeC4AtomTypePairError(ParmError):
     pass
 
 class LJ_TypeError(ParmError):

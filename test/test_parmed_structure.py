@@ -862,6 +862,18 @@ class TestStructureAdd(FileIOTestCase):
         s2 += s1
         self._check_sum(s2, structure.Structure(), s1)
 
+    def test_add_to_empty_structure_preserves_box(self):
+        """Adding a periodic structure to an empty one keeps its unit cell."""
+        s1 = structure.Structure()
+        s1.add_atom(Atom(name='C', atomic_number=6, mass=12.0), 'MOL', 1)
+        s1.coordinates = [[0.0, 0.0, 0.0]]
+        s1.box = [10.0, 11.0, 12.0, 90.0, 90.0, 90.0]
+
+        s2 = structure.Structure()
+        s2 += s1
+
+        np.testing.assert_array_equal(s2.box, s1.box)
+
     def test_iadd(self):
         """ Tests in-place addition of two Structure instances """
         s1 = create_random_structure(parametrized=True)
@@ -885,6 +897,26 @@ class TestStructureAdd(FileIOTestCase):
 
         s1cp = s1[:]
         self.assertEqual(s1cp.bonds[0].order, 1.25)
+
+    def test_add_bond_order(self):
+        """ Tests that addition and multiplication keep bond orders """
+        from parmed.topologyobjects import QualitativeBondType
+        s1 = create_random_structure(parametrized=True)
+        s2 = create_random_structure(parametrized=True)
+        s2.bonds[0].order = 2.0
+        s2.bonds[0].qualitative_type = QualitativeBondType.DOUBLE
+
+        s = s1 + s2
+        last = s.bonds[-len(s2.bonds)]
+        self.assertEqual(last.order, 2.0)
+        self.assertEqual(last.qualitative_type, QualitativeBondType.DOUBLE)
+
+        s1.bonds[0].order = 3.0
+        s1.bonds[0].qualitative_type = QualitativeBondType.TRIPLE
+        s3 = s1 * 2
+        replica = s3.bonds[len(s1.bonds)]
+        self.assertEqual(replica.order, 3.0)
+        self.assertEqual(replica.qualitative_type, QualitativeBondType.TRIPLE)
 
     def test_add_not_parametrized(self):
         """ Tests addition of two non-parametrized Structure instances """
@@ -1045,6 +1077,16 @@ class TestStructureAdd(FileIOTestCase):
         self.assertIsNot(s1, s3)
         self.assertEqual(len(s3.atoms), len(s1.atoms) * multfac)
         self._check_mult(s3, s1, multfac)
+
+    def test_multiply_rejects_nonpositive_count(self):
+        """Replication counts must not silently return the original structure."""
+        s1 = create_random_structure(parametrized=False)
+        with self.assertRaises(ValueError):
+            s1 * 0
+        with self.assertRaises(ValueError):
+            s1 * -1
+        with self.assertRaises(ValueError):
+            s1.__imul__(0)
 
     def test_mult_no_valence(self):
         """ Tests addition of two minimal Structure instances """

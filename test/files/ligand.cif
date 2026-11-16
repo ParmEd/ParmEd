@@ -1,0 +1,50 @@
+data_LIG
+#
+_chem_comp.id                                    LIG
+_chem_comp.name                                  'test ligand'
+_chem_comp.type                                  non-polymer
+_chem_comp.pdbx_type                             HETAIN
+_chem_comp.formula                               'C2 N1 O3'
+_chem_comp.pdbx_formal_charge                    -1
+_chem_comp.pdbx_release_status                   REL
+_chem_comp.mon_nstd_parent_comp_id               ?
+_chem_comp.pdbx_synonyms                         ?
+_chem_comp.pdbx_modified_date                    2011-06-07
+_chem_comp.pdbx_processing_site                  RCSB
+#
+loop_
+_chem_comp_atom.comp_id
+_chem_comp_atom.atom_id
+_chem_comp_atom.alt_atom_id
+_chem_comp_atom.type_symbol
+_chem_comp_atom.charge
+_chem_comp_atom.pdbx_align
+_chem_comp_atom.pdbx_aromatic_flag
+_chem_comp_atom.pdbx_leaving_atom_flag
+_chem_comp_atom.pdbx_stereo_config
+_chem_comp_atom.model_Cartn_x
+_chem_comp_atom.model_Cartn_y
+_chem_comp_atom.model_Cartn_z
+_chem_comp_atom.pdbx_model_Cartn_x_ideal
+_chem_comp_atom.pdbx_model_Cartn_y_ideal
+_chem_comp_atom.pdbx_model_Cartn_z_ideal
+_chem_comp_atom.pdbx_component_atom_id
+_chem_comp_atom.pdbx_component_comp_id
+_chem_comp_atom.pdbx_ordinal
+LIG C1  C1  C 0  1 N N N 10.000 11.000 12.000 9.900  11.100 12.100 C1  LIG 1
+LIG O1  O1  O -1 1 N N N 11.000 12.000 13.000 10.900 12.100 13.100 O1  LIG 2
+LIG N1  N1  N 0  1 N N N 12.000 13.000 14.000 11.900 13.100 14.100 N1  LIG 3
+LIG O2  O2  O 0  1 N N N 13.000 14.000 15.000 12.900 14.100 15.100 O2  LIG 4
+#
+loop_
+_chem_comp_bond.comp_id
+_chem_comp_bond.atom_id_1
+_chem_comp_bond.atom_id_2
+_chem_comp_bond.value_order
+_chem_comp_bond.pdbx_aromatic_flag
+_chem_comp_bond.pdbx_stereo_config
+_chem_comp_bond.pdbx_ordinal
+LIG C1 O1 sing N N 1
+LIG C1 N1 doub N N 2
+LIG N1 O2 sing N N 3
+#

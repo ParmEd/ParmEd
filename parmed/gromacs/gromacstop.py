@@ -1543,7 +1543,7 @@ class GromacsTopologyFile(Structure, TopFromStructureMixin, metaclass=FileFormat
                     parfile.write('[ dihedraltypes ]\n')
                     parfile.write(';i  j   k  l  func      phase      kd      pn\n')
                     used_keys = set()
-                    conv = u.kilojoules.conversion_factor_to(u.kilocalories)
+                    conv = u.kilocalories.conversion_factor_to(u.kilojoules)
                     fmt = '%-6s %-6s %-6s %-6s  %d   %.2f   %.6f   %d\n'
                     for key, param in params.improper_periodic_types.items():
                         if key in used_keys: continue

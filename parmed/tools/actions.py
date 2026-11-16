@@ -38,7 +38,7 @@ from ..topologyobjects import (
 )
 from .argumentlist import ArgumentList
 from .exceptions import (
-    AddPDBError, AddPDBWarning, AmbiguousParmError, ArgumentError, ChamberError, ChangeLJPairError,
+    AddPDBError, AddPDBWarning, AmbiguousParmError, ArgumentError, ChamberError, ChangeLJPairError, ChangeC4AtomTypePairError,
     ChangeStateError, DeleteDihedralError, FileDoesNotExist, FileExists, HMassRepartitionError,
     IncompatibleParmsError, InputError, LJ12_6_4Error, NoArgument, NonexistentParm, ParmError,
     ParmedChangeError, ParmFileNotFound, ParmWarning, SeriousParmWarning, SetParamError,
@@ -675,6 +675,51 @@ class changeLJ14Pair(Action):
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+class changeC4AtomTypePair(Action):
+    """
+    Changes a particular C4 between an atom-type pair based on a given C4 coeff
+    """
+    usage = '<mask1> <mask2> <C4_coef>'
+    strictly_supported = (AmberParm, ChamberParm)
+    def init(self, arg_list):
+        self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
+        self.mask2 = AmberMask(self.parm, arg_list.get_next_mask())
+        self.c4 = arg_list.get_next_float()
+
+    def __str__(self):
+        return (
+            f'Setting atom-type based C4 {self.mask1}-{self.mask2} interaction to '
+            f'have C4_coef = {self.c4:16.5f}'
+        )
+
+    def execute(self):
+        selection1 = self.mask1.Selection()
+        selection2 = self.mask2.Selection()
+        if sum(selection1) == 0 or sum(selection2) == 0:
+            Action.stderr.write('Skipping empty masks in changeC4AtomTypePair\n')
+            return 0
+        # Make sure we only selected 1 atom type in each mask
+        attype1 = None
+        attype2 = None
+        for i, atom in enumerate(self.parm.atoms):
+            if selection1[i] == 1:
+                if attype1 is None:
+                    attype1 = atom.nb_idx
+                else:
+                    if attype1 != atom.nb_idx:
+                        raise ChangeC4AtomTypePairError('First mask matches multiple atom types!')
+            if selection2[i] == 1:
+                if attype2 is None:
+                    attype2 = atom.nb_idx
+                else:
+                    if attype2 != atom.nb_idx:
+                        raise ChangeC4AtomTypePairError('Second mask matches multiple atom types!')
+        if 'LENNARD_JONES_CCOEF' not in self.parm.flag_list:
+            raise ChangeC4AtomTypePairError('No C4 information in parm. Please use the "add12_6_4" command first.')
+        _change_c4_atom_type_pair(self.parm, attype1, attype2, self.c4)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 class checkValidity(Action):
     """
     Basic checks for prmtop validity.
@@ -1069,6 +1114,9 @@ class changeLJSingleType(Action):
         ntypes = self.parm.ptr('NTYPES')
         for i in range(ntypes):
             lj_index = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*i+attype-1] - 1
+            if lj_index < 0:
+                # 10-12 (HBOND) pair, e.g. water OW-HW: no A/B entry to change
+                continue
             rij = self.parm.LJ_radius[i] + self.radius
             wij = math.sqrt(self.parm.LJ_depth[i] * self.depth)
             acoef = wij * rij ** 12
@@ -2209,10 +2257,14 @@ class printLJMatrix(Action):
             for ty2 in range(1,ntypes+1):
                 type1, type2 = min(ty, ty2), max(ty, ty2)
                 idx = self.parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(type1-1)+type2-1]
-                acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
-                bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
-                if has_1264:
-                    ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
+                if idx < 0:
+                    # 10-12 (HBOND) pair, e.g. water OW-HW: no 12-6(-4) term
+                    acoef = bcoef = ccoef = 0.0
+                else:
+                    acoef = self.parm.parm_data['LENNARD_JONES_ACOEF'][idx-1]
+                    bcoef = self.parm.parm_data['LENNARD_JONES_BCOEF'][idx-1]
+                    if has_1264:
+                        ccoef = self.parm.parm_data['LENNARD_JONES_CCOEF'][idx-1]
                 if bcoef == 0 or acoef == 0:
                     rij = eij = 0.0
                 else:
@@ -3199,7 +3251,7 @@ class add12_6_4(Action):
         Theory Comput., 2021, 17, 2342-2354.
     """
     usage = ('[<ion mask>] [c4file <C4 Param. File> | watermodel <water model>] '
-             '[polfile <Pol. Param File> [tunfactor <tunfactor>]')
+             '[polfile <Pol. Param File> [tunfactor <tunfactor>] [onlywater]')
     strictly_supported = (AmberParm, ChamberParm)
 
     _supported_wms = ('TIP3P', 'TIP4PEW', 'SPCE', 'OPC3', 'OPC', 'FB3', 'FB4')
@@ -3213,7 +3265,9 @@ class add12_6_4(Action):
             'polfile', os.path.join(os.getenv('AMBERHOME') or '', 'dat', 'leap', 'parm', 'lj_1264_pol.dat')
         )
         self.tunfactor = arg_list.get_key_float('tunfactor', 1.0)
+        self.onlywater = arg_list.has_key('onlywater')
 
+        # About C4 file and water model
         if self.c4file is None:
             if self.watermodel is None:
                 self.watermodel = 'TIP3P'
@@ -3227,6 +3281,12 @@ class add12_6_4(Action):
         else:
             if self.watermodel is not None:
                 raise LJ12_6_4Error('c4file and watermodel are mutually exclusive')
+ 
+        # About tunfactor and onlywater
+        if self.onlywater:
+            if self.tunfactor != 0.0:
+                print(f"Note that onlywater will overwrite the tunfactor variable, making tunfactor = 0.0")
+                self.tunfactor = 0.0
 
     def __str__(self):
         retstr = ('Adding Lennard-Jones C-coefficient for 12-6-4 potential. '
@@ -4271,6 +4331,9 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
 
     # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
     term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
+    if term_idx < 0:
+        raise ChangeLJPairError(f'Atom types {a1} and {a2} interact through a 10-12 '
+                                '(HBOND) term; there is no LJ pair term to change')
 
     # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
     parm.parm_data[f'{key}_ACOEF'][term_idx] = eps * rmin**12
@@ -4279,3 +4342,21 @@ def _change_lj_pair(parm, atom_1, atom_2, rmin, eps, c4=None, one_4=False):
     # Change the CCOEF arrays if provided
     if c4 is not None and not one_4:
         parm.parm_data[f'{key}_CCOEF'][term_idx] = c4
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+def _change_c4_atom_type_pair(parm, atom_1, atom_2, c4):
+
+    # Make sure that atom type 1 comes first
+    a1, a2 = sorted([atom_1, atom_2])
+    ntypes = parm.pointers['NTYPES']
+
+    # Find the atom1 - atom2 interaction (adjusting for indexing from 0)
+    term_idx = parm.parm_data['NONBONDED_PARM_INDEX'][ntypes*(a1-1)+a2-1] - 1
+    if term_idx < 0:
+        raise ChangeC4AtomTypePairError(f'Atom types {a1} and {a2} interact through a '
+                                        '10-12 (HBOND) term; there is no C4 term to change')
+
+    # Now change the ACOEF and BCOEF arrays, assuming pre-combined values
+    parm.parm_data[f'LENNARD_JONES_CCOEF'][term_idx] = c4
+

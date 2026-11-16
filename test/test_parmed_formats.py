@@ -1706,6 +1706,31 @@ class TestCIFStructure(FileIOTestCase):
                 formats.CIFFile.parse(get_fn('model_error3.cif'))
         )
 
+    def test_cif_chem_comp(self):
+        """ Test parsing chemical component (ligand) CIF files """
+        cif = formats.load_file(get_fn('ligand.cif'))
+        self.assertEqual(len(cif.atoms), 4)
+        self.assertEqual(len(cif.residues), 1)
+        self.assertEqual(cif.residues[0].name, 'LIG')
+        self.assertEqual(cif.residues[0].number, 1)
+        self.assertEqual([a.name for a in cif.atoms], ['C1', 'O1', 'N1', 'O2'])
+        self.assertEqual([a.atomic_number for a in cif.atoms], [6, 8, 7, 8])
+        self.assertEqual(cif.atoms[1].formal_charge, -1)
+        np.testing.assert_allclose(cif.get_coordinates('all')[0],
+                [[10, 11, 12], [11, 12, 13], [12, 13, 14], [13, 14, 15]])
+        self.assertEqual(len(cif.bonds), 3)
+        self.assertEqual(
+            {(b.atom1.name, b.atom2.name) for b in cif.bonds},
+            {('C1', 'O1'), ('C1', 'N1'), ('N1', 'O2')}
+        )
+        self.assertEqual([b.qualitative_type for b in cif.bonds],
+                [pmd.topologyobjects.QualitativeBondType.SINGLE,
+                 pmd.topologyobjects.QualitativeBondType.DOUBLE,
+                 pmd.topologyobjects.QualitativeBondType.SINGLE])
+        # A CIF file with no atom records at all yields an empty Structure
+        empty = formats.CIFFile.parse(get_fn('empty.cif'))
+        self.assertEqual(len(empty.atoms), 0)
+
     def test_cif_multiple_molecules(self):
         """ Test parsing CIF files with multiple molecules defined """
         # Create a composite CIF file from sample.cif and models.cif (both small

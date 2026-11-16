@@ -2041,6 +2041,60 @@ Basic MD simulation
                        get_saved_fn('Mg_ti1_b_1264.parm7'))
         )
 
+    def test_add12_6_4_onlywater(self):
+        """ Test add12_6_4 action on AmberParm specifying onlywater """
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
+        PT.addLJType(parm, '@14').execute()
+        PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
+        act = PT.add12_6_4(parm, ':MG', 'onlywater', watermodel='TIP4PEW',
+                           polfile=self.get_fn('lj_1264_pol.dat'))
+        self.assertEqual(act.tunfactor, 0.0)
+        act.execute()
+        str(act)
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264_ow.parm7', written=True))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264_ow.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264_ow.parm7'),
+                       relative_error=1e-3)
+        )
+
+    def test_add12_6_4_then_addLJType_10_12_pair(self):
+        """ Test addLJType on a 12-6-4 parm with a 10-12 (water OW-HW) pair """
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
+                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
+        ntypes = parm.ptr('ntypes')
+        nbidx = parm.parm_data['NONBONDED_PARM_INDEX']
+        ow, hw = next((i // ntypes + 1, i % ntypes + 1) for i, x in enumerate(nbidx) if x < 0)
+        mg = parm.atoms[parm.view[':MG'].atoms[0].idx].nb_idx
+        ccoef = parm.parm_data['LENNARD_JONES_CCOEF']
+        mg_ow_c4 = ccoef[nbidx[ntypes*(min(mg, ow)-1)+max(mg, ow)-1]-1]
+        self.assertGreater(mg_ow_c4, 0)
+        # Give one water oxygen a new LJ type copied from OW
+        iow = next(a.idx for a in parm.atoms if a.nb_idx == ow)
+        PT.addLJType(parm, f'@{iow+1}').execute()
+        ntypes = parm.ptr('ntypes')
+        nbidx = parm.parm_data['NONBONDED_PARM_INDEX']
+        ccoef = parm.parm_data['LENNARD_JONES_CCOEF']
+        def c4(t1, t2):
+            return ccoef[nbidx[ntypes*(t1-1)+t2-1]-1]
+        self.assertEqual(c4(hw, ntypes), 0.0)
+        self.assertEqual(c4(mg, ntypes), mg_ow_c4)
+        # printLJMatrix must not print a bogus C4 for the 10-12 OW-HW pair
+        for line in str(PT.printLJMatrix(parm, f'@{iow+1}')).splitlines():
+            if f'[{hw}]' in line and f'[{ntypes}]' in line:
+                self.assertEqual(float(line.split()[6]), 0.0)
+        # The 10-12 pair cannot be changed through the LJ/C4 pair helpers
+        with self.assertRaises(exc.ChangeC4AtomTypePairError):
+            PT.actions._change_c4_atom_type_pair(parm, ow, hw, 1.0)
+        with self.assertRaises(exc.ChangeLJPairError):
+            PT.actions._change_lj_pair(parm, ow, hw, 1.0, 1.0)
+        # changeLJSingleType on OW must not touch unrelated coefficients
+        acoef = parm.parm_data['LENNARD_JONES_ACOEF'][:]
+        PT.changeLJSingleType(parm, f'@{iow+1}', 1.8, 0.2).execute()
+        changed = {i for i, (x, y) in enumerate(zip(acoef, parm.parm_data['LENNARD_JONES_ACOEF'])) if x != y}
+        self.assertTrue(changed <= {nbidx[ntypes*(t-1)+ntypes-1]-1 for t in range(1, ntypes+1)})
+
     def test_add_12_6_4_2metals(self):
         """ Test the add12_6_4 action on AmberParm with 2+ metals """
         parm1 = AmberParm(self.get_fn('mg_na_cl.parm7'))
@@ -2049,6 +2103,24 @@ Basic MD simulation
         PT.add12_6_4(parm2, ':MG,NA,CL', watermodel='TIP3P', polfile=self.get_fn('lj_1264_pol.dat')).execute()
         self.assertEqual(str(PT.printLJMatrix(parm1, ':MG')), saved.PRINTLJMATRIX_MGNACL)
         self.assertEqual(str(PT.printLJMatrix(parm2, ':MG')), saved.PRINTLJMATRIX_NACLMG)
+
+    def test_change_c4_atom_type_pair(self):
+        """ Test changeC4AtomTypePair on AmberParm """
+        parm = AmberParm(self.get_fn('Mg_ti1_b.parm7'))
+        PT.addLJType(parm, '@14').execute()
+        PT.changeLJPair(parm, '@14', ':MG', 3.26, 0.061666).execute()
+        PT.add12_6_4(parm, ':MG', watermodel='TIP4PEW',
+                     polfile=self.get_fn('lj_1264_pol.dat')).execute()
+
+        act = PT.changeC4AtomTypePair(parm, ':WAT@O', ':MG', 100.0)
+        act.execute()
+        str(act)
+        parm.write_parm(self.get_fn('Mg_ti1_b_1264_ow_100.parm7', written=True))
+        self.assertTrue(
+            diff_files(self.get_fn('Mg_ti1_b_1264_ow_100.parm7', written=True),
+                       get_saved_fn('Mg_ti1_b_1264_ow_100.parm7'),
+                       relative_error=1e-3)
+        )
 
     @unittest.skipIf(PYPY, 'NetCDF support does not work on PYPY yet')
     def test_write_coordinates(self):

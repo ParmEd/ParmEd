@@ -63,6 +63,10 @@ class RDKit:
         if not coordinates:
             parm.coordinates = None
             parm._coordinates = None
+        for b1, b2 in zip(parm.bonds, mol.GetBonds()):
+            bond_order = b2.GetBondTypeAsDouble()
+            if bond_order:
+                b1.order = bond_order
         return parm
 
     @staticmethod

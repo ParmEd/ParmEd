@@ -8,7 +8,7 @@ import warnings
 from math import pi, sqrt
 
 from ..constants import DEG_TO_RAD, PrmtopPointers, RAD_TO_DEG, SMALL, TINY
-from ..exceptions import AmberError, AmberWarning
+from ..exceptions import AmberError, AmberWarning, ParameterError
 from ..topologyobjects import BondType, ExtraPoint, Improper, ImproperType, UreyBradley
 from ._amberparm import AmberParm
 
@@ -395,6 +395,8 @@ class ChamberParm(AmberParm):
         for urey_type in self.urey_bradley_types:
             urey_type.used = False
         for urey in self.urey_bradleys:
+            if urey.type is None:
+                raise ParameterError(f'{urey} has no Urey-Bradley type; missing parameters')
             urey.type.used = True
         self.urey_bradley_types.prune_unused()
         data['CHARMM_UREY_BRADLEY_FORCE_CONSTANT'] = \
@@ -419,6 +421,8 @@ class ChamberParm(AmberParm):
         for improper_type in self.improper_types:
             improper_type.used = False
         for improper in self.impropers:
+            if improper.type is None:
+                raise ParameterError(f'{improper} has no improper type; missing parameters')
             improper.type.used = True
         self.improper_types.prune_unused()
         data['CHARMM_IMPROPER_FORCE_CONSTANT'] = \
