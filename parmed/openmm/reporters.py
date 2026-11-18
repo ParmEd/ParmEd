@@ -652,7 +652,7 @@ class ProgressReporter(StateDataReporter):
         Whether to print the system temperature (default True)
     volume : bool, optional
         Whether to print the system volume (default False)
-    density : bool, optional
+    density : bool, ophttps://github.com/ParmEd/ParmEd/pull/1110/conflict?name=parmed%252Famber%252F_chamberparm.py&ancestor_oid=43577934bfb35c9b422b8a9515ae77f07162279b&base_oid=3d4edeb62425dcf3839a1a2dd73c0053e09309ca&head_oid=199b245160d4bad1704189c1195d2e5ba1dc36bbtional
         Whether to print the system density (default False)
     systemMass : float or :class:`unit.Quantity`
         The mass of the system used when reporting density (useful in instances
