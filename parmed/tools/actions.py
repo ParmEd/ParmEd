@@ -18,6 +18,7 @@ except ImportError:
     HAS_RDKIT = False
 
 from .. import gromacs, unit as u, read_PDB
+from ..amber._amberparm import CMAP
 from ..amber import (
     AmberAsciiRestart, AmberMask, AmberMdcrd, AmberParm, AmoebaParm, ChamberParm,
     NetCDFRestart, NetCDFTraj
@@ -336,6 +337,90 @@ class writeFrcmod(Action):
         parmset = AmberParameterSet.from_structure(self.parm)
         title = f'Force field parameters from {os.path.split(str(self.parm))[1]}'
         parmset.write(self.frcmod_name, title=title)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class loadCmap(Action):
+    """
+    Loads a CMAP file so we can edit CMAPS in parmed 
+    """
+    usage = '<cmap_filename>'
+    def init(self, arg_list):
+        self.filename = filename = arg_list.get_next_string()
+        
+    def __str__(self):
+        return f'Loading CMAP file {self.filename}'
+
+    def execute(self):
+        self.parm.load_cmap_frcmod(self.filename)
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class printCmaps(Action):
+    '''
+    print cmaps currently read in and in topology file
+    can print cmap on a given dihedral mask or all 
+    command is printCmap :* to print all cmaps 
+    '''
+    usage = '[<mask> [<mask> [<mask> [<mask>] ] ] ]'
+    def init(self, arg_list):
+        mask = arg_list.get_next_mask(optional=True, default=':*')
+        self.mask = AmberMask(self.parm, mask)
+        arg2 = arg_list.get_next_mask(optional=True)
+        arg3 = arg_list.get_next_mask(optional=True)
+        arg4 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_mask = True
+            all_arg = self.mask
+            print (all_arg)
+            if str(all_arg) != ":*":
+                print ("command is printCmap :* to print all cmaps or specify a mask of 4 atoms")
+        else:
+            self.one_mask = False
+            self.mask2 = AmberMask(self.parm, arg2)
+            if arg3 is None: arg3 = '*'
+            self.mask3 = AmberMask(self.parm, arg3)
+            if arg4 is None: arg4 = '*'
+            self.mask4 = AmberMask(self.parm, arg4)
+
+    def execute(self):
+        self.parm.printCmaps() 
+
+#+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+class assignCmap(Action):
+    usage = '[<mask1> [<mask2> <mask3> <mask4> <mask5>]  <cmaptitle>' 
+    #strictly_supported = (AmberParm)
+    def init(self, arg_list):
+        self.mask1 = AmberMask(self.parm, arg_list.get_next_mask())
+        arg2 = arg_list.get_next_mask(optional=True)
+        if arg2 is None:
+            self.one_mask = True
+            self.cmap_title = arg_list.get_next_string(optional=True).lower()
+            print (f'{self.mask1} {self.cmap_title}')
+        else:
+            self.one_mask = False
+            arg3 = arg_list.get_next_mask(optional=True)
+            arg4 = arg_list.get_next_mask(optional=True)
+            arg5 = arg_list.get_next_mask(optional=True)
+            self.mask2 = AmberMask(self.parm, arg2) 
+            self.mask3 = AmberMask(self.parm, arg3) 
+            self.mask4 = AmberMask(self.parm, arg4) 
+            self.mask5 = AmberMask(self.parm, arg5) 
+            self.cmap_title = arg_list.get_next_string(optional=True).lower()
+            print (f'{self.mask1} {self.mask2} {self.mask3} {self.mask4} {self.mask5} {self.cmap_title}')
+
+    def __str__(self):
+        if self.one_mask == True:
+            return f'Assigning CMAP titled {self.cmap_title} to mask {self.mask1}'
+        else: 
+            return f'Assigning CMAP titled {self.cmap_title} to mask {self.mask1} {self.mask2} {self.mask3} {self.mask4} {self.mask5}'
+ 
+    def execute(self):
+        if self.one_mask == True:
+            self.parm.modify_cmap(self.cmap_title, self.one_mask, self.mask1)
+        else:
+            self.parm.modify_cmap(self.cmap_title, self.one_mask, self.mask1, self.mask2, self.mask3, self.mask4, self.mask5)
 
 #+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
