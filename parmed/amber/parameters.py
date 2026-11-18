@@ -703,9 +703,6 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
         a1, a2, a3, a4, k, phi, per = rematch.groups()
         a1 = a1.strip(); a2 = a2.strip();
         a3 = a3.strip(); a4 = a4.strip()
-        # Pre-sort the improper types, assuming atom3 is the central atom (which
-        # it must be in Amber parameter files!!!!)
-        a1, a2, a4 = sorted([a1, a2, a4])
         key = (a1, a2, a3, a4)
         self.improper_periodic_types[key] = DihedralType(float(k), float(per), float(phi))
 
@@ -821,16 +818,7 @@ class AmberParameterSet(ParameterSet, metaclass=FileFormatType):
         # Write the impropers
         outfile.write('IMPROPER\n')
         written_impropers = dict()
-        for (a1, a2, a3, a4), typ in self.improper_periodic_types.items():
-            # Make sure wild-cards come at the beginning
-            if a2 == 'X':
-                assert a4 == 'X', 'Malformed generic improper!'
-                a1, a2, a3, a4 = a2, a4, a3, a1
-            elif a4 == 'X':
-                a1, a2, a3, a4 = a4, a1, a3, a2
-                a2, a4 = sorted([a2, a4])
-            else:
-                a1, a2, a4 = sorted([a1, a2, a4])
+        for (a1, a2, a3, a4), typ in sorted(self.improper_periodic_types.items()):
             if (a1, a2, a3, a4) in written_impropers:
                 if written_impropers[(a1, a2, a3, a4)] != typ:
                     raise ValueError('Multiple impropers with the same atom set not allowed')
